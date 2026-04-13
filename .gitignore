@@ -35,6 +35,7 @@ yarn-error.log*
 
 # session data (file-based store)
 /data/sessions/
+/data/research/
 
 # vercel
 .vercel

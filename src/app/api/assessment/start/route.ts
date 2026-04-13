@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSession } from '@/lib/db/store';
 import { DIAGNOSTIC_QUESTIONS } from '@/lib/diagnostic/questions';
+import { startBackgroundResearch } from '@/lib/research/engine';
 import type { CompanyProfile } from '@/types/diagnostic';
 
 const REQUIRED_FIELDS: (keyof CompanyProfile)[] = [
@@ -36,6 +37,11 @@ export async function POST(request: NextRequest) {
     }
 
     const session = await createSession(profile);
+
+    // Kick off background research immediately — runs while customer answers questions
+    // This searches SEC filings, news, press releases, leadership interviews, etc.
+    // and uses Claude to synthesize a deep company intelligence profile
+    startBackgroundResearch(session.id, profile);
 
     return NextResponse.json(
       { session, questions: DIAGNOSTIC_QUESTIONS },

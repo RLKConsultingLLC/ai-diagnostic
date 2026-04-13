@@ -9,6 +9,7 @@ import type {
   GeneratedReport,
   ReportSection,
 } from '@/types/diagnostic';
+import type { CompanyResearchProfile } from '@/types/research';
 import {
   SECTION_PROMPTS,
   SECTION_TITLES,
@@ -43,7 +44,8 @@ const MAX_TOKENS = 2048;
 
 export async function generateReportSection(
   sectionSlug: string,
-  result: DiagnosticResult
+  result: DiagnosticResult,
+  research?: CompanyResearchProfile
 ): Promise<string> {
   const promptFn = SECTION_PROMPTS[sectionSlug];
   if (!promptFn) {
@@ -52,7 +54,7 @@ export async function generateReportSection(
     );
   }
 
-  const { system, user } = promptFn(result);
+  const { system, user } = promptFn(result, research);
   const client = getClient();
 
   const response = await client.messages.create({
@@ -82,12 +84,13 @@ export async function generateReportSection(
 // ---------------------------------------------------------------------------
 
 export async function generateFullReport(
-  result: DiagnosticResult
+  result: DiagnosticResult,
+  research?: CompanyResearchProfile
 ): Promise<GeneratedReport> {
-  // Fire all 7 section calls in parallel
+  // Fire all 7 section calls in parallel — enriched with company research if available
   const sectionPromises: Promise<ReportSection>[] = SECTION_ORDER.map(
     async (slug) => {
-      const content = await generateReportSection(slug, result);
+      const content = await generateReportSection(slug, result, research);
       return {
         title: SECTION_TITLES[slug],
         slug,

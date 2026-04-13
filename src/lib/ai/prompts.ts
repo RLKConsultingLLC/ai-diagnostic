@@ -10,6 +10,7 @@ import type {
   StageClassification,
   EconomicEstimate,
 } from '@/types/diagnostic';
+import type { CompanyResearchProfile } from '@/types/research';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -102,8 +103,8 @@ function serializeEconomicEstimate(econ: EconomicEstimate): string {
 - Industry Benchmark: ${econ.industryBenchmark}`;
 }
 
-function buildDiagnosticDataBlock(result: DiagnosticResult): string {
-  return `
+function buildDiagnosticDataBlock(result: DiagnosticResult, research?: CompanyResearchProfile): string {
+  let block = `
 ${serializeCompanyContext(result.companyProfile)}
 
 OVERALL SCORE: ${result.overallScore}/100
@@ -115,6 +116,105 @@ ${serializeCompositeIndices(result.compositeIndices)}
 ${serializeStageClassification(result.stageClassification)}
 
 ${serializeEconomicEstimate(result.economicEstimate)}`;
+
+  if (research) {
+    block += `\n\n${serializeResearchIntelligence(research)}`;
+  }
+
+  return block;
+}
+
+// ---------------------------------------------------------------------------
+// Research intelligence serialization — makes reports deeply custom
+// ---------------------------------------------------------------------------
+
+function serializeResearchIntelligence(research: CompanyResearchProfile): string {
+  const sections: string[] = [];
+
+  sections.push('=== COMPANY INTELLIGENCE (from public sources) ===');
+  sections.push(`Sources consulted: ${research.sourcesConsulted} | Confidence: ${research.confidenceLevel}`);
+
+  if (research.executiveBriefing) {
+    sections.push(`\nEXECUTIVE BRIEFING:\n${research.executiveBriefing}`);
+  }
+
+  if (research.aiPostureAssessment) {
+    sections.push(`\nPUBLIC AI POSTURE:\n${research.aiPostureAssessment}`);
+  }
+
+  if (research.competitivePositionNote) {
+    sections.push(`\nCOMPETITIVE POSITION (from public data):\n${research.competitivePositionNote}`);
+  }
+
+  if (research.recentNews.length > 0) {
+    const newsLines = research.recentNews
+      .filter((n) => n.relevance !== 'low')
+      .slice(0, 5)
+      .map((n) => `- [${n.relevance.toUpperCase()}] ${n.headline} (${n.source}, ${n.date})${n.aiRelated ? ' [AI-RELATED]' : ''}: ${n.summary}`);
+    sections.push(`\nRECENT NEWS:\n${newsLines.join('\n')}`);
+  }
+
+  if (research.aiMentions.length > 0) {
+    const mentionLines = research.aiMentions
+      .slice(0, 5)
+      .map((m) => `- [${m.sentiment}] ${m.context}: "${m.quote}" (${m.source}, ${m.date})`);
+    sections.push(`\nAI MENTIONS IN PUBLIC RECORD:\n${mentionLines.join('\n')}`);
+  }
+
+  if (research.aiInvestments.length > 0) {
+    const investLines = research.aiInvestments
+      .slice(0, 5)
+      .map((i) => `- [${i.category}] ${i.description}${i.amount ? ` ($${i.amount})` : ''} (${i.source}, ${i.date})`);
+    sections.push(`\nAI INVESTMENTS & PARTNERSHIPS:\n${investLines.join('\n')}`);
+  }
+
+  if (research.leadershipInsights.length > 0) {
+    const leaderLines = research.leadershipInsights
+      .slice(0, 4)
+      .map((l) => `- ${l.executiveName} (${l.title}): ${l.context}${l.quote ? `\n  Quote: "${l.quote}"` : ''} (${l.source})`);
+    sections.push(`\nLEADERSHIP SIGNALS:\n${leaderLines.join('\n')}`);
+  }
+
+  if (research.strategicInitiatives.length > 0) {
+    const initLines = research.strategicInitiatives
+      .slice(0, 4)
+      .map((i) => `- ${i.name} [${i.status}]: ${i.description} (AI relevance: ${i.aiRelevance})`);
+    sections.push(`\nSTRATEGIC INITIATIVES:\n${initLines.join('\n')}`);
+  }
+
+  if (research.competitorAIActivity.length > 0) {
+    const compLines = research.competitorAIActivity
+      .slice(0, 4)
+      .map((c) => `- ${c.competitorName}: ${c.activity} → Implication: ${c.implication}`);
+    sections.push(`\nCOMPETITOR AI ACTIVITY:\n${compLines.join('\n')}`);
+  }
+
+  if (research.industryTrends.length > 0) {
+    const trendLines = research.industryTrends
+      .slice(0, 4)
+      .map((t) => `- [${t.timeframe}] ${t.trend}: ${t.relevance}`);
+    sections.push(`\nINDUSTRY AI TRENDS:\n${trendLines.join('\n')}`);
+  }
+
+  if (research.regulatoryDevelopments.length > 0) {
+    const regLines = research.regulatoryDevelopments
+      .slice(0, 3)
+      .map((r) => `- ${r.regulation} (${r.jurisdiction}): ${r.impact}`);
+    sections.push(`\nREGULATORY DEVELOPMENTS:\n${regLines.join('\n')}`);
+  }
+
+  if (research.riskFactors.length > 0) {
+    sections.push(`\nIDENTIFIED RISK FACTORS:\n${research.riskFactors.map((r) => `- ${r}`).join('\n')}`);
+  }
+
+  if (research.opportunities.length > 0) {
+    sections.push(`\nIDENTIFIED OPPORTUNITIES:\n${research.opportunities.map((o) => `- ${o}`).join('\n')}`);
+  }
+
+  sections.push('\n=== END COMPANY INTELLIGENCE ===');
+  sections.push('IMPORTANT: Use this intelligence to make the report specific to this company. Reference actual news, leadership signals, competitor moves, and industry trends by name. The customer should feel this report could only have been written about THEIR company.');
+
+  return sections.join('\n');
 }
 
 // ---------------------------------------------------------------------------
@@ -130,7 +230,7 @@ export interface PromptTemplate {
 // 1. Executive Summary
 // ---------------------------------------------------------------------------
 
-export function executiveSummaryPrompt(result: DiagnosticResult): PromptTemplate {
+export function executiveSummaryPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   return {
     system: SYSTEM_MESSAGE,
     user: `Write a 300-word Executive Summary for the board of ${result.companyProfile.companyName}.
@@ -140,10 +240,10 @@ This is the opening section of an AI Maturity diagnostic report. It must accompl
 2. Deliver the headline financial figure — the unrealized value range (${formatCurrency(result.economicEstimate.unrealizedValueLow)} – ${formatCurrency(result.economicEstimate.unrealizedValueHigh)}) — and frame it as what the board is leaving on the table.
 3. Provide a one-sentence diagnosis: the single most important structural reason this organization is underperforming on AI.
 
-Then provide 2-3 short paragraphs of supporting context that connect the overall score to the dimension-level findings.
+Then provide 2-3 short paragraphs of supporting context that connect the overall score to the dimension-level findings.${research ? '\n\nCRITICAL: You have access to company intelligence below. Reference at least one specific finding — a recent news item, leadership signal, or competitor move — to demonstrate that this report is built on real-world intelligence, not just survey data.' : ''}
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown with a single H2 header: ## Executive Summary
@@ -157,7 +257,7 @@ OUTPUT FORMAT:
 // 2. AI Posture Diagnosis
 // ---------------------------------------------------------------------------
 
-export function aiPostureDiagnosisPrompt(result: DiagnosticResult): PromptTemplate {
+export function aiPostureDiagnosisPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   return {
     system: SYSTEM_MESSAGE,
     user: `Write the AI Posture Diagnosis section for ${result.companyProfile.companyName}.
@@ -167,10 +267,10 @@ This section must analyze each of the five dimensions and explain what the score
 - What the score tells us the organization is NOT doing (gap)
 - What an organization at Stage ${result.stageClassification.primaryStage + 1 > 5 ? 5 : result.stageClassification.primaryStage + 1} would be doing differently
 
-Pay special attention to dimension-level stage divergence. Where one dimension is significantly ahead or behind the others, call that out explicitly — it reveals structural imbalance.
+Pay special attention to dimension-level stage divergence. Where one dimension is significantly ahead or behind the others, call that out explicitly — it reveals structural imbalance.${research ? '\n\nYou have company intelligence from public sources. Where leadership has made public statements about AI, reference them. Where the company has announced AI initiatives, assess whether the diagnostic data supports or contradicts their public narrative.' : ''}
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown starting with H2: ## AI Posture Diagnosis
@@ -186,7 +286,7 @@ OUTPUT FORMAT:
 // 3. Structural Constraints
 // ---------------------------------------------------------------------------
 
-export function structuralConstraintsPrompt(result: DiagnosticResult): PromptTemplate {
+export function structuralConstraintsPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   const authorityFriction = result.compositeIndices.find(
     (i) => i.slug === 'authority_friction'
   );
@@ -211,7 +311,7 @@ Focus areas:
 Do NOT just restate the scores. Explain the organizational dynamics they reveal.
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown starting with H2: ## Structural Constraints
@@ -225,7 +325,7 @@ OUTPUT FORMAT:
 // 4. Financial Impact
 // ---------------------------------------------------------------------------
 
-export function financialImpactPrompt(result: DiagnosticResult): PromptTemplate {
+export function financialImpactPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   const econ = result.economicEstimate;
 
   return {
@@ -245,10 +345,10 @@ Frame this section around three financial narratives:
 2. The Capture Gap — the delta between current capture (${econ.currentCapturePercent}%) and what Stage ${Math.min(result.stageClassification.primaryStage + 1, 5)} organizations in ${formatIndustryLabel(result.companyProfile.industry)} typically capture
 3. The ROI Frame — position the unrealized value against typical AI investment costs to show the return multiple
 
-Use specific dollar amounts, percentages, and timeframes. No vague "significant savings" language.
+Use specific dollar amounts, percentages, and timeframes. No vague "significant savings" language.${research?.financialHighlights ? `\n\nPublic financial data is available. Reference their actual R&D spend, technology budget, or recent financial performance where it strengthens the financial narrative.` : ''}
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown starting with H2: ## Financial Impact
@@ -263,7 +363,7 @@ OUTPUT FORMAT:
 // 5. Competitive Positioning
 // ---------------------------------------------------------------------------
 
-export function competitivePositioningPrompt(result: DiagnosticResult): PromptTemplate {
+export function competitivePositioningPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   return {
     system: SYSTEM_MESSAGE,
     user: `Write the Competitive Positioning section for ${result.companyProfile.companyName}.
@@ -277,10 +377,10 @@ Analysis framework:
 
 Be direct about competitive risk. If the organization is behind, say so plainly. If it has advantages, name them specifically.
 
-The organization is ${result.companyProfile.publicOrPrivate}. ${result.companyProfile.publicOrPrivate === 'public' ? 'Consider shareholder and analyst expectations around AI investment.' : 'Consider how private-company advantages (longer time horizons, less quarterly pressure) can be leveraged.'}
+The organization is ${result.companyProfile.publicOrPrivate}. ${result.companyProfile.publicOrPrivate === 'public' ? 'Consider shareholder and analyst expectations around AI investment.' : 'Consider how private-company advantages (longer time horizons, less quarterly pressure) can be leveraged.'}${research?.competitorAIActivity?.length ? '\n\nCRITICAL: You have specific competitor AI activity data. Name these competitors and their moves. This is what makes this section worth $50K — the customer sees their actual competitive landscape, not generic benchmarks.' : ''}
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown starting with H2: ## Competitive Positioning
@@ -295,7 +395,7 @@ OUTPUT FORMAT:
 // 6. Security & Governance Risk
 // ---------------------------------------------------------------------------
 
-export function securityGovernanceRiskPrompt(result: DiagnosticResult): PromptTemplate {
+export function securityGovernanceRiskPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   const profile = result.companyProfile;
   const workflowScore =
     result.dimensionScores.find((d) => d.dimension === 'workflow_integration')
@@ -321,10 +421,10 @@ Address these risk domains:
 3. Data Governance Gaps — Based on the workflow integration and adoption patterns, what data is likely flowing through AI tools without proper governance?
 4. Board Liability — What questions should the board be asking that they probably are not? What governance structures should exist?
 
-Be specific to their industry and regulatory context. Generic "AI ethics" guidance is worthless here.
+Be specific to their industry and regulatory context. Generic "AI ethics" guidance is worthless here.${research?.regulatoryDevelopments?.length ? '\n\nYou have specific regulatory intelligence. Reference actual regulations and their implications for this company.' : ''}
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown starting with H2: ## Security & Governance Risk
@@ -339,7 +439,7 @@ OUTPUT FORMAT:
 // 7. 90-Day Action Plan
 // ---------------------------------------------------------------------------
 
-export function ninetyDayActionPlanPrompt(result: DiagnosticResult): PromptTemplate {
+export function ninetyDayActionPlanPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
   const weakestDimension = [...result.dimensionScores].sort(
     (a, b) => a.normalizedScore - b.normalizedScore
   )[0];
@@ -371,7 +471,7 @@ Produce 3-5 prioritized actions. Each action MUST include:
 Prioritize based on: (1) highest financial impact, (2) lowest implementation friction, (3) addresses the weakest dimension. Front-load quick wins in Days 1-30.
 
 DIAGNOSTIC DATA:
-${buildDiagnosticDataBlock(result)}
+${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown starting with H2: ## 90-Day Action Plan
@@ -388,7 +488,7 @@ OUTPUT FORMAT:
 
 export const SECTION_PROMPTS: Record<
   string,
-  (result: DiagnosticResult) => PromptTemplate
+  (result: DiagnosticResult, research?: CompanyResearchProfile) => PromptTemplate
 > = {
   'executive-summary': executiveSummaryPrompt,
   'ai-posture-diagnosis': aiPostureDiagnosisPrompt,
