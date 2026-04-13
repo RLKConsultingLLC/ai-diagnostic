@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# session data (file-based store)
+/data/sessions/
+
 # vercel
 .vercel
 

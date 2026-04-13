@@ -1,26 +1,89 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --rlk-navy: #0B1D3A;
+  --rlk-secondary: #364E6E;
+  --rlk-tertiary: #6B7F99;
+  --rlk-accent: #A8B5C4;
+  --rlk-light: #CED5DD;
+  --rlk-body: #2D2D2D;
+  --rlk-offwhite: #F7F8FA;
+  --rlk-white: #FFFFFF;
+
+  --background: var(--rlk-offwhite);
+  --foreground: var(--rlk-body);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-navy: var(--rlk-navy);
+  --color-secondary: var(--rlk-secondary);
+  --color-tertiary: var(--rlk-tertiary);
+  --color-accent: var(--rlk-accent);
+  --color-light: var(--rlk-light);
+  --color-offwhite: var(--rlk-offwhite);
+  --font-sans: Calibri, "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Calibri, "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  color: var(--rlk-navy);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  color: var(--rlk-secondary);
+  font-weight: 600;
+}
+
+h3 {
+  color: var(--rlk-tertiary);
+  font-weight: 600;
+}
+
+/* RLK Gradient Bar — decorative 5-segment header element */
+.rlk-gradient-bar {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    #0B1D3A 0%,
+    #0B1D3A 20%,
+    #364E6E 20%,
+    #364E6E 40%,
+    #6B7F99 40%,
+    #6B7F99 60%,
+    #A8B5C4 60%,
+    #A8B5C4 80%,
+    #CED5DD 80%,
+    #CED5DD 100%
+  );
+}
+
+/* Thicker variant for hero sections */
+.rlk-gradient-bar-thick {
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    #0B1D3A 0%,
+    #0B1D3A 20%,
+    #364E6E 20%,
+    #364E6E 40%,
+    #6B7F99 40%,
+    #6B7F99 60%,
+    #A8B5C4 60%,
+    #A8B5C4 80%,
+    #CED5DD 80%,
+    #CED5DD 100%
+  );
 }
