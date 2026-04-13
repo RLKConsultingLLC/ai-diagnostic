@@ -598,7 +598,7 @@ export default function AssessmentPage() {
             href="/"
             className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
           >
-            RLK Consulting
+            RLK AI Diagnostic
           </Link>
           <div className="text-xs text-tertiary">{headerLabel}</div>
         </div>
