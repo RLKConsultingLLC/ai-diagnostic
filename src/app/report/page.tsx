@@ -272,7 +272,7 @@ function ReportPage() {
                   Redirecting to Checkout...
                 </>
               ) : (
-                "Purchase Full Report -- $497"
+                "Purchase Full Report: $497"
               )}
             </button>
             <p className="text-white/40 text-xs mt-4">
@@ -426,7 +426,7 @@ function StageDisplay({ stage }: { stage: StageClassification }) {
       </p>
       {stage.confidence < 0.7 && (
         <p className="text-xs text-tertiary mt-3">
-          Confidence: {Math.round(stage.confidence * 100)}% — Dimension
+          Confidence: {Math.round(stage.confidence * 100)}%. Dimension
           scores show significant variance, suggesting mixed maturity across
           organizational areas.
         </p>
@@ -521,7 +521,7 @@ function EconomicSummary({ estimate }: { estimate: EconomicEstimate }) {
           Estimated Unrealized Annual Value
         </p>
         <div className="text-2xl md:text-3xl font-bold text-navy">
-          {fmt(estimate.unrealizedValueLow)} &ndash;{" "}
+          {fmt(estimate.unrealizedValueLow)} to{" "}
           {fmt(estimate.unrealizedValueHigh)}
         </div>
       </div>

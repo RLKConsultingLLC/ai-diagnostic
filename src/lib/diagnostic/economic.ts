@@ -191,7 +191,7 @@ function buildBenchmarkNarrative(
     `Organizations at the "${stageLabel}" stage in your industry typically capture ` +
     `approximately ${capturePercent}% of their potential AI value. ` +
     `For an organization of your size and industry, this represents an estimated ` +
-    `${formatCurrency(unrealizedLow)}–${formatCurrency(unrealizedHigh)} in unrealized annual value, ` +
+    `${formatCurrency(unrealizedLow)} to ${formatCurrency(unrealizedHigh)} in unrealized annual value, ` +
     `equivalent to approximately ${unrealizedPercent.toFixed(1)}% of revenue. ` +
     `Advancing one stage would roughly double your capture rate.`
   );
@@ -205,7 +205,7 @@ export function formatEconomicSummary(estimate: EconomicEstimate): string {
   return (
     `Productivity Potential: ${estimate.productivityPotentialPercent}% of addressable labor cost\n` +
     `Current Capture Rate: ${estimate.currentCapturePercent}%\n` +
-    `Unrealized Value: ${formatCurrency(estimate.unrealizedValueLow)}–${formatCurrency(estimate.unrealizedValueHigh)} annually\n` +
+    `Unrealized Value: ${formatCurrency(estimate.unrealizedValueLow)} to ${formatCurrency(estimate.unrealizedValueHigh)} annually\n` +
     `Wasted Hours: ${estimate.annualWastedHours.toLocaleString()} hours/year`
   );
 }

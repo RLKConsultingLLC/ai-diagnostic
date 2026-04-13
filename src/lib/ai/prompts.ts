@@ -24,7 +24,8 @@ Rules you must follow in every response:
 - Never hedge with "it depends" or "consider exploring." State what to do.
 - Use specific numbers from the diagnostic data provided. Do not invent statistics.
 - Write in markdown with headers. Do not use bullet-point walls — use short, punchy paragraphs.
-- Tone: authoritative, direct, peer-level. No jargon. No filler.`;
+- Tone: authoritative, direct, peer-level. No jargon. No filler.
+- Never use em dashes or double dashes. Use commas, periods, or colons instead.`;
 
 function formatCurrency(value: number): string {
   if (value >= 1_000_000_000) {
@@ -97,7 +98,7 @@ function serializeEconomicEstimate(econ: EconomicEstimate): string {
   return `ECONOMIC ESTIMATE:
 - Productivity Potential: ${econ.productivityPotentialPercent}%
 - Current Capture: ${econ.currentCapturePercent}%
-- Unrealized Value Range: ${formatCurrency(econ.unrealizedValueLow)} – ${formatCurrency(econ.unrealizedValueHigh)}
+- Unrealized Value Range: ${formatCurrency(econ.unrealizedValueLow)} to ${formatCurrency(econ.unrealizedValueHigh)}
 - Annual Wasted Hours: ${econ.annualWastedHours.toLocaleString()}
 - Cost Per Employee: ${formatCurrency(econ.costPerEmployee)}
 - Industry Benchmark: ${econ.industryBenchmark}`;

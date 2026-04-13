@@ -87,3 +87,130 @@ h3 {
     #CED5DD 100%
   );
 }
+
+/* ================================================================
+   RLK Diagonal Stripe Dividers
+   Bold angled gradient bars used as section transitions.
+   5 color segments rendered at a steep diagonal.
+   ================================================================ */
+
+.rlk-diagonal-divider {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+}
+
+.rlk-diagonal-divider::before {
+  content: "";
+  position: absolute;
+  inset: -40% 0;
+  background: linear-gradient(
+    to right,
+    #0B1D3A 0%,
+    #0B1D3A 20%,
+    #364E6E 20%,
+    #364E6E 40%,
+    #6B7F99 40%,
+    #6B7F99 60%,
+    #A8B5C4 60%,
+    #A8B5C4 80%,
+    #CED5DD 80%,
+    #CED5DD 100%
+  );
+  transform: skewY(-4deg);
+  transform-origin: top left;
+}
+
+/* Reverse angle: lower-left to upper-right */
+.rlk-diagonal-divider-reverse {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+}
+
+.rlk-diagonal-divider-reverse::before {
+  content: "";
+  position: absolute;
+  inset: -40% 0;
+  background: linear-gradient(
+    to right,
+    #0B1D3A 0%,
+    #0B1D3A 20%,
+    #364E6E 20%,
+    #364E6E 40%,
+    #6B7F99 40%,
+    #6B7F99 60%,
+    #A8B5C4 60%,
+    #A8B5C4 80%,
+    #CED5DD 80%,
+    #CED5DD 100%
+  );
+  transform: skewY(4deg);
+  transform-origin: top right;
+}
+
+/* Navy-to-white transition (dark section above, light section below) */
+.rlk-diagonal-navy-to-white {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  background: var(--rlk-white);
+}
+
+.rlk-diagonal-navy-to-white::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    #0B1D3A 0%,
+    #0B1D3A 20%,
+    #364E6E 20%,
+    #364E6E 40%,
+    #6B7F99 40%,
+    #6B7F99 60%,
+    #A8B5C4 60%,
+    #A8B5C4 80%,
+    #CED5DD 80%,
+    #CED5DD 100%
+  );
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 0 80%);
+}
+
+/* White-to-navy transition (light section above, dark section below) */
+.rlk-diagonal-white-to-navy {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  background: var(--rlk-navy);
+}
+
+.rlk-diagonal-white-to-navy::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -60%;
+  background: linear-gradient(
+    to right,
+    #CED5DD 0%,
+    #CED5DD 20%,
+    #A8B5C4 20%,
+    #A8B5C4 40%,
+    #6B7F99 40%,
+    #6B7F99 60%,
+    #364E6E 60%,
+    #364E6E 80%,
+    #0B1D3A 80%,
+    #0B1D3A 100%
+  );
+  clip-path: polygon(0 20%, 100% 60%, 100% 100%, 0 100%);
+}

@@ -79,6 +79,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Diagonal Divider: Hero -> Feature Columns */}
+      <div className="rlk-diagonal-divider" />
+
       {/* Feature Columns */}
       <section className="bg-offwhite py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
@@ -114,7 +117,7 @@ export default function Home() {
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed">
                 Move beyond technology audits. We assess how your people actually
-                use AI -- adoption patterns, authority structures, and workflow
+                use AI, including adoption patterns, authority structures, and workflow
                 integration at every level of your organization.
               </p>
             </div>
@@ -208,6 +211,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Diagonal Divider: Social Proof -> How It Works */}
+      <div className="rlk-diagonal-divider-reverse" />
 
       {/* How It Works */}
       <section id="how-it-works" className="bg-offwhite py-20 md:py-24">
@@ -377,6 +383,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Diagonal Divider: Pricing -> Footer (white to navy) */}
+      <div className="rlk-diagonal-white-to-navy" />
 
       {/* Footer */}
       <footer className="bg-navy text-white/70 py-14">

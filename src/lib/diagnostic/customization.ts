@@ -140,7 +140,7 @@ export function getSizeContext(employeeCount: number): {
   if (employeeCount < 20000) {
     return {
       sizeCategory: 'large_enterprise',
-      complexityNarrative: 'Large enterprise AI adoption requires balancing centralized governance with distributed execution. The "frozen middle" — where middle management neither blocks nor enables — is the primary change management challenge.',
+      complexityNarrative: 'Large enterprise AI adoption requires balancing centralized governance with distributed execution. The "frozen middle," where middle management neither blocks nor enables, is the primary change management challenge.',
       changeManagementNote: 'Change management at enterprise scale requires systematic approaches including executive alignment, middle-management enablement, and frontline engagement.',
     };
   }
@@ -166,7 +166,7 @@ export function getPublicPrivateContext(
   }
   return {
     boardNarrative: 'As a private company, you have the advantage of longer time horizons for AI investment without quarterly earnings pressure. This should translate into more ambitious, multi-year AI strategies that create durable competitive advantage.',
-    financialFraming: 'AI investments should be framed in terms of enterprise value creation, competitive positioning, and operational efficiency — metrics that drive valuation multiples.',
+    financialFraming: 'AI investments should be framed in terms of enterprise value creation, competitive positioning, and operational efficiency: metrics that drive valuation multiples.',
   };
 }
 
@@ -200,7 +200,7 @@ export const INDUSTRY_THEMES: Record<Industry, {
   },
   manufacturing: {
     primaryValueDriver: 'Predictive maintenance, quality control, supply chain optimization, and production efficiency.',
-    competitiveThreat: 'Smart manufacturing and Industry 4.0 leaders are achieving 10–20% efficiency advantages that compound annually.',
+    competitiveThreat: 'Smart manufacturing and Industry 4.0 leaders are achieving 10 to 20% efficiency advantages that compound annually.',
     regulatoryContext: 'Manufacturing AI faces quality management system requirements and industry-specific safety standards.',
     keyUseCases: ['predictive maintenance', 'quality inspection', 'supply chain optimization', 'demand forecasting', 'process optimization'],
   },
@@ -218,7 +218,7 @@ export const INDUSTRY_THEMES: Record<Industry, {
   },
   professional_services: {
     primaryValueDriver: 'Knowledge worker augmentation, project efficiency, client delivery acceleration, and expertise scaling.',
-    competitiveThreat: 'Firms that augment their professionals with AI can deliver faster, with higher quality, at lower cost — fundamentally changing competitive dynamics and pricing models.',
+    competitiveThreat: 'Firms that augment their professionals with AI can deliver faster, with higher quality, at lower cost, fundamentally changing competitive dynamics and pricing models.',
     regulatoryContext: 'Professional liability and client confidentiality obligations shape AI deployment in advisory and consulting contexts.',
     keyUseCases: ['document analysis', 'research automation', 'knowledge management', 'proposal generation', 'client analytics'],
   },

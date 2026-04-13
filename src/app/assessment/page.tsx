@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type {
@@ -8,6 +8,7 @@ import type {
   CompanyProfile,
   DiagnosticQuestion,
   AssessmentResponse,
+  Dimension,
 } from "@/types/diagnostic";
 
 // ---------------------------------------------------------------------------
@@ -52,177 +53,100 @@ const REGULATORY_OPTIONS: {
   { value: "very_high", label: "Very High" },
 ];
 
-// Placeholder diagnostic questions. The real set comes from the API in production;
-// this gives a representative sample so the UI is functional end-to-end.
-const QUESTIONS: DiagnosticQuestion[] = [
-  {
-    id: "ab_01",
-    dimension: "adoption_behavior",
-    text: "How would you characterize employee AI tool usage across your organization?",
-    subtext:
-      "Consider both sanctioned and unsanctioned tools, from generative AI to embedded features.",
-    options: [
-      { text: "Virtually no one uses AI tools in their daily work", score: 1 },
-      { text: "A small group of early adopters experiment on their own", score: 2 },
-      { text: "Several departments have adopted AI tools with varying success", score: 3 },
-      { text: "Most teams use AI tools regularly with documented workflows", score: 4 },
-      { text: "AI is deeply embedded in most workflows across the organization", score: 5 },
-    ],
-    weight: 1.0,
-    tags: ["adoption", "behavioral"],
-  },
-  {
-    id: "ab_02",
-    dimension: "adoption_behavior",
-    text: "When a new AI capability becomes available, how does your organization typically respond?",
-    subtext: "Think about the last 2-3 AI tools or features introduced.",
-    options: [
-      { text: "New AI tools are generally ignored or blocked", score: 1 },
-      { text: "Individual enthusiasts try them; no organizational response", score: 2 },
-      { text: "IT evaluates them but rollout is slow and inconsistent", score: 3 },
-      { text: "There is a defined evaluation and rollout process", score: 4 },
-      { text: "Rapid, structured evaluation with clear adoption pathways", score: 5 },
-    ],
-    weight: 1.0,
-    tags: ["adoption", "process"],
-  },
-  {
-    id: "as_01",
-    dimension: "authority_structure",
-    text: "Who has decision-making authority over AI investments and implementation?",
-    subtext:
-      "Consider both formal authority (budget, policy) and informal influence.",
-    options: [
-      { text: "No clear ownership; decisions happen ad hoc", score: 1 },
-      { text: "IT department controls most AI decisions unilaterally", score: 2 },
-      { text: "Shared between IT and business units, but often contentious", score: 3 },
-      { text: "Cross-functional governance with clear accountability", score: 4 },
-      { text: "Federated model with executive oversight and business-unit autonomy", score: 5 },
-    ],
-    weight: 1.2,
-    tags: ["authority", "governance"],
-  },
-  {
-    id: "as_02",
-    dimension: "authority_structure",
-    text: "How are AI policies (acceptable use, data governance, ethics) established and enforced?",
-    options: [
-      { text: "No formal AI policies exist", score: 1 },
-      { text: "Informal guidelines exist but are not enforced", score: 2 },
-      { text: "Written policies exist but compliance is inconsistent", score: 3 },
-      { text: "Clear policies with regular training and enforcement", score: 4 },
-      { text: "Comprehensive framework with continuous monitoring and adaptation", score: 5 },
-    ],
-    weight: 1.1,
-    tags: ["authority", "policy"],
-  },
-  {
-    id: "wi_01",
-    dimension: "workflow_integration",
-    text: "To what extent are AI tools integrated into core business processes?",
-    subtext:
-      "Core processes = those directly tied to revenue, customer experience, or compliance.",
-    options: [
-      { text: "AI is not part of any core business process", score: 1 },
-      { text: "AI is used in peripheral tasks (e.g., note-taking, summarization)", score: 2 },
-      { text: "AI supports some core processes but is not essential to them", score: 3 },
-      { text: "AI is integral to several core processes with fallback procedures", score: 4 },
-      { text: "AI is deeply embedded in most core processes and continuously optimized", score: 5 },
-    ],
-    weight: 1.0,
-    tags: ["workflow", "integration"],
-  },
-  {
-    id: "wi_02",
-    dimension: "workflow_integration",
-    text: "How well do your AI systems integrate with existing enterprise software and data infrastructure?",
-    options: [
-      { text: "AI tools are standalone; no integration with existing systems", score: 1 },
-      { text: "Basic integrations exist but require manual data transfer", score: 2 },
-      { text: "Some API-level integrations but significant gaps remain", score: 3 },
-      { text: "Well-integrated with most systems; unified data pipelines", score: 4 },
-      { text: "Fully integrated ecosystem with real-time data flow and automated orchestration", score: 5 },
-    ],
-    weight: 1.0,
-    tags: ["workflow", "infrastructure"],
-  },
-  {
-    id: "dv_01",
-    dimension: "decision_velocity",
-    text: "How quickly can your organization move from an AI insight to an operational decision?",
-    subtext:
-      "Consider a typical scenario where an AI model surfaces a recommendation.",
-    options: [
-      { text: "AI-generated insights are rarely acted upon", score: 1 },
-      { text: "Insights are reviewed but decisions take weeks or months", score: 2 },
-      { text: "Moderate speed -- decisions within days for non-critical items", score: 3 },
-      { text: "Fast decision cycle; AI recommendations are acted on within hours to a day", score: 4 },
-      { text: "Near-real-time; AI recommendations automatically trigger or accelerate decisions", score: 5 },
-    ],
-    weight: 1.2,
-    tags: ["velocity", "decision"],
-  },
-  {
-    id: "dv_02",
-    dimension: "decision_velocity",
-    text: "How effectively does your leadership team use AI-generated data in strategic decisions?",
-    options: [
-      { text: "Leadership does not use AI outputs in decision-making", score: 1 },
-      { text: "AI data is occasionally referenced but not trusted", score: 2 },
-      { text: "AI data informs some decisions but is supplemented heavily by intuition", score: 3 },
-      { text: "AI data is a key input in most strategic discussions", score: 4 },
-      { text: "AI-driven insights are central to strategy with executive confidence in the models", score: 5 },
-    ],
-    weight: 1.1,
-    tags: ["velocity", "leadership"],
-  },
-  {
-    id: "et_01",
-    dimension: "economic_translation",
-    text: "Can you quantify the financial return on your AI investments?",
-    subtext:
-      "Consider direct savings, revenue growth, efficiency gains, or risk reduction.",
-    options: [
-      { text: "We have no way to measure AI ROI", score: 1 },
-      { text: "We have anecdotal evidence of value but no formal measurement", score: 2 },
-      { text: "Some initiatives have measured ROI; others do not", score: 3 },
-      { text: "Most AI initiatives have defined KPIs and regular ROI reporting", score: 4 },
-      { text: "Comprehensive ROI framework with real-time value tracking across all AI investments", score: 5 },
-    ],
-    weight: 1.3,
-    tags: ["economic", "measurement"],
-  },
-  {
-    id: "et_02",
-    dimension: "economic_translation",
-    text: "How does your organization allocate budget for AI initiatives?",
-    options: [
-      { text: "No dedicated AI budget; funded ad hoc from departmental budgets", score: 1 },
-      { text: "Small exploratory budget controlled by IT", score: 2 },
-      { text: "Dedicated AI budget but inconsistent allocation criteria", score: 3 },
-      { text: "Strategic AI budget with business-case-driven allocation", score: 4 },
-      { text: "Dynamic portfolio approach with stage-gate funding tied to measurable outcomes", score: 5 },
-    ],
-    weight: 1.0,
-    tags: ["economic", "budget"],
-  },
+const DIMENSION_ORDER: Dimension[] = [
+  "adoption_behavior",
+  "authority_structure",
+  "workflow_integration",
+  "decision_velocity",
+  "economic_translation",
 ];
+
+const DIMENSION_META: Record<
+  Dimension,
+  { label: string; description: string }
+> = {
+  adoption_behavior: {
+    label: "Adoption Behavior",
+    description:
+      "How AI tools are discovered, adopted, and used across your organization.",
+  },
+  authority_structure: {
+    label: "Authority Structure",
+    description:
+      "Governance models, decision rights, and policy frameworks for AI.",
+  },
+  workflow_integration: {
+    label: "Workflow Integration",
+    description:
+      "How deeply AI is embedded into core business processes and systems.",
+  },
+  decision_velocity: {
+    label: "Decision Velocity",
+    description:
+      "Speed and effectiveness of translating AI insights into action.",
+  },
+  economic_translation: {
+    label: "Economic Translation",
+    description:
+      "Ability to measure, quantify, and capture financial value from AI.",
+  },
+};
+
+// Research status messages to cycle through
+const RESEARCH_STATUS_MESSAGES = [
+  "Background research in progress...",
+  "Analyzing SEC filings...",
+  "Gathering industry intelligence...",
+  "Benchmarking against peers...",
+  "Compiling market data...",
+  "Reviewing regulatory landscape...",
+  "Mapping competitive positioning...",
+];
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+type Step = "intake" | "questions" | "dimension_transition" | "review";
+
+interface DimensionGroup {
+  dimension: Dimension;
+  questions: DiagnosticQuestion[];
+}
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-
-type Step = "intake" | "questions" | "review";
 
 export default function AssessmentPage() {
   const router = useRouter();
 
   // -- Navigation state
   const [step, setStep] = useState<Step>("intake");
-  const [currentQ, setCurrentQ] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // -- Questions from API
+  const [questions, setQuestions] = useState<DiagnosticQuestion[]>([]);
+  const [dimensionGroups, setDimensionGroups] = useState<DimensionGroup[]>([]);
+
+  // -- Dimension-based navigation
+  const [currentDimIndex, setCurrentDimIndex] = useState(0);
+  const [currentQInDim, setCurrentQInDim] = useState(0);
+  const [completedDimensions, setCompletedDimensions] = useState<Dimension[]>(
+    []
+  );
+
+  // -- Dimension transition screen state
+  const [dimensionInsight, setDimensionInsight] = useState<string | null>(null);
+  const [insightLoading, setInsightLoading] = useState(false);
+
+  // -- Research status polling
+  const [researchStatus, setResearchStatus] = useState<string>(
+    RESEARCH_STATUS_MESSAGES[0]
+  );
+  const [researchComplete, setResearchComplete] = useState(false);
 
   // -- Intake form
   const [companyName, setCompanyName] = useState("");
@@ -238,10 +162,90 @@ export default function AssessmentPage() {
   const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
   const [executiveEmail, setExecutiveEmail] = useState("");
 
-  // -- Question responses (indexed by question array position)
-  const [responses, setResponses] = useState<(number | null)[]>(
-    () => new Array(QUESTIONS.length).fill(null)
+  // -- Question responses keyed by question id
+  const [responses, setResponses] = useState<
+    Record<string, { optionIndex: number; score: number }>
+  >({});
+
+  // -- Insight cache: dimension -> insight text
+  const [insightCache, setInsightCache] = useState<
+    Record<string, string>
+  >({});
+
+  // ---------- Derived ----------
+
+  const currentGroup: DimensionGroup | undefined =
+    dimensionGroups[currentDimIndex];
+  const currentQuestion: DiagnosticQuestion | undefined =
+    currentGroup?.questions[currentQInDim];
+
+  const totalQuestions = questions.length;
+  const answeredCount = Object.keys(responses).length;
+
+  // Overall progress percent
+  const progressPercent =
+    step === "intake"
+      ? 0
+      : step === "review"
+      ? 100
+      : totalQuestions > 0
+      ? Math.round((answeredCount / totalQuestions) * 100)
+      : 0;
+
+  const allQuestionsAnswered =
+    totalQuestions > 0 && answeredCount === totalQuestions;
+
+  // ---------- Group questions by dimension ----------
+
+  const groupQuestionsByDimension = useCallback(
+    (qs: DiagnosticQuestion[]): DimensionGroup[] => {
+      const groups: DimensionGroup[] = [];
+      for (const dim of DIMENSION_ORDER) {
+        const dimQuestions = qs.filter((q) => q.dimension === dim);
+        if (dimQuestions.length > 0) {
+          groups.push({ dimension: dim, questions: dimQuestions });
+        }
+      }
+      return groups;
+    },
+    []
   );
+
+  // ---------- Research status polling ----------
+
+  useEffect(() => {
+    if (!sessionId || step === "intake" || researchComplete) return;
+
+    let statusIndex = 0;
+
+    const poll = async () => {
+      try {
+        const res = await fetch(
+          `/api/research/status?sessionId=${sessionId}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "complete" || data.complete) {
+            setResearchComplete(true);
+            setResearchStatus("Research complete");
+            return;
+          }
+          if (data.message) {
+            setResearchStatus(data.message);
+            return;
+          }
+        }
+      } catch {
+        // Silently continue on poll failure
+      }
+      // Cycle through status messages as fallback
+      statusIndex = (statusIndex + 1) % RESEARCH_STATUS_MESSAGES.length;
+      setResearchStatus(RESEARCH_STATUS_MESSAGES[statusIndex]);
+    };
+
+    const interval = setInterval(poll, 10000);
+    return () => clearInterval(interval);
+  }, [sessionId, step, researchComplete]);
 
   // ---------- Handlers ----------
 
@@ -253,13 +257,16 @@ export default function AssessmentPage() {
 
   const selectOption = useCallback(
     (optionIndex: number) => {
-      setResponses((prev) => {
-        const next = [...prev];
-        next[currentQ] = optionIndex;
-        return next;
-      });
+      if (!currentQuestion) return;
+      setResponses((prev) => ({
+        ...prev,
+        [currentQuestion.id]: {
+          optionIndex,
+          score: currentQuestion.options[optionIndex].score,
+        },
+      }));
     },
-    [currentQ]
+    [currentQuestion]
   );
 
   const intakeValid =
@@ -271,9 +278,68 @@ export default function AssessmentPage() {
     regulatoryIntensity !== "" &&
     selectedUseCases.length > 0;
 
-  const allQuestionsAnswered = responses.every((r) => r !== null);
+  // Fetch dimension insight from API
+  const fetchDimensionInsight = useCallback(
+    async (dimension: Dimension) => {
+      // Return cached insight if available
+      if (insightCache[dimension]) {
+        setDimensionInsight(insightCache[dimension]);
+        return;
+      }
 
-  // Submit intake to create a session
+      setInsightLoading(true);
+      setDimensionInsight(null);
+
+      try {
+        const dimQuestions = questions.filter(
+          (q) => q.dimension === dimension
+        );
+        const dimResponses = dimQuestions
+          .filter((q) => responses[q.id])
+          .map((q) => ({
+            questionId: q.id,
+            selectedOptionIndex: responses[q.id].optionIndex,
+            score: responses[q.id].score,
+          }));
+
+        const res = await fetch("/api/assessment/insight", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId,
+            dimension,
+            responses: dimResponses,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.insight || data.text || data.message;
+          if (text) {
+            setDimensionInsight(text);
+            setInsightCache((prev) => ({ ...prev, [dimension]: text }));
+          } else {
+            setDimensionInsight(
+              "Your responses are being analyzed. Detailed insights will appear in your final report."
+            );
+          }
+        } else {
+          setDimensionInsight(
+            "Your responses are being analyzed. Detailed insights will appear in your final report."
+          );
+        }
+      } catch {
+        setDimensionInsight(
+          "Your responses are being analyzed. Detailed insights will appear in your final report."
+        );
+      } finally {
+        setInsightLoading(false);
+      }
+    },
+    [questions, responses, sessionId, insightCache]
+  );
+
+  // Submit intake to create a session and get questions
   const handleIntakeSubmit = async () => {
     if (!intakeValid) return;
     setSubmitting(true);
@@ -295,13 +361,41 @@ export default function AssessmentPage() {
       const res = await fetch("/api/assessment/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyProfile: profile }),
+        body: JSON.stringify(profile),
       });
 
       if (!res.ok) throw new Error("Failed to start assessment session.");
 
       const data = await res.json();
-      setSessionId(data.sessionId ?? data.id);
+      const sid = data.session?.id ?? data.sessionId ?? data.id;
+      setSessionId(sid);
+
+      // Use questions from the response, or fall back to fetching them
+      let fetchedQuestions: DiagnosticQuestion[] = data.questions || [];
+
+      if (fetchedQuestions.length === 0) {
+        try {
+          const qRes = await fetch("/api/assessment/questions");
+          if (qRes.ok) {
+            const qData = await qRes.json();
+            fetchedQuestions = qData.questions || qData || [];
+          }
+        } catch {
+          // If fallback also fails, we cannot proceed
+        }
+      }
+
+      if (fetchedQuestions.length === 0) {
+        throw new Error(
+          "No assessment questions available. Please try again."
+        );
+      }
+
+      setQuestions(fetchedQuestions);
+      const groups = groupQuestionsByDimension(fetchedQuestions);
+      setDimensionGroups(groups);
+      setCurrentDimIndex(0);
+      setCurrentQInDim(0);
       setStep("questions");
     } catch (err) {
       setError(
@@ -312,19 +406,75 @@ export default function AssessmentPage() {
     }
   };
 
+  // Handle moving to next question / dimension transition
+  const handleNext = useCallback(() => {
+    if (!currentGroup) return;
+
+    const isLastInDimension =
+      currentQInDim >= currentGroup.questions.length - 1;
+    const isLastDimension = currentDimIndex >= dimensionGroups.length - 1;
+
+    if (isLastInDimension) {
+      // Mark dimension complete
+      setCompletedDimensions((prev) => {
+        if (prev.includes(currentGroup.dimension)) return prev;
+        return [...prev, currentGroup.dimension];
+      });
+
+      if (isLastDimension) {
+        // All questions answered -- go to review
+        setStep("review");
+      } else {
+        // Show dimension transition screen
+        setStep("dimension_transition");
+        fetchDimensionInsight(currentGroup.dimension);
+      }
+    } else {
+      // Next question within same dimension
+      setCurrentQInDim((q) => q + 1);
+    }
+  }, [
+    currentGroup,
+    currentQInDim,
+    currentDimIndex,
+    dimensionGroups.length,
+    fetchDimensionInsight,
+  ]);
+
+  // Handle moving to previous question
+  const handlePrev = useCallback(() => {
+    if (currentQInDim > 0) {
+      setCurrentQInDim((q) => q - 1);
+    } else if (currentDimIndex > 0) {
+      // Go back to last question of previous dimension
+      const prevGroup = dimensionGroups[currentDimIndex - 1];
+      setCurrentDimIndex((d) => d - 1);
+      setCurrentQInDim(prevGroup.questions.length - 1);
+    } else {
+      // First question of first dimension -- go back to intake
+      setStep("intake");
+    }
+  }, [currentQInDim, currentDimIndex, dimensionGroups]);
+
+  // Continue from dimension transition to next dimension
+  const handleContinueFromTransition = useCallback(() => {
+    setCurrentDimIndex((d) => d + 1);
+    setCurrentQInDim(0);
+    setDimensionInsight(null);
+    setStep("questions");
+  }, []);
+
   // Final submit
   const handleFinalSubmit = async () => {
     if (!allQuestionsAnswered) return;
     setSubmitting(true);
     setError(null);
 
-    const assessmentResponses: AssessmentResponse[] = QUESTIONS.map(
-      (q, idx) => ({
-        questionId: q.id,
-        selectedOptionIndex: responses[idx]!,
-        score: q.options[responses[idx]!].score,
-      })
-    );
+    const assessmentResponses: AssessmentResponse[] = questions.map((q) => ({
+      questionId: q.id,
+      selectedOptionIndex: responses[q.id].optionIndex,
+      score: responses[q.id].score,
+    }));
 
     try {
       const res = await fetch("/api/assessment/submit", {
@@ -349,12 +499,51 @@ export default function AssessmentPage() {
     }
   };
 
-  // ---------- Progress ----------
+  // Navigate to a specific question from the review screen
+  const navigateToQuestion = useCallback(
+    (questionId: string) => {
+      for (let di = 0; di < dimensionGroups.length; di++) {
+        const qi = dimensionGroups[di].questions.findIndex(
+          (q) => q.id === questionId
+        );
+        if (qi !== -1) {
+          setCurrentDimIndex(di);
+          setCurrentQInDim(qi);
+          setStep("questions");
+          return;
+        }
+      }
+    },
+    [dimensionGroups]
+  );
 
-  const totalSteps = QUESTIONS.length + 2; // intake + questions + review
-  const currentStep =
-    step === "intake" ? 1 : step === "questions" ? currentQ + 2 : totalSteps;
-  const progressPercent = Math.round((currentStep / totalSteps) * 100);
+  // ---------- Progress helpers ----------
+
+  // Count answered in current dimension
+  const answeredInCurrentDim = currentGroup
+    ? currentGroup.questions.filter((q) => responses[q.id]).length
+    : 0;
+
+  // Compute which question number we are on overall (1-indexed)
+  const overallQuestionIndex = (() => {
+    let count = 0;
+    for (let i = 0; i < currentDimIndex; i++) {
+      count += dimensionGroups[i]?.questions.length ?? 0;
+    }
+    count += currentQInDim + 1;
+    return count;
+  })();
+
+  // ---------- Header label ----------
+
+  const headerLabel =
+    step === "intake"
+      ? "Company Profile"
+      : step === "questions" && currentGroup
+      ? `Question ${overallQuestionIndex} of ${totalQuestions}`
+      : step === "dimension_transition"
+      ? "Dimension Complete"
+      : "Review & Submit";
 
   // ---------- Render: Shell ----------
 
@@ -371,22 +560,145 @@ export default function AssessmentPage() {
           >
             RLK Consulting
           </Link>
-          <div className="text-xs text-tertiary">
-            {step === "intake"
-              ? "Company Profile"
-              : step === "questions"
-              ? `Question ${currentQ + 1} of ${QUESTIONS.length}`
-              : "Review & Submit"}
-          </div>
+          <div className="text-xs text-tertiary">{headerLabel}</div>
         </div>
         {/* Progress bar */}
         <div className="h-1 bg-light">
           <div
-            className="h-full bg-navy transition-all duration-300 ease-out"
+            className="h-full bg-navy transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </header>
+
+      {/* Building Your AI Profile sidebar / top card (visible during questions) */}
+      {(step === "questions" || step === "dimension_transition") &&
+        dimensionGroups.length > 0 && (
+          <div className="mx-auto max-w-3xl px-6 pt-6">
+            <div className="bg-white border border-light p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-navy tracking-wide uppercase">
+                  Building Your AI Profile
+                </h3>
+                <span className="text-xs text-tertiary">
+                  {answeredCount} of {totalQuestions} questions
+                </span>
+              </div>
+
+              {/* Dimension progress indicators */}
+              <div className="space-y-2">
+                {dimensionGroups.map((group, idx) => {
+                  const isCompleted = completedDimensions.includes(
+                    group.dimension
+                  );
+                  const isCurrent = idx === currentDimIndex;
+                  const dimAnswered = group.questions.filter(
+                    (q) => responses[q.id]
+                  ).length;
+                  const dimTotal = group.questions.length;
+
+                  return (
+                    <div key={group.dimension} className="flex items-center gap-3">
+                      {/* Status icon */}
+                      <div
+                        className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                          isCompleted
+                            ? "bg-navy"
+                            : isCurrent
+                            ? "border-2 border-navy"
+                            : "border-2 border-light"
+                        }`}
+                      >
+                        {isCompleted && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                        {isCurrent && !isCompleted && (
+                          <span className="w-2 h-2 rounded-full bg-navy" />
+                        )}
+                      </div>
+
+                      {/* Label and mini bar */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-xs font-medium truncate ${
+                              isCompleted
+                                ? "text-navy"
+                                : isCurrent
+                                ? "text-secondary"
+                                : "text-accent"
+                            }`}
+                          >
+                            {DIMENSION_META[group.dimension].label}
+                          </span>
+                          <span className="text-xs text-tertiary ml-2 shrink-0">
+                            {dimAnswered}/{dimTotal}
+                          </span>
+                        </div>
+                        <div className="h-1 bg-light mt-1 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-navy rounded-full transition-all duration-300"
+                            style={{
+                              width: `${
+                                dimTotal > 0
+                                  ? Math.round(
+                                      (dimAnswered / dimTotal) * 100
+                                    )
+                                  : 0
+                              }%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Research status indicator */}
+              {sessionId && !researchComplete && (
+                <div className="mt-4 pt-3 border-t border-light flex items-center gap-2">
+                  <div className="research-pulse shrink-0 w-2 h-2 rounded-full bg-navy" />
+                  <span className="text-xs text-tertiary research-status-text">
+                    {researchStatus}
+                  </span>
+                </div>
+              )}
+              {sessionId && researchComplete && (
+                <div className="mt-4 pt-3 border-t border-light flex items-center gap-2">
+                  <svg
+                    className="w-3.5 h-3.5 text-navy shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span className="text-xs text-navy font-medium">
+                    Research complete
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
       <main className="mx-auto max-w-3xl px-6 py-10 md:py-14">
         {error && (
@@ -435,7 +747,7 @@ export default function AssessmentPage() {
                 </select>
               </Field>
 
-              {/* Revenue + Employees — two columns */}
+              {/* Revenue + Employees -- two columns */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Field label="Annual Revenue (USD)" required>
                   <input
@@ -572,63 +884,65 @@ export default function AssessmentPage() {
         )}
 
         {/* ---------- QUESTION VIEW ---------- */}
-        {step === "questions" && (
+        {step === "questions" && currentGroup && currentQuestion && (
           <div>
-            <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-2">
-              Question {currentQ + 1} of {QUESTIONS.length}
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-tertiary tracking-widest uppercase">
+                Question {overallQuestionIndex} of {totalQuestions}
+              </p>
+              <span className="text-xs text-tertiary">
+                {DIMENSION_META[currentGroup.dimension].label}:{" "}
+                {currentQInDim + 1} of {currentGroup.questions.length}
+              </span>
+            </div>
 
-            <DimensionBadge dimension={QUESTIONS[currentQ].dimension} />
+            <DimensionBadge dimension={currentGroup.dimension} />
 
             <h1 className="text-xl md:text-2xl mt-4 mb-2 leading-snug">
-              {QUESTIONS[currentQ].text}
+              {currentQuestion.text}
             </h1>
-            {QUESTIONS[currentQ].subtext && (
+            {currentQuestion.subtext && (
               <p className="text-sm text-foreground/50 mb-8">
-                {QUESTIONS[currentQ].subtext}
+                {currentQuestion.subtext}
               </p>
             )}
-            {!QUESTIONS[currentQ].subtext && <div className="mb-8" />}
+            {!currentQuestion.subtext && <div className="mb-8" />}
 
             <div className="space-y-3">
-              {QUESTIONS[currentQ].options.map((opt, oi) => (
-                <button
-                  key={oi}
-                  onClick={() => selectOption(oi)}
-                  className={`w-full text-left px-5 py-4 border transition-all text-sm leading-relaxed ${
-                    responses[currentQ] === oi
-                      ? "border-navy bg-navy/5 text-navy font-medium"
-                      : "border-light bg-white text-foreground/80 hover:border-accent"
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-3">
-                    <span
-                      className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        responses[currentQ] === oi
-                          ? "border-navy"
-                          : "border-accent"
-                      }`}
-                    >
-                      {responses[currentQ] === oi && (
-                        <span className="w-2.5 h-2.5 rounded-full bg-navy" />
-                      )}
+              {currentQuestion.options.map((opt, oi) => {
+                const isSelected =
+                  responses[currentQuestion.id]?.optionIndex === oi;
+                return (
+                  <button
+                    key={oi}
+                    onClick={() => selectOption(oi)}
+                    className={`question-option w-full text-left px-5 py-4 border transition-all text-sm leading-relaxed ${
+                      isSelected
+                        ? "border-navy bg-navy/5 text-navy font-medium"
+                        : "border-light bg-white text-foreground/80 hover:border-accent hover:bg-white/80"
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-3">
+                      <span
+                        className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                          isSelected ? "border-navy" : "border-accent"
+                        }`}
+                      >
+                        {isSelected && (
+                          <span className="w-2.5 h-2.5 rounded-full bg-navy" />
+                        )}
+                      </span>
+                      {opt.text}
                     </span>
-                    {opt.text}
-                  </span>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Navigation */}
             <div className="mt-10 flex justify-between items-center">
               <button
-                onClick={() => {
-                  if (currentQ === 0) {
-                    setStep("intake");
-                  } else {
-                    setCurrentQ((q) => q - 1);
-                  }
-                }}
+                onClick={handlePrev}
                 className="text-sm text-secondary hover:text-navy transition-colors flex items-center gap-1.5"
               >
                 <svg
@@ -647,15 +961,94 @@ export default function AssessmentPage() {
                 Previous
               </button>
 
-              {currentQ < QUESTIONS.length - 1 ? (
-                <button
-                  onClick={() => setCurrentQ((q) => q + 1)}
-                  disabled={responses[currentQ] === null}
-                  className="bg-navy text-white px-6 py-3 text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              <button
+                onClick={handleNext}
+                disabled={!responses[currentQuestion.id]}
+                className="bg-navy text-white px-6 py-3 text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {currentQInDim >= currentGroup.questions.length - 1 &&
+                currentDimIndex >= dimensionGroups.length - 1
+                  ? "Review Answers"
+                  : "Next"}
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
                 >
-                  Next
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ---------- DIMENSION TRANSITION SCREEN ---------- */}
+        {step === "dimension_transition" && currentGroup && (
+          <div className="dimension-transition">
+            {/* Diagonal stripe divider */}
+            <div className="rlk-diagonal-divider mb-10 -mx-6" />
+
+            <div className="text-center max-w-xl mx-auto">
+              {/* Dimension completion badge */}
+              <div className="inline-flex items-center gap-2 bg-navy/5 border border-navy/20 px-4 py-2 mb-6">
+                <svg
+                  className="w-4 h-4 text-navy"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span className="text-sm font-semibold text-navy">
+                  {DIMENSION_META[currentGroup.dimension].label} Complete
+                </span>
+              </div>
+
+              {/* Progress indicator */}
+              <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-3">
+                Dimension {currentDimIndex + 1} of {dimensionGroups.length}{" "}
+                complete
+              </p>
+
+              {/* What is next */}
+              {currentDimIndex + 1 < dimensionGroups.length && (
+                <div className="mb-8">
+                  <p className="text-foreground/60 text-sm">
+                    Next:{" "}
+                    <span className="text-secondary font-medium">
+                      {
+                        DIMENSION_META[
+                          dimensionGroups[currentDimIndex + 1].dimension
+                        ].label
+                      }
+                    </span>
+                  </p>
+                  <p className="text-foreground/40 text-xs mt-1">
+                    {
+                      DIMENSION_META[
+                        dimensionGroups[currentDimIndex + 1].dimension
+                      ].description
+                    }
+                  </p>
+                </div>
+              )}
+
+              {/* AI Insight Card */}
+              <div className="insight-card bg-white border border-light text-left p-6 mb-8 border-l-4 border-l-navy">
+                <div className="flex items-center gap-2 mb-3">
                   <svg
-                    className="w-4 h-4"
+                    className="w-4 h-4 text-navy"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -664,19 +1057,64 @@ export default function AssessmentPage() {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                     />
                   </svg>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setStep("review")}
-                  disabled={responses[currentQ] === null}
-                  className="bg-navy text-white px-6 py-3 text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  <span className="text-xs font-semibold text-navy uppercase tracking-wider">
+                    AI Insight
+                  </span>
+                </div>
+                {insightLoading ? (
+                  <div className="flex items-center gap-3">
+                    <Spinner />
+                    <span className="text-sm text-tertiary">
+                      Analyzing your responses...
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-sm text-foreground/80 leading-relaxed insight-text">
+                    {dimensionInsight}
+                  </p>
+                )}
+              </div>
+
+              {/* Dimension completion dots */}
+              <div className="flex items-center justify-center gap-3 mb-10">
+                {dimensionGroups.map((group, idx) => (
+                  <div
+                    key={group.dimension}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      completedDimensions.includes(group.dimension)
+                        ? "bg-navy"
+                        : idx === currentDimIndex + 1
+                        ? "border-2 border-navy bg-transparent"
+                        : "bg-light"
+                    }`}
+                    title={DIMENSION_META[group.dimension].label}
+                  />
+                ))}
+              </div>
+
+              {/* Continue button */}
+              <button
+                onClick={handleContinueFromTransition}
+                className="bg-navy text-white px-8 py-3.5 text-sm font-semibold hover:bg-secondary transition-colors flex items-center gap-2 mx-auto"
+              >
+                Continue
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
                 >
-                  Review Answers
-                </button>
-              )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         )}
@@ -695,57 +1133,73 @@ export default function AssessmentPage() {
               back and change your selection.
             </p>
 
-            <div className="space-y-4">
-              {QUESTIONS.map((q, idx) => {
-                const selectedIdx = responses[idx];
-                return (
-                  <button
-                    key={q.id}
-                    onClick={() => {
-                      setCurrentQ(idx);
-                      setStep("questions");
-                    }}
-                    className="w-full text-left bg-white border border-light p-5 hover:border-accent transition-colors group"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs text-tertiary mb-1">
-                          Q{idx + 1} &middot;{" "}
-                          {dimensionLabel(q.dimension)}
-                        </p>
-                        <p className="text-sm font-medium text-foreground/90">
-                          {q.text}
-                        </p>
-                        {selectedIdx !== null && (
-                          <p className="text-sm text-navy mt-1.5">
-                            {q.options[selectedIdx].text}
-                          </p>
-                        )}
-                      </div>
-                      <svg
-                        className="w-4 h-4 text-accent group-hover:text-secondary shrink-0 mt-1 transition-colors"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
+            {/* Group reviews by dimension */}
+            {dimensionGroups.map((group) => (
+              <div key={group.dimension} className="mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <DimensionBadge dimension={group.dimension} />
+                  {/* Show cached insight inline if available */}
+                  {insightCache[group.dimension] && (
+                    <span className="text-xs text-tertiary ml-auto max-w-xs truncate hidden sm:block">
+                      {insightCache[group.dimension]}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {group.questions.map((q) => {
+                    const resp = responses[q.id];
+                    // Compute the question's overall index (1-indexed)
+                    const globalIdx = questions.indexOf(q) + 1;
+                    return (
+                      <button
+                        key={q.id}
+                        onClick={() => navigateToQuestion(q.id)}
+                        className="w-full text-left bg-white border border-light p-5 hover:border-accent transition-colors group"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"
-                        />
-                      </svg>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-xs text-tertiary mb-1">
+                              Q{globalIdx}
+                            </p>
+                            <p className="text-sm font-medium text-foreground/90">
+                              {q.text}
+                            </p>
+                            {resp && (
+                              <p className="text-sm text-navy mt-1.5">
+                                {q.options[resp.optionIndex].text}
+                              </p>
+                            )}
+                          </div>
+                          <svg
+                            className="w-4 h-4 text-accent group-hover:text-secondary shrink-0 mt-1 transition-colors"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"
+                            />
+                          </svg>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
 
             {/* Submit */}
             <div className="mt-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <button
                 onClick={() => {
-                  setCurrentQ(QUESTIONS.length - 1);
+                  // Go back to last question of last dimension
+                  const lastGroup =
+                    dimensionGroups[dimensionGroups.length - 1];
+                  setCurrentDimIndex(dimensionGroups.length - 1);
+                  setCurrentQInDim(lastGroup.questions.length - 1);
                   setStep("questions");
                 }}
                 className="text-sm text-secondary hover:text-navy transition-colors flex items-center gap-1.5"
@@ -803,6 +1257,73 @@ export default function AssessmentPage() {
         }
         .form-input::placeholder {
           color: var(--rlk-accent);
+        }
+
+        /* Question option hover/selection states */
+        .question-option {
+          position: relative;
+          transition: all 0.15s ease;
+        }
+        .question-option:hover {
+          transform: translateX(2px);
+        }
+
+        /* Insight card fade-in */
+        .insight-card {
+          animation: insightFadeIn 0.5s ease-out;
+        }
+        .insight-text {
+          animation: insightTextFade 0.6s ease-out 0.2s both;
+        }
+        @keyframes insightFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes insightTextFade {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        /* Dimension transition screen fade-in */
+        .dimension-transition {
+          animation: dimTransitionIn 0.4s ease-out;
+        }
+        @keyframes dimTransitionIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        /* Research status pulse */
+        .research-pulse {
+          animation: researchPulse 2s ease-in-out infinite;
+        }
+        @keyframes researchPulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.3;
+          }
+        }
+
+        /* Research status text transition */
+        .research-status-text {
+          transition: opacity 0.3s ease;
         }
       `}</style>
     </div>

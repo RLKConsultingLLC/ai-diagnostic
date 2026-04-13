@@ -47,7 +47,7 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
   const valueLow = formatCurrency(unrealizedValueLow);
   const valueHigh = formatCurrency(unrealizedValueHigh);
 
-  const subject = 'Your AI Strategy Diagnostic Report — RLK Consulting';
+  const subject = 'Your AI Strategy Diagnostic Report | RLK Consulting';
 
   const html = `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">

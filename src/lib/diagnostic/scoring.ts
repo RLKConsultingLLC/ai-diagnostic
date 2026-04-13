@@ -204,7 +204,7 @@ function getIndexInterpretation(
       { range: [81, 100], text: 'Minimal friction. Authority structures enable rather than constrain AI adoption. Governance is embedded, not imposed.' },
     ],
     decision_velocity: [
-      { range: [0, 20], text: 'Critically slow. The organization takes 6–12+ months to move from idea to pilot, making it unable to keep pace with AI evolution.' },
+      { range: [0, 20], text: 'Critically slow. The organization takes 6 to 12+ months to move from idea to pilot, making it unable to keep pace with AI evolution.' },
       { range: [21, 40], text: 'Slow. While some AI activity exists, the time from insight to action erodes competitive advantage and team morale.' },
       { range: [41, 60], text: 'Moderate pace. The organization can execute AI initiatives but is slower than industry leaders, creating a widening capability gap.' },
       { range: [61, 80], text: 'Fast. AI decisions move at competitive speed with appropriate governance. The organization can respond to market changes within weeks.' },

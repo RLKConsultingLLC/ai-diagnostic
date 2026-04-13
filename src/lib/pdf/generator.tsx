@@ -853,7 +853,7 @@ function EconomicHighlight({
     <View style={s.economicHighlight}>
       <Text style={s.economicHighlightLabel}>ESTIMATED UNREALIZED AI VALUE</Text>
       <Text style={s.economicHighlightValue}>
-        {formatCurrency(estimate.unrealizedValueLow)} &ndash;{' '}
+        {formatCurrency(estimate.unrealizedValueLow)} to{' '}
         {formatCurrency(estimate.unrealizedValueHigh)}
       </Text>
       <Text style={s.economicHighlightSub}>
@@ -1072,7 +1072,7 @@ function AboutPage(): React.JSX.Element {
         <Text style={s.aboutText}>
           Our AI Board Brief diagnostic is designed to give organizational
           leaders the same caliber of AI readiness analysis that Fortune 100
-          companies receive from top-tier strategy firms — made accessible,
+          companies receive from top-tier strategy firms, made accessible,
           actionable, and specific to your organization.
         </Text>
         <Text style={s.aboutText}>
@@ -1146,7 +1146,7 @@ function ReportDocument({
 
   return (
     <Document
-      title={`AI Board Brief — ${report.companyProfile.companyName}`}
+      title={`AI Board Brief | ${report.companyProfile.companyName}`}
       author="RLK Consulting, LLC"
       subject="AI Readiness Diagnostic Report"
       creator="RLK Consulting AI Board Brief"

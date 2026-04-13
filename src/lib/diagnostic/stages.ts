@@ -33,7 +33,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       'AI is discussed but not embedded. Individuals may experiment, but the organization has no strategy, no measurement, and no structural support for AI adoption.',
     overallThreshold: [0, 20],
     boardNarrative:
-      'Your organization is in the exploratory phase. AI conversations are happening, but there is no organizational infrastructure to convert curiosity into capability. Without structural intervention, the gap between your organization and AI-enabled competitors will widen significantly over the next 12–18 months.',
+      'Your organization is in the exploratory phase. AI conversations are happening, but there is no organizational infrastructure to convert curiosity into capability. Without structural intervention, the gap between your organization and AI-enabled competitors will widen significantly over the next 12 to 18 months.',
   },
   {
     stage: 2,
@@ -42,7 +42,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       'Multiple pilots exist but they are uncoordinated, inconsistently funded, and rarely reach production. Value is promised but not proven.',
     overallThreshold: [21, 40],
     boardNarrative:
-      'Your organization has moved beyond curiosity into active experimentation, but pilots are proliferating without coordination or clear paths to production. This stage is where most AI investment is wasted — the gap between pilot activity and operational impact represents significant unrealized value.',
+      'Your organization has moved beyond curiosity into active experimentation, but pilots are proliferating without coordination or clear paths to production. This stage is where most AI investment is wasted. The gap between pilot activity and operational impact represents significant unrealized value.',
   },
   {
     stage: 3,
@@ -51,7 +51,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       'Some AI initiatives are in production with governance frameworks emerging. Value is being captured in pockets but not systematically across the organization.',
     overallThreshold: [41, 60],
     boardNarrative:
-      'Your organization has begun translating AI from experiments into operational capability. Governance structures are forming and some financial impact is visible. The critical challenge at this stage is preventing the "frozen middle" — where initial successes plateau due to structural and cultural barriers to scaling.',
+      'Your organization has begun translating AI from experiments into operational capability. Governance structures are forming and some financial impact is visible. The critical challenge at this stage is preventing the "frozen middle," where initial successes plateau due to structural and cultural barriers to scaling.',
   },
   {
     stage: 4,
@@ -60,7 +60,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       'AI is embedded in core workflows with mature governance. Financial impact is measured and material. The organization can deploy AI at speed with appropriate risk management.',
     overallThreshold: [61, 80],
     boardNarrative:
-      'Your organization has achieved meaningful AI integration with measurable financial returns. AI is no longer a side initiative — it is part of how the business operates. The opportunity now is accelerating value capture and preventing competitors from closing the gap.',
+      'Your organization has achieved meaningful AI integration with measurable financial returns. AI is no longer a side initiative. It is part of how the business operates. The opportunity now is accelerating value capture and preventing competitors from closing the gap.',
   },
   {
     stage: 5,
@@ -69,7 +69,7 @@ export const STAGE_DEFINITIONS: StageDefinition[] = [
       'AI is the operating model. Decisions, workflows, and resource allocation are AI-augmented by default. The organization continuously evolves its AI capabilities as a core competency.',
     overallThreshold: [81, 100],
     boardNarrative:
-      'Your organization operates as an AI-native enterprise. AI is not a capability layered onto the business — it is foundational to how the business creates and captures value. Fewer than 5% of enterprises globally have reached this stage. The priority is maintaining this advantage through continuous evolution.',
+      'Your organization operates as an AI-native enterprise. AI is not a capability layered onto the business; it is foundational to how the business creates and captures value. Fewer than 5% of enterprises globally have reached this stage. The priority is maintaining this advantage through continuous evolution.',
   },
 ];
 
@@ -248,7 +248,7 @@ export function getStageRecommendations(
       2: { priority: 'high', title: 'Build Integration Infrastructure', description: 'Invest in APIs, data pipelines, and platform capabilities that allow AI to operate within existing workflows rather than alongside them.', timeframe: '60–120 days', dimension: 'workflow_integration' },
       3: { priority: 'high', title: 'Automate AI-to-Workflow Handoffs', description: 'Eliminate manual handoffs between AI outputs and operational systems. Move from "AI generates, human transfers" to automated flow with human oversight.', timeframe: '60–150 days', dimension: 'workflow_integration' },
       4: { priority: 'medium', title: 'Unify AI Platform', description: 'Connect disparate AI tools into a coherent platform where context is shared and tools reinforce each other.', timeframe: '90–180 days', dimension: 'workflow_integration' },
-      5: { priority: 'medium', title: 'Evolve to Invisible AI Infrastructure', description: 'Continue making AI invisible within workflows — employees should interact with enhanced tools, not AI tools.', timeframe: 'Ongoing', dimension: 'workflow_integration' },
+      5: { priority: 'medium', title: 'Evolve to Invisible AI Infrastructure', description: 'Continue making AI invisible within workflows. Employees should interact with enhanced tools, not AI tools.', timeframe: 'Ongoing', dimension: 'workflow_integration' },
     },
     decision_velocity: {
       1: { priority: 'critical', title: 'Create Fast-Track Decision Pathway', description: 'Establish a rapid-approval mechanism for AI initiatives under a defined risk threshold. Current decision speed guarantees competitive disadvantage.', timeframe: '0–60 days', dimension: 'decision_velocity' },
@@ -261,7 +261,7 @@ export function getStageRecommendations(
       1: { priority: 'critical', title: 'Establish AI Value Measurement', description: 'Before investing further, build the measurement infrastructure to track AI financial impact. You cannot manage what you cannot measure, and the board cannot support what cannot be quantified.', timeframe: '0–60 days', dimension: 'economic_translation' },
       2: { priority: 'critical', title: 'Implement Value Capture Framework', description: 'Move beyond anecdotal ROI. Deploy a standardized framework for measuring AI value across cost savings, productivity gains, and revenue impact.', timeframe: '30–90 days', dimension: 'economic_translation' },
       3: { priority: 'high', title: 'Connect AI Value to P&L', description: 'Ensure AI value metrics flow into financial reporting. Finance and AI leadership must be aligned on how value is counted and reported.', timeframe: '60–120 days', dimension: 'economic_translation' },
-      4: { priority: 'medium', title: 'Optimize Value Capture Rate', description: 'Identify where AI is generating value that is not being captured — particularly in time savings that are absorbed without reallocation.', timeframe: '90–180 days', dimension: 'economic_translation' },
+      4: { priority: 'medium', title: 'Optimize Value Capture Rate', description: 'Identify where AI is generating value that is not being captured, particularly in time savings that are absorbed without reallocation.', timeframe: '90–180 days', dimension: 'economic_translation' },
       5: { priority: 'medium', title: 'Drive AI-Led Economic Strategy', description: 'Use AI economics to drive capital allocation and strategic planning. AI should be a primary input to investment decisions.', timeframe: 'Ongoing', dimension: 'economic_translation' },
     },
   };
