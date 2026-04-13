@@ -13,6 +13,9 @@ export default function Home() {
             RLK Consulting
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm text-secondary">
+            <a href="#why-rlk" className="hover:text-navy transition-colors">
+              Why RLK
+            </a>
             <a href="#how-it-works" className="hover:text-navy transition-colors">
               How It Works
             </a>
@@ -34,22 +37,24 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
           <div className="max-w-3xl">
             <p className="text-tertiary text-sm font-semibold tracking-widest uppercase mb-4">
-              AI Strategy Diagnostic
+              For CIOs who have run enough pilots
             </p>
             <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] leading-tight mb-6">
-              Your organization is investing in AI.
-              <span className="block mt-1">Is it working?</span>
+              Your AI investments are working.
+              <span className="block mt-1">Your organization is not.</span>
             </h1>
             <p className="text-lg md:text-xl text-foreground/80 leading-relaxed mb-4 max-w-2xl">
-              Most enterprises are spending millions on AI initiatives without a
-              clear framework to measure behavioral adoption, authority alignment,
-              or economic return.
+              Pilots succeed in isolation. Productivity improves in pockets.
+              Yet at the enterprise level, boards see no meaningful margin
+              expansion, operating models remain intact, and decision speed
+              stays constrained by legacy structures.
             </p>
             <p className="text-lg text-foreground/70 leading-relaxed mb-10 max-w-2xl">
-              The AI Board Brief diagnostic gives your leadership team a
-              data-driven assessment of AI maturity across five critical
-              dimensions, with board-ready reporting and actionable
-              recommendations.
+              The AI Board Brief is the diagnostic that explains why. Built
+              on the same frameworks Ryan King developed across a decade at
+              McKinsey and Deloitte, it identifies the structural barriers
+              preventing your AI investments from translating into enterprise
+              value.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 items-start">
               <Link
@@ -72,31 +77,121 @@ export default function Home() {
                 </svg>
               </Link>
               <span className="text-sm text-tertiary mt-2 sm:mt-3">
-                Takes approximately 15 minutes
+                15 minutes. No tools audit. Just operating-model truth.
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Diagonal Divider: Hero -> Feature Columns */}
+      {/* Diagonal Divider */}
       <div className="rlk-diagonal-divider" />
 
-      {/* Feature Columns */}
+      {/* The Problem */}
       <section className="bg-offwhite py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-2xl md:text-3xl mb-3">
-              What You Will Receive
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
+              The Problem
+            </p>
+            <h2 className="text-2xl md:text-3xl mb-6">
+              AI is not failing inside your organization.
+              It is colliding with management structures designed for a
+              different information environment.
             </h2>
-            <p className="text-tertiary text-base max-w-xl mx-auto">
-              A comprehensive assessment that translates AI activity into
-              executive-level insight.
+            <p className="text-foreground/70 leading-relaxed">
+              The tools work. Individual contributors report meaningful
+              productivity gains. But the organization surrounding those
+              tools has not adapted. Approval chains still assume scarce
+              information. Governance frameworks still treat AI as an IT
+              project. Financial measurement still cannot connect deployed
+              capabilities to bottom-line impact.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Card 1 */}
             <div className="bg-white p-8 border border-light">
+              <div className="text-3xl font-bold text-navy mb-3">87%</div>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                of organizations use AI in at least one business function,
+                yet only a small fraction can point to measurable
+                bottom-line impact.
+              </p>
+            </div>
+            <div className="bg-white p-8 border border-light">
+              <div className="text-3xl font-bold text-navy mb-3">3x</div>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                the number of AI pilots launched vs. those that reach
+                production. Most organizations are stuck between
+                experimentation and operational integration.
+              </p>
+            </div>
+            <div className="bg-white p-8 border border-light">
+              <div className="text-3xl font-bold text-navy mb-3">6 to 12+</div>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                months from AI use case identification to funded pilot in
+                most enterprises. By the time approval arrives, the
+                competitive window has narrowed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What You Get */}
+      <section className="bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-14">
+            <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
+              What You Receive
+            </p>
+            <h2 className="text-2xl md:text-3xl mb-3">
+              Not another maturity assessment. A structural diagnosis.
+            </h2>
+            <p className="text-tertiary text-base max-w-2xl mx-auto">
+              The AI Board Brief measures five hidden dimensions that
+              determine whether your AI investments translate into
+              enterprise value, or evaporate.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-5 gap-6">
+            {[
+              {
+                title: "Adoption Behavior",
+                desc: "How employees actually use AI vs. how leadership thinks they do.",
+              },
+              {
+                title: "Authority Structure",
+                desc: "Who controls AI decisions. Where permission bottlenecks exist.",
+              },
+              {
+                title: "Workflow Integration",
+                desc: "Whether AI is embedded in work or bolted onto it.",
+              },
+              {
+                title: "Decision Velocity",
+                desc: "How fast your organization moves from insight to action.",
+              },
+              {
+                title: "Economic Translation",
+                desc: "Whether AI value shows up in financial statements or vanishes.",
+              },
+            ].map((dim) => (
+              <div
+                key={dim.title}
+                className="bg-offwhite p-6 border border-light text-center"
+              >
+                <h3 className="text-sm font-bold text-navy mb-2">
+                  {dim.title}
+                </h3>
+                <p className="text-xs text-foreground/60 leading-relaxed">
+                  {dim.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 grid md:grid-cols-3 gap-8">
+            <div className="bg-offwhite p-8 border border-light">
               <div className="w-12 h-12 bg-navy/5 flex items-center justify-center mb-5">
                 <svg
                   className="w-6 h-6 text-navy"
@@ -116,14 +211,12 @@ export default function Home() {
                 Behavioral Diagnosis
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed">
-                Move beyond technology audits. We assess how your people actually
-                use AI, including adoption patterns, authority structures, and workflow
-                integration at every level of your organization.
+                36 behavioral questions that diagnose how your people
+                actually interact with AI, not which tools you purchased.
+                The gap between those two things is where value disappears.
               </p>
             </div>
-
-            {/* Card 2 */}
-            <div className="bg-white p-8 border border-light">
+            <div className="bg-offwhite p-8 border border-light">
               <div className="w-12 h-12 bg-navy/5 flex items-center justify-center mb-5">
                 <svg
                   className="w-6 h-6 text-navy"
@@ -139,16 +232,16 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-3">Financial Impact</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                Financial Quantification
+              </h3>
               <p className="text-foreground/70 text-sm leading-relaxed">
-                Quantify the gap between your AI potential and current capture.
-                Our economic model translates behavioral patterns into
-                dollar-denominated unrealized value your board can act on.
+                Dollar-denominated unrealized value your board can act on.
+                Not vendor ROI projections. An independent economic model
+                that translates behavioral patterns into financial exposure.
               </p>
             </div>
-
-            {/* Card 3 */}
-            <div className="bg-white p-8 border border-light">
+            <div className="bg-offwhite p-8 border border-light">
               <div className="w-12 h-12 bg-navy/5 flex items-center justify-center mb-5">
                 <svg
                   className="w-6 h-6 text-navy"
@@ -168,10 +261,113 @@ export default function Home() {
                 Board-Ready Report
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed">
-                Receive a professionally formatted PDF briefing designed for
-                executive and board-level audiences. Clear visualizations,
-                stage classifications, and prioritized action items.
+                A 5 to 8 page PDF briefing designed for executive and board
+                audiences. Enriched with company-specific intelligence from
+                public filings, news, and competitive analysis. Includes a
+                90-day action plan with named owners.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Diagonal Divider */}
+      <div className="rlk-diagonal-divider-reverse" />
+
+      {/* Why RLK */}
+      <section id="why-rlk" className="bg-offwhite py-20 md:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-start">
+            <div>
+              <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
+                Who Built This
+              </p>
+              <h2 className="text-2xl md:text-3xl mb-6">
+                This diagnostic was not built by a software company.
+                It was built by a consultant who has done this work by hand.
+              </h2>
+              <p className="text-foreground/70 leading-relaxed mb-5">
+                Ryan King is the founder of RLK Consulting and author of{" "}
+                <em>The Human and Machine Company: Leadership, Work, and
+                Decision-Making in the Age of Intelligent Systems</em>{" "}
+                (2026). She has spent nearly 15 years in consulting,
+                including a decade across McKinsey &amp; Company and
+                Deloitte, advising CIOs, CTOs, and senior technology leaders
+                on strategy, performance, and organizational transformation.
+              </p>
+              <p className="text-foreground/70 leading-relaxed mb-5">
+                Her work sits at the intersection of technology strategy
+                and organizational design. She has advised leaders inside
+                Fortune 50 enterprises and small founder-led companies,
+                across insurance, banking, healthcare, logistics, government,
+                consumer retail, aerospace, and technology environments.
+              </p>
+              <p className="text-foreground/70 leading-relaxed mb-8">
+                The AI Board Brief diagnostic is a productized version of
+                the assessment Ryan has conducted by hand for enterprise
+                clients. The same frameworks, the same analytical rigor,
+                the same CIO-grade output. Delivered in 15 minutes instead
+                of 6 weeks, at a fraction of the cost.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="bg-white p-5 border border-light flex-1">
+                  <div className="text-xs text-tertiary tracking-widest uppercase mb-1">
+                    Background
+                  </div>
+                  <div className="text-sm font-semibold text-navy">
+                    McKinsey &amp; Company, Deloitte
+                  </div>
+                </div>
+                <div className="bg-white p-5 border border-light flex-1">
+                  <div className="text-xs text-tertiary tracking-widest uppercase mb-1">
+                    Experience
+                  </div>
+                  <div className="text-sm font-semibold text-navy">
+                    Nearly 15 years, CIO advisory
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="bg-white border border-light p-8">
+                <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
+                  From the Book
+                </p>
+                <blockquote className="text-lg text-secondary leading-relaxed italic mb-6">
+                  &ldquo;Artificial intelligence is not failing inside large
+                  organizations. It is colliding with management structures
+                  designed for a different information environment. The tools
+                  are working. The organization surrounding them has not yet
+                  adapted.&rdquo;
+                </blockquote>
+                <div className="border-t border-light pt-4">
+                  <div className="text-sm font-semibold text-navy">
+                    Ryan L. King
+                  </div>
+                  <div className="text-xs text-tertiary">
+                    <em>The Human and Machine Company</em> (2026)
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 bg-white border border-light p-8">
+                <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
+                  What This Diagnostic Measures
+                </p>
+                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                  The book&apos;s central argument: AI adoption follows a
+                  predictable progression. Individuals experiment.
+                  Organizations attempt to govern. Only later do some
+                  redesign workflows and decision authority. Most enterprises
+                  are stalled between governance and redesign, accumulating
+                  activity without structural impact.
+                </p>
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  The diagnostic measures exactly where you are stalled,
+                  what structural barrier is holding you there, and what it
+                  is costing you in unrealized value.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -183,37 +379,43 @@ export default function Home() {
           <div className="inline-flex items-center gap-3 mb-5">
             <div className="h-px w-12 bg-accent" />
             <span className="text-xs font-semibold tracking-widest uppercase text-tertiary">
-              Trusted Framework
+              Advisory Foundation
             </span>
             <div className="h-px w-12 bg-accent" />
           </div>
           <p className="text-xl md:text-2xl text-secondary font-semibold max-w-3xl mx-auto leading-relaxed">
-            Based on frameworks developed from 200+ enterprise AI engagements
-            across financial services, insurance, healthcare, and manufacturing.
+            Built on frameworks developed across nearly 15 years of
+            enterprise advisory work spanning financial services, insurance,
+            healthcare, government, logistics, and manufacturing.
           </p>
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto">
             <div>
-              <div className="text-2xl font-bold text-navy">200+</div>
-              <div className="text-xs text-tertiary mt-1">Engagements</div>
+              <div className="text-2xl font-bold text-navy">5</div>
+              <div className="text-xs text-tertiary mt-1">
+                Hidden Dimensions
+              </div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-navy">5</div>
-              <div className="text-xs text-tertiary mt-1">Dimensions</div>
+              <div className="text-2xl font-bold text-navy">36</div>
+              <div className="text-xs text-tertiary mt-1">
+                Behavioral Questions
+              </div>
             </div>
             <div>
               <div className="text-2xl font-bold text-navy">12</div>
-              <div className="text-xs text-tertiary mt-1">Industries</div>
+              <div className="text-xs text-tertiary mt-1">
+                Industries Calibrated
+              </div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-navy">$2B+</div>
-              <div className="text-xs text-tertiary mt-1">Value Identified</div>
+              <div className="text-2xl font-bold text-navy">3</div>
+              <div className="text-xs text-tertiary mt-1">
+                Composite Indices
+              </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Diagonal Divider: Social Proof -> How It Works */}
-      <div className="rlk-diagonal-divider-reverse" />
 
       {/* How It Works */}
       <section id="how-it-works" className="bg-offwhite py-20 md:py-24">
@@ -221,11 +423,10 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl mb-3">How It Works</h2>
             <p className="text-tertiary text-base">
-              Three steps to board-level AI clarity.
+              Three steps. Fifteen minutes. Board-level clarity.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-12">
-            {/* Step 1 */}
             <div className="text-center">
               <div className="w-14 h-14 mx-auto bg-navy text-white flex items-center justify-center text-xl font-bold mb-5">
                 1
@@ -234,12 +435,11 @@ export default function Home() {
                 Complete the Assessment
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed max-w-xs mx-auto">
-                Answer questions about your organization&apos;s AI adoption across
-                five behavioral dimensions. Takes approximately 15 minutes.
+                Answer 36 behavioral questions across five dimensions.
+                While you respond, our AI researches your company using
+                public filings, news, and competitive intelligence.
               </p>
             </div>
-
-            {/* Step 2 */}
             <div className="text-center">
               <div className="w-14 h-14 mx-auto bg-secondary text-white flex items-center justify-center text-xl font-bold mb-5">
                 2
@@ -248,12 +448,12 @@ export default function Home() {
                 Receive Your Diagnosis
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed max-w-xs mx-auto">
-                Our model scores your organization across five dimensions,
-                classifies your maturity stage, and quantifies economic impact.
+                Your diagnostic data merges with company-specific
+                intelligence to produce a structural analysis: stage
+                classification, composite indices, and economic
+                quantification.
               </p>
             </div>
-
-            {/* Step 3 */}
             <div className="text-center">
               <div className="w-14 h-14 mx-auto bg-tertiary text-white flex items-center justify-center text-xl font-bold mb-5">
                 3
@@ -262,25 +462,78 @@ export default function Home() {
                 Get Your Board Report
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed max-w-xs mx-auto">
-                Download a professionally formatted PDF briefing with executive
-                summary, dimension analysis, and prioritized action plan.
+                Download a professionally formatted PDF briefing with
+                executive summary, vendor landscape analysis, competitive
+                positioning, and a 90-day action plan with named owners
+                by role.
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* What Makes This Different */}
+      <section className="bg-white py-20 md:py-24 border-t border-light">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-14">
+            <h2 className="text-2xl md:text-3xl mb-3">
+              Why this is not another survey
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-x-16 gap-y-10 max-w-4xl mx-auto">
+            <div>
+              <h3 className="text-sm font-bold text-navy uppercase tracking-wide mb-2">
+                Most AI assessments
+              </h3>
+              <ul className="text-sm text-foreground/60 space-y-2">
+                <li>Ask which tools you use</li>
+                <li>Measure self-reported adoption percentages</li>
+                <li>Produce generic maturity scores</li>
+                <li>Recommend &ldquo;building a center of excellence&rdquo;</li>
+                <li>Cost $50K+ and take 6 weeks</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-navy uppercase tracking-wide mb-2">
+                The AI Board Brief
+              </h3>
+              <ul className="text-sm text-foreground/80 space-y-2">
+                <li className="font-medium">
+                  Diagnoses behavioral patterns, not tool inventories
+                </li>
+                <li className="font-medium">
+                  Identifies structural barriers your team cannot see from inside
+                </li>
+                <li className="font-medium">
+                  Quantifies unrealized value in dollar terms
+                </li>
+                <li className="font-medium">
+                  Delivers a 90-day action plan with owners by role
+                </li>
+                <li className="font-medium">
+                  $497, delivered in minutes, enriched with public intelligence
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Diagonal Divider */}
+      <div className="rlk-diagonal-divider-reverse" />
+
       {/* Pricing */}
-      <section id="pricing" className="bg-white py-20 md:py-24">
+      <section id="pricing" className="bg-offwhite py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center mb-14">
             <h2 className="text-2xl md:text-3xl mb-3">Investment</h2>
             <p className="text-tertiary text-base max-w-xl mx-auto">
-              A fraction of the cost of traditional consulting, with
-              board-level analytical rigor.
+              The same analytical framework Ryan King applies in six-figure
+              advisory engagements. Productized for leadership teams that
+              need clarity now.
             </p>
           </div>
-          <div className="max-w-lg mx-auto bg-offwhite border border-light p-10 text-center">
+          <div className="max-w-lg mx-auto bg-white border border-light p-10 text-center">
             <div className="text-sm font-semibold text-tertiary tracking-widest uppercase mb-4">
               AI Board Brief Diagnostic
             </div>
@@ -289,86 +542,33 @@ export default function Home() {
             </div>
             <p className="text-sm text-tertiary mb-8">One-time assessment</p>
             <ul className="text-left text-sm text-foreground/80 space-y-3 mb-10">
-              <li className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-navy shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-                Full 5-dimension behavioral diagnostic
-              </li>
-              <li className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-navy shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-                Maturity stage classification with confidence scoring
-              </li>
-              <li className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-navy shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-                Economic impact quantification with dollar-denominated values
-              </li>
-              <li className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-navy shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-                Board-ready PDF report with executive summary
-              </li>
-              <li className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-navy shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
-                Prioritized action plan tailored to your industry
-              </li>
+              {[
+                "36-question behavioral diagnostic across 5 dimensions",
+                "Stage classification with confidence scoring",
+                "3 composite indices (Authority Friction, Decision Velocity, Economic Translation)",
+                "Dollar-denominated unrealized value quantification",
+                "Company-specific intelligence from public filings and news",
+                "AI vendor landscape analysis for your industry and use cases",
+                "Board-ready PDF report with executive summary",
+                "90-day action plan with owners by role",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <svg
+                    className="w-5 h-5 text-navy shrink-0 mt-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4.5 12.75l6 6 9-13.5"
+                    />
+                  </svg>
+                  {item}
+                </li>
+              ))}
             </ul>
             <Link
               href="/assessment"
@@ -384,7 +584,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Diagonal Divider: Pricing -> Footer (white to navy) */}
+      {/* Diagonal to Footer */}
       <div className="rlk-diagonal-white-to-navy" />
 
       {/* Footer */}
@@ -395,9 +595,14 @@ export default function Home() {
               <div className="text-white text-sm font-bold tracking-[0.3em] uppercase mb-4">
                 RLK Consulting
               </div>
-              <p className="text-sm leading-relaxed">
-                Enterprise AI strategy advisory. Helping leadership teams
-                translate AI investment into measurable organizational value.
+              <p className="text-sm leading-relaxed mb-4">
+                Enterprise AI strategy advisory. Helping CIOs, CTOs, and
+                senior technology leaders translate AI investment into
+                measurable organizational value.
+              </p>
+              <p className="text-sm">
+                Founded by Ryan King. McKinsey &amp; Deloitte alum.
+                Author of <em>The Human and Machine Company</em>.
               </p>
             </div>
             <div>
@@ -406,17 +611,34 @@ export default function Home() {
               </div>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#how-it-works" className="hover:text-white transition-colors">
+                  <a
+                    href="#how-it-works"
+                    className="hover:text-white transition-colors"
+                  >
                     How It Works
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="hover:text-white transition-colors">
+                  <a
+                    href="#why-rlk"
+                    className="hover:text-white transition-colors"
+                  >
+                    Why RLK
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#pricing"
+                    className="hover:text-white transition-colors"
+                  >
                     Pricing
                   </a>
                 </li>
                 <li>
-                  <Link href="/assessment" className="hover:text-white transition-colors">
+                  <Link
+                    href="/assessment"
+                    className="hover:text-white transition-colors"
+                  >
                     Start Diagnostic
                   </Link>
                 </li>
@@ -424,6 +646,29 @@ export default function Home() {
             </div>
             <div>
               <div className="text-white text-xs font-semibold tracking-widest uppercase mb-4">
+                Contact
+              </div>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="mailto:hello@rlkconsultingco.com"
+                    className="hover:text-white transition-colors"
+                  >
+                    hello@rlkconsultingco.com
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://rlkconsultingco.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    rlkconsultingco.com
+                  </a>
+                </li>
+              </ul>
+              <div className="text-white text-xs font-semibold tracking-widest uppercase mt-6 mb-2">
                 Legal
               </div>
               <ul className="space-y-2 text-sm">
@@ -437,22 +682,17 @@ export default function Home() {
                     Terms of Service
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Data Security
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-xs">
-              &copy; {new Date().getFullYear()} RLK Consulting. All rights
-              reserved.
+              &copy; {new Date().getFullYear()} RLK Consulting, LLC. All
+              rights reserved.
             </p>
             <p className="text-xs text-white/40">
-              All assessment data is treated as strictly confidential and is not
-              shared with third parties.
+              All assessment data is treated as strictly confidential and
+              is not shared with third parties.
             </p>
           </div>
         </div>

@@ -19,6 +19,7 @@ import {
   NewsItem,
   RegulatoryItem,
   StrategicInitiative,
+  VendorAnalysis,
 } from '@/types/research';
 import { RawNewsResult, SECFiling } from './sources';
 
@@ -44,11 +45,13 @@ export async function synthesizeResearchProfile(
     aiIntelligence,
     strategicAnalysis,
     industryContext,
+    vendorAnalysis,
   ] = await Promise.all([
     synthesizeNews(companyProfile, rawData.companyNews),
     synthesizeAIIntelligence(companyProfile, rawData.aiNews, rawData.webContent),
     synthesizeStrategicIntel(companyProfile, rawData.secFilings, rawData.companyNews),
     synthesizeIndustryContext(companyProfile, rawData.industryNews),
+    synthesizeVendorAnalysis(companyProfile, rawData.aiNews, rawData.industryNews),
   ]);
 
   // Final synthesis: executive briefing that ties everything together
@@ -80,6 +83,7 @@ export async function synthesizeResearchProfile(
     industryTrends: industryContext.trends,
     regulatoryDevelopments: industryContext.regulatory,
     recentEarnings: strategicAnalysis.earnings,
+    vendorAnalysis,
     executiveBriefing: executiveSynthesis.briefing,
     aiPostureAssessment: executiveSynthesis.aiPosture,
     competitivePositionNote: executiveSynthesis.competitivePosition,
@@ -402,6 +406,105 @@ Include at least 3-4 trends and 2-3 regulatory items. Be specific to ${profile.i
     };
   } catch {
     return { trends: [], regulatory: [] };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// VENDOR ANALYSIS SYNTHESIS
+// ---------------------------------------------------------------------------
+
+async function synthesizeVendorAnalysis(
+  profile: CompanyProfile,
+  aiNews: RawNewsResult[],
+  industryNews: RawNewsResult[]
+): Promise<VendorAnalysis> {
+  const vendorNewsText = [...aiNews, ...industryNews]
+    .filter((n) => {
+      const lower = (n.title + ' ' + n.description).toLowerCase();
+      return (
+        lower.includes('vendor') ||
+        lower.includes('partner') ||
+        lower.includes('platform') ||
+        lower.includes('deploy') ||
+        lower.includes('openai') ||
+        lower.includes('microsoft') ||
+        lower.includes('google') ||
+        lower.includes('aws') ||
+        lower.includes('salesforce') ||
+        lower.includes('ibm') ||
+        lower.includes('automation') ||
+        lower.includes('copilot') ||
+        lower.includes('genai') ||
+        lower.includes('gen ai') ||
+        lower.includes('llm')
+      );
+    })
+    .slice(0, 15)
+    .map((n, i) => `[${i + 1}] "${n.title}" — ${n.source} (${n.publishedAt})\n${n.description}`)
+    .join('\n\n');
+
+  const useCases = profile.primaryAIUseCases?.length
+    ? profile.primaryAIUseCases.join(', ')
+    : 'general enterprise AI';
+
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 3000,
+    system: `You are a senior technology analyst at Gartner or Forrester. Analyze the AI vendor landscape for this company's specific industry and use cases. Be specific about vendor names, capabilities, and limitations. Your analysis should help a CIO evaluate whether their current vendor investments are optimal. Respond ONLY with valid JSON.`,
+    messages: [
+      {
+        role: 'user',
+        content: `Analyze the AI vendor landscape for a ${profile.industry} company (~${profile.employeeCount.toLocaleString()} employees, ${profile.publicOrPrivate}) with these primary AI use cases: ${useCases}.
+
+VENDOR-RELATED NEWS & SIGNALS:
+${vendorNewsText || 'No vendor-specific news found. Rely on your knowledge of the current vendor landscape.'}
+
+Using the news above plus your knowledge of the AI vendor ecosystem, identify the top 5-8 vendors most relevant to this company's industry and use cases. For each vendor, assess fit, cost, and market position.
+
+Respond with this exact JSON structure:
+{
+  "vendorsIdentified": [
+    {
+      "vendorName": "Vendor Name",
+      "category": "Enterprise AI Platform" | "LLM Provider" | "RPA/Automation" | "Industry-Specific AI" | "Data & Analytics" | "AI Infrastructure",
+      "relevantUseCases": ["which of the company's use cases this vendor serves"],
+      "strengths": ["2-3 key strengths"],
+      "weaknesses": ["2-3 key weaknesses"],
+      "marketPosition": "leader" | "challenger" | "niche" | "emerging",
+      "costEfficiency": "premium" | "moderate" | "value",
+      "industryFit": "strong" | "moderate" | "weak",
+      "verdict": "One sentence: should this company consider this vendor and why?"
+    }
+  ],
+  "marketLandscape": "A 3-4 sentence overview of the current AI vendor landscape as it applies to the ${profile.industry} industry and these use cases (${useCases}). Note key trends like consolidation, pricing pressure, or capability shifts.",
+  "recommendations": [
+    "3-5 specific vendor strategy recommendations for this company. Be concrete: name vendors, suggest evaluation approaches, flag build-vs-buy decisions."
+  ],
+  "riskFlags": [
+    "2-4 vendor-related risks: lock-in risks, concentration risks, capability gaps in the market, pricing trajectory concerns, or vendor stability issues."
+  ]
+}
+
+Be specific. Name real vendors. Assess real capabilities. A CIO should be able to hand this to their procurement team.`,
+      },
+    ],
+  });
+
+  try {
+    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return { vendorsIdentified: [], marketLandscape: '', recommendations: [], riskFlags: [] };
+    }
+    const parsed = JSON.parse(jsonMatch[0]);
+    return {
+      vendorsIdentified: parsed.vendorsIdentified || [],
+      marketLandscape: parsed.marketLandscape || '',
+      recommendations: parsed.recommendations || [],
+      riskFlags: parsed.riskFlags || [],
+    };
+  } catch {
+    return { vendorsIdentified: [], marketLandscape: '', recommendations: [], riskFlags: [] };
   }
 }
 

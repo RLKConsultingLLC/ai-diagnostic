@@ -32,6 +32,9 @@ export interface CompanyResearchProfile {
   industryTrends: IndustryTrend[];
   regulatoryDevelopments: RegulatoryItem[];
 
+  // Vendor Intelligence
+  vendorAnalysis?: VendorAnalysis;
+
   // Synthesized Intelligence
   executiveBriefing: string;          // Claude-synthesized 2-paragraph briefing
   aiPostureAssessment: string;        // What public data reveals about their AI stance
@@ -136,6 +139,26 @@ export interface RegulatoryItem {
   impact: string;
   effectiveDate?: string;
   source: string;
+}
+
+// Vendor Intelligence
+export interface VendorAnalysis {
+  vendorsIdentified: VendorIntel[];
+  marketLandscape: string; // Claude-synthesized overview of the vendor landscape for their use cases
+  recommendations: string[]; // 3-5 vendor strategy recommendations
+  riskFlags: string[]; // vendor-related risks (lock-in, concentration, capability gaps)
+}
+
+export interface VendorIntel {
+  vendorName: string;
+  category: string; // e.g., "Enterprise AI Platform", "LLM Provider", "RPA/Automation"
+  relevantUseCases: string[]; // which of the company's use cases this vendor serves
+  strengths: string[];
+  weaknesses: string[];
+  marketPosition: 'leader' | 'challenger' | 'niche' | 'emerging';
+  costEfficiency: 'premium' | 'moderate' | 'value';
+  industryFit: 'strong' | 'moderate' | 'weak';
+  verdict: string; // one-sentence assessment
 }
 
 // Research job tracking

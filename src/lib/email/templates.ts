@@ -192,7 +192,8 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                       </tr>
                       <tr>
                         <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#8a95a5;line-height:20px;letter-spacing:0.5px;">
-                          AI Strategy &amp; Transformation
+                          AI Strategy &amp; Transformation<br/>
+                          <a href="mailto:hello@rlkconsultingco.com" style="color:#c9a84c;text-decoration:none;">hello@rlkconsultingco.com</a>
                         </td>
                       </tr>
                     </table>

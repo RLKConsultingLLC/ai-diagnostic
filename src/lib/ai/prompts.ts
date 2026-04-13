@@ -212,6 +212,29 @@ function serializeResearchIntelligence(research: CompanyResearchProfile): string
     sections.push(`\nIDENTIFIED OPPORTUNITIES:\n${research.opportunities.map((o) => `- ${o}`).join('\n')}`);
   }
 
+  if (research.vendorAnalysis) {
+    const va = research.vendorAnalysis;
+
+    if (va.marketLandscape) {
+      sections.push(`\nVENDOR LANDSCAPE OVERVIEW:\n${va.marketLandscape}`);
+    }
+
+    if (va.vendorsIdentified.length > 0) {
+      const vendorLines = va.vendorsIdentified
+        .slice(0, 8)
+        .map((v) => `- ${v.vendorName} (${v.category}, ${v.marketPosition}): ${v.verdict}`);
+      sections.push(`\nVENDOR LANDSCAPE:\n${vendorLines.join('\n')}`);
+    }
+
+    if (va.recommendations.length > 0) {
+      sections.push(`\nVENDOR STRATEGY RECOMMENDATIONS:\n${va.recommendations.map((r) => `- ${r}`).join('\n')}`);
+    }
+
+    if (va.riskFlags.length > 0) {
+      sections.push(`\nVENDOR RISK FLAGS:\n${va.riskFlags.map((f) => `- ${f}`).join('\n')}`);
+    }
+  }
+
   sections.push('\n=== END COMPANY INTELLIGENCE ===');
   sections.push('IMPORTANT: Use this intelligence to make the report specific to this company. Reference actual news, leadership signals, competitor moves, and industry trends by name. The customer should feel this report could only have been written about THEIR company.');
 
