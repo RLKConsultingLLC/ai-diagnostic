@@ -141,6 +141,13 @@ export default function AssessmentPage() {
   // -- Dimension transition screen state
   const [dimensionInsight, setDimensionInsight] = useState<string | null>(null);
   const [insightLoading, setInsightLoading] = useState(false);
+  const [insightLayer, setInsightLayer] = useState(0);
+  const [reportPreview, setReportPreview] = useState<{
+    unlockedSections: string[];
+    nextUnlock: string | null;
+    valueTeaser: string;
+  } | null>(null);
+  const [dimensionScoreDisplay, setDimensionScoreDisplay] = useState<number | null>(null);
 
   // -- Research status polling
   const [researchStatus, setResearchStatus] = useState<string>(
@@ -278,7 +285,7 @@ export default function AssessmentPage() {
     regulatoryIntensity !== "" &&
     selectedUseCases.length > 0;
 
-  // Fetch dimension insight from API
+  // Fetch dimension insight from API (escalating with each dimension)
   const fetchDimensionInsight = useCallback(
     async (dimension: Dimension) => {
       // Return cached insight if available
@@ -289,6 +296,8 @@ export default function AssessmentPage() {
 
       setInsightLoading(true);
       setDimensionInsight(null);
+      setReportPreview(null);
+      setDimensionScoreDisplay(null);
 
       try {
         const dimQuestions = questions.filter(
@@ -298,17 +307,34 @@ export default function AssessmentPage() {
           .filter((q) => responses[q.id])
           .map((q) => ({
             questionId: q.id,
-            selectedOptionIndex: responses[q.id].optionIndex,
             score: responses[q.id].score,
           }));
+
+        // Build completed dimensions context for cumulative analysis
+        const completedDims = completedDimensions
+          .filter((d) => d !== dimension)
+          .map((d) => {
+            const dQuestions = questions.filter((q) => q.dimension === d);
+            const dResponses = dQuestions.filter((q) => responses[q.id]);
+            const avg =
+              dResponses.length > 0
+                ? dResponses.reduce((s, q) => s + responses[q.id].score, 0) /
+                  dResponses.length
+                : 0;
+            return { dimension: d, responses: [], averageScore: avg };
+          });
 
         const res = await fetch("/api/assessment/insight", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            sessionId,
             dimension,
             responses: dimResponses,
+            companyName,
+            industry,
+            employeeCount: employeeCount ? parseInt(employeeCount, 10) : undefined,
+            revenue: revenue ? parseFloat(revenue) : undefined,
+            completedDimensions: completedDims,
           }),
         });
 
@@ -318,12 +344,13 @@ export default function AssessmentPage() {
           if (text) {
             setDimensionInsight(text);
             setInsightCache((prev) => ({ ...prev, [dimension]: text }));
-          } else {
-            setDimensionInsight(
-              "Your responses are being analyzed. Detailed insights will appear in your final report."
-            );
           }
-        } else {
+          if (data.layer) setInsightLayer(data.layer);
+          if (data.dimensionScore) setDimensionScoreDisplay(data.dimensionScore);
+          if (data.reportPreview) setReportPreview(data.reportPreview);
+        }
+
+        if (!dimensionInsight) {
           setDimensionInsight(
             "Your responses are being analyzed. Detailed insights will appear in your final report."
           );
@@ -336,7 +363,7 @@ export default function AssessmentPage() {
         setInsightLoading(false);
       }
     },
-    [questions, responses, sessionId, insightCache]
+    [questions, responses, insightCache, completedDimensions, companyName, industry, employeeCount, revenue, dimensionInsight]
   );
 
   // Submit intake to create a session and get questions
@@ -421,14 +448,12 @@ export default function AssessmentPage() {
         return [...prev, currentGroup.dimension];
       });
 
-      if (isLastDimension) {
-        // All questions answered -- go to review
-        setStep("review");
-      } else {
-        // Show dimension transition screen
-        setStep("dimension_transition");
-        fetchDimensionInsight(currentGroup.dimension);
-      }
+      // Always show transition screen (including after the final dimension)
+      setStep("dimension_transition");
+      fetchDimensionInsight(currentGroup.dimension);
+
+      // The continue button in the transition screen handles routing
+      // to either the next dimension or the review screen
     } else {
       // Next question within same dimension
       setCurrentQInDim((q) => q + 1);
@@ -456,13 +481,21 @@ export default function AssessmentPage() {
     }
   }, [currentQInDim, currentDimIndex, dimensionGroups]);
 
-  // Continue from dimension transition to next dimension
+  // Continue from dimension transition to next dimension (or review if last)
   const handleContinueFromTransition = useCallback(() => {
-    setCurrentDimIndex((d) => d + 1);
-    setCurrentQInDim(0);
+    const isLastDimension = currentDimIndex >= dimensionGroups.length - 1;
     setDimensionInsight(null);
-    setStep("questions");
-  }, []);
+    setReportPreview(null);
+    setDimensionScoreDisplay(null);
+
+    if (isLastDimension) {
+      setStep("review");
+    } else {
+      setCurrentDimIndex((d) => d + 1);
+      setCurrentQInDim(0);
+      setStep("questions");
+    }
+  }, [currentDimIndex, dimensionGroups.length]);
 
   // Final submit
   const handleFinalSubmit = async () => {
@@ -992,127 +1025,175 @@ export default function AssessmentPage() {
         {step === "dimension_transition" && currentGroup && (
           <div className="dimension-transition">
             {/* Diagonal stripe divider */}
-            <div className="rlk-diagonal-divider mb-10 -mx-6" />
+            <div className="rlk-diagonal-divider mb-8 -mx-6" />
 
-            <div className="text-center max-w-xl mx-auto">
-              {/* Dimension completion badge */}
-              <div className="inline-flex items-center gap-2 bg-navy/5 border border-navy/20 px-4 py-2 mb-6">
-                <svg
-                  className="w-4 h-4 text-navy"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
+            {/* Score + Completion Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="inline-flex items-center gap-2 bg-navy/5 border border-navy/20 px-4 py-2">
+                <svg className="w-4 h-4 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
                 <span className="text-sm font-semibold text-navy">
-                  {DIMENSION_META[currentGroup.dimension].label} Complete
+                  {DIMENSION_META[currentGroup.dimension].label}
                 </span>
               </div>
-
-              {/* Progress indicator */}
-              <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-3">
-                Dimension {currentDimIndex + 1} of {dimensionGroups.length}{" "}
-                complete
-              </p>
-
-              {/* What is next */}
-              {currentDimIndex + 1 < dimensionGroups.length && (
-                <div className="mb-8">
-                  <p className="text-foreground/60 text-sm">
-                    Next:{" "}
-                    <span className="text-secondary font-medium">
-                      {
-                        DIMENSION_META[
-                          dimensionGroups[currentDimIndex + 1].dimension
-                        ].label
-                      }
-                    </span>
-                  </p>
-                  <p className="text-foreground/40 text-xs mt-1">
-                    {
-                      DIMENSION_META[
-                        dimensionGroups[currentDimIndex + 1].dimension
-                      ].description
-                    }
-                  </p>
+              {dimensionScoreDisplay !== null && (
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-navy">
+                    {((dimensionScoreDisplay / 5) * 100).toFixed(0)}
+                    <span className="text-sm text-tertiary font-normal">/100</span>
+                  </div>
+                  <div className="text-xs text-tertiary">Dimension Score</div>
                 </div>
               )}
+            </div>
 
-              {/* AI Insight Card */}
-              <div className="insight-card bg-white border border-light text-left p-6 mb-8 border-l-4 border-l-navy">
-                <div className="flex items-center gap-2 mb-3">
-                  <svg
-                    className="w-4 h-4 text-navy"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
+            <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-6">
+              Dimension {currentDimIndex + 1} of {dimensionGroups.length} complete
+            </p>
+
+            {/* AI Insight Card (the main event) */}
+            <div className="insight-card bg-white border border-light text-left p-6 mb-6 border-l-4 border-l-navy">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                   <span className="text-xs font-semibold text-navy uppercase tracking-wider">
-                    AI Insight
+                    {insightLayer <= 1 ? "Structural Insight" :
+                     insightLayer === 2 ? "Cross-Dimensional Pattern" :
+                     insightLayer === 3 ? "Emerging Diagnosis" :
+                     insightLayer === 4 ? "Preliminary Findings" :
+                     "Complete Structural Analysis"}
                   </span>
                 </div>
-                {insightLoading ? (
-                  <div className="flex items-center gap-3">
-                    <Spinner />
-                    <span className="text-sm text-tertiary">
-                      Analyzing your responses...
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-sm text-foreground/80 leading-relaxed insight-text">
-                    {dimensionInsight}
-                  </p>
+                {insightLayer > 1 && (
+                  <span className="text-xs text-accent">
+                    Layer {insightLayer} of 5
+                  </span>
                 )}
               </div>
+              {insightLoading ? (
+                <div className="space-y-3 py-2">
+                  <div className="flex items-center gap-3">
+                    <Spinner />
+                    <span className="text-sm text-secondary font-medium">
+                      {insightLayer <= 1 ? "Analyzing behavioral patterns..." :
+                       insightLayer === 2 ? "Identifying cross-dimensional dynamics..." :
+                       insightLayer === 3 ? "Building structural diagnosis..." :
+                       insightLayer === 4 ? "Synthesizing competitive position..." :
+                       "Completing full organizational analysis..."}
+                    </span>
+                  </div>
+                  <div className="h-1 bg-light rounded-full overflow-hidden">
+                    <div className="h-full bg-navy/30 rounded-full animate-pulse" style={{ width: "60%" }} />
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-foreground/80 leading-relaxed insight-text">
+                  {dimensionInsight}
+                </p>
+              )}
+            </div>
 
-              {/* Dimension completion dots */}
-              <div className="flex items-center justify-center gap-3 mb-10">
-                {dimensionGroups.map((group, idx) => (
-                  <div
-                    key={group.dimension}
-                    className={`w-3 h-3 rounded-full transition-colors ${
-                      completedDimensions.includes(group.dimension)
-                        ? "bg-navy"
-                        : idx === currentDimIndex + 1
-                        ? "border-2 border-navy bg-transparent"
-                        : "bg-light"
-                    }`}
-                    title={DIMENSION_META[group.dimension].label}
-                  />
-                ))}
+            {/* Report Preview: Progressive Unlock */}
+            {reportPreview && !insightLoading && (
+              <div className="insight-card bg-offwhite border border-light p-6 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <svg className="w-4 h-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                  </svg>
+                  <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
+                    Your Report is Building
+                  </span>
+                </div>
+
+                <p className="text-xs text-foreground/60 mb-4">
+                  {reportPreview.valueTeaser}
+                </p>
+
+                {/* Section unlock list */}
+                <div className="space-y-2">
+                  {reportPreview.unlockedSections.map((section, idx) => (
+                    <div key={section} className="flex items-center gap-2.5 report-section-unlock" style={{ animationDelay: `${idx * 0.1}s` }}>
+                      <div className="w-4 h-4 rounded-full bg-navy flex items-center justify-center shrink-0">
+                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span className="text-xs font-medium text-navy">{section}</span>
+                    </div>
+                  ))}
+                  {reportPreview.nextUnlock && (
+                    <div className="flex items-center gap-2.5 opacity-40">
+                      <div className="w-4 h-4 rounded-full border border-accent shrink-0" />
+                      <span className="text-xs text-tertiary">{reportPreview.nextUnlock}</span>
+                    </div>
+                  )}
+                  {/* Show remaining locked sections */}
+                  {Array.from({ length: Math.max(0, 7 - (reportPreview.unlockedSections.length + (reportPreview.nextUnlock ? 1 : 0))) }).map((_, i) => (
+                    <div key={`locked-${i}`} className="flex items-center gap-2.5 opacity-20">
+                      <div className="w-4 h-4 rounded-full border border-light shrink-0" />
+                      <div className="h-2 bg-light rounded w-32" />
+                    </div>
+                  ))}
+                </div>
               </div>
+            )}
 
-              {/* Continue button */}
+            {/* Next dimension preview */}
+            {currentDimIndex + 1 < dimensionGroups.length && (
+              <div className="bg-white border border-light p-5 mb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-tertiary uppercase tracking-wider mb-1">
+                      Next Dimension
+                    </p>
+                    <p className="text-sm font-semibold text-secondary">
+                      {DIMENSION_META[dimensionGroups[currentDimIndex + 1].dimension].label}
+                    </p>
+                    <p className="text-xs text-foreground/50 mt-0.5">
+                      {DIMENSION_META[dimensionGroups[currentDimIndex + 1].dimension].description}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-tertiary">
+                      {dimensionGroups[currentDimIndex + 1].questions.length} questions
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Dimension completion dots */}
+            <div className="flex items-center justify-center gap-3 mb-8">
+              {dimensionGroups.map((group, idx) => (
+                <div
+                  key={group.dimension}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    completedDimensions.includes(group.dimension)
+                      ? "bg-navy"
+                      : idx === currentDimIndex + 1
+                      ? "border-2 border-navy bg-transparent"
+                      : "bg-light"
+                  }`}
+                  title={DIMENSION_META[group.dimension].label}
+                />
+              ))}
+            </div>
+
+            {/* Continue button */}
+            <div className="text-center">
               <button
                 onClick={handleContinueFromTransition}
-                className="bg-navy text-white px-8 py-3.5 text-sm font-semibold hover:bg-secondary transition-colors flex items-center gap-2 mx-auto"
+                disabled={insightLoading}
+                className="bg-navy text-white px-8 py-3.5 text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40 flex items-center gap-2 mx-auto"
               >
-                Continue
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
+                {currentDimIndex + 1 < dimensionGroups.length
+                  ? `Continue to ${DIMENSION_META[dimensionGroups[currentDimIndex + 1].dimension].label}`
+                  : "Review All Responses"}
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </button>
             </div>
@@ -1324,6 +1405,21 @@ export default function AssessmentPage() {
         /* Research status text transition */
         .research-status-text {
           transition: opacity 0.3s ease;
+        }
+
+        /* Report section unlock animation */
+        .report-section-unlock {
+          animation: sectionUnlock 0.4s ease-out both;
+        }
+        @keyframes sectionUnlock {
+          from {
+            opacity: 0;
+            transform: translateX(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
       `}</style>
     </div>
