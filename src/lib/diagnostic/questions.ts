@@ -1,14 +1,14 @@
 // =============================================================================
-// RLK AI Board Brief — Proprietary Diagnostic Question Bank
+// RLK AI Diagnostic and Board Brief — Proprietary Diagnostic Question Bank
 // =============================================================================
-// 36 questions across 5 hidden dimensions. Each question diagnoses BEHAVIOR,
+// 61 questions across 5 hidden dimensions. Each question diagnoses BEHAVIOR,
 // not tools. Answer options map to maturity levels 0–5.
 // =============================================================================
 
 import { DiagnosticQuestion } from '@/types/diagnostic';
 
 // ---------------------------------------------------------------------------
-// DIMENSION 1: ADOPTION BEHAVIOR (7 questions)
+// DIMENSION 1: ADOPTION BEHAVIOR (12 questions)
 // Measures how AI is actually being used vs. merely purchased/discussed
 // ---------------------------------------------------------------------------
 
@@ -112,10 +112,80 @@ const adoptionBehavior: DiagnosticQuestion[] = [
     weight: 1.1,
     tags: ['adoption', 'breadth'],
   },
+  {
+    id: 'AB-08',
+    dimension: 'adoption_behavior',
+    text: 'How do managers at your organization respond when a direct report proposes using AI to replace part of an existing process?',
+    options: [
+      { text: 'Proposals are dismissed or seen as a threat to existing roles', score: 0 },
+      { text: 'Polite interest but no follow-through or resource allocation', score: 1 },
+      { text: 'Managers are open but lack authority or budget to act on proposals', score: 2 },
+      { text: 'Proposals are evaluated against clear criteria with a path to pilot', score: 4 },
+      { text: 'Bottom-up AI proposals are actively encouraged, resourced, and celebrated when successful', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['adoption', 'culture', 'management'],
+  },
+  {
+    id: 'AB-09',
+    dimension: 'adoption_behavior',
+    text: 'What is the typical time between identifying an AI use case and putting a working solution in front of end users?',
+    options: [
+      { text: 'Over 12 months, if it happens at all', score: 0 },
+      { text: '6–12 months due to approval, procurement, and implementation cycles', score: 1 },
+      { text: '3–6 months with a dedicated project team', score: 2 },
+      { text: '4–12 weeks using pre-approved tools and agile deployment practices', score: 4 },
+      { text: 'Under 4 weeks for standard use cases; dedicated fast-track for high-priority needs', score: 5 },
+    ],
+    weight: 1.2,
+    tags: ['adoption', 'speed', 'deployment'],
+  },
+  {
+    id: 'AB-10',
+    dimension: 'adoption_behavior',
+    text: 'How does your organization approach AI-related upskilling and training?',
+    options: [
+      { text: 'No formal AI training exists; employees learn on their own or not at all', score: 0 },
+      { text: 'Optional webinars or external courses with low completion rates', score: 1 },
+      { text: 'Structured training for select roles (data scientists, analysts) but not broadly', score: 2 },
+      { text: 'Role-specific AI training programs with completion tracking and practical exercises', score: 4 },
+      { text: 'Continuous learning culture with embedded AI coaching, peer learning networks, and skill-based progression', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['adoption', 'training', 'talent'],
+  },
+  {
+    id: 'AB-11',
+    dimension: 'adoption_behavior',
+    text: 'When an AI tool produces an output that contradicts an employee\'s judgment, what typically happens?',
+    options: [
+      { text: 'The AI output is ignored; employees trust their gut over any AI recommendation', score: 0 },
+      { text: 'The AI output is quietly overridden without investigation or documentation', score: 1 },
+      { text: 'It depends entirely on the individual; no organizational norms exist', score: 2 },
+      { text: 'A defined process exists to evaluate discrepancies and escalate when warranted', score: 4 },
+      { text: 'AI and human judgment are integrated through calibrated decision frameworks with feedback loops', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['adoption', 'trust', 'decision_making'],
+  },
+  {
+    id: 'AB-12',
+    dimension: 'adoption_behavior',
+    text: 'How would you characterize your C-suite\'s personal engagement with AI tools?',
+    options: [
+      { text: 'None of our executives actively use AI tools themselves', score: 0 },
+      { text: 'One or two executives have experimented but it hasn\'t influenced their leadership', score: 1 },
+      { text: 'Several executives use AI for personal productivity but haven\'t championed it organizationally', score: 2 },
+      { text: 'Executive leadership actively uses AI and references their experience when setting strategy', score: 4 },
+      { text: 'The C-suite models AI usage, shares learnings publicly, and holds themselves accountable for AI-driven outcomes', score: 5 },
+    ],
+    weight: 1.3,
+    tags: ['adoption', 'executive', 'leadership'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
-// DIMENSION 2: AUTHORITY STRUCTURE (7 questions)
+// DIMENSION 2: AUTHORITY STRUCTURE (7+5=12 questions)
 // Measures who controls AI decisions and how permission flows
 // ---------------------------------------------------------------------------
 
@@ -219,10 +289,80 @@ const authorityStructure: DiagnosticQuestion[] = [
     weight: 1.1,
     tags: ['authority', 'decentralization'],
   },
+  {
+    id: 'AS-08',
+    dimension: 'authority_structure',
+    text: 'How are AI ethics and responsible AI principles governed in your organization?',
+    options: [
+      { text: 'No formal AI ethics framework exists', score: 0 },
+      { text: 'High-level principles are documented but not operationalized or enforced', score: 1 },
+      { text: 'An ethics review is required for customer-facing AI but enforcement varies', score: 2 },
+      { text: 'A dedicated ethics review board evaluates AI deployments against defined criteria', score: 4 },
+      { text: 'AI ethics is embedded in development workflows with automated checks, audit trails, and regular external review', score: 5 },
+    ],
+    weight: 1.2,
+    tags: ['authority', 'ethics', 'responsible_ai'],
+  },
+  {
+    id: 'AS-09',
+    dimension: 'authority_structure',
+    text: 'When an AI system produces a biased or incorrect outcome that affects a customer or employee, what happens?',
+    options: [
+      { text: 'We have no process; incidents are handled reactively if noticed at all', score: 0 },
+      { text: 'It\'s escalated as a one-off incident with no systemic response', score: 1 },
+      { text: 'An incident report is filed but root cause analysis is inconsistent', score: 2 },
+      { text: 'A defined incident response protocol triggers investigation, remediation, and process updates', score: 4 },
+      { text: 'Continuous monitoring catches issues proactively; incidents trigger organization-wide learning and model retraining', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['authority', 'incident_response', 'risk'],
+  },
+  {
+    id: 'AS-10',
+    dimension: 'authority_structure',
+    text: 'How is AI-related data governance handled across your organization?',
+    options: [
+      { text: 'No data governance specific to AI exists; teams use whatever data they can access', score: 0 },
+      { text: 'Basic data access policies exist but are not enforced or AI-specific', score: 1 },
+      { text: 'Data classification exists but AI teams frequently need exceptions or workarounds', score: 2 },
+      { text: 'Clear data governance framework with defined access levels, quality standards, and AI-specific policies', score: 4 },
+      { text: 'Automated data governance with lineage tracking, quality monitoring, and self-service data access within guardrails', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['authority', 'data_governance', 'compliance'],
+  },
+  {
+    id: 'AS-11',
+    dimension: 'authority_structure',
+    text: 'How does your organization manage the risk of AI vendor lock-in?',
+    options: [
+      { text: 'We haven\'t considered vendor lock-in as a risk', score: 0 },
+      { text: 'We\'re aware of the risk but have no formal strategy to mitigate it', score: 1 },
+      { text: 'We try to avoid single-vendor dependency but have no formal exit planning', score: 2 },
+      { text: 'Vendor contracts include data portability clauses and exit provisions', score: 4 },
+      { text: 'Multi-vendor strategy with abstraction layers, regular competitive reviews, and tested migration paths', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['authority', 'vendor', 'risk'],
+  },
+  {
+    id: 'AS-12',
+    dimension: 'authority_structure',
+    text: 'How are AI-related intellectual property and competitive moats protected?',
+    options: [
+      { text: 'We have not considered AI IP implications', score: 0 },
+      { text: 'General IP policies exist but nothing specific to AI models, training data, or outputs', score: 1 },
+      { text: 'We restrict sharing of proprietary data with AI vendors but lack comprehensive AI IP strategy', score: 2 },
+      { text: 'Clear AI IP policies covering model ownership, training data rights, and output attribution', score: 4 },
+      { text: 'Strategic AI IP portfolio with proprietary models, data advantages, and competitive moat assessment integrated into AI roadmap', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['authority', 'ip', 'competitive'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
-// DIMENSION 3: WORKFLOW INTEGRATION (8 questions)
+// DIMENSION 3: WORKFLOW INTEGRATION (8+5=13 questions)
 // Measures whether AI is embedded in actual work vs. bolted on
 // ---------------------------------------------------------------------------
 
@@ -339,10 +479,80 @@ const workflowIntegration: DiagnosticQuestion[] = [
     weight: 1.0,
     tags: ['workflow', 'orchestration', 'platform'],
   },
+  {
+    id: 'WI-09',
+    dimension: 'workflow_integration',
+    text: 'How does AI factor into your customer-facing interactions (sales, support, service)?',
+    options: [
+      { text: 'Customer-facing teams do not use AI in any meaningful way', score: 0 },
+      { text: 'Basic chatbots or canned response systems exist but are rarely effective', score: 1 },
+      { text: 'AI assists with knowledge retrieval or suggestion during customer interactions', score: 2 },
+      { text: 'AI is embedded in customer workflows with real-time guidance, next-best-action, and sentiment analysis', score: 4 },
+      { text: 'AI co-pilots customer interactions end-to-end: personalization, resolution prediction, proactive outreach, and continuous learning from outcomes', score: 5 },
+    ],
+    weight: 1.2,
+    tags: ['workflow', 'customer_facing', 'cx'],
+  },
+  {
+    id: 'WI-10',
+    dimension: 'workflow_integration',
+    text: 'How is AI integrated into your internal knowledge management and documentation?',
+    options: [
+      { text: 'Knowledge management is entirely manual with no AI involvement', score: 0 },
+      { text: 'Basic search exists but employees still spend significant time finding information', score: 1 },
+      { text: 'AI-powered search helps locate documents but doesn\'t synthesize or summarize', score: 2 },
+      { text: 'AI generates summaries, surfaces relevant context proactively, and keeps documentation updated', score: 4 },
+      { text: 'Organizational knowledge is continuously captured, structured, and surfaced by AI at the point of need across all workflows', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['workflow', 'knowledge_management'],
+  },
+  {
+    id: 'WI-11',
+    dimension: 'workflow_integration',
+    text: 'To what extent has AI changed the nature of meetings and collaborative decision-making?',
+    options: [
+      { text: 'Meetings are conducted exactly as they were before AI existed', score: 0 },
+      { text: 'Some teams use AI for transcription or note-taking after meetings', score: 1 },
+      { text: 'AI pre-generates agendas, summaries, and action items for select meeting types', score: 2 },
+      { text: 'AI actively participates in meetings: surfacing data, flagging conflicts, and tracking commitments in real-time', score: 4 },
+      { text: 'AI has fundamentally reduced meeting load; most coordination happens asynchronously through AI-mediated workflows', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['workflow', 'collaboration', 'meetings'],
+  },
+  {
+    id: 'WI-12',
+    dimension: 'workflow_integration',
+    text: 'How deeply is AI integrated into your financial planning, budgeting, and forecasting processes?',
+    options: [
+      { text: 'Financial planning is entirely spreadsheet-driven with no AI involvement', score: 0 },
+      { text: 'Some AI-generated forecasts exist but planners default to manual models', score: 1 },
+      { text: 'AI provides inputs to the planning process but human analysts build the final models', score: 2 },
+      { text: 'AI generates baseline forecasts that planners refine; scenario modeling is AI-assisted', score: 4 },
+      { text: 'Continuous AI-driven forecasting with real-time variance detection, automated scenario modeling, and direct integration to resource allocation', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['workflow', 'finance', 'planning'],
+  },
+  {
+    id: 'WI-13',
+    dimension: 'workflow_integration',
+    text: 'How does AI influence your product development or service design process?',
+    options: [
+      { text: 'AI plays no role in how we design products or services', score: 0 },
+      { text: 'Developers or designers occasionally use AI tools as personal productivity aids', score: 1 },
+      { text: 'AI is used in specific stages (testing, code review, user research analysis) but not end-to-end', score: 2 },
+      { text: 'AI is embedded across the development lifecycle from ideation through deployment and monitoring', score: 4 },
+      { text: 'AI is a co-creator: generating prototypes, predicting market fit, optimizing features, and enabling continuous experimentation at scale', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['workflow', 'product', 'innovation'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
-// DIMENSION 4: DECISION VELOCITY (7 questions)
+// DIMENSION 4: DECISION VELOCITY (7+5=12 questions)
 // Measures speed from insight to action and from idea to deployment
 // ---------------------------------------------------------------------------
 
@@ -445,10 +655,80 @@ const decisionVelocity: DiagnosticQuestion[] = [
     weight: 1.1,
     tags: ['velocity', 'risk', 'governance'],
   },
+  {
+    id: 'DV-08',
+    dimension: 'decision_velocity',
+    text: 'When a competitor announces a significant AI capability, how quickly does your organization respond?',
+    options: [
+      { text: 'We typically don\'t notice or respond to competitor AI moves', score: 0 },
+      { text: 'It triggers discussion but no action for 6+ months', score: 1 },
+      { text: 'A competitive analysis is commissioned; response takes 3–6 months', score: 2 },
+      { text: 'Standing competitive intelligence process assesses implications within weeks; response plan within 60 days', score: 4 },
+      { text: 'Continuous competitive monitoring with pre-approved response playbooks; counter-moves deploy in days to weeks', score: 5 },
+    ],
+    weight: 1.2,
+    tags: ['velocity', 'competitive', 'responsiveness'],
+  },
+  {
+    id: 'DV-09',
+    dimension: 'decision_velocity',
+    text: 'How quickly can your organization decommission or replace an underperforming AI solution?',
+    options: [
+      { text: 'Sunken cost fallacy rules; we\'ve never shut down a deployed AI system', score: 0 },
+      { text: 'Decommissioning takes 6–12 months due to organizational inertia and vendor contracts', score: 1 },
+      { text: 'We can sunset tools in 3–6 months if a business case is made', score: 2 },
+      { text: 'Kill criteria are defined upfront; underperformers are flagged and replaced within 8 weeks', score: 4 },
+      { text: 'Continuous performance monitoring with automated alerts; replacement and migration are standard operating procedure', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['velocity', 'agility', 'portfolio'],
+  },
+  {
+    id: 'DV-10',
+    dimension: 'decision_velocity',
+    text: 'How effectively does your organization capture and share learnings from AI experiments across teams?',
+    options: [
+      { text: 'Learnings stay trapped in the team that ran the experiment, if captured at all', score: 0 },
+      { text: 'Occasional presentations or email updates but no structured process', score: 1 },
+      { text: 'Retrospectives happen but findings are documented inconsistently and rarely referenced', score: 2 },
+      { text: 'Centralized knowledge repository with structured experiment logs; teams reference prior work before starting new initiatives', score: 4 },
+      { text: 'Living institutional memory: AI experiment results feed automated recommendations for future projects; cross-team learning is built into the operating model', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['velocity', 'learning', 'knowledge'],
+  },
+  {
+    id: 'DV-11',
+    dimension: 'decision_velocity',
+    text: 'How does your organization decide between building custom AI solutions versus buying or licensing them?',
+    options: [
+      { text: 'No framework exists; it depends on who\'s making the decision', score: 0 },
+      { text: 'Default is to buy/license; build is rarely considered regardless of strategic value', score: 1 },
+      { text: 'Build vs. buy analysis happens but criteria are inconsistent and politically influenced', score: 2 },
+      { text: 'Clear build-buy-partner decision framework based on strategic value, data sensitivity, and competitive differentiation', score: 4 },
+      { text: 'Dynamic portfolio approach: core differentiators are built in-house, commodity capabilities are licensed, with regular rebalancing as the market evolves', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['velocity', 'strategy', 'build_buy'],
+  },
+  {
+    id: 'DV-12',
+    dimension: 'decision_velocity',
+    text: 'When new AI regulations or compliance requirements emerge, how quickly does your organization adapt?',
+    options: [
+      { text: 'We react only when forced; compliance is achieved months after deadlines', score: 0 },
+      { text: 'Legal monitors regulations but organizational response is slow and reactive', score: 1 },
+      { text: 'A compliance team tracks requirements; adaptation takes 3–6 months', score: 2 },
+      { text: 'Proactive regulatory monitoring with pre-planned response protocols; adaptation within weeks', score: 4 },
+      { text: 'Regulatory intelligence is embedded in AI governance; we often comply before regulations take effect and participate in shaping industry standards', score: 5 },
+    ],
+    weight: 1.2,
+    tags: ['velocity', 'regulatory', 'compliance'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
-// DIMENSION 5: ECONOMIC TRANSLATION (7 questions)
+// DIMENSION 5: ECONOMIC TRANSLATION (7+5=12 questions)
 // Measures ability to quantify and capture financial value from AI
 // ---------------------------------------------------------------------------
 
@@ -550,6 +830,76 @@ const economicTranslation: DiagnosticQuestion[] = [
     ],
     weight: 1.2,
     tags: ['economic', 'accountability', 'investor'],
+  },
+  {
+    id: 'ET-08',
+    dimension: 'economic_translation',
+    text: 'How does your organization account for the "hidden costs" of AI (data preparation, change management, ongoing maintenance)?',
+    options: [
+      { text: 'Hidden costs are not tracked; only licensing and headcount are budgeted', score: 0 },
+      { text: 'We know hidden costs exist but have no framework to quantify them', score: 1 },
+      { text: 'Some hidden costs are estimated but systematically underbudgeted', score: 2 },
+      { text: 'Total cost of ownership models include data prep, training, maintenance, and change management', score: 4 },
+      { text: 'Full lifecycle costing with real-time tracking of all direct and indirect costs, informing continuous portfolio optimization', score: 5 },
+    ],
+    weight: 1.1,
+    tags: ['economic', 'tco', 'hidden_costs'],
+  },
+  {
+    id: 'ET-09',
+    dimension: 'economic_translation',
+    text: 'How effectively does your organization use AI to generate net-new revenue (new products, services, or markets)?',
+    options: [
+      { text: 'AI has not been considered as a revenue driver; it\'s viewed purely as a cost-reduction tool', score: 0 },
+      { text: 'Some ideas exist for AI-enabled products/services but none have launched', score: 1 },
+      { text: 'One or two AI-enabled offerings are in market but revenue contribution is minimal', score: 2 },
+      { text: 'AI-enabled products/services contribute measurable revenue with a clear growth trajectory', score: 4 },
+      { text: 'AI is a core revenue engine; multiple AI-native products in market with proven customer willingness to pay and expanding addressable market', score: 5 },
+    ],
+    weight: 1.3,
+    tags: ['economic', 'revenue', 'innovation'],
+  },
+  {
+    id: 'ET-10',
+    dimension: 'economic_translation',
+    text: 'How does your AI investment compare to your industry peers as a percentage of revenue?',
+    options: [
+      { text: 'We don\'t know what peers are spending and haven\'t benchmarked', score: 0 },
+      { text: 'We believe we\'re significantly behind peers but have no precise data', score: 1 },
+      { text: 'We track some benchmarks; our spend is at or slightly below industry median', score: 2 },
+      { text: 'We actively benchmark against top-quartile peers and invest accordingly', score: 4 },
+      { text: 'We are a recognized AI investment leader in our sector with deliberate above-market spending tied to strategic differentiation', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['economic', 'benchmarking', 'investment'],
+  },
+  {
+    id: 'ET-11',
+    dimension: 'economic_translation',
+    text: 'How does your organization think about the AI talent premium (cost of hiring and retaining AI-skilled employees)?',
+    options: [
+      { text: 'We haven\'t adjusted compensation or talent strategy for AI skills', score: 0 },
+      { text: 'We\'re losing AI talent to competitors and struggling to compete on compensation', score: 1 },
+      { text: 'We pay market rate for dedicated AI roles but haven\'t valued AI skills across the broader workforce', score: 2 },
+      { text: 'AI skills are reflected in compensation bands across roles; retention programs target key AI talent', score: 4 },
+      { text: 'Strategic talent portfolio: competitive compensation, internal mobility, AI upskilling paths, and brand positioning that attracts top AI talent', score: 5 },
+    ],
+    weight: 1.0,
+    tags: ['economic', 'talent', 'compensation'],
+  },
+  {
+    id: 'ET-12',
+    dimension: 'economic_translation',
+    text: 'How clearly can you articulate the "cost of doing nothing" with respect to AI transformation?',
+    options: [
+      { text: 'We haven\'t framed it in those terms; AI is seen as optional', score: 0 },
+      { text: 'Leadership senses urgency but can\'t quantify the risk of inaction', score: 1 },
+      { text: 'Qualitative arguments exist (competitor moves, talent flight) but no financial modeling', score: 2 },
+      { text: 'Financial model quantifies cost of inaction across key value levers (market share, productivity gap, talent cost)', score: 4 },
+      { text: 'Dynamic cost-of-inaction model updated quarterly with competitive intelligence, tied to strategic planning and board-level capital allocation decisions', score: 5 },
+    ],
+    weight: 1.2,
+    tags: ['economic', 'inaction', 'strategy'],
   },
 ];
 

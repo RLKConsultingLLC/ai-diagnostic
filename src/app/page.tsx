@@ -77,7 +77,7 @@ export default function Home() {
                 </svg>
               </Link>
               <span className="text-sm text-tertiary mt-2 sm:mt-3">
-                15 minutes. No tools audit. Just operating-model truth.
+                25 minutes. No tools audit. Just operating-model truth.
               </span>
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function Home() {
                 Behavioral Diagnosis
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed">
-                36 behavioral questions that diagnose how your people
+                61 behavioral questions that diagnose how your people
                 actually interact with AI, not which tools you purchased.
                 The gap between those two things is where value disappears.
               </p>
@@ -306,7 +306,7 @@ export default function Home() {
                 The AI Board Brief diagnostic is a productized version of
                 the assessment Ryan has conducted by hand for enterprise
                 clients. The same frameworks, the same analytical rigor,
-                the same CIO-grade output. Delivered in 15 minutes instead
+                the same CIO-grade output. Delivered in 25 minutes instead
                 of 6 weeks, at a fraction of the cost.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -396,7 +396,7 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-navy">36</div>
+              <div className="text-2xl font-bold text-navy">61</div>
               <div className="text-xs text-tertiary mt-1">
                 Behavioral Questions
               </div>
@@ -435,7 +435,7 @@ export default function Home() {
                 Complete the Assessment
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed max-w-xs mx-auto">
-                Answer 36 behavioral questions across five dimensions.
+                Answer 61 behavioral questions across five dimensions.
                 While you respond, our AI researches your company using
                 public filings, news, and competitive intelligence.
               </p>
@@ -543,7 +543,7 @@ export default function Home() {
             <p className="text-sm text-tertiary mb-8">One-time assessment</p>
             <ul className="text-left text-sm text-foreground/80 space-y-3 mb-10">
               {[
-                "36-question behavioral diagnostic across 5 dimensions",
+                "61-question behavioral diagnostic across 5 dimensions",
                 "Stage classification with confidence scoring",
                 "3 composite indices (Authority Friction, Decision Velocity, Economic Translation)",
                 "Dollar-denominated unrealized value quantification",

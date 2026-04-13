@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RLK AI Diagnostic",
+  title: "RLK AI Diagnostic and Board Brief",
   description: "AI Strategy Diagnostic for Enterprise Leadership",
 };
 
