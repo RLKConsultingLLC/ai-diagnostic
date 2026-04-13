@@ -47,7 +47,7 @@ function ReportPage() {
   const [error, setError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  // Fetch report on mount
+  // Fetch session data first (diagnostic results), then try report generation
   useEffect(() => {
     if (!sessionId) {
       setError("No session ID provided.");
@@ -58,29 +58,45 @@ function ReportPage() {
     let cancelled = false;
 
     (async () => {
+      // Step 1: Try to get the session with diagnostic results
+      try {
+        const sessionRes = await fetch(`/api/assessment/session?sessionId=${sessionId}`);
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json();
+          if (!cancelled && sessionData.session?.diagnosticResult) {
+            setResult(sessionData.session.diagnosticResult);
+            setPhase("preview");
+            if (sessionData.session.generatedReport) {
+              setReport(sessionData.session.generatedReport);
+            }
+          }
+        }
+      } catch {
+        // Session fetch failed, continue to report generation
+      }
+
+      // Step 2: Try to generate the AI report (requires ANTHROPIC_API_KEY)
       try {
         const res = await fetch("/api/report/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId }),
         });
-        if (!res.ok) throw new Error("Report generation failed.");
-        const data = await res.json();
-
-        if (cancelled) return;
-
-        if (data.diagnosticResult) setResult(data.diagnosticResult);
-        if (data.report) setReport(data.report);
-
-        // If the session is already paid, show full report
-        setPhase(data.paid ? "full" : "preview");
-      } catch (err) {
-        if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load report."
-          );
-          setPhase("preview");
+        if (res.ok) {
+          const data = await res.json();
+          if (cancelled) return;
+          if (data.report) setReport(data.report);
+          // Update result if returned
+          if (data.report?.companyProfile) {
+            setResult((prev) => prev ? { ...prev, companyProfile: data.report.companyProfile } : prev);
+          }
+          setPhase(data.paid ? "full" : "preview");
+        } else {
+          // Report generation failed (likely no API key), but we still have diagnostic data
+          if (!cancelled) setPhase("preview");
         }
+      } catch {
+        if (!cancelled) setPhase("preview");
       }
     })();
 
@@ -252,32 +268,132 @@ function ReportPage() {
       {/* Paywall / Full Report */}
       {phase === "preview" && (
         <section className="bg-navy text-white p-8 md:p-10 mb-8">
-          <div className="max-w-xl mx-auto text-center">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
-              Unlock Your Full Board Report
-            </h2>
-            <p className="text-white/70 text-sm mb-8 leading-relaxed">
-              Get the complete AI Board Brief including detailed analysis for
-              each dimension, personalized recommendations, implementation
-              roadmap, and a downloadable PDF formatted for board presentation.
-            </p>
-            <button
-              onClick={handleCheckout}
-              disabled={checkoutLoading}
-              className="bg-white text-navy px-8 py-4 text-base font-semibold hover:bg-offwhite transition-colors disabled:opacity-60 inline-flex items-center gap-2"
-            >
-              {checkoutLoading ? (
-                <>
-                  <Spinner />
-                  Redirecting to Checkout...
-                </>
-              ) : (
-                "Purchase Full Report: $497"
-              )}
-            </button>
-            <p className="text-white/40 text-xs mt-4">
-              Secure payment via Stripe. Includes downloadable PDF.
-            </p>
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
+                Your Diagnostic Data is Ready.
+                <br />
+                The Full Analysis Goes Deeper.
+              </h2>
+              <p className="text-white/70 text-sm leading-relaxed max-w-lg mx-auto">
+                The scores above are the starting point. The full AI Board Brief
+                translates these numbers into a board-ready narrative your
+                leadership team can act on immediately.
+              </p>
+            </div>
+
+            {/* What's included grid */}
+            <div className="grid sm:grid-cols-2 gap-4 mb-8 text-left">
+              <div className="bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  AI Posture Diagnosis
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  What your behavioral patterns reveal about how AI actually
+                  operates inside your organization, not how leadership thinks
+                  it does.
+                </p>
+              </div>
+              <div className="bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  Structural Constraints
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  The specific authority structures, governance bottlenecks, and
+                  approval dynamics preventing your AI investments from scaling.
+                </p>
+              </div>
+              <div className="bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  Financial Impact Analysis
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  Dollar-denominated cost of inaction, capture gap analysis, and
+                  ROI framing your CFO can present to the board.
+                </p>
+              </div>
+              <div className="bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  Competitive Positioning
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  Where you stand vs. industry peers with named competitor
+                  analysis and competitive window assessment.
+                </p>
+              </div>
+              <div className="bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  Vendor Landscape Assessment
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  Are your AI vendors worth what you are paying? Independent
+                  analysis of your vendor stack with buy/build/partner
+                  recommendations.
+                </p>
+              </div>
+              <div className="bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  Security & Governance Risks
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  Shadow AI exposure, compliance gaps, and the board-level
+                  governance questions you should be asking but likely are not.
+                </p>
+              </div>
+              <div className="sm:col-span-2 bg-white/10 border border-white/10 p-4">
+                <p className="text-white text-sm font-semibold mb-1">
+                  90-Day Action Plan
+                </p>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  3 to 5 prioritized actions with named owners by role (CIO,
+                  CFO, CHRO), specific timeframes (Days 1-30, 31-60, 61-90),
+                  and measurable outcomes. Not aspirational. Executable.
+                </p>
+              </div>
+            </div>
+
+            {/* Enrichment callout */}
+            <div className="bg-white/5 border border-white/10 p-4 mb-8 text-center">
+              <p className="text-white/80 text-xs font-semibold tracking-widest uppercase mb-1">
+                Enriched with public intelligence
+              </p>
+              <p className="text-white/50 text-xs leading-relaxed">
+                Your report is not generated from survey data alone. Our AI
+                researches your company using SEC filings, news, leadership
+                signals, competitor activity, and regulatory developments to
+                produce analysis specific to{" "}
+                <span className="text-white font-medium">
+                  {result?.companyProfile.companyName || "your organization"}
+                </span>
+                .
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center">
+              <button
+                onClick={handleCheckout}
+                disabled={checkoutLoading}
+                className="bg-white text-navy px-10 py-4 text-base font-semibold hover:bg-offwhite transition-colors disabled:opacity-60 inline-flex items-center gap-2"
+              >
+                {checkoutLoading ? (
+                  <>
+                    <Spinner />
+                    Redirecting to Checkout...
+                  </>
+                ) : (
+                  "Get Your Full Board Report: $497"
+                )}
+              </button>
+              <p className="text-white/40 text-xs mt-4">
+                Secure payment via Stripe. Includes downloadable PDF
+                formatted for board presentation.
+              </p>
+              <p className="text-white/30 text-xs mt-2">
+                Built on the same frameworks Ryan King developed across a
+                decade at McKinsey and Deloitte.
+              </p>
+            </div>
           </div>
         </section>
       )}
