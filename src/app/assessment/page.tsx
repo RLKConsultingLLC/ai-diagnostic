@@ -142,6 +142,7 @@ export default function AssessmentPage() {
   const [dimensionInsight, setDimensionInsight] = useState<string | null>(null);
   const [insightLoading, setInsightLoading] = useState(false);
   const [insightLayer, setInsightLayer] = useState(0);
+  const [researchEnriched, setResearchEnriched] = useState(false);
   const [reportPreview, setReportPreview] = useState<{
     unlockedSections: string[];
     nextUnlock: string | null;
@@ -334,6 +335,7 @@ export default function AssessmentPage() {
             industry,
             employeeCount: employeeCount ? parseInt(employeeCount, 10) : undefined,
             revenue: revenue ? parseFloat(revenue) : undefined,
+            sessionId,
             completedDimensions: completedDims,
           }),
         });
@@ -348,6 +350,7 @@ export default function AssessmentPage() {
           if (data.layer) setInsightLayer(data.layer);
           if (data.dimensionScore) setDimensionScoreDisplay(data.dimensionScore);
           if (data.reportPreview) setReportPreview(data.reportPreview);
+          if (data.researchEnriched) setResearchEnriched(true);
         }
 
         if (!dimensionInsight) {
@@ -1067,11 +1070,18 @@ export default function AssessmentPage() {
                      "Complete Structural Analysis"}
                   </span>
                 </div>
-                {insightLayer > 1 && (
-                  <span className="text-xs text-accent">
-                    Layer {insightLayer} of 5
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {researchEnriched && !insightLoading && (
+                    <span className="text-xs text-white bg-secondary px-2 py-0.5 tracking-wide uppercase font-semibold">
+                      Enriched with public intelligence
+                    </span>
+                  )}
+                  {insightLayer > 1 && (
+                    <span className="text-xs text-accent">
+                      Layer {insightLayer}/5
+                    </span>
+                  )}
+                </div>
               </div>
               {insightLoading ? (
                 <div className="space-y-3 py-2">
