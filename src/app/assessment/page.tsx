@@ -168,6 +168,8 @@ export default function AssessmentPage() {
     CompanyProfile["regulatoryIntensity"] | ""
   >("");
   const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
+  const [ticker, setTicker] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [executiveEmail, setExecutiveEmail] = useState("");
 
   // -- Question responses keyed by question id
@@ -385,6 +387,8 @@ export default function AssessmentPage() {
         regulatoryIntensity as CompanyProfile["regulatoryIntensity"],
       primaryAIUseCases: selectedUseCases,
       executiveEmail: executiveEmail.trim() || undefined,
+      ticker: ticker.trim() || undefined,
+      websiteUrl: websiteUrl.trim() || undefined,
     };
 
     try {
@@ -766,6 +770,34 @@ export default function AssessmentPage() {
                   placeholder="Acme Corporation"
                 />
               </Field>
+
+              {/* Stock Ticker + Website URL */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <Field label="Stock Ticker" optional>
+                  <input
+                    type="text"
+                    value={ticker}
+                    onChange={(e) => setTicker(e.target.value.toUpperCase())}
+                    className="form-input"
+                    placeholder="e.g. AAPL"
+                  />
+                  <p className="text-xs text-tertiary mt-1.5">
+                    Public companies only. Enables SEC filing analysis.
+                  </p>
+                </Field>
+                <Field label="Company Website" optional>
+                  <input
+                    type="url"
+                    value={websiteUrl}
+                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                    className="form-input"
+                    placeholder="e.g. https://acme.com"
+                  />
+                  <p className="text-xs text-tertiary mt-1.5">
+                    Helps us identify the right company for research.
+                  </p>
+                </Field>
+              </div>
 
               {/* Industry */}
               <Field label="Industry" required>

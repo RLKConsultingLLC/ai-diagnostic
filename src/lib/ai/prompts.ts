@@ -460,7 +460,76 @@ OUTPUT FORMAT:
 }
 
 // ---------------------------------------------------------------------------
-// 7. 90-Day Action Plan
+// 7. Vendor Landscape Analysis
+// ---------------------------------------------------------------------------
+
+export function vendorLandscapePrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
+  const profile = result.companyProfile;
+  const useCases = profile.primaryAIUseCases.join(', ');
+
+  const vendorDataBlock = research?.vendorAnalysis
+    ? `
+VENDOR INTELLIGENCE (from research):
+- Market Landscape: ${research.vendorAnalysis.marketLandscape || 'N/A'}
+- Vendors Identified: ${research.vendorAnalysis.vendorsIdentified.map((v) => `${v.vendorName} (${v.category}, ${v.marketPosition}): ${v.verdict}`).join('; ')}
+- Recommendations: ${research.vendorAnalysis.recommendations.join('; ')}
+- Risk Flags: ${research.vendorAnalysis.riskFlags.join('; ')}
+`
+    : '\nNo vendor-specific research data available. Base your analysis on the company profile, industry, and stated use cases.';
+
+  return {
+    system: `You are a Gartner-level technology analyst who has spent 15 years evaluating AI/ML vendor ecosystems, negotiating enterprise contracts, and advising Fortune 500 procurement teams. You have deep knowledge of vendor pricing models, lock-in mechanisms, capability roadmaps, and competitive dynamics. You call out vendor BS when you see it and give procurement teams the intelligence they need to negotiate from strength.
+
+Rules:
+- Do not use the word "journey."
+- Do not hedge. State clear buy/build/partner verdicts.
+- Name specific vendors and products. Generic "consider a vendor" advice is worthless.
+- Never use em dashes or double dashes. Use commas, periods, or colons.
+- Tone: authoritative, direct, peer-level. You are advising the CTO and CFO together.`,
+    user: `Write the Vendor Landscape Analysis section for ${profile.companyName}.
+
+This section gives the board a clear picture of the AI vendor ecosystem relevant to their business and tells them exactly where to spend, where to build internally, and where to partner.
+
+COMPANY CONTEXT:
+- Industry: ${formatIndustryLabel(profile.industry)}
+- Revenue: ${formatCurrency(profile.revenue)}
+- Employees: ${profile.employeeCount.toLocaleString()}
+- Primary AI Use Cases: ${useCases}
+- Current AI Stage: ${result.stageClassification.primaryStage} ("${result.stageClassification.stageName}")
+${vendorDataBlock}
+
+Analysis framework:
+1. Vendor Stack Assessment: Based on the company's use cases (${useCases}), map the relevant vendor categories (foundation models, cloud AI platforms, vertical AI solutions, automation/RPA, data infrastructure). Name the top 2-3 vendors per category (e.g., OpenAI, Anthropic, Google for foundation models; Microsoft, AWS, GCP for cloud AI; Salesforce Einstein, ServiceNow for CRM/ITSM AI; UiPath, Automation Anywhere for RPA). Assess which are most relevant for this company's stage and industry.
+
+2. Buy/Build/Partner Recommendations: For each major AI capability the company needs, provide a clear verdict:
+   - BUY: Off-the-shelf solutions that are mature enough and cost-effective
+   - BUILD: Capabilities where internal development creates lasting competitive advantage
+   - PARTNER: Areas where a strategic vendor relationship (not just procurement) is the right model
+   Justify each recommendation with specifics.
+
+3. Vendor Risk Assessment: Flag specific risks including:
+   - Lock-in risk (which vendors make it hardest to switch, and the switching cost)
+   - Pricing trajectory (which vendors are raising prices fastest, which are in a price war)
+   - Capability gaps (where vendor promises outrun delivery)
+   - Concentration risk (over-dependence on a single vendor ecosystem)
+   - Regulatory/compliance risk (which vendors have the weakest data governance)
+
+4. Negotiation Intelligence: Provide 2-3 specific procurement tactics for the vendor relationships that matter most to this company.
+
+DIAGNOSTIC DATA:
+${buildDiagnosticDataBlock(result, research)}
+
+OUTPUT FORMAT:
+- Markdown starting with H2: ## Vendor Landscape Analysis
+- Use H3 subheaders for each analysis area
+- 500-700 words total
+- Name at least 5 specific vendors with concrete assessments
+- End with a summary table or ranked list of the top 3 vendor decisions the board should make in the next quarter.`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 8. 90-Day Action Plan
 // ---------------------------------------------------------------------------
 
 export function ninetyDayActionPlanPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
@@ -520,6 +589,7 @@ export const SECTION_PROMPTS: Record<
   'financial-impact': financialImpactPrompt,
   'competitive-positioning': competitivePositioningPrompt,
   'security-governance-risk': securityGovernanceRiskPrompt,
+  'vendor-landscape': vendorLandscapePrompt,
   '90-day-action-plan': ninetyDayActionPlanPrompt,
 };
 
@@ -530,6 +600,7 @@ export const SECTION_TITLES: Record<string, string> = {
   'financial-impact': 'Financial Impact',
   'competitive-positioning': 'Competitive Positioning',
   'security-governance-risk': 'Security & Governance Risk',
+  'vendor-landscape': 'Vendor Landscape Analysis',
   '90-day-action-plan': '90-Day Action Plan',
 };
 
@@ -540,5 +611,6 @@ export const SECTION_ORDER: string[] = [
   'financial-impact',
   'competitive-positioning',
   'security-governance-risk',
+  'vendor-landscape',
   '90-day-action-plan',
 ];

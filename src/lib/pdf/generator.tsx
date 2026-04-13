@@ -235,25 +235,25 @@ const s = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 48,
   },
+  coverPreparedLabel: {
+    fontSize: 11,
+    color: C.tertiary,
+    textAlign: 'center',
+    fontFamily: FONT_FAMILY_OBLIQUE,
+    marginBottom: 6,
+  },
   coverClientName: {
     fontFamily: FONT_FAMILY_BOLD,
-    fontSize: 18,
-    color: C.secondary,
+    fontSize: 28,
+    color: C.navy,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
   coverDate: {
     fontSize: 11,
     color: C.tertiary,
     textAlign: 'center',
-    marginBottom: 36,
-  },
-  coverPrepared: {
-    fontSize: 10,
-    color: C.tertiary,
-    textAlign: 'center',
-    fontFamily: FONT_FAMILY_OBLIQUE,
-    marginBottom: 60,
+    marginBottom: 48,
   },
   coverConfidential: {
     fontSize: 10,
@@ -888,11 +888,9 @@ function CoverPage({
         <Text style={s.coverSubtitle}>
           Organizational AI Readiness Diagnostic
         </Text>
+        <Text style={s.coverPreparedLabel}>Prepared for</Text>
         <Text style={s.coverClientName}>{report.companyProfile.companyName}</Text>
         <Text style={s.coverDate}>{date}</Text>
-        <Text style={s.coverPrepared}>
-          Prepared exclusively for {report.companyProfile.companyName}
-        </Text>
         <Text style={s.coverConfidential}>CONFIDENTIAL</Text>
       </View>
       <PageFooter />

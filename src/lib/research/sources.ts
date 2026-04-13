@@ -233,10 +233,33 @@ export async function searchIndustryNews(industry: Industry): Promise<RawNewsRes
 // ---------------------------------------------------------------------------
 
 export async function fetchCompanyWebContent(
-  companyName: string
+  companyName: string,
+  websiteUrl?: string
 ): Promise<{ aboutText: string; newsroomItems: string[]; aiReferences: string[] }> {
   // Try to find and fetch the company's about/news pages
   const result = { aboutText: '', newsroomItems: [] as string[], aiReferences: [] as string[] };
+
+  // If we have a direct website URL, try to fetch about/newsroom content from it
+  if (websiteUrl) {
+    try {
+      const baseUrl = websiteUrl.replace(/\/$/, '');
+      const aboutResponse = await fetch(baseUrl, {
+        headers: {
+          'User-Agent': 'RLK Consulting research@rlkconsultingco.com',
+          'Accept': 'text/html',
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (aboutResponse.ok) {
+        const html = await aboutResponse.text();
+        // Extract text content, strip tags, limit length
+        const textContent = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        result.aboutText = textContent.slice(0, 2000);
+      }
+    } catch {
+      // Fall through to news-based research
+    }
+  }
 
   try {
     // Search for company newsroom/press releases

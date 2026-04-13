@@ -26,6 +26,8 @@ export interface DiagnosticQuestion {
 
 export interface CompanyProfile {
   companyName: string;
+  ticker?: string; // Stock ticker (e.g., "AAPL") for public company research
+  websiteUrl?: string; // Company website for research targeting
   industry: Industry;
   subIndustry?: string;
   revenue: number; // Annual revenue in USD

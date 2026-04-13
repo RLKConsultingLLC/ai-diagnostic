@@ -125,7 +125,7 @@ async function executeResearch(
   // Phase 1: Parallel data gathering (runs while customer answers questions)
   const [secFilings, companyNews, aiNews, industryNews, webContent] = await Promise.all([
     // SEC filings (public companies)
-    searchSECFilings(profile.companyName).then((result) => {
+    searchSECFilings(profile.companyName, profile.ticker).then((result) => {
       job.progress.financials = true;
       console.log(`[Research] SEC filings: found ${result.length}`);
       return result;
@@ -153,7 +153,7 @@ async function executeResearch(
     }),
 
     // Company website intelligence
-    fetchCompanyWebContent(profile.companyName).then((result) => {
+    fetchCompanyWebContent(profile.companyName, profile.websiteUrl).then((result) => {
       job.progress.leadership = true;
       console.log(`[Research] Web content: ${result.newsroomItems.length} items`);
       return result;
