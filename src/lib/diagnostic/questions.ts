@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic and Board Brief — Proprietary Diagnostic Question Bank
+// RLK AI Diagnostic — Proprietary Diagnostic Question Bank
 // =============================================================================
 // 61 questions across 5 hidden dimensions. Each question diagnoses BEHAVIOR,
 // not tools. Answer options map to maturity levels 0–5.

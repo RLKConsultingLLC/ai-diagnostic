@@ -16,17 +16,25 @@ import type {
 // ---------------------------------------------------------------------------
 
 const INDUSTRIES: { value: Industry; label: string }[] = [
-  { value: "financial_services", label: "Financial Services" },
-  { value: "insurance", label: "Insurance" },
-  { value: "healthcare", label: "Healthcare" },
-  { value: "manufacturing", label: "Manufacturing" },
-  { value: "technology", label: "Technology" },
-  { value: "retail_ecommerce", label: "Retail / E-Commerce" },
-  { value: "professional_services", label: "Professional Services" },
-  { value: "energy_utilities", label: "Energy & Utilities" },
-  { value: "government", label: "Government" },
+  { value: "aerospace_defense", label: "Aerospace & Defense" },
+  { value: "consumer_retail", label: "Consumer Retail" },
   { value: "education", label: "Education" },
+  { value: "energy_utilities", label: "Energy & Utilities" },
+  { value: "federal_government", label: "Federal Government" },
+  { value: "financial_services", label: "Financial Services" },
+  { value: "healthcare", label: "Healthcare" },
+  { value: "hospitality_travel", label: "Hospitality & Travel" },
+  { value: "insurance", label: "Insurance" },
+  { value: "manufacturing", label: "Manufacturing" },
   { value: "media_entertainment", label: "Media & Entertainment" },
+  { value: "nonprofit", label: "Non-Profit" },
+  { value: "professional_services", label: "Professional Services" },
+  { value: "real_estate", label: "Real Estate" },
+  { value: "retail_ecommerce", label: "Retail / E-Commerce" },
+  { value: "shipping_logistics", label: "Shipping & Logistics" },
+  { value: "state_local_government", label: "State & Local Government" },
+  { value: "technology", label: "Technology" },
+  { value: "telecommunications", label: "Telecommunications" },
   { value: "other", label: "Other" },
 ];
 
@@ -598,7 +606,7 @@ export default function AssessmentPage() {
             href="/"
             className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
           >
-            RLK AI Diagnostic and Board Brief
+            RLK AI Diagnostic
           </Link>
           <div className="text-xs text-tertiary">{headerLabel}</div>
         </div>

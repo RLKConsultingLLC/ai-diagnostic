@@ -55,10 +55,46 @@ const INDUSTRY_WEIGHT_MODIFIERS: Record<Industry, Partial<Record<Dimension, numb
     workflow_integration: 1.2,
     decision_velocity: 0.8,
   },
-  government: {
-    authority_structure: 1.4,
-    decision_velocity: 0.7,    // Bureaucratic pace expected
+  consumer_retail: {
+    workflow_integration: 1.2,  // In-store and e-commerce integration critical
+    decision_velocity: 1.2,    // Fast-moving consumer trends demand agility
+    adoption_behavior: 1.1,
+  },
+  federal_government: {
+    authority_structure: 1.5,   // Strict procurement and authority frameworks
+    decision_velocity: 0.7,    // Federal acquisition and ATO processes are slow
     workflow_integration: 1.2,
+  },
+  state_local_government: {
+    authority_structure: 1.3,
+    decision_velocity: 0.8,    // Faster than federal but still bureaucratic
+    workflow_integration: 1.3,  // Citizen-facing service integration is key
+  },
+  nonprofit: {
+    economic_translation: 1.3,  // Must demonstrate impact per dollar
+    adoption_behavior: 1.2,     // Staff buy-in critical with limited resources
+    authority_structure: 0.9,   // Typically flatter governance
+  },
+  aerospace_defense: {
+    authority_structure: 1.4,   // ITAR, clearance, and compliance requirements
+    workflow_integration: 1.3,  // Complex systems integration across programs
+    economic_translation: 1.1,
+    decision_velocity: 0.8,    // Deliberate pace due to safety and security
+  },
+  telecommunications: {
+    workflow_integration: 1.3,  // Network operations and OSS/BSS integration
+    decision_velocity: 1.1,    // Competitive pressure demands speed
+    economic_translation: 1.2, // ARPU and churn economics are paramount
+  },
+  hospitality_travel: {
+    decision_velocity: 1.3,    // Real-time pricing and demand shifts
+    adoption_behavior: 1.2,    // Frontline workforce adoption is critical
+    workflow_integration: 1.1,
+  },
+  real_estate: {
+    economic_translation: 1.3,  // Deal economics and portfolio NOI drive everything
+    workflow_integration: 1.1,
+    decision_velocity: 1.1,    // Market timing matters
   },
   education: {
     adoption_behavior: 1.3,
@@ -69,6 +105,11 @@ const INDUSTRY_WEIGHT_MODIFIERS: Record<Industry, Partial<Record<Dimension, numb
     adoption_behavior: 1.2,
     decision_velocity: 1.3,
     workflow_integration: 1.1,
+  },
+  shipping_logistics: {
+    workflow_integration: 1.3,  // Fleet/route/warehouse automation is central
+    economic_translation: 1.2, // Thin margins demand rigorous cost tracking
+    decision_velocity: 1.1,    // Real-time operational decisions matter
   },
   other: {},
 };
@@ -228,11 +269,53 @@ export const INDUSTRY_THEMES: Record<Industry, {
     regulatoryContext: 'Critical infrastructure regulations (NERC CIP) and environmental compliance create both constraints and opportunities for AI.',
     keyUseCases: ['grid optimization', 'predictive maintenance', 'demand forecasting', 'safety monitoring', 'regulatory compliance'],
   },
-  government: {
-    primaryValueDriver: 'Citizen service improvement, fraud detection, operational efficiency, and program effectiveness.',
-    competitiveThreat: 'Rising citizen expectations for digital services, driven by private sector AI, create political pressure for government AI adoption.',
-    regulatoryContext: 'Government AI operates under executive orders, OMB guidance, and agency-specific mandates with emphasis on equity and transparency.',
-    keyUseCases: ['citizen services', 'fraud detection', 'document processing', 'program analytics', 'workforce optimization'],
+  consumer_retail: {
+    primaryValueDriver: 'Inventory optimization, hyper-personalized customer experiences, supply chain resilience, and unified commerce across physical and digital channels.',
+    competitiveThreat: 'DTC brands and AI-native retailers like Shein and Temu are compressing product cycles and price-matching at machine speed, forcing legacy retailers to match or lose share.',
+    regulatoryContext: 'Consumer data privacy laws (CCPA, GDPR, state-level biometric laws) and FTC enforcement on algorithmic pricing and dark patterns constrain personalization strategies.',
+    keyUseCases: ['demand forecasting and inventory optimization', 'real-time personalized merchandising', 'supply chain disruption prediction', 'customer lifetime value modeling', 'shelf and assortment analytics'],
+  },
+  federal_government: {
+    primaryValueDriver: 'Citizen service modernization, fraud detection and improper payment prevention, national security intelligence, and operational efficiency across agencies.',
+    competitiveThreat: 'Peer nations are investing heavily in AI for defense and intelligence. Domestically, citizen expectations for digital services set by the private sector create political urgency for modernization.',
+    regulatoryContext: 'Federal AI deployment is governed by FedRAMP authorization, OMB AI guidance (M-24-10), the Executive Order on AI, NIST AI RMF, and agency-specific ATOs with emphasis on equity and civil liberties.',
+    keyUseCases: ['fraud detection and improper payment prevention', 'citizen services chatbots and case management', 'national security intelligence analysis', 'document processing and adjudication', 'regulatory enforcement prioritization'],
+  },
+  state_local_government: {
+    primaryValueDriver: '311 service optimization, permitting and licensing acceleration, public safety analytics, and constituent engagement across municipal operations.',
+    competitiveThreat: 'Residents compare government services to private sector digital experiences. Jurisdictions that modernize attract talent and businesses; those that lag face declining tax bases and constituent trust.',
+    regulatoryContext: 'State-level AI legislation is proliferating (CO SB 205, NYC Local Law 144), alongside open records laws, ADA accessibility requirements, and emerging municipal AI governance frameworks.',
+    keyUseCases: ['311 request routing and resolution prediction', 'permit and license processing automation', 'public safety predictive analytics', 'infrastructure maintenance prioritization', 'code enforcement and inspection scheduling'],
+  },
+  nonprofit: {
+    primaryValueDriver: 'Donor analytics and fundraising optimization, program effectiveness measurement, grant management, and mission-impact amplification with constrained resources.',
+    competitiveThreat: 'Donors and foundations increasingly expect data-driven impact evidence. Nonprofits that cannot demonstrate measurable outcomes lose funding to those that can, and AI-enabled peers are setting new efficiency benchmarks.',
+    regulatoryContext: 'IRS reporting requirements, grant compliance obligations, donor data stewardship, and state charitable solicitation laws shape AI deployment in the sector.',
+    keyUseCases: ['donor propensity modeling and gift optimization', 'program outcome prediction and measurement', 'grant application and compliance automation', 'volunteer matching and engagement optimization', 'beneficiary needs assessment and service routing'],
+  },
+  aerospace_defense: {
+    primaryValueDriver: 'Predictive maintenance for fleet readiness, supply chain resilience across complex multi-tier programs, defense system optimization, and engineering productivity acceleration.',
+    competitiveThreat: 'Lockheed Martin, Raytheon, Northrop Grumman, and emerging defense-tech startups (Anduril, Shield AI) are racing to embed AI into platforms and proposals. Primes without AI capability risk losing next-generation program bids.',
+    regulatoryContext: 'ITAR export controls, DFARS cybersecurity requirements (CMMC), DoD Responsible AI principles, and classified environment constraints create unique deployment complexity.',
+    keyUseCases: ['predictive maintenance and fleet readiness optimization', 'supply chain risk monitoring across sub-tier suppliers', 'engineering design and simulation acceleration', 'test and evaluation automation', 'mission planning and logistics optimization'],
+  },
+  telecommunications: {
+    primaryValueDriver: 'Network optimization and autonomous operations, customer churn prediction and retention, 5G monetization, and service assurance at scale.',
+    competitiveThreat: 'T-Mobile, AT&T, and Verizon are investing billions in AI-driven network automation and customer experience. MVNOs and cloud-native operators are using AI to compete on service quality with a fraction of the headcount.',
+    regulatoryContext: 'FCC regulations on network reliability, CPNI customer data protections, net neutrality considerations, and emerging state-level AI transparency requirements affect deployment strategies.',
+    keyUseCases: ['network anomaly detection and self-healing', 'customer churn prediction and proactive retention', 'dynamic spectrum management and 5G optimization', 'field service dispatch optimization', 'revenue assurance and fraud detection'],
+  },
+  hospitality_travel: {
+    primaryValueDriver: 'Dynamic pricing and revenue management, guest personalization across the journey, operational efficiency in labor-intensive environments, and demand forecasting.',
+    competitiveThreat: 'Booking.com, Airbnb, and OTA platforms use AI to capture guest relationships before brands can. Hotel and airline groups that fail to personalize at scale will see direct bookings erode further.',
+    regulatoryContext: 'Consumer protection laws around dynamic pricing transparency, ADA accommodation requirements, data privacy (especially cross-border guest data), and labor regulations constrain AI deployment.',
+    keyUseCases: ['dynamic pricing and revenue optimization', 'personalized guest experience orchestration', 'demand forecasting and staffing optimization', 'predictive maintenance for property and fleet', 'sentiment analysis and reputation management'],
+  },
+  real_estate: {
+    primaryValueDriver: 'Property valuation and market prediction, tenant experience optimization, portfolio performance analytics, and deal origination intelligence.',
+    competitiveThreat: 'PropTech firms like Zillow, Redfin, and CoStar are leveraging AI to disintermediate traditional players. Institutional investors with AI-driven underwriting are executing faster and capturing off-market opportunities.',
+    regulatoryContext: 'Fair Housing Act compliance on algorithmic valuations, state real estate licensing laws, CFPB scrutiny of automated lending decisions, and ESG reporting requirements affect AI strategies.',
+    keyUseCases: ['automated property valuation and comp analysis', 'market trend prediction and investment signal detection', 'tenant experience and smart building optimization', 'lease abstraction and portfolio analytics', 'construction project monitoring and risk assessment'],
   },
   education: {
     primaryValueDriver: 'Personalized learning, administrative efficiency, student success prediction, and research acceleration.',
@@ -245,6 +328,12 @@ export const INDUSTRY_THEMES: Record<Industry, {
     competitiveThreat: 'AI-powered content creation and distribution are lowering barriers to entry while raising audience expectations for relevance.',
     regulatoryContext: 'Copyright, rights management, and emerging AI content regulation affect production and distribution strategies.',
     keyUseCases: ['content generation', 'audience analytics', 'personalization', 'production automation', 'rights management'],
+  },
+  shipping_logistics: {
+    primaryValueDriver: 'Route optimization, predictive ETAs, warehouse automation, and end-to-end supply chain visibility.',
+    competitiveThreat: 'Amazon and AI-native freight platforms are setting new standards for speed, cost, and transparency that legacy carriers must match or face margin erosion.',
+    regulatoryContext: 'Cross-border customs compliance, hazardous materials handling, and evolving emissions reporting requirements create both constraints and high-value automation targets.',
+    keyUseCases: ['route optimization', 'demand forecasting', 'warehouse robotics', 'predictive maintenance', 'customs and compliance automation'],
   },
   other: {
     primaryValueDriver: 'Operational efficiency, decision intelligence, customer experience, and competitive differentiation.',

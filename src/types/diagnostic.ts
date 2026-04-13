@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Core Diagnostic Types
+// RLK AI Diagnostic — Core Diagnostic Types
 // =============================================================================
 
 export type Dimension =
@@ -46,11 +46,19 @@ export type Industry =
   | 'manufacturing'
   | 'technology'
   | 'retail_ecommerce'
+  | 'consumer_retail'
   | 'professional_services'
   | 'energy_utilities'
-  | 'government'
+  | 'federal_government'
+  | 'state_local_government'
+  | 'nonprofit'
   | 'education'
   | 'media_entertainment'
+  | 'shipping_logistics'
+  | 'aerospace_defense'
+  | 'telecommunications'
+  | 'hospitality_travel'
+  | 'real_estate'
   | 'other';
 
 export interface AssessmentResponse {
