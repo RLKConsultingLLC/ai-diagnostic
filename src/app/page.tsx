@@ -407,7 +407,7 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-navy">12</div>
+              <div className="text-2xl font-bold text-navy">23</div>
               <div className="text-xs text-tertiary mt-1">
                 Industries Calibrated
               </div>

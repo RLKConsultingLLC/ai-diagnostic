@@ -755,14 +755,17 @@ export default function AssessmentPage() {
         {/* ---------- INTAKE FORM ---------- */}
         {step === "intake" && (
           <div>
-            <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-2">
-              Step 1
-            </p>
-            <h1 className="text-2xl md:text-3xl mb-2">Company Profile</h1>
-            <p className="text-foreground/60 text-sm mb-10 max-w-lg">
-              We use this information to customize the diagnostic scoring and
-              generate industry-relevant benchmarks.
-            </p>
+            <div className="text-center mb-10">
+              <p className="text-xs font-semibold text-tertiary tracking-[0.3em] uppercase mb-3">
+                Step 1
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-navy mb-3">Company Profile</h1>
+              <div className="mx-auto w-12 h-px bg-navy/15 mb-4" />
+              <p className="text-foreground/60 text-sm max-w-lg mx-auto">
+                We use this information to customize the diagnostic scoring and
+                generate industry-relevant benchmarks.
+              </p>
+            </div>
 
             <div className="space-y-8">
               {/* Company Name */}
@@ -958,27 +961,25 @@ export default function AssessmentPage() {
         {/* ---------- QUESTION VIEW ---------- */}
         {step === "questions" && currentGroup && currentQuestion && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-tertiary tracking-widest uppercase">
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <DimensionBadge dimension={currentGroup.dimension} />
+                <span className="text-xs text-tertiary">
+                  {currentQInDim + 1} of {currentGroup.questions.length}
+                </span>
+              </div>
+              <p className="text-xs font-semibold text-tertiary tracking-[0.3em] uppercase mb-4">
                 Question {overallQuestionIndex} of {totalQuestions}
               </p>
-              <span className="text-xs text-tertiary">
-                {DIMENSION_META[currentGroup.dimension].label}:{" "}
-                {currentQInDim + 1} of {currentGroup.questions.length}
-              </span>
+              <h1 className="text-xl md:text-2xl font-bold text-navy leading-snug max-w-2xl mx-auto">
+                {currentQuestion.text}
+              </h1>
+              {currentQuestion.subtext && (
+                <p className="text-sm text-foreground/50 mt-2 max-w-xl mx-auto">
+                  {currentQuestion.subtext}
+                </p>
+              )}
             </div>
-
-            <DimensionBadge dimension={currentGroup.dimension} />
-
-            <h1 className="text-xl md:text-2xl mt-4 mb-2 leading-snug">
-              {currentQuestion.text}
-            </h1>
-            {currentQuestion.subtext && (
-              <p className="text-sm text-foreground/50 mb-8">
-                {currentQuestion.subtext}
-              </p>
-            )}
-            {!currentQuestion.subtext && <div className="mb-8" />}
 
             <div className="space-y-3">
               {currentQuestion.options.map((opt, oi) => {
@@ -1066,9 +1067,12 @@ export default function AssessmentPage() {
             {/* Diagonal stripe divider */}
             <div className="rlk-diagonal-divider mb-8 -mx-6" />
 
-            {/* Score + Completion Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="inline-flex items-center gap-2 bg-navy/5 border border-navy/20 px-4 py-2">
+            {/* Centered completion header */}
+            <div className="text-center mb-8">
+              <p className="text-xs font-semibold text-tertiary tracking-[0.3em] uppercase mb-3">
+                Dimension {currentDimIndex + 1} of {dimensionGroups.length} complete
+              </p>
+              <div className="inline-flex items-center gap-2 bg-navy/5 border border-navy/20 px-5 py-2.5 mb-4">
                 <svg className="w-4 h-4 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
@@ -1077,19 +1081,16 @@ export default function AssessmentPage() {
                 </span>
               </div>
               {dimensionScoreDisplay !== null && (
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-navy">
+                <div className="mt-2">
+                  <div className="text-3xl font-bold text-navy">
                     {((dimensionScoreDisplay / 5) * 100).toFixed(0)}
-                    <span className="text-sm text-tertiary font-normal">/100</span>
+                    <span className="text-sm text-tertiary font-normal ml-0.5">/100</span>
                   </div>
-                  <div className="text-xs text-tertiary">Dimension Score</div>
+                  <div className="text-xs text-tertiary mt-1">Dimension Score</div>
                 </div>
               )}
+              <div className="mx-auto w-12 h-px bg-navy/15 mt-5" />
             </div>
-
-            <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-6">
-              Dimension {currentDimIndex + 1} of {dimensionGroups.length} complete
-            </p>
 
             {/* AI Insight Card (the main event) */}
             <div className="insight-card bg-white border border-light text-left p-6 mb-6 border-l-4 border-l-navy">
@@ -1249,16 +1250,19 @@ export default function AssessmentPage() {
         {/* ---------- REVIEW SCREEN ---------- */}
         {step === "review" && (
           <div>
-            <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-2">
-              Final Step
-            </p>
-            <h1 className="text-2xl md:text-3xl mb-2">
-              Review Your Responses
-            </h1>
-            <p className="text-foreground/60 text-sm mb-10 max-w-lg">
-              Confirm your answers below. You can click on any question to go
-              back and change your selection.
-            </p>
+            <div className="text-center mb-10">
+              <p className="text-xs font-semibold text-tertiary tracking-[0.3em] uppercase mb-3">
+                Final Step
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-navy mb-3">
+                Review Your Responses
+              </h1>
+              <div className="mx-auto w-12 h-px bg-navy/15 mb-4" />
+              <p className="text-foreground/60 text-sm max-w-lg mx-auto">
+                Confirm your answers below. You can click on any question to go
+                back and change your selection.
+              </p>
+            </div>
 
             {/* Group reviews by dimension */}
             {dimensionGroups.map((group) => (
