@@ -95,19 +95,19 @@ export default function Home() {
       {/* Diagonal Divider */}
       <div className="rlk-diagonal-divider" />
 
-      {/* The Problem */}
-      <section className="bg-offwhite py-20 md:py-24">
+      {/* The Problem — navy section for visual contrast */}
+      <section className="bg-navy text-white py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
+            <p className="text-white/40 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
               The Problem
             </p>
-            <h2 className="text-2xl md:text-3xl mb-6">
+            <h2 className="text-2xl md:text-3xl text-white mb-6">
               AI is not failing inside your organization.
               It is colliding with management structures designed for a
               different information environment.
             </h2>
-            <p className="text-foreground/70 leading-relaxed">
+            <p className="text-white/60 leading-relaxed">
               The tools work. Individual contributors report meaningful
               productivity gains. But the organization surrounding those
               tools has not adapted. Approval chains still assume scarce
@@ -116,31 +116,20 @@ export default function Home() {
               capabilities to bottom-line impact.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 border border-light">
-              <div className="text-3xl font-bold text-navy mb-3">87%</div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                of organizations use AI in at least one business function,
-                yet only a small fraction can point to measurable
-                bottom-line impact.
-              </p>
-            </div>
-            <div className="bg-white p-8 border border-light">
-              <div className="text-3xl font-bold text-navy mb-3">3x</div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                the number of AI pilots launched vs. those that reach
-                production. Most organizations are stuck between
-                experimentation and operational integration.
-              </p>
-            </div>
-            <div className="bg-white p-8 border border-light">
-              <div className="text-3xl font-bold text-navy mb-3">6 to 12+</div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                months from AI use case identification to funded pilot in
-                most enterprises. By the time approval arrives, the
-                competitive window has narrowed.
-              </p>
-            </div>
+          <div className="grid md:grid-cols-3 gap-px bg-white/10">
+            {[
+              { stat: "87%", text: "of organizations use AI in at least one business function, yet only a small fraction can point to measurable bottom-line impact." },
+              { stat: "3x", text: "the number of AI pilots launched vs. those that reach production. Most organizations are stuck between experimentation and operational integration." },
+              { stat: "6\u201312+", text: "months from AI use case identification to funded pilot in most enterprises. By the time approval arrives, the competitive window has narrowed." },
+            ].map((item) => (
+              <div key={item.stat} className="bg-navy p-8">
+                <div className="text-4xl md:text-5xl font-bold text-white/90 mb-3 tracking-tight">{item.stat}</div>
+                <div className="w-8 h-0.5 bg-white/20 mb-4" />
+                <p className="text-sm text-white/50 leading-relaxed">
+                  {item.text}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -161,120 +150,35 @@ export default function Home() {
               enterprise value, or evaporate.
             </p>
           </div>
-          <div className="grid md:grid-cols-5 gap-6">
+          {/* Five dimensions — left accent bar cards */}
+          <div className="grid md:grid-cols-5 gap-0 md:gap-px bg-light/50 border border-light overflow-hidden">
             {[
-              {
-                title: "Adoption Behavior",
-                desc: "How employees actually use AI vs. how leadership thinks they do.",
-              },
-              {
-                title: "Authority Structure",
-                desc: "Who controls AI decisions. Where permission bottlenecks exist.",
-              },
-              {
-                title: "Workflow Integration",
-                desc: "Whether AI is embedded in work or bolted onto it.",
-              },
-              {
-                title: "Decision Velocity",
-                desc: "How fast your organization moves from insight to action.",
-              },
-              {
-                title: "Economic Translation",
-                desc: "Whether AI value shows up in financial statements or vanishes.",
-              },
-            ].map((dim) => (
-              <div
-                key={dim.title}
-                className="bg-offwhite p-6 border border-light text-center"
-              >
-                <h3 className="text-sm font-bold text-navy mb-2">
-                  {dim.title}
-                </h3>
-                <p className="text-xs text-foreground/60 leading-relaxed">
-                  {dim.desc}
-                </p>
+              { title: "Adoption Behavior", desc: "How employees actually use AI vs. how leadership thinks they do." },
+              { title: "Authority Structure", desc: "Who controls AI decisions. Where permission bottlenecks exist." },
+              { title: "Workflow Integration", desc: "Whether AI is embedded in work or bolted onto it." },
+              { title: "Decision Velocity", desc: "How fast your organization moves from insight to action." },
+              { title: "Economic Translation", desc: "Whether AI value shows up in financial statements or vanishes." },
+            ].map((dim, i) => (
+              <div key={dim.title} className="bg-white p-6 border-l-[3px] border-l-navy md:border-l-0 md:border-b-[3px] md:border-b-navy">
+                <div className="text-[10px] font-bold text-navy/30 tracking-widest uppercase mb-2">0{i + 1}</div>
+                <h3 className="text-sm font-bold text-navy mb-2">{dim.title}</h3>
+                <p className="text-xs text-foreground/60 leading-relaxed">{dim.desc}</p>
               </div>
             ))}
           </div>
 
+          {/* Three deliverables — McKinsey-style accent bar cards */}
           <div className="mt-16 grid md:grid-cols-3 gap-8">
-            <div className="bg-offwhite p-8 border border-light">
-              <div className="w-12 h-12 bg-navy/5 flex items-center justify-center mb-5">
-                <svg
-                  className="w-6 h-6 text-navy"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21a48.25 48.25 0 0 1-8.135-.687c-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"
-                  />
-                </svg>
+            {[
+              { title: "Behavioral Diagnosis", text: "61 behavioral questions that diagnose how your people actually interact with AI, not which tools you purchased. The gap between those two things is where value disappears." },
+              { title: "Financial Quantification", text: "Dollar-denominated unrealized value your board can act on. Not vendor ROI projections. An independent economic model that translates behavioral patterns into financial exposure." },
+              { title: "Board-Ready Report", text: "A 5 to 8 page PDF briefing designed for executive and board audiences. Enriched with company-specific intelligence from public filings, news, and competitive analysis. Includes a 90-day action plan with named owners." },
+            ].map((item) => (
+              <div key={item.title} className="bg-offwhite border border-light border-l-[3px] border-l-navy p-8">
+                <h3 className="text-lg font-semibold mb-3">{item.title}</h3>
+                <p className="text-foreground/70 text-sm leading-relaxed">{item.text}</p>
               </div>
-              <h3 className="text-lg font-semibold mb-3">
-                Behavioral Diagnosis
-              </h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                61 behavioral questions that diagnose how your people
-                actually interact with AI, not which tools you purchased.
-                The gap between those two things is where value disappears.
-              </p>
-            </div>
-            <div className="bg-offwhite p-8 border border-light">
-              <div className="w-12 h-12 bg-navy/5 flex items-center justify-center mb-5">
-                <svg
-                  className="w-6 h-6 text-navy"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold mb-3">
-                Financial Quantification
-              </h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                Dollar-denominated unrealized value your board can act on.
-                Not vendor ROI projections. An independent economic model
-                that translates behavioral patterns into financial exposure.
-              </p>
-            </div>
-            <div className="bg-offwhite p-8 border border-light">
-              <div className="w-12 h-12 bg-navy/5 flex items-center justify-center mb-5">
-                <svg
-                  className="w-6 h-6 text-navy"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold mb-3">
-                Board-Ready Report
-              </h3>
-              <p className="text-foreground/70 text-sm leading-relaxed">
-                A 5 to 8 page PDF briefing designed for executive and board
-                audiences. Enriched with company-specific intelligence from
-                public filings, news, and competitive analysis. Includes a
-                90-day action plan with named owners.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -520,7 +424,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What Makes This Different */}
+      {/* What Makes This Different — side-by-side comparison */}
       <section className="bg-white py-20 md:py-24 border-t border-light">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center mb-14">
@@ -528,39 +432,45 @@ export default function Home() {
               Why this is not another survey
             </h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-x-16 gap-y-10 max-w-4xl mx-auto">
-            <div>
-              <h3 className="text-sm font-bold text-navy uppercase tracking-wide mb-2">
-                Most AI assessments
+          <div className="grid md:grid-cols-2 gap-0 max-w-4xl mx-auto overflow-hidden border border-light">
+            <div className="bg-offwhite p-8 md:p-10">
+              <h3 className="text-xs font-bold text-foreground/40 uppercase tracking-[0.2em] mb-5">
+                Most AI Assessments
               </h3>
-              <ul className="text-sm text-foreground/60 space-y-2">
-                <li>Ask which tools you use</li>
-                <li>Measure self-reported adoption percentages</li>
-                <li>Produce generic maturity scores</li>
-                <li>Recommend &ldquo;building a center of excellence&rdquo;</li>
-                <li>Cost $50K+ and take 6 weeks</li>
+              <ul className="text-sm text-foreground/50 space-y-3">
+                {[
+                  "Ask which tools you use",
+                  "Measure self-reported adoption percentages",
+                  "Produce generic maturity scores",
+                  "Recommend \u201Cbuilding a center of excellence\u201D",
+                  "Cost $50K+ and take 6 weeks",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <span className="text-foreground/20 mt-0.5">&mdash;</span>
+                    {item}
+                  </li>
+                ))}
               </ul>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-navy uppercase tracking-wide mb-2">
-                The AI Diagnostic
+            <div className="bg-navy p-8 md:p-10">
+              <h3 className="text-xs font-bold text-white/50 uppercase tracking-[0.2em] mb-5">
+                The RLK Diagnostic
               </h3>
-              <ul className="text-sm text-foreground/80 space-y-2">
-                <li className="font-medium">
-                  Diagnoses behavioral patterns, not tool inventories
-                </li>
-                <li className="font-medium">
-                  Identifies structural barriers your team cannot see from inside
-                </li>
-                <li className="font-medium">
-                  Quantifies unrealized value in dollar terms
-                </li>
-                <li className="font-medium">
-                  Delivers a 90-day action plan with owners by role
-                </li>
-                <li className="font-medium">
-                  $497, delivered in minutes, enriched with public intelligence
-                </li>
+              <ul className="text-sm text-white/80 space-y-3">
+                {[
+                  "Diagnoses behavioral patterns, not tool inventories",
+                  "Identifies structural barriers your team cannot see from inside",
+                  "Quantifies unrealized value in dollar terms",
+                  "Delivers a 90-day action plan with owners by role",
+                  "$497, delivered in minutes, enriched with public intelligence",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <svg className="w-4 h-4 text-white/40 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
