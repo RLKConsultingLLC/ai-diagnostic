@@ -1,8 +1,20 @@
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia',
-});
+// Lazy singleton — avoids initializing at build time when env vars aren't available
+let _stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error('STRIPE_SECRET_KEY is not configured');
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: '2026-03-25.dahlia',
+    });
+  }
+  return _stripe;
+}
 
 const DEFAULT_PRICE_CENTS = 49700; // $497.00
 
@@ -66,7 +78,7 @@ export async function createCheckoutSession(
     ];
   }
 
-  const session = await stripe.checkout.sessions.create(sessionConfig);
+  const session = await getStripe().checkout.sessions.create(sessionConfig);
 
   if (!session.url) {
     throw new Error('Stripe did not return a checkout URL');
@@ -84,7 +96,7 @@ export async function createCheckoutSession(
 export async function verifyPayment(
   sessionId: string
 ): Promise<PaymentVerification> {
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
   return {
     paid: session.payment_status === 'paid',
@@ -105,5 +117,5 @@ export function constructWebhookEvent(
   if (!webhookSecret) {
     throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
   }
-  return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  return getStripe().webhooks.constructEvent(rawBody, signature, webhookSecret);
 }
