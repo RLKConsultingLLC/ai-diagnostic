@@ -1118,6 +1118,22 @@ function ReportPage() {
                 {[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 — is the primary bottleneck
                 limiting {result.companyProfile.companyName}&apos;s ability to capture value from these same investments.
               </p>
+              {/* Investment priority legend */}
+              <div className="flex items-center gap-5 mb-3">
+                <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Priority:</p>
+                {[
+                  { label: "Critical", color: "#0B1D3A" },
+                  { label: "High", color: "#364E6E" },
+                  { label: "Medium", color: "#6B7F99" },
+                  { label: "Emerging", color: "#A8B5C4" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-[10px] text-foreground/50">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+
               <div className="grid sm:grid-cols-2 gap-3">
                 {getCompetitorInvestmentAreas(result.companyProfile.industry).map((area, idx) => (
                   <div key={idx} className="bg-offwhite border border-light p-4">
