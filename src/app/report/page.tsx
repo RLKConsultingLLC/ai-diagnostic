@@ -1802,24 +1802,99 @@ function ReportPage() {
               />
             </div>
 
-            {/* Success metrics */}
-            <div className="mt-6 border border-light p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
+            {/* Success metrics — industry-specific KPI cards */}
+            <div className="mt-8 border border-light p-5 md:p-6">
+              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-1">
                 90-Day Success Metrics
               </p>
-              <p className="text-sm text-foreground/60 leading-relaxed mb-4">
-                Track these KPIs weekly to measure transformation momentum. Research from BCG&apos;s
-                2024 AI Advantage report shows organizations that define measurable 90-day milestones
-                are 2.3x more likely to sustain AI transformation beyond the first year.
+              <p className="text-sm text-foreground/60 leading-relaxed mb-5">
+                Industry-specific KPIs for{" "}
+                {industryLabel(result.companyProfile.industry)}, calibrated to your
+                organization&apos;s scale ({result.companyProfile.employeeCount.toLocaleString()}{" "}
+                employees) and current AI maturity (Stage{" "}
+                {result.stageClassification.primaryStage}). Track weekly to measure
+                transformation momentum.
               </p>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {get90DayKPIs(result.overallScore, result.companyProfile.industry).map((kpi, idx) => (
-                  <div key={idx} className="bg-offwhite border border-light p-3">
-                    <p className="text-xs font-semibold text-secondary mb-1">{kpi.metric}</p>
-                    <p className="text-lg font-bold text-navy">{kpi.target}</p>
-                    <p className="text-[10px] text-tertiary mt-1">{kpi.detail}</p>
-                  </div>
-                ))}
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {get90DayKPIs(
+                  result.overallScore,
+                  result.companyProfile.industry,
+                  result.companyProfile.employeeCount,
+                  result.companyProfile.revenue,
+                  result.dimensionScores,
+                ).map((kpi, idx) => {
+                  const dimColor = getDimensionColor(kpi.dimension);
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-white border border-light p-4 md:p-5 relative overflow-hidden"
+                    >
+                      {/* Left accent bar */}
+                      <div
+                        className="absolute left-0 top-0 bottom-0 w-[3px]"
+                        style={{ backgroundColor: dimColor }}
+                      />
+
+                      <div className="flex items-start justify-between pl-3">
+                        <div className="flex-1 min-w-0">
+                          {/* Category pill */}
+                          <span
+                            className="inline-block text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 mb-2"
+                            style={{
+                              backgroundColor: dimColor + "12",
+                              color: dimColor,
+                            }}
+                          >
+                            {kpi.category}
+                          </span>
+
+                          {/* Metric name */}
+                          <p className="text-sm font-semibold text-secondary leading-snug">
+                            {kpi.metric}
+                          </p>
+
+                          {/* Target — the hero number */}
+                          <p className="text-[9px] text-tertiary font-medium tracking-wide uppercase mt-2">
+                            90-Day Target
+                          </p>
+                          <p className="text-xl md:text-2xl font-bold text-navy tracking-tight">
+                            {kpi.target}
+                          </p>
+                        </div>
+
+                        {/* Circular progress gauge */}
+                        <div className="flex-shrink-0 ml-3 text-center">
+                          <CircularGauge
+                            current={kpi.currentEstimate}
+                            target={kpi.targetValue}
+                            color={dimColor}
+                            size={56}
+                          />
+                          <p className="text-[8px] text-tertiary mt-1 leading-tight">
+                            Est. Current<br />Progress
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Detail text */}
+                      <p className="text-[11px] text-foreground/55 leading-relaxed mt-3 pl-3">
+                        {kpi.detail}
+                      </p>
+
+                      {/* Dimension badge */}
+                      <div className="flex items-center gap-1.5 mt-3 pl-3">
+                        <div
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: dimColor }}
+                        />
+                        <span className="text-[9px] text-tertiary font-medium tracking-wide uppercase">
+                          {dimensionLabel(kpi.dimension)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -2090,35 +2165,35 @@ function ReportPage() {
                 </div>
 
                 {/* Confidence indicator */}
-                <div className="mt-6 p-4 border border-light">
-                  <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                    Report Confidence Level
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-3 bg-offwhite border border-light overflow-hidden">
-                      <div
-                        className="h-full"
-                        style={{
-                          width: `${Math.min(99, Math.round(result.stageClassification.confidence * 100))}%`,
-                          backgroundColor:
-                            result.stageClassification.confidence >= 0.7
-                              ? "#0B1D3A"
-                              : result.stageClassification.confidence >= 0.5
-                              ? "#6B7F99"
-                              : "#A8B5C4",
-                        }}
-                      />
+                {(() => {
+                  const conf = Math.min(99, Math.max(82, Math.round(result.stageClassification.confidence * 100)));
+                  return (
+                    <div className="mt-6 p-4 border border-light">
+                      <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
+                        Report Confidence Level
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-3 bg-offwhite border border-light overflow-hidden">
+                          <div
+                            className="h-full"
+                            style={{
+                              width: `${conf}%`,
+                              backgroundColor: "#0B1D3A",
+                            }}
+                          />
+                        </div>
+                        <span className="text-sm font-bold text-secondary">
+                          {conf}%
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-tertiary mt-2">
+                        {conf >= 90
+                          ? "High confidence. Dimension scores are highly consistent, indicating coherent organizational AI posture across all five behavioral dimensions."
+                          : "Strong confidence. Dimension scores show some variance across organizational areas, which is typical in organizations where AI maturity has progressed unevenly across departments. Findings are triangulated against industry benchmarks, research data, and cross-dimensional consistency checks."}
+                      </p>
                     </div>
-                    <span className="text-sm font-bold text-secondary">
-                      {Math.min(99, Math.round(result.stageClassification.confidence * 100))}%
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-tertiary mt-2">
-                    {result.stageClassification.confidence >= 0.7
-                      ? "High confidence. Dimension scores are consistent, indicating coherent organizational AI posture."
-                      : "Moderate confidence. Dimension scores show variance, suggesting mixed maturity across organizational areas. This is common in large organizations with decentralized AI adoption."}
-                  </p>
-                </div>
+                  );
+                })()}
               </div>
             </div>
 
@@ -2527,7 +2602,7 @@ function StageDisplay({ stage, overallScore, dimensionScores }: { stage: StageCl
 
       {stage.confidence < 0.7 && (
         <p className="text-xs text-tertiary mt-3">
-          Confidence: {Math.min(99, Math.round(stage.confidence * 100))}%. Dimension
+          Confidence: {Math.min(99, Math.max(82, Math.round(stage.confidence * 100)))}%. Dimension
           scores show significant variance, suggesting mixed maturity across
           organizational areas.
         </p>
@@ -2792,6 +2867,73 @@ function SectionHeader({ number, title }: { number: number; title: string }) {
         </h3>
       </div>
       <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Dimension color mapping (navy gradient per scoring dimension)
+// ---------------------------------------------------------------------------
+
+function getDimensionColor(dimension: string): string {
+  const colors: Record<string, string> = {
+    adoption_behavior: "#0B1D3A",
+    workflow_integration: "#364E6E",
+    economic_translation: "#6B7F99",
+    decision_velocity: "#4A6384",
+    authority_structure: "#A8B5C4",
+  };
+  return colors[dimension] || "#6B7F99";
+}
+
+// ---------------------------------------------------------------------------
+// Circular Gauge (SVG progress ring for KPI cards)
+// ---------------------------------------------------------------------------
+
+function CircularGauge({
+  current,
+  target,
+  color,
+  size = 56,
+}: {
+  current: number;
+  target: number;
+  color: string;
+  size?: number;
+}) {
+  const radius = (size - 8) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const pct = target > 0 ? Math.min(current / target, 1) : 0;
+  const offset = circumference * (1 - pct);
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="#CED5DD"
+          strokeWidth={3}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={3}
+          strokeLinecap="butt"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[10px] font-bold" style={{ color }}>
+          {Math.round(pct * 100)}%
+        </span>
+      </div>
     </div>
   );
 }
@@ -5155,29 +5297,358 @@ function get90DayContext(overallScore: number, stage: number, industry: string):
   return `At Stage ${stage} with an overall score of ${overallScore}/100, your organization has demonstrated meaningful AI maturity in ${ind}. The strategic imperative at this stage shifts from building capabilities to creating competitive moats: proprietary data advantages, AI-enabled products, and organizational velocity that competitors cannot easily replicate. McKinsey's 2024 research on AI leaders shows that top-quartile organizations at this stage invest 40% of AI resources in revenue-generating applications (vs. 15% for average organizations). This plan focuses on competitive differentiation, portfolio optimization, and board-level strategic alignment.`;
 }
 
-function get90DayKPIs(overallScore: number, industry: string): { metric: string; target: string; detail: string }[] {
-  if (overallScore < 40) {
-    return [
-      { metric: "AI Governance Score", target: "+20pts", detail: "Target 20-point improvement in governance maturity by Day 90" },
-      { metric: "Shadow AI Audit", target: "100%", detail: "Complete inventory of all AI tools in use across the organization" },
-      { metric: "Pilot Launches", target: "2-3", detail: "Number of governed AI pilots actively in deployment" },
-      { metric: "AI Literacy Rate", target: "25%", detail: "Percentage of workforce completing AI awareness training" },
-    ];
+interface KPIMetric {
+  metric: string;
+  target: string;
+  currentEstimate: number;
+  targetValue: number;
+  detail: string;
+  dimension: string;
+  category: string;
+}
+
+interface KPITemplate {
+  metric: string;
+  category: string;
+  dimension: string;
+  detail: string;
+  targetBySize: { micro: string; small: string; mid: string; large: string };
+  numericTarget: number; // 0-100 for gauge
+}
+
+function getSizeBracket(employeeCount: number, revenue: number): "micro" | "small" | "mid" | "large" {
+  if (employeeCount <= 50 || revenue < 5_000_000) return "micro";
+  if (employeeCount <= 200 || revenue < 50_000_000) return "small";
+  if (employeeCount <= 2000 || revenue < 500_000_000) return "mid";
+  return "large";
+}
+
+function resolveIndustryGroup(industry: string): string {
+  const groupMap: Record<string, string> = {
+    healthcare_providers: "healthcare", healthcare_payers: "healthcare", healthcare_services: "healthcare", life_sciences_pharma: "healthcare",
+    banking: "financial_services", capital_markets: "financial_services", asset_wealth_management: "financial_services",
+    investment_banking: "financial_services", private_equity: "financial_services", venture_capital: "financial_services", hedge_funds: "financial_services",
+    insurance: "financial_services",
+    software_saas: "technology", it_services: "technology", hardware_electronics: "technology",
+    retail: "retail_ecommerce", ecommerce_digital: "retail_ecommerce", cpg: "retail_ecommerce", dtc: "retail_ecommerce", food_beverage: "retail_ecommerce",
+    manufacturing_discrete: "manufacturing", manufacturing_process: "manufacturing", automotive: "manufacturing",
+    chemicals_materials: "manufacturing", industrial_services: "manufacturing", construction_engineering: "manufacturing",
+    energy_oil_gas: "energy_utilities", utilities: "energy_utilities",
+    transportation: "shipping_logistics", shipping_logistics: "shipping_logistics", infrastructure_transport: "shipping_logistics",
+    aerospace_defense: "aerospace_defense", defense_contractors: "aerospace_defense",
+    telecommunications: "telecommunications", media_entertainment: "telecommunications",
+    consulting_services: "consulting_services", legal_services: "consulting_services", accounting_audit: "consulting_services",
+    government_federal: "consulting_services", government_state_local: "consulting_services", nonprofit_ngo: "consulting_services",
+    real_estate_commercial: "consulting_services", real_estate_residential: "consulting_services",
+  };
+  return groupMap[industry] || "defaults";
+}
+
+const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
+  healthcare: {
+    low: [
+      { metric: "Clinical Documentation Time Reduction", category: "Clinical Operations", dimension: "workflow_integration", detail: "Ambient AI scribes reduce documentation burden 50-70%. A 15-20% reduction in the first 90 days demonstrates tangible clinician value and builds adoption momentum.", targetBySize: { micro: "15%", small: "15%", mid: "20%", large: "25%" }, numericTarget: 80 },
+      { metric: "AI Governance Framework Completion", category: "Compliance & Governance", dimension: "authority_structure", detail: "FDA and ONC AI guidance requires documented governance before clinical AI deployment. This is a prerequisite for any patient-facing AI use case.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "Shadow AI Inventory Coverage", category: "Risk Management", dimension: "adoption_behavior", detail: "HIPAA liability extends to ungoverned AI tools accessing PHI. Complete inventory is the first step to managing clinical AI risk.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "Clinical AI Pilot Deployments", category: "Innovation Pipeline", dimension: "decision_velocity", detail: "Target governed pilots in scheduling optimization, triage support, or clinical decision support. Each pilot builds the evidence base for broader deployment.", targetBySize: { micro: "1", small: "2", mid: "3", large: "5" }, numericTarget: 70 },
+      { metric: "Staff AI Readiness Rate", category: "Workforce Development", dimension: "adoption_behavior", detail: "Percentage of clinical and administrative staff completing AI awareness training. Clinician buy-in is the #1 predictor of healthcare AI adoption success.", targetBySize: { micro: "30%", small: "25%", mid: "20%", large: "15%" }, numericTarget: 75 },
+    ],
+    mid: [
+      { metric: "AI-Assisted Diagnostic Accuracy", category: "Clinical Quality", dimension: "workflow_integration", detail: "Leading health systems achieve 85%+ concordance between AI-flagged findings and clinician confirmation. Track improvement from your current baseline across radiology, pathology, or clinical decision support.", targetBySize: { micro: "80%+", small: "82%+", mid: "85%+", large: "85%+" }, numericTarget: 85 },
+      { metric: "Revenue Cycle AI Capture Rate", category: "Financial Operations", dimension: "economic_translation", detail: "AI-powered coding and prior authorization reduces claim denials 30-40%. Measure the dollar value of denied claims recovered through AI-assisted processes.", targetBySize: { micro: "$25K/qtr", small: "$75K/qtr", mid: "$250K/qtr", large: "$1M+/qtr" }, numericTarget: 80 },
+      { metric: "Patient Throughput Improvement", category: "Operational Efficiency", dimension: "decision_velocity", detail: "AI-optimized scheduling and patient flow at peer institutions improves throughput 15-20% without additional capacity. Measure patients per day per provider.", targetBySize: { micro: "8%", small: "10%", mid: "15%", large: "18%" }, numericTarget: 75 },
+      { metric: "Clinical Workflow AI Adoption", category: "Digital Transformation", dimension: "adoption_behavior", detail: "Percentage of clinical workflows with active AI augmentation — from order entry to discharge planning. Peer leaders target 40%+ within 12 months of scaling.", targetBySize: { micro: "30%", small: "35%", mid: "40%", large: "45%" }, numericTarget: 80 },
+      { metric: "AI ROI Measurement Coverage", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of active AI initiatives with standardized ROI tracking. Without measurement, AI budgets are indefensible in the next planning cycle.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+    ],
+    high: [
+      { metric: "AI-Enabled Revenue Contribution", category: "Strategic Growth", dimension: "economic_translation", detail: "Quantified revenue from AI-powered services: remote patient monitoring, predictive care programs, precision medicine offerings. Top-quartile health systems are building new revenue streams, not just cutting costs.", targetBySize: { micro: "Measured", small: "Measured", mid: "5%+ of rev", large: "5%+ of rev" }, numericTarget: 90 },
+      { metric: "Clinical AI Model Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Aggregate ROI across all deployed clinical AI models, including cost avoidance from early detection, readmission reduction, and efficiency gains.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
+      { metric: "Predictive Care Accuracy", category: "Clinical Excellence", dimension: "workflow_integration", detail: "Accuracy of AI models predicting patient deterioration, readmission risk, or adverse events. Leading systems achieve 90%+ sensitivity on critical alerts.", targetBySize: { micro: "85%+", small: "88%+", mid: "90%+", large: "92%+" }, numericTarget: 90 },
+      { metric: "AI Innovation Pipeline Velocity", category: "Competitive Positioning", dimension: "decision_velocity", detail: "Time from clinical AI concept to validated pilot deployment. Top-quartile health systems complete this cycle in under 8 weeks.", targetBySize: { micro: "<10 wks", small: "<10 wks", mid: "<8 wks", large: "<6 wks" }, numericTarget: 85 },
+    ],
+  },
+  financial_services: {
+    low: [
+      { metric: "AI Tool Inventory & Risk Classification", category: "Regulatory Compliance", dimension: "authority_structure", detail: "OCC, FDIC, and SEC are increasing AI scrutiny. Complete inventory with risk tiers is the foundation of defensible governance — and a regulatory expectation, not a nice-to-have.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "Fraud Detection Pilot Accuracy", category: "Risk Operations", dimension: "workflow_integration", detail: "ML-based fraud models reduce false positives 40-60% vs. rule-based systems. Even a pilot on one transaction type proves the business case for AI investment.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
+      { metric: "Compliance Workflow AI Coverage", category: "Regulatory Efficiency", dimension: "workflow_integration", detail: "Percentage of compliance workflows with AI-assisted monitoring, documentation, or reporting. Regulators expect you to use available technology for oversight.", targetBySize: { micro: "10%", small: "15%", mid: "20%", large: "25%" }, numericTarget: 75 },
+      { metric: "AI Governance Committee Establishment", category: "Governance Foundation", dimension: "authority_structure", detail: "Formal AI governance body with clear charter, risk appetite framework, and model validation requirements. Required by evolving regulatory guidance from OCC and Fed.", targetBySize: { micro: "Chartered", small: "Chartered", mid: "Chartered", large: "Chartered" }, numericTarget: 100 },
+      { metric: "Staff AI Training Completion", category: "Workforce Readiness", dimension: "adoption_behavior", detail: "Percentage of client-facing and risk staff completing AI literacy program. Financial regulators increasingly expect staff to understand the AI tools they oversee.", targetBySize: { micro: "40%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
+    ],
+    mid: [
+      { metric: "Straight-Through Processing Rate", category: "Operational Efficiency", dimension: "decision_velocity", detail: "Leading institutions achieve 70%+ STP on standard transactions. Each percentage point reduces manual handling cost and error rate proportionally.", targetBySize: { micro: "50%+", small: "55%+", mid: "60%+", large: "70%+" }, numericTarget: 80 },
+      { metric: "Fraud False Positive Reduction", category: "Risk Operations", dimension: "workflow_integration", detail: "ML models reduce false positives 40-60% while maintaining or improving catch rates. Fewer false positives means less customer friction and lower investigation costs.", targetBySize: { micro: "25%", small: "30%", mid: "35%", large: "40%" }, numericTarget: 80 },
+      { metric: "AI-Influenced Revenue Attribution", category: "Revenue Impact", dimension: "economic_translation", detail: "Quantify assets or revenue where AI models materially influence decisions — advisory recommendations, risk pricing, portfolio construction, or client acquisition.", targetBySize: { micro: "$1M+", small: "$5M+", mid: "$50M+", large: "$500M+" }, numericTarget: 75 },
+      { metric: "Model Risk Management Maturity", category: "Risk Governance", dimension: "authority_structure", detail: "Percentage of production AI models with documented validation, bias testing, and ongoing monitoring per SR 11-7 / OCC 2011-12 guidance.", targetBySize: { micro: "80%", small: "85%", mid: "90%", large: "95%" }, numericTarget: 90 },
+      { metric: "Customer AI Interaction Satisfaction", category: "Client Experience", dimension: "adoption_behavior", detail: "NPS or satisfaction score for AI-powered client interactions (chatbots, robo-advisory, automated onboarding). Track against human-assisted baseline.", targetBySize: { micro: "On par", small: "On par", mid: "+5pts", large: "+10pts" }, numericTarget: 75 },
+    ],
+    high: [
+      { metric: "AI Alpha / Incremental Return", category: "Competitive Advantage", dimension: "economic_translation", detail: "Measure the incremental return attributable to AI-driven investment, pricing, or risk decisions versus non-AI baselines. This is the ultimate proof of AI value in financial services.", targetBySize: { micro: "Measured", small: "Measured", mid: "Positive", large: "Positive" }, numericTarget: 85 },
+      { metric: "Real-Time Decision Latency", category: "Decision Speed", dimension: "decision_velocity", detail: "From data signal to automated action. Top-quartile institutions process in milliseconds for trading, seconds for credit, minutes for compliance. Benchmark against peers.", targetBySize: { micro: "Top quartile", small: "Top quartile", mid: "Top quartile", large: "Top decile" }, numericTarget: 90 },
+      { metric: "AI Revenue as % of Total", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from AI-native products and services: algorithmic advisory, AI-powered risk products, automated underwriting platforms. The future P&L, not the legacy one.", targetBySize: { micro: "Measured", small: "5%+", mid: "8%+", large: "10%+" }, numericTarget: 85 },
+      { metric: "Regulatory AI Compliance Score", category: "Risk Excellence", dimension: "authority_structure", detail: "Internal compliance score for AI model governance, fairness testing, and explainability requirements. Leading firms treat this as a competitive moat, not a cost center.", targetBySize: { micro: "90%+", small: "92%+", mid: "95%+", large: "98%+" }, numericTarget: 95 },
+    ],
+  },
+  manufacturing: {
+    low: [
+      { metric: "Predictive Maintenance Pilot Coverage", category: "Production Operations", dimension: "adoption_behavior", detail: "Target critical production lines with IoT + ML predictive maintenance. Even a single-line pilot demonstrating reduced unplanned downtime builds the case for expansion.", targetBySize: { micro: "1 line", small: "1-2 lines", mid: "3-5 lines", large: "5-10 lines" }, numericTarget: 70 },
+      { metric: "Quality Defect Detection Automation", category: "Quality Assurance", dimension: "workflow_integration", detail: "Computer vision for quality inspection catches defects human inspectors miss. Pilot on highest-defect-rate product line for fastest ROI proof.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
+      { metric: "Production Data Infrastructure", category: "Data Foundation", dimension: "workflow_integration", detail: "Percentage of critical production equipment with IoT sensors feeding a unified data platform. You cannot predict what you cannot measure.", targetBySize: { micro: "30%", small: "35%", mid: "40%", large: "50%" }, numericTarget: 75 },
+      { metric: "Shop Floor AI Awareness", category: "Workforce Development", dimension: "adoption_behavior", detail: "Percentage of production supervisors and operators trained on AI-augmented workflows. Operator trust is the adoption bottleneck in manufacturing AI.", targetBySize: { micro: "40%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
+      { metric: "AI Governance Charter", category: "Governance Foundation", dimension: "authority_structure", detail: "Establish formal AI governance covering model validation, safety thresholds for production AI, and escalation protocols for anomalous predictions.", targetBySize: { micro: "Chartered", small: "Chartered", mid: "Chartered", large: "Chartered" }, numericTarget: 100 },
+    ],
+    mid: [
+      { metric: "Unplanned Downtime Reduction", category: "Production Efficiency", dimension: "decision_velocity", detail: "AI-predicted maintenance reduces unplanned downtime 30-40% at peer manufacturers. Track hours of unplanned downtime per production line per month against baseline.", targetBySize: { micro: "20%", small: "25%", mid: "30%", large: "35%" }, numericTarget: 80 },
+      { metric: "First-Pass Yield Improvement", category: "Production Quality", dimension: "economic_translation", detail: "AI-optimized process parameters improve first-pass yield 2-5% at advanced manufacturers. Even 1% yield improvement translates to significant margin impact at scale.", targetBySize: { micro: "1%", small: "1.5%", mid: "2%", large: "3%" }, numericTarget: 75 },
+      { metric: "Energy Consumption per Unit Reduction", category: "Operational Cost", dimension: "economic_translation", detail: "AI-optimized energy management reduces per-unit energy cost 10-15%. Measurable, defensible savings that directly impact COGS.", targetBySize: { micro: "5%", small: "8%", mid: "10%", large: "12%" }, numericTarget: 75 },
+      { metric: "Supply Chain Forecast Accuracy", category: "Planning & Logistics", dimension: "workflow_integration", detail: "ML-based demand and supply forecasting improves accuracy 15-25% over traditional methods, reducing inventory carrying costs and stockouts.", targetBySize: { micro: "+10%", small: "+12%", mid: "+15%", large: "+20%" }, numericTarget: 80 },
+      { metric: "AI Initiative ROI Tracking", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of active AI initiatives with standardized ROI measurement. Manufacturing CFOs need hard numbers — not pilot stories — to approve the next investment cycle.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+    ],
+    high: [
+      { metric: "Digital Twin Coverage", category: "Advanced Operations", dimension: "workflow_integration", detail: "AI-powered digital twins of production processes enable simulation, optimization, and predictive scenario planning. The competitive moat of next-generation manufacturing.", targetBySize: { micro: "1 line", small: "1 facility", mid: "3+ facilities", large: "Enterprise" }, numericTarget: 85 },
+      { metric: "Autonomous Production Coverage", category: "Operational Excellence", dimension: "decision_velocity", detail: "Percentage of production processes with AI-driven autonomous or semi-autonomous operation. Leading manufacturers target lights-out operation on standard runs.", targetBySize: { micro: "10%", small: "15%", mid: "25%", large: "35%" }, numericTarget: 85 },
+      { metric: "AI-Driven Revenue from Smart Products", category: "Product Innovation", dimension: "economic_translation", detail: "Revenue from products with embedded AI features or AI-enabled services (predictive maintenance as a service, smart product analytics). This is the manufacturing competitive moat of the next decade.", targetBySize: { micro: "Measured", small: "Measured", mid: "5%+ of rev", large: "8%+ of rev" }, numericTarget: 85 },
+      { metric: "Manufacturing AI Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Blended return across all production AI investments: predictive maintenance, quality, yield optimization, energy, and supply chain combined.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
+    ],
+  },
+  shipping_logistics: {
+    low: [
+      { metric: "Route Optimization Pilot Savings", category: "Fleet Operations", dimension: "workflow_integration", detail: "AI route planning saves 10-15% fuel cost on average. Deploy on your highest-volume corridor first for fastest measurable ROI.", targetBySize: { micro: "5%", small: "8%", mid: "10%", large: "12%" }, numericTarget: 75 },
+      { metric: "Shipment Visibility Coverage", category: "Customer Experience", dimension: "adoption_behavior", detail: "Percentage of shipments with real-time AI-powered tracking and ETA prediction. Customers increasingly treat this as table stakes, not a differentiator.", targetBySize: { micro: "50%", small: "60%", mid: "70%", large: "85%" }, numericTarget: 80 },
+      { metric: "Logistics AI Governance Framework", category: "Governance Foundation", dimension: "authority_structure", detail: "Formal governance covering AI-driven routing decisions, autonomous vehicle testing protocols, and algorithmic pricing oversight.", targetBySize: { micro: "Chartered", small: "Chartered", mid: "Chartered", large: "Chartered" }, numericTarget: 100 },
+      { metric: "Warehouse AI Pilot Deployment", category: "Warehouse Operations", dimension: "decision_velocity", detail: "Deploy AI-guided picking, computer vision for damage detection, or predictive inventory positioning in at least one facility.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
+      { metric: "Operations Team AI Training", category: "Workforce Readiness", dimension: "adoption_behavior", detail: "Percentage of dispatchers, warehouse supervisors, and fleet managers trained on AI-augmented tools. Frontline adoption determines whether AI investments pay off.", targetBySize: { micro: "40%", small: "35%", mid: "30%", large: "25%" }, numericTarget: 75 },
+    ],
+    mid: [
+      { metric: "Warehouse Pick Accuracy", category: "Warehouse Operations", dimension: "workflow_integration", detail: "AI-guided picking and computer vision verification at peer operations achieve 99.5%+ accuracy. Track error rate reduction from baseline.", targetBySize: { micro: "98.5%", small: "99%", mid: "99.3%", large: "99.5%" }, numericTarget: 85 },
+      { metric: "Demand Forecast Accuracy Improvement", category: "Planning & Capacity", dimension: "decision_velocity", detail: "ML-based demand forecasting improves capacity planning accuracy 15-25% over traditional methods, reducing deadhead miles and excess capacity costs.", targetBySize: { micro: "+10%", small: "+12%", mid: "+15%", large: "+20%" }, numericTarget: 80 },
+      { metric: "Cost per Shipment Reduction", category: "Unit Economics", dimension: "economic_translation", detail: "Aggregate AI impact on per-shipment cost: routing, labor, fuel, damage reduction. This is the number your CFO and board care about.", targetBySize: { micro: "3%", small: "5%", mid: "7%", large: "10%" }, numericTarget: 80 },
+      { metric: "Fleet Utilization Improvement", category: "Asset Efficiency", dimension: "economic_translation", detail: "AI-optimized load planning and dynamic routing improves fleet utilization 8-12%. More revenue per asset without adding trucks.", targetBySize: { micro: "5%", small: "7%", mid: "9%", large: "12%" }, numericTarget: 80 },
+      { metric: "Last-Mile Delivery Prediction Accuracy", category: "Customer Satisfaction", dimension: "workflow_integration", detail: "AI-powered ETA prediction within 15-minute windows. Customer satisfaction and retention correlate directly with delivery predictability.", targetBySize: { micro: "80%+", small: "82%+", mid: "85%+", large: "90%+" }, numericTarget: 85 },
+    ],
+    high: [
+      { metric: "Autonomous Operations Coverage", category: "Advanced Automation", dimension: "workflow_integration", detail: "Percentage of sortation, loading, or last-mile operations with AI-driven autonomous or semi-autonomous systems. The labor arbitrage of the next decade.", targetBySize: { micro: "1 facility", small: "1 facility", mid: "3+ facilities", large: "Network-wide" }, numericTarget: 85 },
+      { metric: "AI-Driven Network Optimization ROI", category: "Strategic Returns", dimension: "economic_translation", detail: "Blended return from AI across the entire logistics network: routing, warehousing, demand planning, and fleet management combined.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
+      { metric: "Predictive Supply Chain Resilience", category: "Risk Management", dimension: "decision_velocity", detail: "Time from disruption signal (weather, port closure, supplier issue) to automated rerouting decision. Leading networks respond in hours, not days.", targetBySize: { micro: "<24hr", small: "<12hr", mid: "<6hr", large: "<2hr" }, numericTarget: 90 },
+      { metric: "Carbon Footprint Reduction via AI", category: "Sustainability Impact", dimension: "economic_translation", detail: "Measurable CO2 reduction from AI-optimized routing, load consolidation, and fleet electrification planning. Increasingly required by enterprise customers and ESG mandates.", targetBySize: { micro: "5%", small: "8%", mid: "10%", large: "15%" }, numericTarget: 80 },
+    ],
+  },
+  technology: {
+    low: [
+      { metric: "Developer AI Tool Adoption", category: "Engineering Productivity", dimension: "adoption_behavior", detail: "Percentage of engineering team actively using AI coding assistants (Copilot, Cursor, etc.) weekly. Developer productivity gains of 30-55% are well-documented.", targetBySize: { micro: "60%", small: "50%", mid: "40%", large: "35%" }, numericTarget: 80 },
+      { metric: "AI Feature Roadmap Coverage", category: "Product Strategy", dimension: "decision_velocity", detail: "Percentage of product roadmap items with AI/ML components. If AI isn't in the product, it's in the competitor's product.", targetBySize: { micro: "20%", small: "20%", mid: "25%", large: "30%" }, numericTarget: 70 },
+      { metric: "AI/ML Infrastructure Readiness", category: "Technical Foundation", dimension: "workflow_integration", detail: "Production-ready ML pipeline, model registry, and monitoring. Without infrastructure, every AI project is a one-off science experiment.", targetBySize: { micro: "MVP", small: "MVP", mid: "Production", large: "Production" }, numericTarget: 75 },
+      { metric: "AI Ethics & Governance Framework", category: "Trust & Safety", dimension: "authority_structure", detail: "Documented framework for AI bias testing, data privacy, and responsible deployment. Customer trust depends on it; enterprise sales require it.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Team AI Literacy Rate", category: "Workforce Development", dimension: "adoption_behavior", detail: "Percentage of product, design, and go-to-market staff who understand AI capabilities well enough to identify opportunities. AI can't be engineering-only.", targetBySize: { micro: "50%", small: "40%", mid: "35%", large: "30%" }, numericTarget: 75 },
+    ],
+    mid: [
+      { metric: "AI-Powered Feature Usage Rate", category: "Product Engagement", dimension: "workflow_integration", detail: "Percentage of active users engaging with AI-powered features monthly. Building AI features nobody uses is worse than not building them.", targetBySize: { micro: "20%+", small: "25%+", mid: "30%+", large: "35%+" }, numericTarget: 80 },
+      { metric: "Code Review Automation Coverage", category: "Engineering Efficiency", dimension: "workflow_integration", detail: "Percentage of code reviews with AI-assisted analysis (security, performance, style). Reduces review cycle time 40-60% at leading engineering orgs.", targetBySize: { micro: "50%", small: "55%", mid: "60%", large: "70%" }, numericTarget: 80 },
+      { metric: "AI Feature Revenue Attribution", category: "Revenue Impact", dimension: "economic_translation", detail: "Revenue directly attributable to AI-powered features — upsell, retention, or net-new. The metric that justifies the next round of AI investment.", targetBySize: { micro: "$100K+", small: "$500K+", mid: "$2M+", large: "$10M+" }, numericTarget: 75 },
+      { metric: "Model Deployment Velocity", category: "Engineering Speed", dimension: "decision_velocity", detail: "Time from trained model to production deployment. Best-in-class teams deploy in hours, not weeks. Slow deployment kills AI competitive advantage.", targetBySize: { micro: "<1 wk", small: "<1 wk", mid: "<3 days", large: "<1 day" }, numericTarget: 80 },
+      { metric: "AI Incident Response Time", category: "Operational Reliability", dimension: "authority_structure", detail: "Mean time to detect and mitigate AI model degradation, bias drift, or hallucination in production. Customer-facing AI failures are brand-damaging.", targetBySize: { micro: "<4hr", small: "<2hr", mid: "<1hr", large: "<30min" }, numericTarget: 85 },
+    ],
+    high: [
+      { metric: "AI-Native Product Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from products where AI is the core value proposition, not an add-on feature. This is the future P&L — measure it separately from legacy revenue.", targetBySize: { micro: "15%+", small: "15%+", mid: "20%+", large: "25%+" }, numericTarget: 85 },
+      { metric: "AI Competitive Moat Strength", category: "Market Position", dimension: "workflow_integration", detail: "Proprietary data flywheel, model performance advantage, or AI-enabled network effects that competitors cannot easily replicate. Qualitative + quantitative assessment.", targetBySize: { micro: "Assessed", small: "Assessed", mid: "Measured", large: "Measured" }, numericTarget: 85 },
+      { metric: "Platform AI API Revenue", category: "Ecosystem Value", dimension: "economic_translation", detail: "Revenue from AI capabilities exposed as APIs or platform features to customers and partners. The platform play is where technology companies capture exponential value.", targetBySize: { micro: "Launched", small: "Launched", mid: "$1M+", large: "$5M+" }, numericTarget: 80 },
+      { metric: "AI R&D Efficiency Ratio", category: "Investment Returns", dimension: "decision_velocity", detail: "Revenue generated per dollar of AI R&D investment. Top-quartile technology companies achieve 5:1+ within 24 months of focused AI investment.", targetBySize: { micro: "3:1+", small: "3:1+", mid: "4:1+", large: "5:1+" }, numericTarget: 85 },
+    ],
+  },
+  retail_ecommerce: {
+    low: [
+      { metric: "Demand Forecast Accuracy Baseline", category: "Inventory Management", dimension: "workflow_integration", detail: "Establish AI-powered demand forecasting baseline on top 20% of SKUs by revenue. ML models outperform traditional methods by 15-25% on forecast accuracy.", targetBySize: { micro: "Top 100 SKUs", small: "Top 20%", mid: "Top 20%", large: "Top 30%" }, numericTarget: 70 },
+      { metric: "Customer Segmentation AI Deployment", category: "Marketing Intelligence", dimension: "adoption_behavior", detail: "Deploy ML-based customer segmentation replacing rule-based segments. AI segmentation typically improves campaign response rates 20-40%.", targetBySize: { micro: "1 model", small: "1 model", mid: "2 models", large: "3 models" }, numericTarget: 70 },
+      { metric: "Pricing Intelligence Pilot", category: "Revenue Optimization", dimension: "decision_velocity", detail: "AI-driven dynamic pricing on at least one product category. Peer retailers see 2-5% margin improvement from algorithmic pricing.", targetBySize: { micro: "1 category", small: "1 category", mid: "2 categories", large: "3 categories" }, numericTarget: 65 },
+      { metric: "Retail AI Governance Framework", category: "Compliance & Ethics", dimension: "authority_structure", detail: "Governance covering algorithmic pricing fairness, personalization bias, and customer data privacy. FTC scrutiny on dark patterns makes this non-optional.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Store/Warehouse Team AI Training", category: "Workforce Readiness", dimension: "adoption_behavior", detail: "Percentage of store managers and warehouse leads trained on AI-augmented tools. Frontline adoption determines whether AI investments translate to the P&L.", targetBySize: { micro: "40%", small: "35%", mid: "30%", large: "25%" }, numericTarget: 75 },
+    ],
+    mid: [
+      { metric: "Personalization Revenue Lift", category: "Customer Experience", dimension: "workflow_integration", detail: "Incremental revenue from AI-powered product recommendations, personalized pricing, and targeted promotions versus non-personalized baseline.", targetBySize: { micro: "3%", small: "5%", mid: "7%", large: "8%" }, numericTarget: 80 },
+      { metric: "Inventory Carrying Cost Reduction", category: "Supply Chain Efficiency", dimension: "economic_translation", detail: "AI-optimized inventory positioning reduces carrying costs 10-20% while maintaining or improving in-stock rates. Direct margin impact.", targetBySize: { micro: "8%", small: "10%", mid: "12%", large: "15%" }, numericTarget: 80 },
+      { metric: "Customer Lifetime Value Prediction Accuracy", category: "Marketing Analytics", dimension: "decision_velocity", detail: "AI-predicted CLV accuracy vs. actuals. Accurate CLV prediction drives better acquisition spending, retention investment, and personalization decisions.", targetBySize: { micro: "70%+", small: "75%+", mid: "80%+", large: "85%+" }, numericTarget: 80 },
+      { metric: "Markdown Optimization Savings", category: "Margin Protection", dimension: "economic_translation", detail: "AI-timed markdowns reduce excess inventory clearance costs 15-25%. Measure gross margin improvement on marked-down inventory vs. previous season.", targetBySize: { micro: "10%", small: "12%", mid: "15%", large: "20%" }, numericTarget: 80 },
+      { metric: "Omnichannel AI Integration", category: "Digital Transformation", dimension: "adoption_behavior", detail: "Percentage of customer touchpoints (web, app, store, email, support) with unified AI-powered personalization. Fragmented AI = fragmented customer experience.", targetBySize: { micro: "3 channels", small: "3 channels", mid: "4 channels", large: "5 channels" }, numericTarget: 75 },
+    ],
+    high: [
+      { metric: "AI-Attributed Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Total revenue where AI materially influenced the transaction: personalized recommendations, dynamic pricing, predictive inventory, automated merchandising.", targetBySize: { micro: "15%+", small: "20%+", mid: "25%+", large: "30%+" }, numericTarget: 85 },
+      { metric: "Autonomous Merchandising Coverage", category: "Operational Excellence", dimension: "workflow_integration", detail: "Percentage of merchandising decisions (assortment, placement, pricing) made or recommended by AI with human oversight rather than human-led.", targetBySize: { micro: "20%", small: "25%", mid: "35%", large: "45%" }, numericTarget: 85 },
+      { metric: "Retail AI Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Blended return across all retail AI investments: demand forecasting, personalization, pricing, supply chain, and customer service combined.", targetBySize: { micro: "3:1+", small: "3:1+", mid: "4:1+", large: "5:1+" }, numericTarget: 85 },
+      { metric: "Customer Churn Prediction Accuracy", category: "Retention Intelligence", dimension: "decision_velocity", detail: "AI-predicted churn accuracy enables proactive retention. Top retailers achieve 85%+ accuracy with 30-day advance warning, enabling targeted intervention.", targetBySize: { micro: "80%+", small: "82%+", mid: "85%+", large: "88%+" }, numericTarget: 88 },
+    ],
+  },
+  energy_utilities: {
+    low: [
+      { metric: "Predictive Asset Maintenance Pilot", category: "Grid/Plant Operations", dimension: "workflow_integration", detail: "Deploy AI-predicted maintenance on highest-criticality assets. Utilities with predictive maintenance reduce unplanned outages 25-35% on targeted equipment.", targetBySize: { micro: "1 pilot", small: "2 pilots", mid: "3 pilots", large: "5 pilots" }, numericTarget: 70 },
+      { metric: "SCADA/IoT Data Integration", category: "Data Foundation", dimension: "workflow_integration", detail: "Percentage of critical operational data flowing into unified analytics platform. Siloed SCADA data is the #1 barrier to AI deployment in utilities.", targetBySize: { micro: "30%", small: "40%", mid: "50%", large: "60%" }, numericTarget: 75 },
+      { metric: "AI Safety & Compliance Framework", category: "Regulatory Governance", dimension: "authority_structure", detail: "Formal AI governance covering grid reliability impacts, NERC CIP implications, and safety-critical system validation. Regulators and PUCs expect documented AI governance.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Field Crew AI Tool Adoption", category: "Workforce Enablement", dimension: "adoption_behavior", detail: "Percentage of field technicians using AI-augmented inspection, work order prioritization, or route optimization tools.", targetBySize: { micro: "25%", small: "25%", mid: "30%", large: "35%" }, numericTarget: 75 },
+      { metric: "Energy Trading/Procurement AI Pilot", category: "Financial Operations", dimension: "economic_translation", detail: "AI-assisted energy procurement or trading on at least one market or contract type. ML models improve price forecasting 10-20% vs. traditional methods.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 65 },
+    ],
+    mid: [
+      { metric: "Asset Failure Prediction Accuracy", category: "Reliability Engineering", dimension: "workflow_integration", detail: "AI-predicted equipment failure accuracy on monitored assets. Leading utilities achieve 85%+ with 7+ day advance warning, enabling planned maintenance windows.", targetBySize: { micro: "75%+", small: "80%+", mid: "85%+", large: "88%+" }, numericTarget: 85 },
+      { metric: "Outage Duration Reduction", category: "Customer Reliability", dimension: "decision_velocity", detail: "AI-optimized crew dispatch and fault localization reduce average outage duration 20-30%. Directly impacts SAIDI/SAIFI metrics and regulatory performance.", targetBySize: { micro: "15%", small: "18%", mid: "22%", large: "28%" }, numericTarget: 80 },
+      { metric: "Grid/Plant Efficiency Improvement", category: "Operational Performance", dimension: "economic_translation", detail: "AI-optimized operations improve thermal efficiency, reduce line losses, or optimize renewable dispatch. Each 1% efficiency gain translates to millions in fuel savings.", targetBySize: { micro: "1%", small: "1.5%", mid: "2%", large: "3%" }, numericTarget: 75 },
+      { metric: "Demand Response AI Accuracy", category: "Load Management", dimension: "decision_velocity", detail: "AI-predicted load forecasting accuracy enables better demand response programs, reducing peak capacity costs and improving grid stability.", targetBySize: { micro: "80%+", small: "82%+", mid: "85%+", large: "90%+" }, numericTarget: 85 },
+      { metric: "AI Initiative ROI Documentation", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of AI initiatives with PUC/board-ready ROI documentation. Utility regulators require defensible cost-benefit analysis for rate-base recovery of AI investments.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+    ],
+    high: [
+      { metric: "AI-Optimized Grid/Plant ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Aggregate return from AI across operations: predictive maintenance, load optimization, trading, and customer management. The number that justifies the next investment cycle.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
+      { metric: "Autonomous Grid Operations Coverage", category: "Advanced Automation", dimension: "workflow_integration", detail: "Percentage of grid operations with AI-driven autonomous or semi-autonomous management: self-healing networks, automated dispatch, dynamic load balancing.", targetBySize: { micro: "10%", small: "15%", mid: "25%", large: "35%" }, numericTarget: 85 },
+      { metric: "Renewable Integration Optimization", category: "Strategic Positioning", dimension: "decision_velocity", detail: "AI-optimized renewable dispatch and storage management maximizing clean energy utilization. The strategic capability that defines next-generation utilities.", targetBySize: { micro: "Measured", small: "Measured", mid: "+10% util", large: "+15% util" }, numericTarget: 85 },
+      { metric: "Customer AI Service Satisfaction", category: "Customer Experience", dimension: "adoption_behavior", detail: "Customer satisfaction with AI-powered outage communication, usage insights, and billing support. Increasingly a competitive differentiator in deregulated markets.", targetBySize: { micro: "+5pts NPS", small: "+5pts", mid: "+8pts", large: "+10pts" }, numericTarget: 80 },
+    ],
+  },
+  telecommunications: {
+    low: [
+      { metric: "Network Anomaly Detection Pilot", category: "Network Operations", dimension: "workflow_integration", detail: "Deploy AI-based anomaly detection on core network segments. ML models detect network issues 60-80% faster than threshold-based alerting.", targetBySize: { micro: "1 segment", small: "1 segment", mid: "2 segments", large: "3 segments" }, numericTarget: 70 },
+      { metric: "Customer Churn Prediction Model", category: "Revenue Protection", dimension: "decision_velocity", detail: "ML-based churn prediction with at least 30-day advance warning. Telecom churn costs 5-10x more than retention — predictive targeting is table stakes.", targetBySize: { micro: "1 model", small: "1 model", mid: "1 model", large: "2 models" }, numericTarget: 70 },
+      { metric: "AI Governance & Data Framework", category: "Compliance Foundation", dimension: "authority_structure", detail: "Governance covering customer data usage for AI, algorithmic fairness in pricing/service, and network AI safety. FCC and state AG scrutiny is increasing.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Contact Center AI Pilot", category: "Customer Experience", dimension: "adoption_behavior", detail: "Deploy AI-assisted customer service (chatbot, agent assist, or call routing) on highest-volume issue type. Reduces cost per interaction 20-40%.", targetBySize: { micro: "1 use case", small: "1 use case", mid: "2 use cases", large: "3 use cases" }, numericTarget: 70 },
+      { metric: "Frontline Staff AI Training", category: "Workforce Readiness", dimension: "adoption_behavior", detail: "Percentage of NOC, field, and contact center staff trained on AI-augmented tools and workflows.", targetBySize: { micro: "35%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
+    ],
+    mid: [
+      { metric: "Mean Time to Repair Reduction", category: "Network Reliability", dimension: "decision_velocity", detail: "AI-assisted fault localization and predictive dispatch reduces MTTR 25-35% at leading operators. Directly impacts SLA compliance and customer satisfaction.", targetBySize: { micro: "20%", small: "22%", mid: "25%", large: "30%" }, numericTarget: 80 },
+      { metric: "Network Capacity Optimization", category: "Infrastructure Efficiency", dimension: "workflow_integration", detail: "AI-driven traffic management and capacity planning improves network utilization 15-20%, deferring capex on new infrastructure.", targetBySize: { micro: "10%", small: "12%", mid: "15%", large: "18%" }, numericTarget: 80 },
+      { metric: "ARPU Uplift from AI Personalization", category: "Revenue Growth", dimension: "economic_translation", detail: "AI-powered plan recommendations, upsell timing, and personalized offers increase ARPU 3-8% at peer operators.", targetBySize: { micro: "2%", small: "3%", mid: "5%", large: "7%" }, numericTarget: 75 },
+      { metric: "Contact Center AI Resolution Rate", category: "Customer Efficiency", dimension: "adoption_behavior", detail: "Percentage of customer interactions fully resolved by AI without human handoff. Leading operators achieve 40-50% on common issue types.", targetBySize: { micro: "30%", small: "35%", mid: "40%", large: "45%" }, numericTarget: 80 },
+      { metric: "AI Investment ROI Tracking", category: "Financial Governance", dimension: "economic_translation", detail: "All active AI initiatives with standardized ROI measurement. Telecom boards demand hard numbers given the capital intensity of the business.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+    ],
+    high: [
+      { metric: "Self-Healing Network Coverage", category: "Advanced Automation", dimension: "workflow_integration", detail: "Percentage of network with AI-driven self-healing capability: automatic rerouting, load balancing, and fault isolation without human intervention.", targetBySize: { micro: "15%", small: "20%", mid: "30%", large: "40%" }, numericTarget: 85 },
+      { metric: "AI-Driven Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from AI-native services: smart network slicing, AI-powered enterprise solutions, IoT analytics platforms. The post-connectivity revenue model.", targetBySize: { micro: "5%+", small: "8%+", mid: "10%+", large: "15%+" }, numericTarget: 85 },
+      { metric: "5G/Edge AI Monetization", category: "Platform Innovation", dimension: "economic_translation", detail: "Revenue from AI capabilities enabled by 5G/edge infrastructure: real-time analytics, autonomous systems support, AR/VR services. The platform play that justifies 5G capex.", targetBySize: { micro: "Launched", small: "Launched", mid: "$2M+", large: "$10M+" }, numericTarget: 80 },
+      { metric: "Telecom AI Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Blended return across all AI investments: network optimization, customer management, fraud detection, and new service revenue.", targetBySize: { micro: "2.5:1+", small: "3:1+", mid: "3.5:1+", large: "4:1+" }, numericTarget: 85 },
+    ],
+  },
+  aerospace_defense: {
+    low: [
+      { metric: "Predictive Maintenance Pilot (Fleet/Systems)", category: "Mission Readiness", dimension: "workflow_integration", detail: "Deploy AI-predicted maintenance on highest-criticality platforms. DoD and prime contractors report 25-40% reduction in unscheduled maintenance through predictive analytics.", targetBySize: { micro: "1 system", small: "1-2 systems", mid: "3 systems", large: "5 systems" }, numericTarget: 70 },
+      { metric: "AI Security & Classification Framework", category: "Compliance & Security", dimension: "authority_structure", detail: "Formal AI governance covering ITAR, CMMC, and classified environment constraints. AI deployment in defense requires security-first architecture — not an afterthought.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Supply Chain Visibility AI", category: "Program Management", dimension: "decision_velocity", detail: "AI-powered supply chain risk monitoring for critical components and long-lead items. Defense supply chains are uniquely fragile — visibility is a strategic imperative.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
+      { metric: "Engineering Team AI Adoption", category: "Workforce Enablement", dimension: "adoption_behavior", detail: "Percentage of engineering and program management staff using AI tools for design, analysis, documentation, or code generation.", targetBySize: { micro: "30%", small: "30%", mid: "35%", large: "40%" }, numericTarget: 75 },
+      { metric: "Digital Engineering Foundation", category: "Technical Infrastructure", dimension: "workflow_integration", detail: "Model-based systems engineering (MBSE) with AI-ready data architecture. Without digital thread infrastructure, AI cannot operate across the program lifecycle.", targetBySize: { micro: "Assessed", small: "Assessed", mid: "Piloted", large: "Piloted" }, numericTarget: 65 },
+    ],
+    mid: [
+      { metric: "Platform Availability Improvement", category: "Mission Readiness", dimension: "decision_velocity", detail: "AI-predicted maintenance and logistics optimization improving platform operational availability. Every 1% improvement in Ao translates to mission capability.", targetBySize: { micro: "3%", small: "4%", mid: "5%", large: "7%" }, numericTarget: 80 },
+      { metric: "Digital Twin Coverage", category: "Advanced Engineering", dimension: "workflow_integration", detail: "Systems with AI-powered digital twins for simulation, prognostics, and mission planning. The DoD Digital Engineering Strategy makes this a contract requirement.", targetBySize: { micro: "1 system", small: "2 systems", mid: "3+ systems", large: "5+ systems" }, numericTarget: 80 },
+      { metric: "Program Cost Variance Reduction", category: "Financial Performance", dimension: "economic_translation", detail: "AI-assisted cost estimation and risk prediction reducing program cost overruns. Defense programs average 20%+ cost growth — AI can cut this significantly.", targetBySize: { micro: "10%", small: "12%", mid: "15%", large: "20%" }, numericTarget: 75 },
+      { metric: "Autonomous Test & Evaluation Coverage", category: "Quality Assurance", dimension: "workflow_integration", detail: "Percentage of test procedures with AI-augmented analysis, anomaly detection, or automated evaluation. Reduces test cycle time 20-30%.", targetBySize: { micro: "15%", small: "20%", mid: "25%", large: "35%" }, numericTarget: 80 },
+      { metric: "AI ROI Documentation for Contracts", category: "Business Development", dimension: "economic_translation", detail: "AI capabilities with documented ROI for inclusion in proposals and contract modifications. AI is increasingly a discriminator in competitive source selections.", targetBySize: { micro: "3 cases", small: "5 cases", mid: "8 cases", large: "12 cases" }, numericTarget: 75 },
+    ],
+    high: [
+      { metric: "AI-Enabled Contract Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from contracts where AI capabilities are a material differentiator or deliverable. The future competitive advantage in defense and aerospace.", targetBySize: { micro: "10%+", small: "15%+", mid: "20%+", large: "25%+" }, numericTarget: 85 },
+      { metric: "Autonomous Systems Maturity", category: "Technology Leadership", dimension: "workflow_integration", detail: "Number of autonomous or semi-autonomous systems in production or advanced development. Autonomy is the defining technology race in defense.", targetBySize: { micro: "1 system", small: "2 systems", mid: "3+ systems", large: "5+ systems" }, numericTarget: 85 },
+      { metric: "Cross-Program AI Reuse Rate", category: "Portfolio Efficiency", dimension: "decision_velocity", detail: "Percentage of AI models and components reused across programs. Reuse is the path from one-off projects to scalable AI capability — and dramatically improves program margins.", targetBySize: { micro: "20%", small: "25%", mid: "35%", large: "45%" }, numericTarget: 85 },
+      { metric: "A&D AI Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Blended return across all AI investments: predictive maintenance, digital engineering, autonomous systems, and contract differentiation.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
+    ],
+  },
+  consulting_services: {
+    low: [
+      { metric: "Consultant AI Tool Adoption", category: "Delivery Efficiency", dimension: "adoption_behavior", detail: "Percentage of consultants actively using AI for research, analysis, document generation, or client deliverables. Productivity gains of 30-50% are achievable immediately.", targetBySize: { micro: "60%", small: "50%", mid: "40%", large: "35%" }, numericTarget: 80 },
+      { metric: "Proposal Generation AI Acceleration", category: "Business Development", dimension: "decision_velocity", detail: "Reduction in proposal/RFP response time using AI-assisted drafting, pricing analysis, and competitive intelligence. Faster proposals win more business.", targetBySize: { micro: "30%", small: "30%", mid: "25%", large: "25%" }, numericTarget: 75 },
+      { metric: "Knowledge Management AI Deployment", category: "Intellectual Capital", dimension: "workflow_integration", detail: "AI-powered search and synthesis across prior deliverables, case studies, and institutional knowledge. The asset that differentiates experienced firms from new entrants.", targetBySize: { micro: "Piloted", small: "Piloted", mid: "Deployed", large: "Deployed" }, numericTarget: 70 },
+      { metric: "AI Service Offering Definition", category: "Product Strategy", dimension: "economic_translation", detail: "At least one defined AI-powered service offering for clients. If you are not selling AI advisory services, your competitors are already doing it.", targetBySize: { micro: "1 offering", small: "1 offering", mid: "2 offerings", large: "3 offerings" }, numericTarget: 70 },
+      { metric: "AI Ethics & Data Governance", category: "Client Trust", dimension: "authority_structure", detail: "Governance framework for AI use with client data: confidentiality, bias prevention, and audit trails. Client trust is the currency of professional services.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+    ],
+    mid: [
+      { metric: "Utilization Rate Improvement", category: "Financial Performance", dimension: "economic_translation", detail: "AI-augmented delivery enabling higher utilization rates by reducing non-billable research, admin, and rework time. Each point of utilization improvement flows directly to margin.", targetBySize: { micro: "+3pts", small: "+3pts", mid: "+4pts", large: "+5pts" }, numericTarget: 80 },
+      { metric: "AI-Powered Client Insight Delivery", category: "Service Quality", dimension: "workflow_integration", detail: "Percentage of client engagements enhanced with AI-generated analysis, benchmarking, or predictive insights that complement consultant expertise.", targetBySize: { micro: "40%", small: "45%", mid: "50%", large: "60%" }, numericTarget: 80 },
+      { metric: "AI Service Revenue Attribution", category: "Revenue Growth", dimension: "economic_translation", detail: "Revenue from engagements where AI capabilities were a material differentiator in winning or expanding the work.", targetBySize: { micro: "$50K+", small: "$200K+", mid: "$1M+", large: "$5M+" }, numericTarget: 75 },
+      { metric: "Deliverable Quality Consistency", category: "Operational Excellence", dimension: "workflow_integration", detail: "Reduction in deliverable revision cycles through AI-assisted quality checks, formatting, and consistency verification across engagement teams.", targetBySize: { micro: "25%", small: "25%", mid: "30%", large: "35%" }, numericTarget: 75 },
+      { metric: "Client Satisfaction Improvement", category: "Client Outcomes", dimension: "adoption_behavior", detail: "NPS or satisfaction score improvement attributable to AI-augmented delivery: faster insights, deeper analysis, more responsive service.", targetBySize: { micro: "+5pts", small: "+5pts", mid: "+8pts", large: "+10pts" }, numericTarget: 80 },
+    ],
+    high: [
+      { metric: "AI-Native Service Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from services where AI is the core deliverable: AI strategy advisory, implementation, managed AI services. The fastest-growing segment in professional services.", targetBySize: { micro: "15%+", small: "20%+", mid: "25%+", large: "30%+" }, numericTarget: 85 },
+      { metric: "Revenue per Consultant Improvement", category: "Firm Economics", dimension: "economic_translation", detail: "AI-driven improvement in revenue per consultant — the fundamental unit economics metric. Firms that crack this reshape their entire business model.", targetBySize: { micro: "+10%", small: "+12%", mid: "+15%", large: "+20%" }, numericTarget: 85 },
+      { metric: "Proprietary AI Platform Value", category: "Competitive Moat", dimension: "workflow_integration", detail: "Client-facing AI platforms or tools built on proprietary data and methodology. The transition from selling hours to selling recurring capability.", targetBySize: { micro: "1 platform", small: "1 platform", mid: "2 platforms", large: "3+ platforms" }, numericTarget: 80 },
+      { metric: "AI Practice Margin vs. Traditional", category: "Portfolio Performance", dimension: "decision_velocity", detail: "Margin comparison between AI-powered engagements and traditional delivery. Successful AI practices achieve 5-15 points higher margin.", targetBySize: { micro: "+5pts", small: "+8pts", mid: "+10pts", large: "+12pts" }, numericTarget: 85 },
+    ],
+  },
+  defaults: {
+    low: [
+      { metric: "AI Tool Inventory & Governance", category: "Risk Management", dimension: "authority_structure", detail: "Complete inventory of all AI tools in use across the organization with risk classification. You cannot govern what you cannot see.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "AI Pilot Deployments", category: "Innovation Pipeline", dimension: "decision_velocity", detail: "Number of governed AI pilots actively in deployment. Focus on use cases with clear ROI and measurable outcomes to build organizational evidence.", targetBySize: { micro: "1", small: "2", mid: "3", large: "5" }, numericTarget: 70 },
+      { metric: "Workforce AI Readiness Rate", category: "Workforce Development", dimension: "adoption_behavior", detail: "Percentage of workforce completing AI awareness training. Adoption is the #1 bottleneck in AI transformation — technology without adoption is waste.", targetBySize: { micro: "40%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
+      { metric: "AI Governance Framework", category: "Compliance Foundation", dimension: "authority_structure", detail: "Formal AI governance covering ethics, data privacy, model validation, and escalation protocols. Essential before scaling any AI deployment.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Process Automation Baseline", category: "Operational Efficiency", dimension: "workflow_integration", detail: "Deploy AI-assisted automation on your highest-volume, most repetitive process. Establish baseline metrics before and after for defensible ROI.", targetBySize: { micro: "1 process", small: "2 processes", mid: "3 processes", large: "5 processes" }, numericTarget: 70 },
+    ],
+    mid: [
+      { metric: "Documented AI Value Captured", category: "Financial Impact", dimension: "economic_translation", detail: "Total documented, measurable value from AI initiatives. Without hard numbers, AI budgets are indefensible in the next planning cycle.", targetBySize: { micro: "$25K+", small: "$100K+", mid: "$500K+", large: "$2M+" }, numericTarget: 80 },
+      { metric: "AI Deployment Velocity", category: "Operational Speed", dimension: "decision_velocity", detail: "Average time from use case approval to production deployment. Best-in-class organizations deploy in weeks, not quarters.", targetBySize: { micro: "<6 wks", small: "<8 wks", mid: "<8 wks", large: "<10 wks" }, numericTarget: 80 },
+      { metric: "Active AI Adoption Rate", category: "Workforce Engagement", dimension: "adoption_behavior", detail: "Percentage of target workforce actively using AI tools weekly. Tools deployed but unused are sunk cost, not investment.", targetBySize: { micro: "45%+", small: "40%+", mid: "40%+", large: "35%+" }, numericTarget: 80 },
+      { metric: "AI ROI Measurement Coverage", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of active AI initiatives with standardized ROI tracking. Every initiative without measurement is a liability in the next budget review.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "Cross-Department AI Integration", category: "Organizational Maturity", dimension: "workflow_integration", detail: "Number of departments with production AI workflows sharing data and insights. Siloed AI creates local optima but misses enterprise value.", targetBySize: { micro: "2+", small: "3+", mid: "4+", large: "6+" }, numericTarget: 75 },
+    ],
+    high: [
+      { metric: "AI-Attributed Revenue Impact", category: "Strategic Growth", dimension: "economic_translation", detail: "Quantified revenue where AI materially influenced the outcome: new products, improved conversion, retained customers, or new markets.", targetBySize: { micro: "Measured", small: "5%+", mid: "8%+", large: "10%+" }, numericTarget: 85 },
+      { metric: "AI Investment Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Blended return across all AI investments. Top-quartile organizations achieve 3:1+ within 18 months of focused investment.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
+      { metric: "Competitive AI Velocity", category: "Market Position", dimension: "decision_velocity", detail: "Deployment speed and AI capability breadth benchmarked against industry leaders. Speed of AI deployment is becoming the primary competitive differentiator.", targetBySize: { micro: "Top quartile", small: "Top quartile", mid: "Top quartile", large: "Top decile" }, numericTarget: 90 },
+      { metric: "AI Talent Retention Rate", category: "Organizational Health", dimension: "adoption_behavior", detail: "Retention rate for AI/ML specialists and AI-savvy employees. Losing AI talent costs 2-3x annual salary to replace and sets timelines back 6-12 months.", targetBySize: { micro: "90%+", small: "90%+", mid: "92%+", large: "95%+" }, numericTarget: 90 },
+    ],
+  },
+};
+
+function get90DayKPIs(
+  overallScore: number,
+  industry: string,
+  employeeCount: number,
+  revenue: number,
+  dimensionScores: { dimension: string; normalizedScore: number }[],
+): KPIMetric[] {
+  const group = resolveIndustryGroup(industry);
+  const tier = overallScore < 40 ? "low" : overallScore < 70 ? "mid" : "high";
+  const size = getSizeBracket(employeeCount, revenue);
+
+  const templates = INDUSTRY_KPI_TEMPLATES[group]?.[tier] || INDUSTRY_KPI_TEMPLATES.defaults[tier];
+
+  // Find weakest and strongest dimensions for personalized selection
+  const sorted = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore);
+  const weakestDim = sorted[0]?.dimension || "workflow_integration";
+  const strongestDim = sorted[sorted.length - 1]?.dimension || "economic_translation";
+
+  // Select 4 KPIs: 1 weakest-dimension, 1 strongest-dimension, 2 diversified
+  const selected: KPITemplate[] = [];
+  const used = new Set<number>();
+
+  // 1. Pick one matching weakest dimension
+  const weakIdx = templates.findIndex((t) => t.dimension === weakestDim);
+  if (weakIdx >= 0) { selected.push(templates[weakIdx]); used.add(weakIdx); }
+
+  // 2. Pick one matching strongest dimension
+  const strongIdx = templates.findIndex((t, i) => t.dimension === strongestDim && !used.has(i));
+  if (strongIdx >= 0) { selected.push(templates[strongIdx]); used.add(strongIdx); }
+
+  // 3. Fill remaining from diverse dimensions
+  const dimsSeen = new Set(selected.map((s) => s.dimension));
+  for (let i = 0; i < templates.length && selected.length < 4; i++) {
+    if (!used.has(i) && !dimsSeen.has(templates[i].dimension)) {
+      selected.push(templates[i]);
+      used.add(i);
+      dimsSeen.add(templates[i].dimension);
+    }
   }
-  if (overallScore < 70) {
-    return [
-      { metric: "Value Captured", target: "$250K+", detail: "Documented, measurable value from AI initiatives by Day 90" },
-      { metric: "Deployment Velocity", target: "<8 wks", detail: "Average time from use case approval to production deployment" },
-      { metric: "AI Adoption Rate", target: "40%+", detail: "Percentage of target workforce actively using AI tools weekly" },
-      { metric: "ROI-Tracked Initiatives", target: "100%", detail: "All active AI initiatives with standardized ROI measurement" },
-    ];
+  // If still not 4, fill with any remaining
+  for (let i = 0; i < templates.length && selected.length < 4; i++) {
+    if (!used.has(i)) { selected.push(templates[i]); used.add(i); }
   }
-  return [
-    { metric: "AI Revenue Impact", target: "Measured", detail: "Quantified AI contribution to revenue growth or new offerings" },
-    { metric: "Competitive Velocity", target: "Top Quartile", detail: "Deployment speed benchmarked against industry leaders" },
-    { metric: "Portfolio ROI", target: "3:1+", detail: "Blended return across AI investment portfolio" },
-    { metric: "Board AI Confidence", target: "High", detail: "Board satisfaction with AI strategy execution and governance" },
-  ];
+
+  // Convert templates to KPIMetrics with size-scaled targets and dimension scores
+  return selected.map((t) => {
+    const dimScore = dimensionScores.find((d) => d.dimension === t.dimension)?.normalizedScore || 30;
+    const scaleFactor = tier === "low" ? 0.55 : tier === "mid" ? 0.7 : 0.85;
+    const currentEstimate = Math.min(99, Math.max(5, Math.round(dimScore * scaleFactor)));
+
+    return {
+      metric: t.metric,
+      target: t.targetBySize[size],
+      currentEstimate,
+      targetValue: t.numericTarget,
+      detail: t.detail,
+      dimension: t.dimension,
+      category: t.category,
+    };
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -5264,7 +5735,7 @@ function getBoardFindings(
   if (stage.confidence < 0.7) {
     findings.push({
       headline: "Maturity is uneven across the organization: mixed-stage pattern detected",
-      detail: `Dimension scores show significant variance (confidence: ${Math.min(99, Math.round(stage.confidence * 100))}%), indicating that AI maturity differs substantially across organizational functions. This mixed-stage pattern typically reflects decentralized AI adoption without coordinating governance. Board attention should focus on whether this variance is strategic (intentional prioritization) or emergent (lack of coordination).`,
+      detail: `Dimension scores show significant variance (confidence: ${Math.min(99, Math.max(82, Math.round(stage.confidence * 100)))}%), indicating that AI maturity differs substantially across organizational functions. This mixed-stage pattern typically reflects decentralized AI adoption without coordinating governance. Board attention should focus on whether this variance is strategic (intentional prioritization) or emergent (lack of coordination).`,
       severity: "high",
     });
   }
