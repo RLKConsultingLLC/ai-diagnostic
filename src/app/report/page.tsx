@@ -1366,15 +1366,15 @@ function ReportPage() {
                   {/* Two-column: Invest vs. Stand Still */}
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Invest column */}
-                    <div className="bg-navy/5 border border-navy/10 p-5">
-                      <p className="text-sm font-bold text-navy mb-4">
+                    <div className="bg-green-50 border border-green-200 p-5">
+                      <p className="text-sm font-bold text-green-900 mb-4">
                         If You Invest Over 12-24 Months
                       </p>
                       <div className="space-y-4">
                         {pnl.scenarios.map((s, i) => (
-                          <div key={i} className="border-b border-navy/10 pb-3 last:border-0 last:pb-0">
+                          <div key={i} className="border-b border-green-100 pb-3 last:border-0 last:pb-0">
                             <div className="flex items-baseline justify-between mb-1">
-                              <span className="text-xs font-semibold text-navy">{s.label}</span>
+                              <span className="text-xs font-semibold text-green-900">{s.label}</span>
                               <span className="text-sm font-bold text-green-700">{s.investDollar}</span>
                             </div>
                             <p className="text-xs text-foreground/60 leading-relaxed">{s.investUpside}</p>
