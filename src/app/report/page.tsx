@@ -198,21 +198,21 @@ function ReportPage() {
 
       {/* Overall Score Hero */}
       {result && (
-        <section className="bg-white border border-light p-6 md:p-10 mb-8">
+        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
-              <p className="text-xs font-semibold text-tertiary tracking-widest uppercase mb-1">
+              <p className="text-[11px] font-semibold text-navy/50 tracking-[0.3em] uppercase mb-2">
                 {result.companyProfile.companyName}
               </p>
-              <h1 className="text-2xl md:text-3xl mb-1">
+              <h1 className="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-2">
                 AI Maturity Diagnostic
               </h1>
-              <p className="text-xs text-foreground/40 leading-relaxed mt-1 mb-2">
+              <p className="text-sm text-foreground/40 leading-relaxed mb-3 max-w-md">
                 Framework developed by Ryan King across a decade advising CIOs
                 and technology executives at McKinsey, Deloitte, and now at RLK
                 Consulting.
               </p>
-              <p className="text-sm text-foreground/50">
+              <p className="text-sm text-foreground/40 font-medium">
                 Completed{" "}
                 {new Date(result.completedAt).toLocaleDateString("en-US", {
                   year: "numeric",
@@ -228,17 +228,19 @@ function ReportPage() {
 
       {/* Stage Classification */}
       {result && (
-        <section className="bg-white border border-light p-6 md:p-10 mb-8">
-          <h2 className="text-lg mb-4">Stage Classification</h2>
+        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Stage Classification</h2>
+          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
           <StageDisplay stage={result.stageClassification} overallScore={result.overallScore} dimensionScores={result.dimensionScores} />
         </section>
       )}
 
       {/* Dimension Scores */}
       {result && (
-        <section className="bg-white border border-light p-6 md:p-10 mb-8">
-          <h2 className="text-lg mb-4">Dimension Scores</h2>
-          <p className="text-xs text-foreground/50 mb-6">
+        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Dimension Scores</h2>
+          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
+          <p className="text-sm text-foreground/50 mb-6">
             Five behavioral dimensions that determine whether your AI investments translate into organizational value.
           </p>
 
@@ -266,9 +268,10 @@ function ReportPage() {
 
       {/* Competitive Positioning Teaser */}
       {result && (
-        <section className="bg-white border border-light p-6 md:p-10 mb-8">
-          <h2 className="text-lg mb-4">Competitive Positioning</h2>
-          <p className="text-xs text-foreground/50 mb-5">
+        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Competitive Positioning</h2>
+          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
+          <p className="text-sm text-foreground/50 mb-5">
             Where {result.companyProfile.companyName} sits relative to peers in{" "}
             {industryLabel(result.companyProfile.industry)}.
           </p>
@@ -296,8 +299,9 @@ function ReportPage() {
 
       {/* Economic Impact */}
       {result && (
-        <section className="bg-white border border-light p-6 md:p-10 mb-8">
-          <h2 className="text-lg mb-6">Economic Impact Summary</h2>
+        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Economic Impact Summary</h2>
+          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-6" />
           <EconomicSummary estimate={result.economicEstimate} />
           <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
             <p className="text-sm text-foreground/70">
@@ -323,7 +327,7 @@ function ReportPage() {
           sorted[sorted.length - 1].dimension,
         );
         return (
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <h2 className="text-lg mb-4">Maturity Analysis</h2>
 
             {/* Headline */}
@@ -540,24 +544,25 @@ function ReportPage() {
           {/* REPORT COVER / TITLE BLOCK                                        */}
           {/* ================================================================= */}
           <div className="rlk-gradient-bar-thick mb-0" />
-          <section className="bg-navy text-white p-10 md:p-14 mb-10">
+          <section className="bg-navy text-white py-14 md:py-20 px-10 md:px-14 mb-10">
             <div className="max-w-3xl mx-auto text-center">
-              <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/40 mb-3">
-                Confidential
+              <p className="text-[10px] font-semibold tracking-[0.4em] uppercase text-white/30 mb-4">
+                Confidential — Prepared for {result.companyProfile.companyName}
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+              <div className="w-12 h-px bg-white/20 mx-auto mb-6" />
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
                 AI Diagnostic Report
               </h2>
-              <p className="text-sm text-white/60 mb-2">
+              <p className="text-base text-white/60 mb-2 font-light">
                 Prepared exclusively for{" "}
                 <span className="text-white font-semibold">
                   {result.companyProfile.companyName}
                 </span>
               </p>
-              <p className="text-xs text-white/35 mb-6 max-w-xl mx-auto">
+              <p className="text-xs text-white/30 mb-8 max-w-xl mx-auto leading-relaxed">
                 Framework developed by Ryan King across years of advising CIOs
-                and technology executives at McKinsey, Deloitte, and now at her
-                CIO advisory firm, RLK Consulting.
+                and technology executives at McKinsey, Deloitte, and now at
+                RLK Consulting.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-xs text-white/40">
                 <span>
@@ -582,7 +587,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 1: EXECUTIVE SUMMARY                                */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={1} title="Executive Summary" />
 
             {(() => {
@@ -735,7 +740,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 2: AI POSTURE DIAGNOSIS                             */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={2} title="AI Posture Diagnosis" />
             <p className="text-sm text-foreground/60 mt-2 mb-6">
               Your AI maturity is measured across five behavioral dimensions. These are not
@@ -861,7 +866,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 3: STRUCTURAL CONSTRAINTS                           */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={3} title="Structural Constraints" />
             <p className="text-sm text-foreground/60 mt-2 mb-8">
               Three composite indices distill your 61 responses into the metrics that matter:
@@ -870,6 +875,19 @@ function ReportPage() {
               accelerating or constraining your AI maturity. For economic implications of these scores,
               see Section 5. For P&L impact, see Section 6. For competitive position, see Section 4.
             </p>
+
+            {/* Composite index signal legend */}
+            <div className="flex items-center gap-5 mb-6">
+              <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Signal Key:</p>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 flex-shrink-0 bg-green-50 border border-green-200" />
+                <span className="text-[10px] text-foreground/50">Strongest Signals (assets to leverage)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 flex-shrink-0 bg-red-50 border border-red-200" />
+                <span className="text-[10px] text-foreground/50">Critical Gaps (immediate attention needed)</span>
+              </div>
+            </div>
 
             <div className="space-y-10">
               {result.compositeIndices.map((ci) => {
@@ -1021,7 +1039,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 4: COMPETITIVE POSITIONING & INDUSTRY INTELLIGENCE  */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={4} title="Competitive Positioning & Industry Intelligence" />
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Your competitors are not standing still — and the gap is measurable.
@@ -1090,7 +1108,15 @@ function ReportPage() {
             {/* Industry AI adoption benchmarks */}
             <div className="mt-6">
               <p className="text-xs font-semibold tracking-widest uppercase text-navy mb-3">
-                Where YOUR Competitors Are Investing Right Now
+                Where {result.companyProfile.companyName}&apos;s Competitors Are Investing Right Now
+              </p>
+              <p className="text-xs text-foreground/50 mb-3">
+                At Stage {result.stageClassification.primaryStage} with an overall score of {result.overallScore}/100,
+                {" "}{result.companyProfile.companyName} is {result.overallScore >= 60 ? "keeping pace with but not leading" : result.overallScore >= 40 ? "trailing the median of" : "significantly behind"} peers
+                in {industryLabel(result.companyProfile.industry)} on these investment areas. Your weakest dimension —{" "}
+                {dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")} at{" "}
+                {[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 — is the primary bottleneck
+                limiting {result.companyProfile.companyName}&apos;s ability to capture value from these same investments.
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {getCompetitorInvestmentAreas(result.companyProfile.industry).map((area, idx) => (
@@ -1128,7 +1154,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 5: ECONOMIC IMPACT MODEL                            */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={5} title="Economic Impact Model" />
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
@@ -1282,7 +1308,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 6: P&L BUSINESS CASE                                */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={6} title="The Business Case: P&L Impact Analysis" />
 
             {(() => {
@@ -1295,6 +1321,8 @@ function ReportPage() {
                 result.economicEstimate.currentCapturePercent,
                 result.companyProfile.companyName,
                 result.companyProfile.employeeCount,
+                result.dimensionScores,
+                result.companyProfile.regulatoryIntensity,
               );
 
               return (
@@ -1435,7 +1463,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 7: SECURITY & GOVERNANCE RISK ASSESSMENT            */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={7} title="Security & Governance Risk Assessment" />
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Risk exposure mapped across likelihood and impact, derived from
@@ -1464,6 +1492,21 @@ function ReportPage() {
                 state-level US regulations (Colorado AI Act, California AI Transparency Act) are
                 increasing the regulatory cost of inadequate governance.
               </p>
+            </div>
+
+            {/* Risk severity legend */}
+            <div className="flex items-center gap-5 mb-4">
+              <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Severity:</p>
+              {[
+                { label: "High", color: "#FCA5A5" },
+                { label: "Medium", color: "#FCD34D" },
+                { label: "Low", color: "#86EFAC" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: item.color }} />
+                  <span className="text-[10px] text-foreground/50">{item.label}</span>
+                </div>
+              ))}
             </div>
 
             {/* Risk breakdown cards */}
@@ -1516,7 +1559,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 8: VENDOR & PARTNER LANDSCAPE ASSESSMENT            */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={8} title="Vendor & Partner Landscape Assessment" />
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Independent analysis of AI vendor positioning, buy/build/partner
@@ -1598,24 +1641,28 @@ function ReportPage() {
                 {[
                   {
                     strategy: "Buy",
-                    when: "Commodity capabilities (chatbots, document processing, analytics dashboards) where differentiation is not a priority",
+                    when: result.companyProfile.regulatoryIntensity === 'high'
+                      ? `Compliance-ready commodity capabilities (AI-assisted documentation, chatbots, analytics) where ${industryLabel(result.companyProfile.industry)} regulatory requirements are well-served by established vendors`
+                      : `Commodity capabilities (chatbots, document processing, analytics dashboards) where differentiation is not a priority for ${result.companyProfile.companyName}`,
                     guidance: result.stageClassification.primaryStage <= 2
-                      ? "Recommended for most use cases at your maturity stage. Focus on time-to-value over customization."
-                      : "Appropriate for non-differentiating capabilities. Ensure vendor contracts include data portability.",
+                      ? `Recommended for most use cases at ${result.companyProfile.companyName}'s maturity stage. With an Authority Structure score of ${result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0}/100, prioritize tools that require minimal governance overhead and deliver time-to-value in weeks, not months.`
+                      : `Appropriate for non-differentiating capabilities. At ${result.companyProfile.companyName}'s scale (${result.companyProfile.employeeCount.toLocaleString()} employees), vendor solutions should include enterprise SLAs and data portability guarantees.`,
                   },
                   {
                     strategy: "Build",
-                    when: "Core differentiators where proprietary data, models, or workflows create competitive advantage",
+                    when: result.companyProfile.regulatoryIntensity === 'high'
+                      ? `Proprietary models trained on ${result.companyProfile.companyName}'s data where off-the-shelf solutions cannot meet ${industryLabel(result.companyProfile.industry)} regulatory or accuracy requirements`
+                      : `Core differentiators where ${result.companyProfile.companyName}'s proprietary data, models, or workflows create competitive advantage in ${industryLabel(result.companyProfile.industry)}`,
                     guidance: result.stageClassification.primaryStage <= 2
-                      ? "Exercise caution. Building custom AI requires mature MLOps and data infrastructure you may not yet have."
-                      : "Appropriate for strategic capabilities. Invest in MLOps and data platform to support custom development.",
+                      ? `Exercise caution. ${result.companyProfile.companyName}'s Workflow Integration score of ${result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0}/100 suggests custom AI infrastructure is premature — build on vendor platforms first, then internalize once usage patterns mature.`
+                      : `Appropriate for strategic capabilities. ${result.companyProfile.companyName}'s ${result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0}/100 Workflow Integration suggests ${(result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) >= 60 ? 'sufficient infrastructure maturity to support selective custom development' : 'building MLOps and data platform capability before scaling custom AI'}.`,
                   },
                   {
                     strategy: "Partner",
-                    when: "Complex transformations requiring domain expertise, organizational change management, or accelerated timelines",
+                    when: `Complex transformations requiring ${result.companyProfile.regulatoryIntensity === 'high' ? `${industryLabel(result.companyProfile.industry)}-specific regulatory expertise, ` : ''}domain knowledge, organizational change management, or accelerated timelines`,
                     guidance: result.stageClassification.primaryStage <= 2
-                      ? "Strongly recommended. A strategic implementation partner can compress your learning curve by 12-18 months."
-                      : "Selective use for specialized domains. Your internal capabilities should lead most initiatives.",
+                      ? `Strongly recommended for ${result.companyProfile.companyName}. With a Decision Velocity score of ${result.dimensionScores.find((d) => d.dimension === "decision_velocity")?.normalizedScore || 0}/100, a strategic partner can compress ${result.companyProfile.companyName}'s learning curve by 12-18 months and avoid the governance pitfalls that stall ${result.overallScore < 40 ? '80%' : '60%'} of organizations at this stage.`
+                      : `Selective use for specialized domains. ${result.companyProfile.companyName}'s internal capabilities should lead most initiatives, with partners filling specific expertise gaps in areas like ${result.companyProfile.regulatoryIntensity === 'high' ? 'AI compliance, model validation, and regulatory technology' : 'advanced ML engineering, change management, and data architecture'}.`,
                   },
                 ].map((s) => (
                   <div key={s.strategy} className="bg-offwhite border border-light p-4">
@@ -1636,34 +1683,39 @@ function ReportPage() {
               </p>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 AI vendor contracts are not software licenses. The economics are different,
-                the risks are different, and the leverage points are different. Here are the
-                deal levers that sophisticated buyers use to maintain optionality and control costs:
+                the risks are different, and the leverage points are different.
+                {result.stageClassification.primaryStage <= 2
+                  ? ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} is likely entering its first significant AI vendor relationships — getting these contracts right from the start avoids costly renegotiations later.`
+                  : ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} likely has existing AI vendor relationships that should be audited against these levers — renegotiation windows are leverage points.`}
+                {result.companyProfile.regulatoryIntensity === 'high'
+                  ? ` In ${industryLabel(result.companyProfile.industry)}, data sovereignty and compliance provisions are non-negotiable and should be explicit in every AI contract.`
+                  : ''}
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
                   {
                     lever: "Declining Unit Economics",
-                    description: "AI inference costs drop 30-50% annually as models become more efficient. Build automatic price reductions into multi-year contracts — 15-20% annual step-downs are reasonable based on current compute cost trajectories.",
+                    description: `AI inference costs drop 30-50% annually as models become more efficient. ${result.stageClassification.primaryStage <= 2 ? `As ${result.companyProfile.companyName} enters new AI contracts, build` : `In ${result.companyProfile.companyName}'s existing and future contracts, ensure`} automatic price reductions — 15-20% annual step-downs are reasonable. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying on AI compute by even 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.`,
                   },
                   {
                     lever: "Data Portability Guarantees",
-                    description: "Insist on full data export in standard formats with ≤30-day extraction windows. Your training data and fine-tuned models are your IP — vendor lock-in happens when you cannot take them with you.",
+                    description: `Insist on full data export in standard formats with ≤30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, data portability is not just a commercial issue — it's a regulatory requirement. Your patient data, financial records, and compliance models must be extractable on demand.` : `${result.companyProfile.companyName}'s training data and fine-tuned models are proprietary IP — vendor lock-in happens when you cannot take them with you.`}`,
                   },
                   {
                     lever: "Model-Agnostic Architecture",
-                    description: "Structure contracts to allow model swaps without renegotiation. The LLM landscape shifts quarterly — being locked to one provider's model is a strategic liability. Require API-compatible alternatives.",
+                    description: `Structure contracts to allow model swaps without renegotiation. The LLM landscape shifts quarterly — ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid committing to a single model provider before understanding which capabilities matter most for ${industryLabel(result.companyProfile.industry)} use cases` : `${result.companyProfile.companyName} should ensure existing integrations support model substitution as better options emerge`}. Require API-compatible alternatives.`,
                   },
                   {
                     lever: "Usage-Based Pricing with Caps",
-                    description: "Negotiate consumption-based pricing with hard budget caps and volume discounts. Avoid flat enterprise licenses until usage patterns stabilize — most organizations overpay by 40-60% in year one.",
+                    description: `Negotiate consumption-based pricing with hard budget caps and volume discounts. ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid flat enterprise licenses until AI usage patterns stabilize — organizations at Stage ${result.stageClassification.primaryStage} typically overpay by 40-60% in year one because adoption is uneven.` : `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} has enough usage data to negotiate volume tiers that match actual consumption. Push for 25-40% volume discounts at your scale.`}`,
                   },
                   {
                     lever: "Performance SLAs with Teeth",
-                    description: "Tie payments to measurable outcomes: latency, accuracy, uptime, not just availability. Include penalty clauses for model degradation. AI outputs can drift — your contract should account for that.",
+                    description: `Tie payments to measurable outcomes: latency, accuracy, uptime, not just availability. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, model accuracy degradation can create compliance liability — your contracts must include drift monitoring and penalty clauses for performance degradation below agreed thresholds.` : `AI outputs can drift over time as data distributions change. ${result.companyProfile.companyName}'s contracts should include penalty clauses for model degradation below agreed accuracy thresholds.`}`,
                   },
                   {
                     lever: "Termination Without Penalty",
-                    description: "Negotiate 90-day termination clauses with data return guarantees. In a market this volatile, 3-year lock-ins are a gift to the vendor, not to you. If the product delivers value, you will stay anyway.",
+                    description: `Negotiate 90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName}'s AI strategy will evolve significantly — 3-year lock-ins made today will be regretted in 18 months. Insist on flexibility.` : `Even at Stage ${result.stageClassification.primaryStage}, the AI vendor landscape is volatile enough that long-term lock-ins carry material risk. If the product delivers value, ${result.companyProfile.companyName} will stay anyway.`}`,
                   },
                 ].map((item) => (
                   <div key={item.lever} className="bg-offwhite border border-light p-3 md:p-4">
@@ -1691,7 +1743,7 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 9: 90-DAY TRANSFORMATION ACTION PLAN                */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
             <SectionHeader number={9} title="90-Day Transformation Action Plan" />
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               A research-backed, role-specific action plan designed for immediate
@@ -1776,10 +1828,135 @@ function ReportPage() {
           </section>
 
           {/* ================================================================= */}
-          {/* SECTION 10: METHODOLOGY & DATA SOURCES                      */}
+          {/* SECTION 10: MESSAGES FOR THE BOARD                          */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
-            <SectionHeader number={10} title="Methodology and Data Sources" />
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+            <SectionHeader number={10} title="Messages for the Board" />
+            <p className="text-sm text-foreground/60 mt-2 mb-4">
+              These findings are structured for direct board presentation. Each item
+              below is a decision point, not an informational update. NACD&apos;s 2024
+              Board Oversight of AI report found that 78% of boards consider AI a
+              top-three priority — but only 23% feel equipped to oversee it. The asks
+              below are designed to close that gap for {result.companyProfile.companyName}.
+            </p>
+
+            {/* Peer board intelligence */}
+            <div className="bg-offwhite border border-light p-4 md:p-5 mb-6">
+              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
+                What Peer Boards Are Doing
+              </p>
+              <div className="space-y-3">
+                {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
+                    <div>
+                      <p className="text-sm text-foreground/70 leading-relaxed">
+                        <strong className="text-secondary">{peer.company}:</strong> {peer.action}
+                      </p>
+                      <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Board-ready headline findings */}
+            <div className="border-2 border-navy p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary">
+                  Board-Ready Headline Findings
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#991B1B" }} />
+                    <span className="text-[10px] text-foreground/50">Critical</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#92400E" }} />
+                    <span className="text-[10px] text-foreground/50">High</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#0B1D3A" }} />
+                    <span className="text-[10px] text-foreground/50">Informational</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).map((finding, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div
+                      className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
+                      style={{ backgroundColor: finding.severity === "critical" ? "#991B1B" : finding.severity === "high" ? "#92400E" : "#0B1D3A" }}
+                    >
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-secondary">{finding.headline}</p>
+                      <p className="text-xs text-foreground/60 leading-relaxed mt-1">{finding.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* How boards at this stage support AI transformation */}
+            <div className="border border-light p-5 mb-6">
+              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
+                How Boards Can Support Organizations at Stage {result.stageClassification.primaryStage}
+              </p>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                {getBoardSupportNarrative(result.stageClassification.primaryStage)}
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
+                  <div key={idx} className="bg-offwhite border border-light p-4">
+                    <p className="text-sm font-semibold text-secondary mb-1">{action.action}</p>
+                    <p className="text-xs text-foreground/60 leading-relaxed">{action.rationale}</p>
+                    <p className="text-[10px] text-navy font-medium mt-2">{action.owner}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Strategic asks of the board */}
+            <div className="bg-navy/5 border border-navy/10 p-6">
+              <p className="text-xs font-semibold tracking-widest uppercase text-navy mb-4">
+                Recommended Board Asks
+              </p>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                Based on this diagnostic, the following asks should be presented to the board
+                for discussion and resolution. These are structured as decision items, not
+                informational updates, per NACD guidance on effective board AI governance.
+              </p>
+              <div className="space-y-3">
+                {getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).map((ask, idx) => (
+                  <div key={idx} className="bg-white border border-light p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span
+                        className="text-[9px] font-bold px-2 py-0.5 text-white"
+                        style={{ backgroundColor: ask.type === "decision" ? "#0B1D3A" : ask.type === "investment" ? "#364E6E" : "#6B7F99" }}
+                      >
+                        {ask.type.toUpperCase()}
+                      </span>
+                      <p className="text-sm font-semibold text-secondary">{ask.title}</p>
+                    </div>
+                    <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ================================================================= */}
+          {/* SECTION 11: METHODOLOGY, DATA SOURCES & CITATIONS            */}
+          {/* ================================================================= */}
+          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+            <SectionHeader number={11} title="Methodology, Data Sources & Citations" />
+            <p className="text-sm text-foreground/60 mt-2 mb-6">
+              Transparency is a core principle of this diagnostic. Below is the complete
+              scoring methodology, every data source consulted, and the full research citation
+              list — so every number and recommendation in this report can be independently verified.
+            </p>
 
             <div className="mt-6 grid md:grid-cols-2 gap-8">
               {/* Scoring methodology */}
@@ -1906,7 +2083,7 @@ function ReportPage() {
                       <div
                         className="h-full"
                         style={{
-                          width: `${Math.round(result.stageClassification.confidence * 100)}%`,
+                          width: `${Math.min(99, Math.round(result.stageClassification.confidence * 100))}%`,
                           backgroundColor:
                             result.stageClassification.confidence >= 0.7
                               ? "#0B1D3A"
@@ -1917,10 +2094,7 @@ function ReportPage() {
                       />
                     </div>
                     <span className="text-sm font-bold text-secondary">
-                      {Math.round(
-                        result.stageClassification.confidence * 100
-                      )}
-                      %
+                      {Math.min(99, Math.round(result.stageClassification.confidence * 100))}%
                     </span>
                   </div>
                   <p className="text-[11px] text-tertiary mt-2">
@@ -1931,18 +2105,12 @@ function ReportPage() {
                 </div>
               </div>
             </div>
-          </section>
 
-          {/* ================================================================= */}
-          {/* SECTION 11: SOURCES & CITATIONS                                   */}
-          {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
-            <SectionHeader number={11} title="Sources & Citations" />
-            <p className="text-sm text-foreground/60 mt-2 mb-6">
-              Every claim in this report is grounded in publicly available research, regulatory
-              filings, or established management frameworks. Below are the primary sources
-              referenced throughout this analysis.
-            </p>
+            {/* Research & Citations */}
+            <div className="mt-8 pt-6 border-t border-light">
+              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-4">
+                Research & Citations
+              </p>
             <div className="grid md:grid-cols-2 gap-x-8 gap-y-1">
               {[
                 { cat: "Industry Research", sources: [
@@ -1996,124 +2164,6 @@ function ReportPage() {
                 </div>
               ))}
             </div>
-          </section>
-
-          {/* SECTION 12: MESSAGES FOR THE BOARD                          */}
-          {/* ================================================================= */}
-          <section className="bg-white border border-light p-6 md:p-10 mb-8">
-            <SectionHeader number={12} title="Messages for the Board" />
-            <p className="text-sm text-foreground/60 mt-2 mb-4">
-              These findings are structured for direct board presentation. Each item
-              below is a decision point, not an informational update. NACD&apos;s 2024
-              Board Oversight of AI report found that 78% of boards consider AI a
-              top-three priority — but only 23% feel equipped to oversee it. The asks
-              below are designed to close that gap for {result.companyProfile.companyName}.
-            </p>
-
-            {/* Peer board intelligence */}
-            <div className="bg-offwhite border border-light p-4 md:p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                What Peer Boards Are Doing
-              </p>
-              <div className="space-y-3">
-                {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
-                    <div>
-                      <p className="text-sm text-foreground/70 leading-relaxed">
-                        <strong className="text-secondary">{peer.company}:</strong> {peer.action}
-                      </p>
-                      <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Board-ready headline findings */}
-            <div className="border-2 border-navy p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary">
-                  Board-Ready Headline Findings
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#991B1B" }} />
-                    <span className="text-[10px] text-foreground/50">Critical</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#92400E" }} />
-                    <span className="text-[10px] text-foreground/50">High</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#0B1D3A" }} />
-                    <span className="text-[10px] text-foreground/50">Informational</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).map((finding, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div
-                      className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
-                      style={{ backgroundColor: finding.severity === "critical" ? "#991B1B" : finding.severity === "high" ? "#92400E" : "#0B1D3A" }}
-                    >
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-secondary">{finding.headline}</p>
-                      <p className="text-xs text-foreground/60 leading-relaxed mt-1">{finding.detail}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* How boards at this stage support AI transformation */}
-            <div className="border border-light p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                How Boards Can Support Organizations at Stage {result.stageClassification.primaryStage}
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                {getBoardSupportNarrative(result.stageClassification.primaryStage)}
-              </p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
-                  <div key={idx} className="bg-offwhite border border-light p-4">
-                    <p className="text-sm font-semibold text-secondary mb-1">{action.action}</p>
-                    <p className="text-xs text-foreground/60 leading-relaxed">{action.rationale}</p>
-                    <p className="text-[10px] text-navy font-medium mt-2">{action.owner}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Strategic asks of the board */}
-            <div className="bg-navy/5 border border-navy/10 p-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-navy mb-4">
-                Recommended Board Asks
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                Based on this diagnostic, the following asks should be presented to the board
-                for discussion and resolution. These are structured as decision items, not
-                informational updates, per NACD guidance on effective board AI governance.
-              </p>
-              <div className="space-y-3">
-                {getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).map((ask, idx) => (
-                  <div key={idx} className="bg-white border border-light p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span
-                        className="text-[9px] font-bold px-2 py-0.5 text-white"
-                        style={{ backgroundColor: ask.type === "decision" ? "#0B1D3A" : ask.type === "investment" ? "#364E6E" : "#6B7F99" }}
-                      >
-                        {ask.type.toUpperCase()}
-                      </span>
-                      <p className="text-sm font-semibold text-secondary">{ask.title}</p>
-                    </div>
-                    <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
-                  </div>
-                ))}
-              </div>
             </div>
           </section>
 
@@ -2461,7 +2511,7 @@ function StageDisplay({ stage, overallScore, dimensionScores }: { stage: StageCl
 
       {stage.confidence < 0.7 && (
         <p className="text-xs text-tertiary mt-3">
-          Confidence: {Math.round(stage.confidence * 100)}%. Dimension
+          Confidence: {Math.min(99, Math.round(stage.confidence * 100))}%. Dimension
           scores show significant variance, suggesting mixed maturity across
           organizational areas.
         </p>
@@ -2713,16 +2763,19 @@ function getEconomicScaleContext(employeeCount: number): string {
 
 function SectionHeader({ number, title }: { number: number; title: string }) {
   return (
-    <div className="flex items-center gap-4">
-      <div
-        className="flex-shrink-0 w-9 h-9 flex items-center justify-center text-white text-sm font-bold"
-        style={{ backgroundColor: "#0B1D3A" }}
-      >
-        {number}
+    <div className="mb-2">
+      <div className="flex items-center gap-4">
+        <div
+          className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-bold tracking-wide"
+          style={{ backgroundColor: "#0B1D3A" }}
+        >
+          {number}
+        </div>
+        <h3 className="text-xl md:text-2xl font-bold text-navy tracking-tight">
+          {title}
+        </h3>
       </div>
-      <h3 className="text-lg md:text-xl font-semibold text-navy">
-        {title}
-      </h3>
+      <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
     </div>
   );
 }
@@ -3169,18 +3222,17 @@ function EconomicWaterfall({
             </div>
             <div className="h-8 bg-offwhite border border-light overflow-hidden">
               <div
-                className="h-full flex items-center pl-3"
+                className="h-full"
                 style={{
                   width: `${barWidth}%`,
                   backgroundColor: step.color,
                   transition: "width 0.8s ease-out",
                 }}
-              >
-                <span className="text-[10px] text-white font-medium truncate">
-                  {step.detail}
-                </span>
-              </div>
+              />
             </div>
+            <p className="text-[10px] text-foreground/50 mt-0.5 leading-snug">
+              {step.detail}
+            </p>
             {/* Connecting arrow */}
             {idx < steps.length - 1 && (
               <div className="flex justify-center py-1">
@@ -4053,7 +4105,22 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
     { area: "AI-Powered Cybersecurity & Threat Detection", detail: "CrowdStrike's AI processes 2T+ security events/week. IBM reports organizations using AI security detect breaches 108 days faster and save $1.76M per incident. Your competitors are using AI to defend against threats that are already using AI to attack.", source: "Source: IBM Cost of a Data Breach Report 2024; CrowdStrike Annual Threat Report 2024" },
     { area: "Workforce Intelligence & Talent Optimization", detail: "Microsoft's Viva Copilot Analytics identifies 8.8 hours/week of meeting time that could be redirected to deep work. Unilever uses AI screening for 1.8M annual applications, reducing hiring time 75%. Workday's ML-powered skills intelligence maps talent gaps across 60M+ workers. Your talent strategy is either AI-augmented or falling behind.", source: "Source: Microsoft Work Trend Index 2024; Unilever HR Innovation Report; Workday Rising 2024" },
   ];
-  return areas[industry] || (industry === "shipping_logistics" ? shippingLogistics : defaults);
+  // Map new industry slugs to their closest match
+  const industryAliases: Record<string, string> = {
+    healthcare_providers: 'healthcare',
+    healthcare_payers: 'healthcare',
+    healthcare_services: 'healthcare',
+    life_sciences_pharma: 'healthcare',
+    banking: 'financial_services',
+    capital_markets: 'financial_services',
+    asset_wealth_management: 'financial_services',
+    investment_banking: 'financial_services',
+    private_equity: 'financial_services',
+    venture_capital: 'financial_services',
+    hedge_funds: 'financial_services',
+  };
+  const key = industry;
+  return areas[key] || areas[industryAliases[key] || ''] || (industry === "shipping_logistics" ? shippingLogistics : defaults);
 }
 
 // ---------------------------------------------------------------------------
@@ -4138,7 +4205,51 @@ function getFreeMaturityAnalysis(
     telecommunications: `Telecom operators are using AI to manage network complexity, reduce churn, and create new revenue streams. T-Mobile's AI-driven customer retention system reduced churn by 30%, worth an estimated $1.2B annually. AT&T's network AI detects and resolves issues 50% faster than manual NOC operations. Ericsson's 2024 industry report found AI-mature operators achieve 15-20% better network efficiency. For ${companyName} at ${rev}, McKinsey estimates that telecom operators at Stage ${stage} spend 25-40% more on network operations and customer retention than AI-optimized peers, a gap that compounds as 5G and edge computing increase network complexity.`,
   };
 
-  const industryContext = industryContextMap[industry] ||
+  // Map new industry slugs to existing context entries
+  const contextAliases: Record<string, string> = {
+    healthcare_providers: 'healthcare',
+    healthcare_payers: 'healthcare',
+    healthcare_services: 'healthcare',
+    life_sciences_pharma: 'healthcare',
+    banking: 'financial_services',
+    capital_markets: 'financial_services',
+    asset_wealth_management: 'financial_services',
+    investment_banking: 'financial_services',
+    private_equity: 'financial_services',
+    venture_capital: 'financial_services',
+    hedge_funds: 'financial_services',
+    software_saas: 'technology',
+    hardware_electronics: 'technology',
+    it_services: 'technology',
+    retail: 'retail_ecommerce',
+    ecommerce_digital: 'retail_ecommerce',
+    cpg: 'retail_ecommerce',
+    dtc: 'retail_ecommerce',
+    food_beverage: 'retail_ecommerce',
+    manufacturing_discrete: 'manufacturing',
+    manufacturing_process: 'manufacturing',
+    automotive: 'manufacturing',
+    chemicals_materials: 'manufacturing',
+    industrial_services: 'manufacturing',
+    energy_oil_gas: 'energy_utilities',
+    utilities: 'energy_utilities',
+    transportation: 'shipping_logistics',
+    infrastructure_transport: 'shipping_logistics',
+    defense_contractors: 'aerospace_defense',
+    legal_services: 'consulting_services',
+    accounting_audit: 'consulting_services',
+    construction_engineering: 'manufacturing',
+    real_estate_commercial: 'financial_services',
+    real_estate_residential: 'financial_services',
+    media_entertainment: 'technology',
+    government_federal: 'consulting_services',
+    government_state_local: 'consulting_services',
+    nonprofit_ngo: 'consulting_services',
+    education_higher: 'consulting_services',
+    education_k12: 'consulting_services',
+  };
+
+  const industryContext = industryContextMap[industry] || industryContextMap[contextAliases[industry] || ''] ||
     `Across industries, the evidence is unambiguous: McKinsey's 2024 Global AI Survey found that top-quartile AI adopters generate 2.5x more value from their AI investments than bottom-quartile organizations at the same spend level. BCG's AI Advantage Report showed AI leaders achieve 1.5x higher EBITDA growth rates, with the gap widening each year as organizational learning compounds. For ${companyName} at ${rev} revenue, Accenture estimates that organizations at Stage ${stage} capture only ${stage <= 2 ? "5-15%" : "25-40%"} of available AI value — meaning the majority of your technology investment is generating returns well below its potential. The competitive window is not infinite: Deloitte's transformation research shows organizations that begin structured AI programs 18 months later pay 40% more in implementation costs and face 2-3x higher talent acquisition costs.`;
 
   // Research-backed insights keyed to weakest dimension
@@ -4196,9 +4307,18 @@ function getPnLImpact(
   capturePercent: number,
   companyName: string,
   employeeCount: number,
+  dimensionScores: DimensionScore[],
+  regulatoryIntensity: string,
 ): PnLImpactData {
   const ind = industryLabel(industry);
   const unrealizedMid = Math.round((unrealizedLow + unrealizedHigh) / 2);
+  const getScore = (dim: string) => dimensionScores.find((d) => d.dimension === dim)?.normalizedScore || 50;
+  const weakest = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0];
+  const strongest = [...dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[0];
+  const isSmall = employeeCount <= 200;
+  const isMid = employeeCount > 200 && employeeCount <= 2000;
+  const isLarge = employeeCount > 2000;
+  const highReg = regulatoryIntensity === 'high' || ['insurance','banking','capital_markets','healthcare_providers','healthcare_payers','life_sciences_pharma','government_federal','defense_contractors'].includes(industry);
 
   // Industry EBITDA margin estimates (public data)
   const ebitdaMargins: Record<string, number> = {
@@ -4373,41 +4493,132 @@ function getPnLImpact(
     stageNarrative = `At Stage ${stage} with a ${capturePercent}% capture rate, ${companyName} is forfeiting ${100 - capturePercent}% of AI-addressable value — not because the technology doesn't exist, but because the organizational infrastructure to capture it hasn't been built. Each quarter of delay doesn't just forfeit that quarter's value; it deepens the organizational learning deficit. Competitors at Stage 3+ have spent 12-24 months building AI workflows, governance frameworks, and measurement systems that compound in effectiveness. In ${ind}, the organizations investing now are locking in cost structures and customer experiences that late movers will spend 2-3x more to replicate. Accenture's 2024 research shows early AI investors achieve 40% lower implementation costs than organizations that start 18 months later — the learning curve has a price.`;
   }
 
+  // ---- Industry-specific revenue growth descriptions ----
+  const revGrowthInvest: Record<string, string> = {
+    insurance: `AI-driven dynamic pricing, personalized cross-sell, and accelerated underwriting expand premium volume and improve win rates. ${companyName}'s Adoption Behavior score of ${getScore('adoption_behavior')}/100 suggests current pricing models are leaving revenue on the table that AI-enabled competitors are already capturing.`,
+    banking: `AI-powered relationship intelligence, personalized product recommendations, and automated loan origination drive fee income and interest revenue. With a Workflow Integration score of ${getScore('workflow_integration')}/100, ${companyName} has significant room to embed AI into revenue-generating processes.`,
+    healthcare_providers: `AI-optimized patient scheduling, reduced no-shows, improved coding accuracy, and capacity utilization drive incremental revenue without adding beds. ${companyName}'s ${getScore('workflow_integration')}/100 Workflow Integration score indicates scheduling and revenue cycle workflows are ripe for AI optimization.`,
+    healthcare_payers: `AI-driven member engagement, predictive risk adjustment, and claims accuracy improvement increase per-member revenue and reduce STARs rating penalties. Current Decision Velocity of ${getScore('decision_velocity')}/100 suggests ${companyName} is slower than peers to deploy revenue-protecting AI.`,
+    life_sciences_pharma: `AI-accelerated drug discovery, clinical trial optimization, and commercial analytics compress time-to-revenue for pipeline assets. Each month of accelerated launch is worth millions in patent-protected revenue.`,
+    software_saas: `AI-native product features command 15-30% price premiums, AI-driven expansion revenue increases NDR, and generative AI reduces time-to-deploy for customers. With ${getScore('adoption_behavior')}/100 Adoption Behavior, ${companyName} is under-leveraging AI for product differentiation.`,
+    retail: `AI-driven demand forecasting, dynamic pricing, and personalized customer experiences improve conversion rates and average order values. In retail, 1% pricing optimization typically yields 8-12% profit improvement.`,
+    manufacturing_discrete: `AI-driven quality optimization, yield improvement, and predictive demand planning increase throughput per dollar of capital employed. ${companyName}'s manufacturing operations at ${fmtUSD(revenue)} revenue can target 2-4% yield improvement through AI inspection and process control.`,
+    manufacturing_process: `AI-optimized process parameters, predictive quality control, and real-time yield adjustment drive revenue-equivalent value through waste reduction and throughput gains.`,
+    energy_oil_gas: `AI reservoir modeling, production optimization, and predictive maintenance increase output per asset. ${companyName}'s ${getScore('workflow_integration')}/100 Workflow Integration suggests AI is not yet embedded in core production workflows.`,
+    telecommunications: `AI-powered churn prediction, dynamic ARPU optimization, and personalized offer engines drive revenue retention and expansion. At ${fmtUSD(revenue)}, even 0.5% churn reduction is worth ${fmtUSD(Math.round(revenue * 0.005))} annually.`,
+    consulting_services: `AI-augmented delivery, knowledge management, and proposal generation increase utilization rates and enable premium pricing. With ${getScore('workflow_integration')}/100 Workflow Integration, ${companyName}'s billable staff are spending time on tasks AI could accelerate.`,
+  };
+
+  const revGrowthCoast: Record<string, string> = {
+    insurance: `Premium leakage accelerates as AI-native carriers (Lemonade, Root, Hippo) capture price-sensitive segments with real-time underwriting ${companyName} can't match at current Authority Structure (${getScore('authority_structure')}/100).`,
+    banking: `Deposit and loan market share erodes as digital-first banks and fintechs offer AI-personalized rates and instant approvals that ${companyName}'s manual processes cannot compete with.`,
+    healthcare_providers: `Patient leakage to AI-optimized health systems offering shorter wait times, better scheduling, and more coordinated care. Cleveland Clinic and Kaiser report 15-20% patient acquisition advantage from AI-driven access optimization.`,
+    healthcare_payers: `STARs rating degradation and member attrition as competitors deploy AI-driven care coordination and member engagement that demonstrably improves outcomes and satisfaction scores.`,
+    life_sciences_pharma: `Pipeline velocity falls behind competitors using AI-accelerated discovery. Each 6-month delay in clinical development costs $50-100M in foregone patent-protected revenue.`,
+    software_saas: `Customer churn accelerates and NRR declines as competitors ship AI-native features that become table stakes. Products without embedded AI are increasingly perceived as legacy.`,
+    retail: `Conversion and basket size stagnate while AI-enabled competitors deliver hyper-personalized experiences. Amazon's AI recommendation engine drives 35% of revenue — that gap compounds every quarter.`,
+    manufacturing_discrete: `Yield disadvantage widens as AI-enabled competitors achieve 2-4% better throughput from the same equipment. At ${companyName}'s scale, that translates to ${fmtUSD(Math.round(revenue * 0.02))} in annual competitive disadvantage.`,
+    manufacturing_process: `Process efficiency gap widens against AI-optimized competitors achieving tighter tolerances, less waste, and higher throughput from equivalent capital assets.`,
+    energy_oil_gas: `Production optimization gap widens as AI-enabled operators extract 2-3% more value from equivalent reserves and infrastructure.`,
+    telecommunications: `Churn rate increases 0.3-0.5% annually relative to AI-enabled carriers offering proactive service and personalized retention. At ${companyName}'s revenue base, that's ${fmtUSD(Math.round(revenue * 0.004))} per year.`,
+    consulting_services: `Utilization rates fall 5-10% behind AI-augmented competitors who deliver faster, at lower cost, with broader evidence bases — compressing both revenue and margin.`,
+  };
+
+  // ---- Industry-specific margin descriptions ----
+  const marginInvest: Record<string, string> = {
+    insurance: `Claims automation, straight-through processing, and AI-driven fraud detection reduce loss adjustment expenses and operating costs. At ${companyName}'s scale, every 1% of combined ratio improvement is worth ${fmtUSD(Math.round(revenue * 0.01))}.`,
+    banking: `AI-powered credit decisioning, compliance automation, and customer service chatbots reduce operating expense ratio. With Authority Structure at ${getScore('authority_structure')}/100, governance improvements alone could unlock faster deployment of margin-enhancing AI.`,
+    healthcare_providers: `AI-driven clinical documentation, prior authorization automation, denials management, and staffing optimization reduce administrative burden — the single largest cost category. ${isLarge ? 'At 13,000+ employees, even small per-FTE efficiency gains compound to material savings.' : `At ${employeeCount} employees, targeted automation of highest-volume workflows delivers outsized margin impact.`}`,
+    healthcare_payers: `AI claims adjudication, medical necessity review, and provider network optimization reduce medical loss ratio and administrative costs. Anthem reports 200bps MLR improvement from AI-driven utilization management.`,
+    life_sciences_pharma: `AI-accelerated clinical trial design, manufacturing quality prediction, and regulatory filing automation compress timelines and reduce development costs across the pipeline.`,
+    software_saas: `AI automates customer support, QA testing, and internal operations while AI-assisted development accelerates feature delivery. GitHub Copilot users report 55% faster task completion — applied across ${companyName}'s engineering org, that is transformative.`,
+    retail: `AI inventory optimization, labor scheduling, and supply chain management reduce shrinkage, overstocking, and fulfillment costs. Walmart reports $1B+ in annual savings from AI demand forecasting alone.`,
+    manufacturing_discrete: `Predictive maintenance reduces unplanned downtime 30-50%, AI quality inspection catches defects earlier (saving rework costs), and production scheduling optimization improves OEE.`,
+    energy_oil_gas: `AI-driven predictive maintenance, drilling optimization, and asset performance management reduce operating costs per barrel. BP reports 2-3% refinery output optimization from AI process control.`,
+    telecommunications: `AI-driven network optimization, predictive maintenance, and automated customer service reduce network OpEx and contact center costs. T-Mobile reports ${fmtUSD(Math.round(revenue * 0.008))} equivalent in AI-driven operating savings at comparable scale.`,
+    consulting_services: `AI-assisted research, document generation, and knowledge management increase consultant productivity 15-25%, directly improving leverage ratios and operating margin per engagement.`,
+  };
+
+  const marginCoast: Record<string, string> = {
+    insurance: `Operating expense gap widens as peers automate claims processing and underwriting. ${companyName}'s combined ratio disadvantage compounds every quarter — at ${fmtUSD(revenue)}, each basis point is ${fmtUSD(Math.round(revenue * 0.0001))}.`,
+    banking: `Efficiency ratio deteriorates relative to AI-optimized peers. JPMorgan targets a sub-50% efficiency ratio through AI — banks that can't match this face structural margin compression.`,
+    healthcare_providers: `Administrative cost per patient encounter rises while AI-optimized systems reduce theirs. The gap is existential for providers operating on ${(ebitdaMargin * 100).toFixed(0)}% margins — there's no room for inefficiency.`,
+    healthcare_payers: `MLR creeps upward as manual utilization management falls behind AI-driven peers. Administrative cost per member grows while competitors shrink theirs.`,
+    life_sciences_pharma: `R&D cost per approved drug remains at $2.6B industry average while AI-enabled competitors cut development costs 20-30%, allowing more pipeline bets per dollar.`,
+    software_saas: `Support costs, development velocity, and infrastructure costs fall behind AI-native competitors. The margin gap becomes a product gap as competitors reinvest savings into features.`,
+    retail: `Shrinkage, labor cost, and inventory carrying costs remain at legacy levels while AI-enabled competitors continuously optimize. At ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margins, ${ind} has no room for structural cost disadvantage.`,
+    manufacturing_discrete: `Maintenance costs, scrap rates, and downtime remain at legacy levels while competitors deploy AI that continuously improves. The cost gap compounds with every production cycle.`,
+    energy_oil_gas: `Per-barrel operating costs remain elevated versus AI-optimized operators. In a commodity business, the low-cost producer wins — and AI is redefining what "low cost" means.`,
+    telecommunications: `Network operating costs and customer service costs remain elevated while competitors automate. At ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margin, margin erosion translates directly to shareholder value destruction.`,
+    consulting_services: `Utilization and productivity lag AI-augmented competitors. The consulting business model depends on leverage — firms that don't augment their people with AI face structural margin compression.`,
+  };
+
+  // ---- Industry-specific cost structure descriptions ----
+  const costInvest = isLarge
+    ? `At ${employeeCount.toLocaleString()} employees, AI-driven automation of repetitive workflows compounds to material structural cost reduction. ${companyName}'s Workflow Integration score (${getScore('workflow_integration')}/100) indicates significant untapped automation potential in core ${ind} operations — every 1% of labor cost shifted to AI-variable costs saves ${fmtUSD(Math.round(employeeCount * 850 * 0.01))} annually.`
+    : isMid
+    ? `With ${employeeCount} employees, ${companyName} can target AI automation of the 5-10 highest-volume workflows to shift from fixed headcount to scalable AI capacity. In ${ind}, mid-size organizations see the fastest ROI from AI cost restructuring because they're large enough to benefit but agile enough to deploy quickly.`
+    : `At ${employeeCount} employees, ${companyName} can punch above its weight by using AI to match the output capacity of organizations 3-5x its size. In ${ind}, small organizations deploying AI effectively achieve per-employee productivity 40-60% higher than non-AI peers (BCG 2024).`;
+
+  const costCoast = isLarge
+    ? `Fixed labor costs for ${employeeCount.toLocaleString()} employees become a competitive liability as AI-enabled peers produce equivalent output with 15-25% fewer FTEs. At ${companyName}'s scale, this gap equates to ${fmtUSD(Math.round(employeeCount * 75000 * 0.002))} in incremental annual cost disadvantage, growing every year.`
+    : isMid
+    ? `${companyName}'s cost structure becomes uncompetitive as AI-enabled ${ind} peers achieve the same throughput with leaner teams. Mid-size organizations that delay AI cost restructuring often find they can't afford to catch up once the gap is apparent.`
+    : `Smaller organizations without AI face an especially acute cost disadvantage: AI-enabled competitors of any size can now match or exceed ${companyName}'s output capacity. Without AI leverage, your ${employeeCount}-person team competes against organizations using AI to effectively double their capacity.`;
+
+  // ---- Talent descriptions ----
+  const talentInvest = highReg
+    ? `In ${ind}, AI-mature organizations attract top compliance, clinical, and technical talent who want to work with modern tools — not against legacy systems. Deloitte 2024 finds 23% lower turnover at AI-mature organizations. For ${companyName} with ${employeeCount.toLocaleString()} employees, that translates to real retention savings and reduced knowledge loss in a highly regulated environment where institutional expertise is irreplaceable.`
+    : `AI-enabled workplaces attract top ${ind} talent who increasingly evaluate employers by technology maturity. Deloitte 2024 finds 23% lower turnover at AI-mature organizations. For ${companyName}, reduced turnover of even 1-2% among ${employeeCount.toLocaleString()} employees saves ${fmtUSD(talentSavings)} in recruiting, onboarding, and lost productivity costs.`;
+
+  const talentCoast = highReg
+    ? `${ind} talent with AI skills increasingly migrates to organizations where they can work with modern tools. In a ${regulatoryIntensity}-regulation environment, losing experienced people who also understand AI compounds both compliance risk and innovation capacity. ${companyName} is competing for talent against organizations offering more AI-forward environments.`
+    : `AI talent attrition accelerates as ${ind} professionals gravitate toward AI-forward employers. Gartner reports 34% of tech workers cite AI tooling as a top-3 factor in employer choice. For ${companyName}, this creates a self-reinforcing disadvantage: the people needed to build AI capability leave for organizations where AI is already embedded.`;
+
+  // ---- Risk descriptions ----
+  const riskInvest = highReg
+    ? `In ${ind} with ${regulatoryIntensity} regulatory intensity, structured AI governance is not optional — it's a compliance requirement. ${companyName}'s Authority Structure score of ${getScore('authority_structure')}/100 indicates governance gaps that create direct regulatory exposure. Proactive AI governance reduces shadow AI incidents, demonstrates compliance readiness, and avoids the ${fmtUSD(Math.round(riskCostBase))}-equivalent cost of a material AI-related incident.`
+    : `Structured AI governance prevents the most expensive AI failures: data breaches, biased outputs, and compliance violations. ${companyName}'s Authority Structure score of ${getScore('authority_structure')}/100 suggests governance gaps that create unnecessary risk. IBM 2024 data shows organizations with AI governance frameworks experience 73% fewer material incidents.`;
+
+  const riskCoast = highReg
+    ? `Ungoverned AI proliferation in a ${regulatoryIntensity}-regulation ${ind} environment creates compounding compliance exposure. Regulators are actively developing AI-specific requirements — ${companyName}'s governance gaps (Authority Structure: ${getScore('authority_structure')}/100) will become audit findings. IBM reports the avg cost of an AI-related data breach at ${fmtUSD(Math.round(riskCostBase))} for organizations of this size and regulatory profile.`
+    : `Shadow AI proliferates without governance — your people are already using AI tools you don't know about. IBM reports the avg cost of an AI-related data breach at ${fmtUSD(Math.round(riskCostBase))}. With Authority Structure at ${getScore('authority_structure')}/100, ${companyName} has limited visibility into what AI tools are being used with what data.`;
+
   // ---- 5 P&L Scenarios ----
   const scenarios: PnLScenario[] = [
     {
       label: "Revenue Growth",
-      investUpside: `AI-enabled product innovation, faster time-to-market, and personalized customer experiences drive ${(revUp * 100).toFixed(1)}% incremental revenue growth in ${ind}`,
+      investUpside: revGrowthInvest[industry] || `AI-driven ${ind.toLowerCase()}-specific optimization — including demand forecasting, customer personalization, and pricing intelligence — drives ${(revUp * 100).toFixed(1)}% incremental revenue growth. With an Adoption Behavior score of ${getScore('adoption_behavior')}/100, ${companyName} has meaningful room to embed AI into revenue-generating workflows.`,
       investDollar: fmtUSD(Math.round(revenue * revUp)),
-      coastDownside: `Market share erosion as competitors offer AI-enhanced products and services at competitive price points`,
+      coastDownside: revGrowthCoast[industry] || `Revenue growth stagnates as AI-enabled ${ind.toLowerCase()} competitors capture market share through faster innovation, better personalization, and lower customer acquisition costs. At Stage ${stage}, ${companyName} is falling ${stage <= 2 ? '18-24 months' : '12-18 months'} behind peers who are already scaling AI-driven revenue initiatives.`,
       coastDollar: `-${fmtUSD(Math.round(revenue * erosionRate))}`,
     },
     {
       label: "Operating Margin",
-      investUpside: `Process automation, error reduction, and workflow optimization improve operating margin by ${(marginUp * 100).toFixed(1)}% of revenue`,
+      investUpside: marginInvest[industry] || `AI-driven process automation, workflow optimization, and error reduction improve operating margin by ${(marginUp * 100).toFixed(1)}% of revenue across ${ind.toLowerCase()} operations. ${companyName}'s weakest dimension — ${dimensionLabel(weakest?.dimension || '')} at ${weakest?.normalizedScore}/100 — represents the highest-leverage target for margin-enhancing AI.`,
       investDollar: `+${fmtUSD(Math.round(revenue * marginUp))}`,
-      coastDownside: `Manual processes become relatively more expensive as AI-enabled competitors drive industry cost benchmarks lower`,
+      coastDownside: marginCoast[industry] || `Operating costs rise relative to AI-optimized ${ind.toLowerCase()} peers. With ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margins, ${companyName} has limited buffer — every quarter of delay widens the structural cost gap as competitors continuously optimize.`,
       coastDollar: `-${fmtUSD(Math.round(revenue * marginUp * 0.4))}`,
     },
     {
       label: "Cost Structure",
-      investUpside: `Shift from fixed labor costs to scalable AI-variable costs; same output at 15-25% lower cost basis over 24 months`,
+      investUpside: costInvest,
       investDollar: `+${fmtUSD(Math.round(revenue * 0.008))}`,
-      coastDownside: `Fixed cost burden rises relative to AI-enabled peers; SG&A gap widens 50-100 bps annually`,
+      coastDownside: costCoast,
       coastDollar: `-${fmtUSD(Math.round(revenue * 0.005))}`,
     },
     {
       label: "Talent Economics",
-      investUpside: `AI-enabled workplaces attract top talent and reduce turnover; Deloitte 2024 finds 23% lower turnover at AI-mature organizations`,
+      investUpside: talentInvest,
       investDollar: `+${fmtUSD(talentSavings)}`,
-      coastDownside: `AI talent flight to more mature organizations; Gartner reports 34% of tech workers cite AI tooling as a top-3 factor in employer choice`,
+      coastDownside: talentCoast,
       coastDollar: `-${fmtUSD(Math.round(talentSavings * 1.5))}`,
     },
     {
       label: "Risk Exposure",
-      investUpside: `Structured AI governance reduces shadow AI incidents, compliance exposure, and operational failures`,
+      investUpside: riskInvest,
       investDollar: `+${fmtUSD(Math.round(riskCostBase * riskReduction))}`,
-      coastDownside: `Ungoverned AI proliferation increases breach risk; IBM reports avg cost of AI-related data breach at ${fmtUSD(Math.round(riskCostBase))}`,
+      coastDownside: riskCoast,
       coastDollar: `-${fmtUSD(Math.round(riskCostBase))}`,
     },
   ];
@@ -5037,7 +5248,7 @@ function getBoardFindings(
   if (stage.confidence < 0.7) {
     findings.push({
       headline: "Maturity is uneven across the organization: mixed-stage pattern detected",
-      detail: `Dimension scores show significant variance (confidence: ${Math.round(stage.confidence * 100)}%), indicating that AI maturity differs substantially across organizational functions. This mixed-stage pattern typically reflects decentralized AI adoption without coordinating governance. Board attention should focus on whether this variance is strategic (intentional prioritization) or emergent (lack of coordination).`,
+      detail: `Dimension scores show significant variance (confidence: ${Math.min(99, Math.round(stage.confidence * 100))}%), indicating that AI maturity differs substantially across organizational functions. This mixed-stage pattern typically reflects decentralized AI adoption without coordinating governance. Board attention should focus on whether this variance is strategic (intentional prioritization) or emergent (lack of coordination).`,
       severity: "high",
     });
   }
