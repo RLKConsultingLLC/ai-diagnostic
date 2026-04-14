@@ -10,101 +10,14 @@ import type {
   AssessmentResponse,
   Dimension,
 } from "@/types/diagnostic";
+import IndustrySelector from "./components/IndustrySelector";
+import { validateCompanyProfile } from "@/lib/validation/intake";
 
 // ---------------------------------------------------------------------------
 // Static Data
 // ---------------------------------------------------------------------------
 
-const INDUSTRY_GROUPS: { group: string; options: { value: Industry; label: string }[] }[] = [
-  {
-    group: "Financial Services",
-    options: [
-      { value: "insurance", label: "Insurance" },
-      { value: "banking", label: "Banking" },
-      { value: "capital_markets", label: "Capital Markets" },
-      { value: "asset_wealth_management", label: "Asset & Wealth Management" },
-      { value: "investment_banking", label: "Investment Banking / M&A Advisory" },
-      { value: "private_equity", label: "Private Equity" },
-      { value: "venture_capital", label: "Venture Capital" },
-      { value: "hedge_funds", label: "Hedge Funds" },
-    ],
-  },
-  {
-    group: "Healthcare & Life Sciences",
-    options: [
-      { value: "healthcare_providers", label: "Healthcare Providers" },
-      { value: "healthcare_payers", label: "Healthcare Payers" },
-      { value: "healthcare_services", label: "Healthcare Services" },
-      { value: "life_sciences_pharma", label: "Life Sciences / Pharmaceuticals" },
-    ],
-  },
-  {
-    group: "Consumer & Retail",
-    options: [
-      { value: "retail", label: "Retail" },
-      { value: "ecommerce_digital", label: "E-commerce / Digital Commerce" },
-      { value: "cpg", label: "Consumer Packaged Goods (CPG)" },
-      { value: "dtc", label: "Direct-to-Consumer (DTC)" },
-      { value: "food_beverage", label: "Food & Beverage" },
-    ],
-  },
-  {
-    group: "Industrial & Energy",
-    options: [
-      { value: "manufacturing_discrete", label: "Manufacturing (Discrete)" },
-      { value: "manufacturing_process", label: "Manufacturing (Process / Industrial)" },
-      { value: "automotive", label: "Automotive" },
-      { value: "aerospace_defense", label: "Aerospace & Defense" },
-      { value: "energy_oil_gas", label: "Energy (Oil & Gas)" },
-      { value: "utilities", label: "Utilities" },
-      { value: "chemicals_materials", label: "Chemicals & Materials" },
-      { value: "industrial_services", label: "Industrial Services" },
-    ],
-  },
-  {
-    group: "Technology",
-    options: [
-      { value: "software_saas", label: "Software / SaaS" },
-      { value: "it_services", label: "IT Services / Managed Services" },
-      { value: "hardware_electronics", label: "Hardware / Electronics" },
-    ],
-  },
-  {
-    group: "Infrastructure & Logistics",
-    options: [
-      { value: "transportation", label: "Transportation" },
-      { value: "shipping_logistics", label: "Shipping & Logistics" },
-      { value: "infrastructure_transport", label: "Infrastructure / Transportation Systems" },
-      { value: "construction_engineering", label: "Construction & Engineering" },
-      { value: "real_estate_commercial", label: "Real Estate (Commercial)" },
-      { value: "real_estate_residential", label: "Real Estate (Residential)" },
-    ],
-  },
-  {
-    group: "Media & Telecom",
-    options: [
-      { value: "telecommunications", label: "Telecommunications" },
-      { value: "media_entertainment", label: "Media & Entertainment" },
-    ],
-  },
-  {
-    group: "Public Sector & Non-Profit",
-    options: [
-      { value: "government_federal", label: "Government (Federal)" },
-      { value: "government_state_local", label: "Government (State & Local)" },
-      { value: "defense_contractors", label: "Defense / Government Contractors" },
-      { value: "nonprofit_ngo", label: "Non-Profit / NGO" },
-    ],
-  },
-  {
-    group: "Professional Services",
-    options: [
-      { value: "consulting_services", label: "Consulting Services" },
-      { value: "legal_services", label: "Legal Services" },
-      { value: "accounting_audit", label: "Accounting / Audit" },
-    ],
-  },
-];
+// INDUSTRY_GROUPS removed — replaced by MCC_INDUSTRY_TREE via IndustrySelector
 
 const AI_USE_CASES = [
   "Customer Service / Chatbots",
@@ -235,6 +148,7 @@ export default function AssessmentPage() {
   // -- Intake form
   const [companyName, setCompanyName] = useState("");
   const [industry, setIndustry] = useState<Industry | "">("");
+  const [industryDisplayLabel, setIndustryDisplayLabel] = useState("");
   const [revenue, setRevenue] = useState("");
   const [employeeCount, setEmployeeCount] = useState("");
   const [publicOrPrivate, setPublicOrPrivate] = useState<
@@ -333,6 +247,8 @@ export default function AssessmentPage() {
     return () => clearInterval(interval);
   }, [sessionId, step, researchComplete]);
 
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
   // ---------- Handlers ----------
 
   const toggleUseCase = useCallback((uc: string) => {
@@ -362,7 +278,8 @@ export default function AssessmentPage() {
     employeeCount !== "" &&
     publicOrPrivate !== "" &&
     regulatoryIntensity !== "" &&
-    selectedUseCases.length > 0;
+    selectedUseCases.length > 0 &&
+    Object.keys(validationErrors).length === 0;
 
   // Fetch dimension insight from API (escalating with each dimension)
   const fetchDimensionInsight = useCallback(
@@ -449,13 +366,10 @@ export default function AssessmentPage() {
 
   // Submit intake to create a session and get questions
   const handleIntakeSubmit = async () => {
-    if (!intakeValid) return;
-    setSubmitting(true);
-    setError(null);
-
     const profile: CompanyProfile = {
       companyName: companyName.trim(),
       industry: industry as Industry,
+      industryDisplayLabel: industryDisplayLabel || undefined,
       revenue: parseFloat(revenue),
       employeeCount: parseInt(employeeCount, 10),
       publicOrPrivate: publicOrPrivate as "public" | "private",
@@ -466,6 +380,15 @@ export default function AssessmentPage() {
       ticker: ticker.trim() || undefined,
       websiteUrl: websiteUrl.trim() || undefined,
     };
+
+    const validation = validateCompanyProfile(profile);
+    if (!validation.valid) {
+      setValidationErrors(validation.errors);
+      return;
+    }
+    setValidationErrors({});
+    setSubmitting(true);
+    setError(null);
 
     try {
       const res = await fetch("/api/assessment/start", {
@@ -877,41 +800,36 @@ export default function AssessmentPage() {
 
               {/* Industry */}
               <Field label="Industry" required>
-                <select
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value as Industry)}
-                  className="form-input"
-                >
-                  <option value="">Select industry...</option>
-                  {INDUSTRY_GROUPS.map((g) => (
-                    <optgroup key={g.group} label={g.group}>
-                      {g.options.map((i) => (
-                        <option key={i.value} value={i.value}>
-                          {i.label}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+                <IndustrySelector
+                  value={
+                    industry
+                      ? { slug: industry as Industry, displayLabel: industryDisplayLabel }
+                      : null
+                  }
+                  onChange={(sel) => {
+                    setIndustry(sel.slug);
+                    setIndustryDisplayLabel(sel.displayLabel);
+                  }}
+                />
               </Field>
 
               {/* Revenue + Employees -- two columns */}
               <div className="grid md:grid-cols-2 gap-6">
-                <Field label="Annual Revenue (USD)" required>
+                <Field label="Annual Revenue (USD)" required error={validationErrors.revenue}>
                   <input
                     type="number"
                     value={revenue}
-                    onChange={(e) => setRevenue(e.target.value)}
+                    onChange={(e) => { setRevenue(e.target.value); setValidationErrors((prev) => { const { revenue: _, ...rest } = prev; return rest; }); }}
                     className="form-input"
                     placeholder="e.g. 500000000"
                     min={0}
                   />
                 </Field>
-                <Field label="Employee Count" required>
+                <Field label="Employee Count" required error={validationErrors.employeeCount}>
                   <input
                     type="number"
                     value={employeeCount}
-                    onChange={(e) => setEmployeeCount(e.target.value)}
+                    onChange={(e) => { setEmployeeCount(e.target.value); setValidationErrors((prev) => { const { employeeCount: _, ...rest } = prev; return rest; }); }}
                     className="form-input"
                     placeholder="e.g. 5000"
                     min={1}
@@ -989,7 +907,7 @@ export default function AssessmentPage() {
               </Field>
 
               {/* Email */}
-              <Field label="Executive Email" optional>
+              <Field label="Executive Email" optional error={validationErrors.executiveEmail}>
                 <input
                   type="email"
                   value={executiveEmail}
@@ -1556,11 +1474,13 @@ function Field({
   label,
   required,
   optional,
+  error,
   children,
 }: {
   label: string;
   required?: boolean;
   optional?: boolean;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -1575,6 +1495,9 @@ function Field({
         )}
       </label>
       {children}
+      {error && (
+        <p className="text-xs text-red-600 mt-1">{error}</p>
+      )}
     </div>
   );
 }

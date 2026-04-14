@@ -12,6 +12,7 @@ import {
   StageClassification,
   StageNumber,
 } from '@/types/diagnostic';
+import { getAllSources } from './economic-sources';
 
 // ---------------------------------------------------------------------------
 // INDUSTRY PRODUCTIVITY POTENTIAL
@@ -166,11 +167,23 @@ export function computeEconomicEstimate(
   profile: CompanyProfile,
   stage: StageClassification
 ): EconomicEstimate {
+  const warnings: string[] = [];
   const industry = profile.industry;
   const potential = INDUSTRY_PRODUCTIVITY_POTENTIAL[industry];
   const captureRate = STAGE_CAPTURE_RATES[stage.primaryStage];
   const sizeMultiplier = getSizeMultiplier(profile.employeeCount);
-  const costPerEmployee = AVG_COST_PER_EMPLOYEE[industry];
+  let costPerEmployee = AVG_COST_PER_EMPLOYEE[industry];
+
+  // --- GUARDRAILS ---
+  const revenuePerEmployee = profile.revenue / Math.max(profile.employeeCount, 1);
+
+  // Revenue-per-employee sanity check: clamp effective labor cost
+  if (revenuePerEmployee < 10_000) {
+    warnings.push('Revenue per employee is unusually low. Economic estimates have been adjusted.');
+    costPerEmployee = Math.min(costPerEmployee, revenuePerEmployee * 3);
+  } else if (revenuePerEmployee > 5_000_000) {
+    warnings.push('Revenue per employee is unusually high. Economic estimates have been adjusted.');
+  }
 
   // Total labor cost estimate
   const totalLaborCost = profile.employeeCount * costPerEmployee;
@@ -191,17 +204,28 @@ export function computeEconomicEstimate(
   const currentCapturePercent = captureRate * 100;
   const capturedValue = midpointPotential * captureRate;
 
-  // Unrealized value
-  const unrealizedLow = productivityPotentialLow * (1 - captureRate);
-  const unrealizedHigh = productivityPotentialHigh * (1 - captureRate);
+  // Unrealized value — floor at $0, cap at 50% of revenue
+  let unrealizedLow = Math.max(0, productivityPotentialLow * (1 - captureRate));
+  let unrealizedHigh = Math.max(0, productivityPotentialHigh * (1 - captureRate));
+  const revenueCap = profile.revenue * 0.5;
+  if (unrealizedHigh > revenueCap) {
+    warnings.push('Unrealized value estimates capped at 50% of revenue.');
+    unrealizedHigh = revenueCap;
+    unrealizedLow = Math.min(unrealizedLow, revenueCap * 0.7);
+  }
 
-  // Wasted hours calculation
+  // Wasted hours calculation — cap at 50% of total available hours
   const hoursPerEmployee = 2080; // Standard work year
+  const maxWasteableHours = profile.employeeCount * hoursPerEmployee * 0.5;
   const potentialHoursSaved = profile.employeeCount *
     hoursPerEmployee *
     ((potential.low + potential.high) / 2);
   const hoursCaptured = potentialHoursSaved * captureRate;
-  const annualWastedHours = Math.round(potentialHoursSaved - hoursCaptured);
+  let annualWastedHours = Math.round(potentialHoursSaved - hoursCaptured);
+  if (annualWastedHours > maxWasteableHours) {
+    annualWastedHours = Math.round(maxWasteableHours);
+    warnings.push('Wasted hours capped at 50% of total available labor hours.');
+  }
 
   // Industry benchmark narrative
   const industryBenchmark = buildBenchmarkNarrative(
@@ -212,6 +236,9 @@ export function computeEconomicEstimate(
     profile.revenue
   );
 
+  // Suppress capturedValue usage warning
+  void capturedValue;
+
   return {
     productivityPotentialPercent: Math.round(productivityPotentialPercent),
     currentCapturePercent: Math.round(currentCapturePercent),
@@ -220,6 +247,8 @@ export function computeEconomicEstimate(
     annualWastedHours,
     costPerEmployee,
     industryBenchmark,
+    warnings: warnings.length > 0 ? warnings : undefined,
+    sources: getAllSources(industry),
   };
 }
 

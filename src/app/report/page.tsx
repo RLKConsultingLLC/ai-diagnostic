@@ -2798,8 +2798,8 @@ const INDUSTRY_LABELS: Record<string, string> = {
   accounting_audit: "Accounting / Audit",
 };
 
-function industryLabel(slug: string): string {
-  return INDUSTRY_LABELS[slug] || slug.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+function industryLabel(slug: string, displayLabel?: string): string {
+  return displayLabel || INDUSTRY_LABELS[slug] || slug.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 // ---------------------------------------------------------------------------

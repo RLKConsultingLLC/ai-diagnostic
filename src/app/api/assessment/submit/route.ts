@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, updateSession } from '@/lib/db/store';
 import { runDiagnostic } from '@/lib/diagnostic/engine';
+import { DIAGNOSTIC_QUESTIONS } from '@/lib/diagnostic/questions';
 import type { AssessmentResponse } from '@/types/diagnostic';
 
 export async function POST(request: NextRequest) {
@@ -30,6 +31,27 @@ export async function POST(request: NextRequest) {
         { error: 'responses must be a non-empty array' },
         { status: 400 }
       );
+    }
+
+    // Validate each response has a valid question and score
+    const validQuestionIds = new Set(DIAGNOSTIC_QUESTIONS.map((q) => q.id));
+    for (const r of responses) {
+      if (!validQuestionIds.has(r.questionId)) {
+        return NextResponse.json(
+          { error: `Invalid questionId: ${r.questionId}` },
+          { status: 400 }
+        );
+      }
+      const question = DIAGNOSTIC_QUESTIONS.find((q) => q.id === r.questionId);
+      if (
+        question &&
+        (r.selectedOptionIndex < 0 || r.selectedOptionIndex >= question.options.length)
+      ) {
+        return NextResponse.json(
+          { error: `Invalid option index ${r.selectedOptionIndex} for question ${r.questionId}` },
+          { status: 400 }
+        );
+      }
     }
 
     // Fetch session

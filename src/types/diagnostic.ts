@@ -29,6 +29,7 @@ export interface CompanyProfile {
   ticker?: string; // Stock ticker (e.g., "AAPL") for public company research
   websiteUrl?: string; // Company website for research targeting
   industry: Industry;
+  industryDisplayLabel?: string; // The user-selected MCC sub-industry label
   subIndustry?: string;
   revenue: number; // Annual revenue in USD
   employeeCount: number;
@@ -126,6 +127,13 @@ export interface StageClassification {
   confidence: number; // 0–1, lower when dimensions diverge significantly
 }
 
+export interface EconomicSource {
+  name: string;
+  metric: string;
+  year: number;
+  url?: string;
+}
+
 export interface EconomicEstimate {
   productivityPotentialPercent: number; // 10–35%
   currentCapturePercent: number;
@@ -134,6 +142,8 @@ export interface EconomicEstimate {
   annualWastedHours: number;
   costPerEmployee: number;
   industryBenchmark: string;
+  warnings?: string[];
+  sources?: EconomicSource[];
 }
 
 export interface DiagnosticResult {

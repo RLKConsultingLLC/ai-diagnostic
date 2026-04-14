@@ -3,6 +3,12 @@
 // =============================================================================
 // 61 questions across 5 hidden dimensions. Each question diagnoses BEHAVIOR,
 // not tools. Answer options map to maturity levels 0–5.
+//
+// SCORING DESIGN NOTE: Many questions use a 0, 1, 2, 4, 5 scoring pattern
+// (intentionally skipping 3). This creates a deliberate gap between "moderate"
+// and "good" responses, forcing respondents to differentiate between genuine
+// capability and aspirational assessment. The gap is calibrated so that only
+// organizations with demonstrated structural maturity score above the midpoint.
 // =============================================================================
 
 import { DiagnosticQuestion } from '@/types/diagnostic';
@@ -658,16 +664,17 @@ const decisionVelocity: DiagnosticQuestion[] = [
   {
     id: 'DV-08',
     dimension: 'decision_velocity',
-    text: 'When a competitor announces a significant AI capability, how quickly does your organization respond?',
+    text: 'When an AI initiative needs to be significantly restructured or pivoted, how quickly can the organization realign resources and direction?',
+    subtext: 'Think about situations where an AI project needed a major course correction — not minor tweaks, but fundamental changes in approach, scope, or technology.',
     options: [
-      { text: 'We typically don\'t notice or respond to competitor AI moves', score: 0 },
-      { text: 'It triggers discussion but no action for 6+ months', score: 1 },
-      { text: 'A competitive analysis is commissioned; response takes 3–6 months', score: 2 },
-      { text: 'Standing competitive intelligence process assesses implications within weeks; response plan within 60 days', score: 4 },
-      { text: 'Continuous competitive monitoring with pre-approved response playbooks; counter-moves deploy in days to weeks', score: 5 },
+      { text: 'Pivots don\'t happen; struggling projects continue unchanged until they are quietly abandoned', score: 0 },
+      { text: 'Restructuring requires a new business case cycle and takes 6+ months', score: 1 },
+      { text: 'Project teams can propose pivots but budget and resource reallocation takes 2–4 months', score: 2 },
+      { text: 'Pivot authority is delegated to project sponsors; resource reallocation happens within 4–6 weeks with defined escalation paths', score: 4 },
+      { text: 'Built-in pivot checkpoints with pre-approved resource flexibility; teams can restructure within 2 weeks without executive re-approval', score: 5 },
     ],
-    weight: 1.2,
-    tags: ['velocity', 'competitive', 'responsiveness'],
+    weight: 1.0,
+    tags: ['velocity', 'agility', 'pivot'],
   },
   {
     id: 'DV-09',

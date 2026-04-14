@@ -8,30 +8,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSession } from '@/lib/db/store';
 import { DIAGNOSTIC_QUESTIONS } from '@/lib/diagnostic/questions';
 import { startBackgroundResearch } from '@/lib/research/engine';
+import { validateCompanyProfile } from '@/lib/validation/intake';
 import type { CompanyProfile } from '@/types/diagnostic';
-
-const REQUIRED_FIELDS: (keyof CompanyProfile)[] = [
-  'companyName',
-  'industry',
-  'revenue',
-  'employeeCount',
-  'publicOrPrivate',
-  'regulatoryIntensity',
-];
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const profile = body as CompanyProfile;
 
-    // Validate required fields
-    const missing = REQUIRED_FIELDS.filter(
-      (field) => profile[field] === undefined || profile[field] === null || profile[field] === ''
-    );
-
-    if (missing.length > 0) {
+    // Validate profile using shared validator
+    const validation = validateCompanyProfile(profile);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: `Missing required fields: ${missing.join(', ')}` },
+        { error: 'Validation failed', details: validation.errors },
         { status: 400 }
       );
     }
