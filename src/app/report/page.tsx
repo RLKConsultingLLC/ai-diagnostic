@@ -1884,15 +1884,15 @@ function ReportPage() {
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#991B1B" }} />
+                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#0B1D3A" }} />
                     <span className="text-[10px] text-foreground/50">Critical</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#92400E" }} />
+                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#364E6E" }} />
                     <span className="text-[10px] text-foreground/50">High</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#0B1D3A" }} />
+                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#A8B5C4" }} />
                     <span className="text-[10px] text-foreground/50">Informational</span>
                   </div>
                 </div>
@@ -1902,7 +1902,7 @@ function ReportPage() {
                   <div key={idx} className="flex items-start gap-3">
                     <div
                       className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
-                      style={{ backgroundColor: finding.severity === "critical" ? "#991B1B" : finding.severity === "high" ? "#92400E" : "#0B1D3A" }}
+                      style={{ backgroundColor: finding.severity === "critical" ? "#0B1D3A" : finding.severity === "high" ? "#364E6E" : "#A8B5C4" }}
                     >
                       {idx + 1}
                     </div>
