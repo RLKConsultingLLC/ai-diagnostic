@@ -33,33 +33,40 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div className="max-w-3xl">
-            <p className="text-tertiary text-sm font-semibold tracking-widest uppercase mb-4">
+      <section className="bg-white relative overflow-hidden">
+        {/* Subtle background accent */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-navy/[0.02] to-transparent" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-navy/[0.015] blur-3xl translate-y-1/2" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-32 lg:py-36">
+          <div className="text-center max-w-4xl mx-auto">
+            <p className="text-tertiary text-xs md:text-sm font-semibold tracking-[0.3em] uppercase mb-6">
               For CIOs who have run enough pilots
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.1] font-bold text-navy tracking-tight mb-8">
               Your AI investments are working.
-              <span className="block mt-1">Your organization is not.</span>
+              <span className="block mt-2 text-foreground/50">Your organization is not.</span>
             </h1>
-            <p className="text-lg md:text-xl text-foreground/80 leading-relaxed mb-4 max-w-2xl">
+            <div className="mx-auto w-16 h-px bg-navy/20 mb-8" />
+            <p className="text-lg md:text-xl text-foreground/70 leading-relaxed mb-4 max-w-2xl mx-auto">
               Pilots succeed in isolation. Productivity improves in pockets.
               Yet at the enterprise level, boards see no meaningful margin
               expansion, operating models remain intact, and decision speed
               stays constrained by legacy structures.
             </p>
-            <p className="text-lg text-foreground/70 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-base md:text-lg text-foreground/55 leading-relaxed mb-12 max-w-2xl mx-auto">
               This is the diagnostic that explains why. Built
-              on the same frameworks Ryan King developed across a decade at
+              on the same frameworks RLK developed across a decade at
               McKinsey and Deloitte, it identifies the structural barriers
               preventing your AI investments from translating into enterprise
               value.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 items-start">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
               <Link
                 href="/assessment"
-                className="inline-flex items-center bg-navy text-white px-8 py-4 text-base font-semibold hover:bg-secondary transition-colors"
+                className="inline-flex items-center bg-navy text-white px-10 py-4 text-base font-semibold hover:bg-secondary transition-colors shadow-sm"
               >
                 Start Your Diagnostic
                 <svg
@@ -76,7 +83,7 @@ export default function Home() {
                   />
                 </svg>
               </Link>
-              <span className="text-sm text-tertiary mt-2 sm:mt-3">
+              <span className="text-sm text-tertiary">
                 20 minutes. No tools audit. Just operating-model truth.
               </span>
             </div>
@@ -526,7 +533,7 @@ export default function Home() {
           <div className="text-center mb-14">
             <h2 className="text-2xl md:text-3xl mb-3">Investment</h2>
             <p className="text-tertiary text-base max-w-xl mx-auto">
-              The same analytical framework Ryan King applies in six-figure
+              The same analytical framework RLK applies in six-figure
               advisory engagements. Productized for leadership teams that
               need clarity now.
             </p>
@@ -671,14 +678,14 @@ export default function Home() {
               </div>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <Link href="/privacy" className="hover:text-white transition-colors">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <Link href="/terms" className="hover:text-white transition-colors">
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
