@@ -8,7 +8,7 @@
 import { Resend } from 'resend';
 import { buildReportEmail } from './templates';
 
-const FROM_ADDRESS = 'diagnostics@rlkconsulting.com';
+const FROM_ADDRESS = 'diagnostics@rlkconsultingco.com';
 const FROM_NAME = 'RLK Consulting';
 
 export interface SendReportEmailInput {

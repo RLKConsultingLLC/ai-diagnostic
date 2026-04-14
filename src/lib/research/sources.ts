@@ -205,18 +205,58 @@ function decodeHtmlEntities(text: string): string {
 
 export async function searchIndustryNews(industry: Industry): Promise<RawNewsResult[]> {
   const industryTerms: Record<string, string> = {
-    financial_services: 'financial services AI artificial intelligence banking',
-    insurance: 'insurance AI artificial intelligence insurtech',
-    healthcare: 'healthcare AI artificial intelligence health tech',
-    manufacturing: 'manufacturing AI artificial intelligence industry 4.0',
-    technology: 'enterprise technology AI artificial intelligence',
-    retail_ecommerce: 'retail ecommerce AI artificial intelligence',
-    professional_services: 'professional services consulting AI artificial intelligence',
-    energy_utilities: 'energy utilities AI artificial intelligence',
-    government: 'government AI artificial intelligence public sector',
-    education: 'education AI artificial intelligence edtech',
-    media_entertainment: 'media entertainment AI artificial intelligence',
-    other: 'enterprise AI artificial intelligence',
+    // Financial Services
+    insurance: 'insurance AI artificial intelligence insurtech underwriting',
+    banking: 'banking AI artificial intelligence fintech',
+    capital_markets: 'capital markets AI trading artificial intelligence',
+    asset_wealth_management: 'wealth management AI artificial intelligence robo-advisor',
+    investment_banking: 'investment banking AI M&A artificial intelligence deal sourcing',
+    private_equity: 'private equity AI artificial intelligence portfolio management',
+    venture_capital: 'venture capital AI artificial intelligence deal flow',
+    hedge_funds: 'hedge fund AI quantitative trading artificial intelligence',
+    // Healthcare & Life Sciences
+    healthcare_providers: 'healthcare providers AI artificial intelligence clinical',
+    healthcare_payers: 'health insurance payers AI artificial intelligence claims',
+    healthcare_services: 'healthcare services AI artificial intelligence health tech',
+    life_sciences_pharma: 'pharmaceutical life sciences AI drug discovery artificial intelligence',
+    // Consumer & Retail
+    retail: 'retail AI artificial intelligence inventory demand forecasting',
+    ecommerce_digital: 'ecommerce digital commerce AI artificial intelligence personalization',
+    cpg: 'consumer packaged goods CPG AI supply chain artificial intelligence',
+    dtc: 'direct to consumer DTC AI artificial intelligence personalization',
+    food_beverage: 'food beverage AI artificial intelligence supply chain',
+    // Industrial & Energy
+    manufacturing_discrete: 'discrete manufacturing AI artificial intelligence industry 4.0',
+    manufacturing_process: 'process manufacturing AI artificial intelligence industrial',
+    automotive: 'automotive AI artificial intelligence autonomous driving',
+    aerospace_defense: 'aerospace defense AI artificial intelligence',
+    energy_oil_gas: 'energy oil gas AI artificial intelligence predictive maintenance',
+    utilities: 'utilities AI artificial intelligence grid smart energy',
+    chemicals_materials: 'chemicals materials AI artificial intelligence process optimization',
+    industrial_services: 'industrial services AI artificial intelligence automation',
+    // Technology
+    software_saas: 'enterprise software SaaS AI artificial intelligence',
+    it_services: 'IT services managed services AI artificial intelligence',
+    hardware_electronics: 'hardware electronics AI chips artificial intelligence semiconductor',
+    // Infrastructure & Logistics
+    transportation: 'transportation AI artificial intelligence logistics',
+    shipping_logistics: 'shipping logistics AI artificial intelligence supply chain',
+    infrastructure_transport: 'infrastructure transportation systems AI artificial intelligence smart city',
+    construction_engineering: 'construction engineering AI artificial intelligence BIM',
+    real_estate_commercial: 'commercial real estate AI artificial intelligence property valuation',
+    real_estate_residential: 'residential real estate AI artificial intelligence proptech',
+    // Media & Telecom
+    telecommunications: 'telecommunications AI artificial intelligence 5G network',
+    media_entertainment: 'media entertainment AI artificial intelligence content',
+    // Public Sector
+    government_federal: 'federal government AI artificial intelligence public sector',
+    government_state_local: 'state local government AI artificial intelligence smart city',
+    defense_contractors: 'defense contractors AI artificial intelligence military technology',
+    nonprofit_ngo: 'nonprofit NGO AI artificial intelligence social impact',
+    // Professional Services
+    consulting_services: 'consulting services AI artificial intelligence advisory',
+    legal_services: 'legal services AI artificial intelligence legal tech',
+    accounting_audit: 'accounting audit AI artificial intelligence automation',
   };
 
   const query = industryTerms[industry] || industryTerms.other;

@@ -259,24 +259,56 @@ export function computeOverallScore(dimensionScores: DimensionScore[]): number {
 // ---------------------------------------------------------------------------
 
 export const INDUSTRY_BENCHMARKS: Record<Industry, { avgScore: number; topQuartile: number; label: string }> = {
-  financial_services: { avgScore: 42, topQuartile: 65, label: 'Financial Services' },
+  // Financial Services
   insurance: { avgScore: 35, topQuartile: 58, label: 'Insurance' },
-  healthcare: { avgScore: 30, topQuartile: 52, label: 'Healthcare' },
-  manufacturing: { avgScore: 33, topQuartile: 55, label: 'Manufacturing' },
-  technology: { avgScore: 58, topQuartile: 78, label: 'Technology' },
-  retail_ecommerce: { avgScore: 45, topQuartile: 68, label: 'Retail & E-Commerce' },
-  professional_services: { avgScore: 40, topQuartile: 62, label: 'Professional Services' },
-  energy_utilities: { avgScore: 28, topQuartile: 48, label: 'Energy & Utilities' },
-  consumer_retail: { avgScore: 40, topQuartile: 61, label: 'Consumer Retail' },
-  federal_government: { avgScore: 32, topQuartile: 52, label: 'Federal Government' },
-  state_local_government: { avgScore: 28, topQuartile: 48, label: 'State & Local Government' },
-  nonprofit: { avgScore: 26, topQuartile: 45, label: 'Non-Profit' },
+  banking: { avgScore: 42, topQuartile: 65, label: 'Banking' },
+  capital_markets: { avgScore: 42, topQuartile: 65, label: 'Capital Markets' },
+  asset_wealth_management: { avgScore: 42, topQuartile: 65, label: 'Asset & Wealth Management' },
+  investment_banking: { avgScore: 44, topQuartile: 67, label: 'Investment Banking' },
+  private_equity: { avgScore: 46, topQuartile: 68, label: 'Private Equity' },
+  venture_capital: { avgScore: 50, topQuartile: 72, label: 'Venture Capital' },
+  hedge_funds: { avgScore: 48, topQuartile: 70, label: 'Hedge Funds' },
+  // Healthcare & Life Sciences
+  healthcare_providers: { avgScore: 30, topQuartile: 52, label: 'Healthcare Providers' },
+  healthcare_payers: { avgScore: 30, topQuartile: 52, label: 'Healthcare Payers' },
+  healthcare_services: { avgScore: 32, topQuartile: 54, label: 'Healthcare Services' },
+  life_sciences_pharma: { avgScore: 30, topQuartile: 52, label: 'Life Sciences & Pharma' },
+  // Consumer & Retail
+  retail: { avgScore: 40, topQuartile: 61, label: 'Retail' },
+  ecommerce_digital: { avgScore: 45, topQuartile: 68, label: 'E-Commerce & Digital' },
+  cpg: { avgScore: 40, topQuartile: 61, label: 'Consumer Packaged Goods' },
+  dtc: { avgScore: 44, topQuartile: 66, label: 'Direct-to-Consumer' },
+  food_beverage: { avgScore: 36, topQuartile: 58, label: 'Food & Beverage' },
+  // Industrial & Energy
+  manufacturing_discrete: { avgScore: 33, topQuartile: 55, label: 'Discrete Manufacturing' },
+  manufacturing_process: { avgScore: 33, topQuartile: 55, label: 'Process Manufacturing' },
+  automotive: { avgScore: 33, topQuartile: 55, label: 'Automotive' },
   aerospace_defense: { avgScore: 44, topQuartile: 65, label: 'Aerospace & Defense' },
-  telecommunications: { avgScore: 46, topQuartile: 66, label: 'Telecommunications' },
-  hospitality_travel: { avgScore: 35, topQuartile: 55, label: 'Hospitality & Travel' },
-  real_estate: { avgScore: 30, topQuartile: 50, label: 'Real Estate' },
-  education: { avgScore: 25, topQuartile: 42, label: 'Education' },
-  media_entertainment: { avgScore: 48, topQuartile: 70, label: 'Media & Entertainment' },
+  energy_oil_gas: { avgScore: 28, topQuartile: 48, label: 'Energy & Oil/Gas' },
+  utilities: { avgScore: 28, topQuartile: 48, label: 'Utilities' },
+  chemicals_materials: { avgScore: 30, topQuartile: 50, label: 'Chemicals & Materials' },
+  industrial_services: { avgScore: 31, topQuartile: 52, label: 'Industrial Services' },
+  // Technology
+  software_saas: { avgScore: 58, topQuartile: 78, label: 'Software & SaaS' },
+  it_services: { avgScore: 52, topQuartile: 73, label: 'IT Services' },
+  hardware_electronics: { avgScore: 58, topQuartile: 78, label: 'Hardware & Electronics' },
+  // Infrastructure & Logistics
+  transportation: { avgScore: 41, topQuartile: 62, label: 'Transportation' },
   shipping_logistics: { avgScore: 41, topQuartile: 62, label: 'Shipping & Logistics' },
-  other: { avgScore: 38, topQuartile: 58, label: 'Cross-Industry' },
+  infrastructure_transport: { avgScore: 35, topQuartile: 56, label: 'Infrastructure & Transport' },
+  construction_engineering: { avgScore: 33, topQuartile: 55, label: 'Construction & Engineering' },
+  real_estate_commercial: { avgScore: 30, topQuartile: 50, label: 'Commercial Real Estate' },
+  real_estate_residential: { avgScore: 28, topQuartile: 48, label: 'Residential Real Estate' },
+  // Media & Telecom
+  telecommunications: { avgScore: 46, topQuartile: 66, label: 'Telecommunications' },
+  media_entertainment: { avgScore: 48, topQuartile: 70, label: 'Media & Entertainment' },
+  // Public Sector & Non-Profit
+  government_federal: { avgScore: 32, topQuartile: 52, label: 'Federal Government' },
+  government_state_local: { avgScore: 28, topQuartile: 48, label: 'State & Local Government' },
+  defense_contractors: { avgScore: 38, topQuartile: 60, label: 'Defense Contractors' },
+  nonprofit_ngo: { avgScore: 26, topQuartile: 45, label: 'Nonprofit & NGO' },
+  // Professional Services
+  consulting_services: { avgScore: 40, topQuartile: 62, label: 'Consulting Services' },
+  legal_services: { avgScore: 34, topQuartile: 56, label: 'Legal Services' },
+  accounting_audit: { avgScore: 36, topQuartile: 58, label: 'Accounting & Audit' },
 };

@@ -15,27 +15,95 @@ import type {
 // Static Data
 // ---------------------------------------------------------------------------
 
-const INDUSTRIES: { value: Industry; label: string }[] = [
-  { value: "aerospace_defense", label: "Aerospace & Defense" },
-  { value: "consumer_retail", label: "Consumer Retail" },
-  { value: "education", label: "Education" },
-  { value: "energy_utilities", label: "Energy & Utilities" },
-  { value: "federal_government", label: "Federal Government" },
-  { value: "financial_services", label: "Financial Services" },
-  { value: "healthcare", label: "Healthcare" },
-  { value: "hospitality_travel", label: "Hospitality & Travel" },
-  { value: "insurance", label: "Insurance" },
-  { value: "manufacturing", label: "Manufacturing" },
-  { value: "media_entertainment", label: "Media & Entertainment" },
-  { value: "nonprofit", label: "Non-Profit" },
-  { value: "professional_services", label: "Professional Services" },
-  { value: "real_estate", label: "Real Estate" },
-  { value: "retail_ecommerce", label: "Retail / E-Commerce" },
-  { value: "shipping_logistics", label: "Shipping & Logistics" },
-  { value: "state_local_government", label: "State & Local Government" },
-  { value: "technology", label: "Technology" },
-  { value: "telecommunications", label: "Telecommunications" },
-  { value: "other", label: "Other" },
+const INDUSTRY_GROUPS: { group: string; options: { value: Industry; label: string }[] }[] = [
+  {
+    group: "Financial Services",
+    options: [
+      { value: "insurance", label: "Insurance" },
+      { value: "banking", label: "Banking" },
+      { value: "capital_markets", label: "Capital Markets" },
+      { value: "asset_wealth_management", label: "Asset & Wealth Management" },
+      { value: "investment_banking", label: "Investment Banking / M&A Advisory" },
+      { value: "private_equity", label: "Private Equity" },
+      { value: "venture_capital", label: "Venture Capital" },
+      { value: "hedge_funds", label: "Hedge Funds" },
+    ],
+  },
+  {
+    group: "Healthcare & Life Sciences",
+    options: [
+      { value: "healthcare_providers", label: "Healthcare Providers" },
+      { value: "healthcare_payers", label: "Healthcare Payers" },
+      { value: "healthcare_services", label: "Healthcare Services" },
+      { value: "life_sciences_pharma", label: "Life Sciences / Pharmaceuticals" },
+    ],
+  },
+  {
+    group: "Consumer & Retail",
+    options: [
+      { value: "retail", label: "Retail" },
+      { value: "ecommerce_digital", label: "E-commerce / Digital Commerce" },
+      { value: "cpg", label: "Consumer Packaged Goods (CPG)" },
+      { value: "dtc", label: "Direct-to-Consumer (DTC)" },
+      { value: "food_beverage", label: "Food & Beverage" },
+    ],
+  },
+  {
+    group: "Industrial & Energy",
+    options: [
+      { value: "manufacturing_discrete", label: "Manufacturing (Discrete)" },
+      { value: "manufacturing_process", label: "Manufacturing (Process / Industrial)" },
+      { value: "automotive", label: "Automotive" },
+      { value: "aerospace_defense", label: "Aerospace & Defense" },
+      { value: "energy_oil_gas", label: "Energy (Oil & Gas)" },
+      { value: "utilities", label: "Utilities" },
+      { value: "chemicals_materials", label: "Chemicals & Materials" },
+      { value: "industrial_services", label: "Industrial Services" },
+    ],
+  },
+  {
+    group: "Technology",
+    options: [
+      { value: "software_saas", label: "Software / SaaS" },
+      { value: "it_services", label: "IT Services / Managed Services" },
+      { value: "hardware_electronics", label: "Hardware / Electronics" },
+    ],
+  },
+  {
+    group: "Infrastructure & Logistics",
+    options: [
+      { value: "transportation", label: "Transportation" },
+      { value: "shipping_logistics", label: "Shipping & Logistics" },
+      { value: "infrastructure_transport", label: "Infrastructure / Transportation Systems" },
+      { value: "construction_engineering", label: "Construction & Engineering" },
+      { value: "real_estate_commercial", label: "Real Estate (Commercial)" },
+      { value: "real_estate_residential", label: "Real Estate (Residential)" },
+    ],
+  },
+  {
+    group: "Media & Telecom",
+    options: [
+      { value: "telecommunications", label: "Telecommunications" },
+      { value: "media_entertainment", label: "Media & Entertainment" },
+    ],
+  },
+  {
+    group: "Public Sector & Non-Profit",
+    options: [
+      { value: "government_federal", label: "Government (Federal)" },
+      { value: "government_state_local", label: "Government (State & Local)" },
+      { value: "defense_contractors", label: "Defense / Government Contractors" },
+      { value: "nonprofit_ngo", label: "Non-Profit / NGO" },
+    ],
+  },
+  {
+    group: "Professional Services",
+    options: [
+      { value: "consulting_services", label: "Consulting Services" },
+      { value: "legal_services", label: "Legal Services" },
+      { value: "accounting_audit", label: "Accounting / Audit" },
+    ],
+  },
 ];
 
 const AI_USE_CASES = [
@@ -815,10 +883,14 @@ export default function AssessmentPage() {
                   className="form-input"
                 >
                   <option value="">Select industry...</option>
-                  {INDUSTRIES.map((i) => (
-                    <option key={i.value} value={i.value}>
-                      {i.label}
-                    </option>
+                  {INDUSTRY_GROUPS.map((g) => (
+                    <optgroup key={g.group} label={g.group}>
+                      {g.options.map((i) => (
+                        <option key={i.value} value={i.value}>
+                          {i.label}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </Field>

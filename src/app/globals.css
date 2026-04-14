@@ -34,20 +34,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1 {
-  color: var(--rlk-navy);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
+@layer base {
+  h1 {
+    color: var(--rlk-navy);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
 
-h2 {
-  color: var(--rlk-secondary);
-  font-weight: 600;
-}
+  h2 {
+    color: var(--rlk-secondary);
+    font-weight: 600;
+  }
 
-h3 {
-  color: var(--rlk-tertiary);
-  font-weight: 600;
+  h3 {
+    color: var(--rlk-tertiary);
+    font-weight: 600;
+  }
 }
 
 /* RLK Gradient Bar — decorative 5-segment header element */

@@ -321,7 +321,20 @@ function buildIndustryIntelligenceBlock(
     economic_translation: `Economic translation in ${industry} is complicated by attribution challenges. The most successful organizations have established "AI value offices" that standardize measurement methodology across business units.`,
   };
 
-  const intel = industryIntel[industry]?.[dimension] || fallback[dimension] || fallback['adoption_behavior'];
+  // Map new industry slugs to intelligence categories
+  const industryCategory: Record<string, string> = {
+    insurance: 'insurance',
+    banking: 'financial_services', capital_markets: 'financial_services',
+    asset_wealth_management: 'financial_services', investment_banking: 'financial_services',
+    private_equity: 'financial_services', venture_capital: 'financial_services',
+    hedge_funds: 'financial_services',
+    healthcare_providers: 'healthcare', healthcare_payers: 'healthcare',
+    healthcare_services: 'healthcare', life_sciences_pharma: 'healthcare',
+    software_saas: 'technology', it_services: 'technology',
+    hardware_electronics: 'technology',
+  };
+  const category = industryCategory[industry] || industry;
+  const intel = industryIntel[category]?.[dimension] || fallback[dimension] || fallback['adoption_behavior'];
 
   return `\n\nINDUSTRY INTELLIGENCE (from our research):\n${intel}\n\n` +
     'Reference specific companies, regulations, or market dynamics from this intelligence in your insight. ' +

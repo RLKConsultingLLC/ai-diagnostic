@@ -11,6 +11,7 @@ import type {
   EconomicEstimate,
 } from '@/types/diagnostic';
 import type { CompanyResearchProfile } from '@/types/research';
+import { DIAGNOSTIC_QUESTIONS } from '@/lib/diagnostic/questions';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -41,10 +42,52 @@ function formatCurrency(value: number): string {
 }
 
 function formatIndustryLabel(industry: string): string {
-  return industry
-    .split('_')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+  const labels: Record<string, string> = {
+    insurance: 'Insurance',
+    banking: 'Banking',
+    capital_markets: 'Capital Markets',
+    asset_wealth_management: 'Asset & Wealth Management',
+    investment_banking: 'Investment Banking / M&A Advisory',
+    private_equity: 'Private Equity',
+    venture_capital: 'Venture Capital',
+    hedge_funds: 'Hedge Funds',
+    healthcare_providers: 'Healthcare Providers',
+    healthcare_payers: 'Healthcare Payers',
+    healthcare_services: 'Healthcare Services',
+    life_sciences_pharma: 'Life Sciences / Pharmaceuticals',
+    retail: 'Retail',
+    ecommerce_digital: 'E-commerce / Digital Commerce',
+    cpg: 'Consumer Packaged Goods (CPG)',
+    dtc: 'Direct-to-Consumer (DTC)',
+    food_beverage: 'Food & Beverage',
+    manufacturing_discrete: 'Manufacturing (Discrete)',
+    manufacturing_process: 'Manufacturing (Process / Industrial)',
+    automotive: 'Automotive',
+    aerospace_defense: 'Aerospace & Defense',
+    energy_oil_gas: 'Energy (Oil & Gas)',
+    utilities: 'Utilities',
+    chemicals_materials: 'Chemicals & Materials',
+    industrial_services: 'Industrial Services',
+    software_saas: 'Software / SaaS',
+    it_services: 'IT Services / Managed Services',
+    hardware_electronics: 'Hardware / Electronics',
+    transportation: 'Transportation',
+    shipping_logistics: 'Shipping & Logistics',
+    infrastructure_transport: 'Infrastructure / Transportation Systems',
+    construction_engineering: 'Construction & Engineering',
+    real_estate_commercial: 'Real Estate (Commercial)',
+    real_estate_residential: 'Real Estate (Residential)',
+    telecommunications: 'Telecommunications',
+    media_entertainment: 'Media & Entertainment',
+    government_federal: 'Government (Federal)',
+    government_state_local: 'Government (State & Local)',
+    defense_contractors: 'Defense / Government Contractors',
+    nonprofit_ngo: 'Non-Profit / NGO',
+    consulting_services: 'Consulting Services',
+    legal_services: 'Legal Services',
+    accounting_audit: 'Accounting / Audit',
+  };
+  return labels[industry] || industry.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
 function serializeCompanyContext(profile: CompanyProfile): string {
@@ -56,7 +99,7 @@ COMPANY CONTEXT:
 - Employees: ${profile.employeeCount.toLocaleString()}
 - Public/Private: ${profile.publicOrPrivate}
 - Regulatory Intensity: ${profile.regulatoryIntensity}
-- Primary AI Use Cases: ${profile.primaryAIUseCases.join(', ')}`;
+- Primary AI Use Cases: ${profile.primaryAIUseCases?.join(', ') || 'Not specified'}`;
 }
 
 function serializeDimensionScores(scores: DimensionScore[]): string {
@@ -582,35 +625,101 @@ OUTPUT FORMAT:
 // ---------------------------------------------------------------------------
 
 export function ninetyDayActionPlanPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
-  const weakestDimension = [...result.dimensionScores].sort(
+  const sortedDimensions = [...result.dimensionScores].sort(
     (a, b) => a.normalizedScore - b.normalizedScore
-  )[0];
-  const strongestDimension = [...result.dimensionScores].sort(
-    (a, b) => b.normalizedScore - a.normalizedScore
-  )[0];
+  );
+  const weakestDimension = sortedDimensions[0];
+  const secondWeakest = sortedDimensions[1];
+  const strongestDimension = sortedDimensions[sortedDimensions.length - 1];
+
+  // Find the 5 lowest-scoring individual questions for hyper-specific action items
+  const lowestQuestions = [...result.responses]
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 5)
+    .map((r) => {
+      const q = DIAGNOSTIC_QUESTIONS.find((dq) => dq.id === r.questionId);
+      return q ? `- ${r.questionId} (score ${r.score}/5): "${q.text}" [${formatDimensionLabel(q.dimension)}]` : '';
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  // Find highest-scoring questions to identify strengths to leverage
+  const highestQuestions = [...result.responses]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((r) => {
+      const q = DIAGNOSTIC_QUESTIONS.find((dq) => dq.id === r.questionId);
+      return q ? `- ${r.questionId} (score ${r.score}/5): "${q.text}" [${formatDimensionLabel(q.dimension)}]` : '';
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  // Composite index context
+  const compositeContext = result.compositeIndices
+    .map((ci) => `- ${ci.name}: ${ci.score}/100 — ${ci.interpretation}`)
+    .join('\n');
+
+  const ind = formatIndustryLabel(result.companyProfile.industry);
+  const empCount = result.companyProfile.employeeCount;
+  const isSmall = empCount <= 100;
+  const isMid = empCount > 100 && empCount <= 1000;
+
+  // Size-specific guidance
+  const sizeContext = isSmall
+    ? `This is a small organization (${empCount} employees). Actions must be achievable without dedicated AI teams. The CEO or a senior partner likely owns most decisions. Skip recommendations that assume large IT departments, enterprise procurement processes, or dedicated AI governance staff. Focus on lightweight, high-leverage moves: a single AI champion, 1-2 tool pilots, and simple measurement.`
+    : isMid
+    ? `This is a mid-market organization (${empCount} employees). Actions should be scoped for teams of 1-3 leading AI initiatives, not enterprise-scale programs. Some formal governance is appropriate but heavy-weight enterprise frameworks (AI CoE with 10+ FTEs, multi-layer approval committees) will stall progress. Focus on agile, owner-driven execution.`
+    : `This is a large organization (${empCount.toLocaleString()} employees). Enterprise-scale governance, cross-functional AI councils, and formal change management are appropriate and necessary. Actions can assume dedicated AI teams, procurement processes, and multi-stakeholder governance.`;
 
   return {
     system: SYSTEM_MESSAGE,
-    user: `Write the 90-Day Action Plan for ${result.companyProfile.companyName}.
+    user: `Write the 90-Day Action Plan for ${result.companyProfile.companyName}, a ${ind} organization.
 
 This is the section the board will actually use. Every action must be executable, not aspirational.
+If an action would be generic across any industry, it does not belong in this plan. Every recommendation must reflect ${ind} specifically.
 
-Context for prioritization:
+COMPANY SIZE CONTEXT:
+${sizeContext}
+
+DIMENSION SCORES (sorted weakest → strongest):
+${sortedDimensions.map((d) => `- ${formatDimensionLabel(d.dimension)}: ${d.normalizedScore}/100`).join('\n')}
+
+COMPOSITE INDICES:
+${compositeContext}
+
+FIVE LOWEST-SCORING BEHAVIORAL QUESTIONS (these are the specific gaps to address):
+${lowestQuestions}
+
+THREE HIGHEST-SCORING QUESTIONS (these are strengths to leverage):
+${highestQuestions}
+
+PRIORITIZATION CONTEXT:
 - Weakest dimension: ${formatDimensionLabel(weakestDimension.dimension)} at ${weakestDimension.normalizedScore}/100
+- Second weakest: ${formatDimensionLabel(secondWeakest.dimension)} at ${secondWeakest.normalizedScore}/100
 - Strongest dimension: ${formatDimensionLabel(strongestDimension.dimension)} at ${strongestDimension.normalizedScore}/100
 - Current stage: ${result.stageClassification.primaryStage} ("${result.stageClassification.stageName}")
-- Unrealized value at stake: ${formatCurrency(result.economicEstimate.unrealizedValueLow)} – ${formatCurrency(result.economicEstimate.unrealizedValueHigh)}
-- Industry: ${formatIndustryLabel(result.companyProfile.industry)} with ${result.companyProfile.regulatoryIntensity} regulatory intensity
-- Company size: ${result.companyProfile.employeeCount.toLocaleString()} employees, ${formatCurrency(result.companyProfile.revenue)} revenue
+- Unrealized value: ${formatCurrency(result.economicEstimate.unrealizedValueLow)} to ${formatCurrency(result.economicEstimate.unrealizedValueHigh)}
+- Industry: ${ind} with ${result.companyProfile.regulatoryIntensity} regulatory intensity
+- Company size: ${empCount.toLocaleString()} employees, ${formatCurrency(result.companyProfile.revenue)} revenue
+- AI use cases they identified: ${result.companyProfile.primaryAIUseCases?.join(', ') || 'not specified'}
 
-Produce 3-5 prioritized actions. Each action MUST include:
-- A specific, measurable action (not "improve AI governance" but "appoint a Chief AI Officer reporting to the CEO and publish an AI acceptable-use policy within 30 days")
-- Owner by role (e.g., CIO, CFO, CHRO, CEO, Head of Data) — not by name
+INDUSTRY-SPECIFIC INSTRUCTIONS:
+You MUST make this plan unmistakably specific to ${ind}. For each action:
+1. Explain WHY this action matters specifically in ${ind} (not in general). Reference industry-specific dynamics, regulatory requirements, competitive pressures, or client expectations.
+2. If an action would be irrelevant, premature, or lower-priority in ${ind}, say so explicitly. For example: "In ${ind}, formal AI governance committees are [essential/premature/overkill] because [specific reason]."
+3. Reference specific tools, platforms, frameworks, or certifications relevant to ${ind}. Do not recommend generic "AI platforms" when you can name what ${ind} firms actually use.
+4. If the company's regulatory intensity is "${result.companyProfile.regulatoryIntensity}", calibrate governance recommendations accordingly. Heavy-regulation industries need compliance-first actions; light-regulation industries should not waste 90 days building governance when they could be deploying.
+5. Connect each action to the specific lowest-scoring questions above. The action should directly address the behavioral gap revealed by that question.
+
+Produce 4-6 prioritized actions. Each action MUST include:
+- A specific, measurable action tied to a specific lowest-scoring question (not "improve AI governance" but "appoint a Chief AI Officer reporting to the CEO and publish an AI acceptable-use policy within 30 days, directly addressing the governance vacuum revealed by your score of ${weakestDimension.normalizedScore}/100 in ${formatDimensionLabel(weakestDimension.dimension)}")
+- Owner by role (e.g., CIO, CFO, CHRO, CEO, Head of Data, Managing Partner, Practice Lead) — use titles appropriate for ${ind}
 - Timeframe within the 90-day window (Days 1-30, Days 31-60, Days 61-90)
-- Expected outcome with a measurable indicator
+- Expected outcome with a measurable indicator specific to ${ind}
+- A 1-2 sentence "${ind} context" note explaining why this specific action matters more (or less) in this industry than in others
 - Connection to which dimension or constraint this action addresses
 
-Prioritize based on: (1) highest financial impact, (2) lowest implementation friction, (3) addresses the weakest dimension. Front-load quick wins in Days 1-30.
+Prioritize based on: (1) highest financial impact given their ${formatCurrency(result.companyProfile.revenue)} revenue, (2) lowest implementation friction for a ${empCount}-person organization, (3) addresses the specific lowest-scoring questions above. Front-load quick wins in Days 1-30.
 
 DIAGNOSTIC DATA:
 ${buildDiagnosticDataBlock(result, research)}
@@ -618,9 +727,9 @@ ${buildDiagnosticDataBlock(result, research)}
 OUTPUT FORMAT:
 - Markdown starting with H2: ## 90-Day Action Plan
 - Number each action (### Action 1: [Title], ### Action 2: [Title], etc.)
-- Within each action, use bold labels: **Owner:**, **Timeframe:**, **Expected Outcome:**, **Addresses:**
-- 500-700 words total
-- Close with a single paragraph on how to track progress and when to reassess.`,
+- Within each action, use bold labels: **Owner:**, **Timeframe:**, **Expected Outcome:**, **Addresses:**, **${ind} Context:**
+- 700-900 words total
+- Close with a single paragraph on how to track progress and when to reassess, referencing their specific composite index scores as leading indicators.`,
   };
 }
 
@@ -659,9 +768,9 @@ export const SECTION_ORDER: string[] = [
   'executive-summary',
   'ai-posture-diagnosis',
   'structural-constraints',
+  'competitive-positioning',
   'financial-impact',
   'pnl-business-case',
-  'competitive-positioning',
   'security-governance-risk',
   'vendor-landscape',
   '90-day-action-plan',

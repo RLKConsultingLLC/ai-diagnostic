@@ -40,26 +40,58 @@ export interface CompanyProfile {
 }
 
 export type Industry =
-  | 'financial_services'
+  // Financial Services
   | 'insurance'
-  | 'healthcare'
-  | 'manufacturing'
-  | 'technology'
-  | 'retail_ecommerce'
-  | 'consumer_retail'
-  | 'professional_services'
-  | 'energy_utilities'
-  | 'federal_government'
-  | 'state_local_government'
-  | 'nonprofit'
-  | 'education'
-  | 'media_entertainment'
-  | 'shipping_logistics'
+  | 'banking'
+  | 'capital_markets'
+  | 'asset_wealth_management'
+  | 'investment_banking'
+  | 'private_equity'
+  | 'venture_capital'
+  | 'hedge_funds'
+  // Healthcare & Life Sciences
+  | 'healthcare_providers'
+  | 'healthcare_payers'
+  | 'healthcare_services'
+  | 'life_sciences_pharma'
+  // Consumer & Retail
+  | 'retail'
+  | 'ecommerce_digital'
+  | 'cpg'
+  | 'dtc'
+  | 'food_beverage'
+  // Industrial & Energy
+  | 'manufacturing_discrete'
+  | 'manufacturing_process'
+  | 'automotive'
   | 'aerospace_defense'
+  | 'energy_oil_gas'
+  | 'utilities'
+  | 'chemicals_materials'
+  | 'industrial_services'
+  // Technology
+  | 'software_saas'
+  | 'it_services'
+  | 'hardware_electronics'
+  // Infrastructure & Logistics
+  | 'transportation'
+  | 'shipping_logistics'
+  | 'infrastructure_transport'
+  | 'construction_engineering'
+  | 'real_estate_commercial'
+  | 'real_estate_residential'
+  // Media & Telecom
   | 'telecommunications'
-  | 'hospitality_travel'
-  | 'real_estate'
-  | 'other';
+  | 'media_entertainment'
+  // Public Sector & Non-Profit
+  | 'government_federal'
+  | 'government_state_local'
+  | 'defense_contractors'
+  | 'nonprofit_ngo'
+  // Professional Services
+  | 'consulting_services'
+  | 'legal_services'
+  | 'accounting_audit';
 
 export interface AssessmentResponse {
   questionId: string;

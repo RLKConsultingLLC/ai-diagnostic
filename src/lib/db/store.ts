@@ -8,9 +8,38 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import type { AssessmentSession, CompanyProfile } from '@/types/diagnostic';
+import type { AssessmentSession, CompanyProfile, Industry } from '@/types/diagnostic';
 
 const DATA_DIR = path.join(process.cwd(), 'data', 'sessions');
+
+// ---------------------------------------------------------------------------
+// Backward compatibility: map old industry slugs to new ones
+// ---------------------------------------------------------------------------
+
+const INDUSTRY_SLUG_MIGRATION: Record<string, Industry> = {
+  retail_consumer: 'retail',
+  technology_software: 'software_saas',
+  technology_hardware: 'hardware_electronics',
+  real_estate_property: 'real_estate_commercial',
+  professional_services: 'consulting_services',
+  travel_hospitality: 'retail',                // closest match
+  education_higher: 'consulting_services',     // closest match
+  education_k12: 'consulting_services',        // closest match
+};
+
+function normalizeSession(session: AssessmentSession): AssessmentSession {
+  const oldIndustry = session.companyProfile?.industry;
+  if (oldIndustry && INDUSTRY_SLUG_MIGRATION[oldIndustry]) {
+    return {
+      ...session,
+      companyProfile: {
+        ...session.companyProfile,
+        industry: INDUSTRY_SLUG_MIGRATION[oldIndustry],
+      },
+    };
+  }
+  return session;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -51,7 +80,7 @@ export async function getSession(
 ): Promise<AssessmentSession | null> {
   try {
     const raw = await fs.readFile(sessionPath(id), 'utf-8');
-    return JSON.parse(raw) as AssessmentSession;
+    return normalizeSession(JSON.parse(raw) as AssessmentSession);
   } catch (err: unknown) {
     if (err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'ENOENT') {
       return null;

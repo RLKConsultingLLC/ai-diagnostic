@@ -15,6 +15,7 @@ import {
   SECTION_TITLES,
   SECTION_ORDER,
 } from '@/lib/ai/prompts';
+import { deduplicateReport } from '@/lib/ai/postProcess';
 
 // ---------------------------------------------------------------------------
 // Client singleton
@@ -99,7 +100,10 @@ export async function generateFullReport(
     }
   );
 
-  const sections = await Promise.all(sectionPromises);
+  const rawSections = await Promise.all(sectionPromises);
+
+  // Post-generation quality pass: deduplicate, fix typos, ensure consistency
+  const sections = await deduplicateReport(rawSections);
 
   return {
     id: uuidv4(),
