@@ -57,7 +57,7 @@ export async function createCheckoutSession(
           currency: 'usd',
           unit_amount: DEFAULT_PRICE_CENTS,
           product_data: {
-            name: 'RLK AI Board Brief | Diagnostic Report',
+            name: 'RLK AI Diagnostic | Full Report',
             description: `AI readiness diagnostic report for ${companyName}`,
           },
         },

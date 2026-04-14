@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Diagnostic Engine Orchestrator
+// RLK AI Diagnostic — Diagnostic Engine Orchestrator
 // =============================================================================
 // Main entry point that runs the full diagnostic pipeline:
 //   responses → dimension scores → indices → stage → economics → result

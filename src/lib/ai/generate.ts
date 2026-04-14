@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Report Generation via Claude API
+// RLK AI Diagnostic — Report Generation via Claude API
 // =============================================================================
 
 import Anthropic from '@anthropic-ai/sdk';

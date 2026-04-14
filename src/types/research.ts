@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Company Research Enrichment Types
+// RLK AI Diagnostic — Company Research Enrichment Types
 // =============================================================================
 // Background research runs while the customer takes the diagnostic.
 // Claude enriches their profile using public data: SEC filings, news,

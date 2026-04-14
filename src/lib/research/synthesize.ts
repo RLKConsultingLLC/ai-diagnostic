@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Claude Research Synthesis Engine
+// RLK AI Diagnostic — Claude Research Synthesis Engine
 // =============================================================================
 // Takes raw research data and uses Claude to synthesize it into a structured
 // CompanyResearchProfile. This is what makes the report feel like a $50K

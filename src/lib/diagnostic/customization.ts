@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Customization Engine
+// RLK AI Diagnostic — Customization Engine
 // =============================================================================
 // Adapts diagnostic behavior based on industry, company size, regulatory
 // intensity, and functional AI usage. Controls question weighting,

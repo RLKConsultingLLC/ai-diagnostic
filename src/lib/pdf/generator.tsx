@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — PDF Report Generator
+// RLK AI Diagnostic — PDF Report Generator
 // =============================================================================
 // Renders a branded, multi-page diagnostic report using @react-pdf/renderer.
 // Designed to match RLK Consulting letterhead exactly.
@@ -884,7 +884,7 @@ function CoverPage({
       <GradientBar tall />
       <View style={s.coverContent}>
         <Text style={s.coverCompanyName}>RLK CONSULTING</Text>
-        <Text style={s.coverTitle}>AI Board Brief</Text>
+        <Text style={s.coverTitle}>AI Diagnostic</Text>
         <Text style={s.coverSubtitle}>
           Organizational AI Readiness Diagnostic
         </Text>
@@ -1068,7 +1068,7 @@ function AboutPage(): React.JSX.Element {
           measurable business value.
         </Text>
         <Text style={s.aboutText}>
-          Our AI Board Brief diagnostic is designed to give organizational
+          Our AI Diagnostic is designed to give organizational
           leaders the same caliber of AI readiness analysis that Fortune 100
           companies receive from top-tier strategy firms, made accessible,
           actionable, and specific to your organization.
@@ -1144,10 +1144,10 @@ function ReportDocument({
 
   return (
     <Document
-      title={`AI Board Brief | ${report.companyProfile.companyName}`}
+      title={`RLK AI Diagnostic | ${report.companyProfile.companyName}`}
       author="RLK Consulting, LLC"
       subject="AI Readiness Diagnostic Report"
-      creator="RLK Consulting AI Board Brief"
+      creator="RLK Consulting AI Diagnostic"
       producer="RLK Consulting"
     >
       {/* Page 1: Cover */}

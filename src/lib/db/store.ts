@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — File-Based Session Store
+// RLK AI Diagnostic — File-Based Session Store
 // =============================================================================
 // MVP persistence layer: one JSON file per AssessmentSession in data/sessions/.
 // Swap this out for a real database when ready.

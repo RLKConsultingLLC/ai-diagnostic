@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Economic Value Estimation Model
+// RLK AI Diagnostic — Economic Value Estimation Model
 // =============================================================================
 // Calculates unrealized AI value based on company profile, stage, and
 // industry benchmarks. Produces board-ready financial framing.

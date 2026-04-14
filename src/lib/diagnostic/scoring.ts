@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Scoring Engine
+// RLK AI Diagnostic — Scoring Engine
 // =============================================================================
 // Computes dimension scores, composite indices, and normalizes to 0–100 scale.
 // =============================================================================

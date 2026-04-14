@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Public Data Source Fetchers
+// RLK AI Diagnostic — Public Data Source Fetchers
 // =============================================================================
 // Fetches company data from public sources: SEC EDGAR, news APIs, etc.
 // Each fetcher returns structured data that feeds into Claude synthesis.

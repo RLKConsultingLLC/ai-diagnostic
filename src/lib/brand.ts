@@ -10,7 +10,7 @@ export const BRAND = {
   legalName: 'RLK Consulting, LLC',
   tagline: 'AI Strategy & Transformation',
   website: 'rlkconsultingco.com',
-  productName: 'AI Board Brief',
+  productName: 'AI Diagnostic',
 
   // Color palette — from letterhead gradient bar + heading styles
   colors: {

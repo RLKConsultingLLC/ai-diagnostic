@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Background Research Engine
+// RLK AI Diagnostic — Background Research Engine
 // =============================================================================
 // Orchestrates the full research pipeline. Runs in the background while
 // the customer completes the diagnostic assessment.

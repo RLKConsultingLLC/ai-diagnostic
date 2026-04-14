@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Prompt Templates for Narrative Generation
+// RLK AI Diagnostic — Prompt Templates for Narrative Generation
 // =============================================================================
 
 import type {
@@ -384,7 +384,56 @@ OUTPUT FORMAT:
 }
 
 // ---------------------------------------------------------------------------
-// 5. Competitive Positioning
+// 5. P&L Business Case
+// ---------------------------------------------------------------------------
+
+export function pnlBusinessCasePrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
+  const econ = result.economicEstimate;
+  const stage = result.stageClassification.primaryStage;
+  const revenue = result.companyProfile.revenue;
+
+  const stageFrame = stage >= 4
+    ? `This is a HIGH scorer (Stage ${stage}). Frame the narrative around protecting their AI edge. What happens to their P&L if they coast? How quickly do competitors close the gap?`
+    : stage === 3
+    ? `This is a MID scorer (Stage 3) at the inflection point. The capture rate roughly doubles from Stage 3 to 4 (25% to 55%). Frame around the asymmetric upside of investing vs. the cost of standing still.`
+    : `This is a LOW scorer (Stage ${stage}). Frame around urgency and compounding damage. At ${econ.currentCapturePercent}% capture, they are forfeiting ${100 - econ.currentCapturePercent}% of AI-addressable value each year.`;
+
+  return {
+    system: SYSTEM_MESSAGE,
+    user: `Write the P&L Business Case section for ${result.companyProfile.companyName}. This section translates unrealized AI value into specific profit-and-loss outcomes that a CFO or board can evaluate.
+
+The diagnostic established:
+- Revenue: ${formatCurrency(revenue)}
+- Unrealized value: ${formatCurrency(econ.unrealizedValueLow)} to ${formatCurrency(econ.unrealizedValueHigh)} annually
+- Current capture rate: ${econ.currentCapturePercent}%
+- Stage: ${stage} ("${result.stageClassification.stageName}")
+- Industry: ${formatIndustryLabel(result.companyProfile.industry)}
+
+${stageFrame}
+
+Write specific P&L impacts across these categories:
+1. Revenue Growth: new revenue streams, faster time-to-market, customer experience improvements. Use their actual revenue to calculate dollar impacts (e.g., "a 2% revenue uplift equals ${formatCurrency(Math.round(revenue * 0.02))}").
+2. Operating Margin: automation, efficiency, error reduction. Quantify margin improvement in basis points and dollars.
+3. Cost Structure: how AI shifts the fixed/variable cost mix over 24 months. What does the structural cost advantage look like?
+4. Talent Economics: retention, attraction, productivity. AI-mature orgs see measurably lower turnover.
+5. Risk Quantification: compliance exposure, operational failures, shadow AI incidents.
+
+For EACH category, present both the invest scenario (what they gain) and the stand-still scenario (what they lose). Be specific with dollar amounts derived from their ${formatCurrency(revenue)} revenue base.${research ? '\n\nCompany-specific research data is available. Reference their actual competitive position, margins, and recent financial performance to make the business case more credible.' : ''}
+
+DIAGNOSTIC DATA:
+${buildDiagnosticDataBlock(result, research)}
+
+OUTPUT FORMAT:
+- Markdown starting with H2: ## The Business Case
+- Use H3 subheaders for each P&L category
+- 400-600 words total
+- Every paragraph must contain at least one specific dollar figure or percentage tied to their data
+- End with a one-sentence summary of total P&L impact range over 24 months.`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 6. Competitive Positioning
 // ---------------------------------------------------------------------------
 
 export function competitivePositioningPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
@@ -587,6 +636,7 @@ export const SECTION_PROMPTS: Record<
   'ai-posture-diagnosis': aiPostureDiagnosisPrompt,
   'structural-constraints': structuralConstraintsPrompt,
   'financial-impact': financialImpactPrompt,
+  'pnl-business-case': pnlBusinessCasePrompt,
   'competitive-positioning': competitivePositioningPrompt,
   'security-governance-risk': securityGovernanceRiskPrompt,
   'vendor-landscape': vendorLandscapePrompt,
@@ -598,6 +648,7 @@ export const SECTION_TITLES: Record<string, string> = {
   'ai-posture-diagnosis': 'AI Posture Diagnosis',
   'structural-constraints': 'Structural Constraints',
   'financial-impact': 'Financial Impact',
+  'pnl-business-case': 'P&L Business Case',
   'competitive-positioning': 'Competitive Positioning',
   'security-governance-risk': 'Security & Governance Risk',
   'vendor-landscape': 'Vendor Landscape Analysis',
@@ -609,6 +660,7 @@ export const SECTION_ORDER: string[] = [
   'ai-posture-diagnosis',
   'structural-constraints',
   'financial-impact',
+  'pnl-business-case',
   'competitive-positioning',
   'security-governance-risk',
   'vendor-landscape',

@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Stage Classification Engine
+// RLK AI Diagnostic — Stage Classification Engine
 // =============================================================================
 // Classifies organizations into 5 stages of AI maturity using composite
 // indices and dimension scores. Handles mixed-stage nuance.

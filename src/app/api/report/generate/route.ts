@@ -1,7 +1,7 @@
 // =============================================================================
 // POST /api/report/generate
 // =============================================================================
-// Generates an AI-powered board brief report from a completed diagnostic.
+// Generates an AI-powered diagnostic report from a completed diagnostic.
 // Incorporates background research data (10-K, news, leadership intel) if
 // available — this is what makes the report feel deeply custom.
 // =============================================================================

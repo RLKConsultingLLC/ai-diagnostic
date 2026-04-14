@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Board Brief — Email Sender
+// RLK AI Diagnostic — Email Sender
 // =============================================================================
 // Sends diagnostic report emails via Resend. Reads RESEND_API_KEY from
 // environment variables. Wraps the template builder for a single-call API.

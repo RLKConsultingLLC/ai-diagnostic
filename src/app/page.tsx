@@ -50,7 +50,7 @@ export default function Home() {
               stays constrained by legacy structures.
             </p>
             <p className="text-lg text-foreground/70 leading-relaxed mb-10 max-w-2xl">
-              The AI Board Brief is the diagnostic that explains why. Built
+              This is the diagnostic that explains why. Built
               on the same frameworks Ryan King developed across a decade at
               McKinsey and Deloitte, it identifies the structural barriers
               preventing your AI investments from translating into enterprise
@@ -77,7 +77,7 @@ export default function Home() {
                 </svg>
               </Link>
               <span className="text-sm text-tertiary mt-2 sm:mt-3">
-                25 minutes. No tools audit. Just operating-model truth.
+                20 minutes. No tools audit. Just operating-model truth.
               </span>
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function Home() {
               Not another maturity assessment. A structural diagnosis.
             </h2>
             <p className="text-tertiary text-base max-w-2xl mx-auto">
-              The AI Board Brief measures five hidden dimensions that
+              The AI Diagnostic measures five hidden dimensions that
               determine whether your AI investments translate into
               enterprise value, or evaporate.
             </p>
@@ -287,13 +287,12 @@ export default function Home() {
                 It was built by a consultant who has done this work by hand.
               </h2>
               <p className="text-foreground/70 leading-relaxed mb-5">
-                Ryan King is the founder of RLK Consulting and author of{" "}
-                <em>The Human and Machine Company: Leadership, Work, and
-                Decision-Making in the Age of Intelligent Systems</em>{" "}
-                (2026). She has spent nearly 15 years in consulting,
-                including a decade across McKinsey &amp; Company and
-                Deloitte, advising CIOs, CTOs, and senior technology leaders
-                on strategy, performance, and organizational transformation.
+                Ryan King is the founder of RLK Consulting. She has spent
+                nearly 15 years in consulting, including a decade across
+                McKinsey &amp; Company and Deloitte, advising CIOs, CTOs,
+                and senior technology leaders on strategy, performance, and
+                organizational transformation. She is the author of{" "}
+                <em>The Human and Machine Company</em> (2026).
               </p>
               <p className="text-foreground/70 leading-relaxed mb-5">
                 Her work sits at the intersection of technology strategy
@@ -303,11 +302,11 @@ export default function Home() {
                 consumer retail, aerospace, and technology environments.
               </p>
               <p className="text-foreground/70 leading-relaxed mb-8">
-                The AI Board Brief diagnostic is a productized version of
-                the assessment Ryan has conducted by hand for enterprise
-                clients. The same frameworks, the same analytical rigor,
-                the same CIO-grade output. Delivered in 25 minutes instead
-                of 6 weeks, at a fraction of the cost.
+                This diagnostic is a productized version of the assessment
+                Ryan has conducted by hand for enterprise clients. The same
+                frameworks, the same analytical rigor, the same CIO-grade
+                output. Delivered in 20 minutes instead of 6 weeks, at a
+                fraction of the cost.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="bg-white p-5 border border-light flex-1">
@@ -331,7 +330,7 @@ export default function Home() {
             <div>
               <div className="bg-white border border-light p-8">
                 <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
-                  From the Book
+                  The Core Thesis
                 </p>
                 <blockquote className="text-lg text-secondary leading-relaxed italic mb-6">
                   &ldquo;Artificial intelligence is not failing inside large
@@ -345,7 +344,7 @@ export default function Home() {
                     Ryan L. King
                   </div>
                   <div className="text-xs text-tertiary">
-                    <em>The Human and Machine Company</em> (2026)
+                    RLK Consulting
                   </div>
                 </div>
               </div>
@@ -355,12 +354,11 @@ export default function Home() {
                   What This Diagnostic Measures
                 </p>
                 <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  The book&apos;s central argument: AI adoption follows a
-                  predictable progression. Individuals experiment.
-                  Organizations attempt to govern. Only later do some
-                  redesign workflows and decision authority. Most enterprises
-                  are stalled between governance and redesign, accumulating
-                  activity without structural impact.
+                  AI adoption follows a predictable progression. Individuals
+                  experiment. Organizations attempt to govern. Only later do
+                  some redesign workflows and decision authority. Most
+                  enterprises are stalled between governance and redesign,
+                  accumulating activity without structural impact.
                 </p>
                 <p className="text-sm text-foreground/70 leading-relaxed">
                   The diagnostic measures exactly where you are stalled,
@@ -423,7 +421,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl mb-3">How It Works</h2>
             <p className="text-tertiary text-base">
-              Three steps. Fifteen minutes. Board-level clarity.
+              Three steps. Twenty minutes. Board-level clarity.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-12">
@@ -495,7 +493,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-sm font-bold text-navy uppercase tracking-wide mb-2">
-                The AI Board Brief
+                The AI Diagnostic
               </h3>
               <ul className="text-sm text-foreground/80 space-y-2">
                 <li className="font-medium">
@@ -535,7 +533,7 @@ export default function Home() {
           </div>
           <div className="max-w-lg mx-auto bg-white border border-light p-10 text-center">
             <div className="text-sm font-semibold text-tertiary tracking-widest uppercase mb-4">
-              AI Board Brief Diagnostic
+              RLK AI Diagnostic
             </div>
             <div className="flex items-baseline justify-center gap-1 mb-2">
               <span className="text-5xl font-bold text-navy">$497</span>
