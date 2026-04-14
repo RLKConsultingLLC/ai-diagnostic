@@ -98,6 +98,22 @@ export interface AssessmentResponse {
   questionId: string;
   selectedOptionIndex: number;
   score: number;
+  durationMs?: number; // time spent on this question
+}
+
+export interface ResponseQualityMetrics {
+  totalDurationMs: number;
+  averageQuestionTimeMs: number;
+  fastResponseCount: number; // < 3 seconds
+  straightLineDetected: boolean; // same answer 10+ times in a row
+  qualityGrade: 'high' | 'acceptable' | 'low' | 'suspect';
+}
+
+export interface ConsistencyFlag {
+  questionPairIds: [string, string];
+  type: 'contradiction' | 'unlikely';
+  severity: 'high' | 'moderate';
+  explanation: string;
 }
 
 export interface DimensionScore {
@@ -125,6 +141,7 @@ export interface StageClassification {
   dimensionStages: Record<Dimension, StageNumber>;
   mixedStageNarrative: string;
   confidence: number; // 0–1, lower when dimensions diverge significantly
+  confidenceFactors?: Record<string, number>;
 }
 
 export interface EconomicSource {
@@ -156,6 +173,8 @@ export interface DiagnosticResult {
   stageClassification: StageClassification;
   economicEstimate: EconomicEstimate;
   overallScore: number; // 0–100 composite
+  responseQuality?: ResponseQualityMetrics;
+  consistencyFlags?: ConsistencyFlag[];
 }
 
 export interface ReportSection {

@@ -147,6 +147,35 @@ function serializeEconomicEstimate(econ: EconomicEstimate): string {
 - Industry Benchmark: ${econ.industryBenchmark}`;
 }
 
+function serializeResponseQuality(result: DiagnosticResult): string {
+  const sections: string[] = [];
+
+  if (result.responseQuality) {
+    const q = result.responseQuality;
+    sections.push(`RESPONSE QUALITY: Grade=${q.qualityGrade.toUpperCase()}`);
+    if (q.fastResponseCount > 0) {
+      sections.push(`- ${q.fastResponseCount} responses under 3 seconds`);
+    }
+    if (q.straightLineDetected) {
+      sections.push('- Straight-line pattern detected (10+ consecutive identical answers)');
+    }
+    if (q.qualityGrade === 'suspect' || q.qualityGrade === 'low') {
+      sections.push('NOTE: Response quality concerns detected. Weight self-reported data accordingly and rely more heavily on public research data where available.');
+    }
+  }
+
+  if (result.consistencyFlags && result.consistencyFlags.length > 0) {
+    sections.push('\nINTERNAL CONSISTENCY FLAGS:');
+    for (const flag of result.consistencyFlags) {
+      const label = flag.type === 'contradiction' ? 'CONTRADICTION' : 'UNLIKELY';
+      sections.push(`- [${label}/${flag.severity.toUpperCase()}] ${flag.explanation}`);
+    }
+    sections.push('NOTE: Reference these inconsistencies in your analysis where relevant. Do not ignore them.');
+  }
+
+  return sections.join('\n');
+}
+
 function buildDiagnosticDataBlock(result: DiagnosticResult, research?: CompanyResearchProfile): string {
   let block = `
 ${serializeCompanyContext(result.companyProfile)}
@@ -160,6 +189,11 @@ ${serializeCompositeIndices(result.compositeIndices)}
 ${serializeStageClassification(result.stageClassification)}
 
 ${serializeEconomicEstimate(result.economicEstimate)}`;
+
+  const qualityBlock = serializeResponseQuality(result);
+  if (qualityBlock) {
+    block += `\n\n${qualityBlock}`;
+  }
 
   if (research) {
     block += `\n\n${serializeResearchIntelligence(research)}`;

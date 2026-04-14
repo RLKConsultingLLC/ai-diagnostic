@@ -14,24 +14,36 @@ import {
 import { computeDimensionScores, computeAllIndices, computeOverallScore } from './scoring';
 import { classifyStage } from './stages';
 import { computeEconomicEstimate } from './economic';
+import { assessResponseQuality } from './quality';
+import { checkConsistency } from './consistency';
+import { DIAGNOSTIC_QUESTIONS } from './questions';
 
 export function runDiagnostic(
   responses: AssessmentResponse[],
   profile: CompanyProfile
 ): DiagnosticResult {
-  // Step 1: Compute dimension scores (industry-weighted)
+  // Step 1: Assess response quality and consistency
+  const responseQuality = assessResponseQuality(responses);
+  const consistencyFlags = checkConsistency(responses);
+
+  // Step 2: Compute dimension scores (industry-weighted)
   const dimensionScores = computeDimensionScores(responses, profile);
 
-  // Step 2: Compute composite indices (cross-dimension)
+  // Step 3: Compute composite indices (cross-dimension)
   const compositeIndices = computeAllIndices(responses);
 
-  // Step 3: Classify stage (uses both dimensions + indices)
-  const stageClassification = classifyStage(dimensionScores, compositeIndices);
+  // Step 4: Classify stage (uses dimensions + indices + quality signals)
+  const stageClassification = classifyStage(dimensionScores, compositeIndices, {
+    qualityMetrics: responseQuality,
+    consistencyFlags,
+    totalQuestions: DIAGNOSTIC_QUESTIONS.length,
+    answeredQuestions: responses.length,
+  });
 
-  // Step 4: Compute economic estimate
+  // Step 5: Compute economic estimate
   const economicEstimate = computeEconomicEstimate(profile, stageClassification);
 
-  // Step 5: Compute overall score
+  // Step 6: Compute overall score
   const overallScore = computeOverallScore(dimensionScores);
 
   return {
@@ -44,5 +56,7 @@ export function runDiagnostic(
     stageClassification,
     economicEstimate,
     overallScore,
+    responseQuality,
+    consistencyFlags,
   };
 }

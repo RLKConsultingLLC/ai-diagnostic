@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type {
@@ -164,8 +164,11 @@ export default function AssessmentPage() {
 
   // -- Question responses keyed by question id
   const [responses, setResponses] = useState<
-    Record<string, { optionIndex: number; score: number }>
+    Record<string, { optionIndex: number; score: number; durationMs?: number }>
   >({});
+
+  // -- Track when each question was first displayed for timing
+  const questionStartRef = useRef<number>(Date.now());
 
   // -- Insight cache: dimension -> insight text
   const [insightCache, setInsightCache] = useState<
@@ -249,6 +252,11 @@ export default function AssessmentPage() {
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  // Reset question timer when current question changes
+  useEffect(() => {
+    questionStartRef.current = Date.now();
+  }, [currentDimIndex, currentQInDim]);
+
   // ---------- Handlers ----------
 
   const toggleUseCase = useCallback((uc: string) => {
@@ -260,13 +268,17 @@ export default function AssessmentPage() {
   const selectOption = useCallback(
     (optionIndex: number) => {
       if (!currentQuestion) return;
+      const durationMs = Date.now() - questionStartRef.current;
       setResponses((prev) => ({
         ...prev,
         [currentQuestion.id]: {
           optionIndex,
           score: currentQuestion.options[optionIndex].score,
+          durationMs,
         },
       }));
+      // Reset timer for the next question
+      questionStartRef.current = Date.now();
     },
     [currentQuestion]
   );
@@ -513,6 +525,7 @@ export default function AssessmentPage() {
       questionId: q.id,
       selectedOptionIndex: responses[q.id].optionIndex,
       score: responses[q.id].score,
+      durationMs: responses[q.id].durationMs,
     }));
 
     try {

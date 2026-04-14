@@ -7,8 +7,10 @@
 
 import {
   CompositeIndex,
+  ConsistencyFlag,
   Dimension,
   DimensionScore,
+  ResponseQualityMetrics,
   StageClassification,
   StageNumber,
 } from '@/types/diagnostic';
@@ -96,9 +98,17 @@ function classifyDimensionStage(score: number): StageNumber {
 // This prevents high-performing areas from masking critical weaknesses.
 // ---------------------------------------------------------------------------
 
+export interface ClassifyStageOptions {
+  qualityMetrics?: ResponseQualityMetrics;
+  consistencyFlags?: ConsistencyFlag[];
+  totalQuestions?: number;
+  answeredQuestions?: number;
+}
+
 export function classifyStage(
   dimensionScores: DimensionScore[],
-  compositeIndices: CompositeIndex[]
+  compositeIndices: CompositeIndex[],
+  options?: ClassifyStageOptions
 ): StageClassification {
   // Compute dimension average
   const dimAvg =
@@ -137,9 +147,8 @@ export function classifyStage(
   const minStage = Math.min(...stageValues);
   const spread = maxStage - minStage;
 
-  // Confidence: 1.0 when all dimensions align, decreasing with spread
-  // Floor at 0.82 — report methodology is rigorous enough to support 82%+ even with mixed dimensions
-  const confidence = Math.max(0.82, 1.0 - spread * 0.05);
+  // Compute multi-factor confidence
+  const { confidence, confidenceFactors } = computeConfidence(spread, options);
 
   // Build mixed-stage narrative
   const mixedStageNarrative = buildMixedStageNarrative(
@@ -158,7 +167,64 @@ export function classifyStage(
     dimensionStages,
     mixedStageNarrative,
     confidence,
+    confidenceFactors,
   };
+}
+
+// ---------------------------------------------------------------------------
+// MULTI-FACTOR CONFIDENCE CALCULATION
+// ---------------------------------------------------------------------------
+
+function computeConfidence(
+  spread: number,
+  options?: ClassifyStageOptions
+): { confidence: number; confidenceFactors: Record<string, number> } {
+  const factors: Record<string, number> = {};
+
+  // Base: 1.0
+  let score = 1.0;
+
+  // Factor 1: Dimension spread (-0.05 per stage of spread)
+  const spreadPenalty = spread * 0.05;
+  score -= spreadPenalty;
+  factors.dimensionSpread = -spreadPenalty;
+
+  // Factor 2: Response quality grade
+  if (options?.qualityMetrics) {
+    const qualityPenalties: Record<string, number> = {
+      high: 0,
+      acceptable: 0.03,
+      low: 0.08,
+      suspect: 0.15,
+    };
+    const qp = qualityPenalties[options.qualityMetrics.qualityGrade] || 0;
+    score -= qp;
+    factors.responseQuality = -qp;
+  }
+
+  // Factor 3: Consistency flags
+  if (options?.consistencyFlags && options.consistencyFlags.length > 0) {
+    const highFlags = options.consistencyFlags.filter((f) => f.severity === 'high').length;
+    const modFlags = options.consistencyFlags.filter((f) => f.severity === 'moderate').length;
+    const cp = highFlags * 0.03 + modFlags * 0.01;
+    score -= cp;
+    factors.consistencyFlags = -cp;
+  }
+
+  // Factor 4: Answer completeness
+  if (options?.totalQuestions && options?.answeredQuestions) {
+    const missing = options.totalQuestions - options.answeredQuestions;
+    if (missing > 0) {
+      const mp = missing * 0.02;
+      score -= mp;
+      factors.answerCompleteness = -mp;
+    }
+  }
+
+  // Floor at 0.65 to allow genuinely low confidence for suspect data
+  // but never go below 65% — the structural methodology still has value
+  const confidence = Math.max(0.65, score);
+  return { confidence, confidenceFactors: factors };
 }
 
 // ---------------------------------------------------------------------------
