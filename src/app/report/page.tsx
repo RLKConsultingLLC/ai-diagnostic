@@ -43,11 +43,15 @@ function ReportPage() {
   const sessionId = params.get("sessionId");
 
   const isDemo = params.get("demo") === "true";
+  const stripeSession = params.get("stripe_session");
   const [phase, setPhase] = useState<Phase>("loading");
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [report, setReport] = useState<GeneratedReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   // Fetch session data first (diagnostic results), then try report generation
   useEffect(() => {
@@ -67,8 +71,9 @@ function ReportPage() {
           const sessionData = await sessionRes.json();
           if (!cancelled && sessionData.session?.diagnosticResult) {
             setResult(sessionData.session.diagnosticResult);
-            // In demo mode, skip paywall and show full report immediately
-            if (isDemo) {
+            // In demo mode or paid session, skip paywall and show full report
+            const isPaid = sessionData.session.status === "paid";
+            if (isDemo || isPaid) {
               setPhase("full");
             } else {
               setPhase("preview");
@@ -80,6 +85,25 @@ function ReportPage() {
         }
       } catch {
         // Session fetch failed, continue to report generation
+      }
+
+      // Step 1.5: If returning from Stripe checkout, verify payment
+      if (stripeSession && !cancelled) {
+        try {
+          const verifyRes = await fetch("/api/payment/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ stripeSessionId: stripeSession }),
+          });
+          if (verifyRes.ok) {
+            const verifyData = await verifyRes.json();
+            if (verifyData.paid) {
+              setPhase("full");
+            }
+          }
+        } catch {
+          // Verification failed — webhook will handle it eventually
+        }
       }
 
       // Step 2: Try to generate the AI report (requires ANTHROPIC_API_KEY)
@@ -96,30 +120,35 @@ function ReportPage() {
           if (data.report?.companyProfile) {
             setResult((prev) => prev ? { ...prev, companyProfile: data.report.companyProfile } : prev);
           }
-          setPhase(isDemo || data.paid ? "full" : "preview");
+          setPhase((isDemo || data.paid) ? "full" : "preview");
         } else {
           // Report generation failed but we still have diagnostic data
-          if (!cancelled) setPhase(isDemo ? "full" : "preview");
+          // Don't downgrade from "full" if already set (e.g., paid session)
+          if (!cancelled) setPhase((p) => p === "full" ? "full" : (isDemo ? "full" : "preview"));
         }
       } catch {
-        if (!cancelled) setPhase(isDemo ? "full" : "preview");
+        if (!cancelled) setPhase((p) => p === "full" ? "full" : (isDemo ? "full" : "preview"));
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [sessionId, isDemo]);
+  }, [sessionId, isDemo, stripeSession]);
 
   // Payment handler
   const handleCheckout = useCallback(async () => {
-    if (!sessionId) return;
+    if (!sessionId || !result) return;
     setCheckoutLoading(true);
     try {
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({
+          assessmentId: sessionId,
+          companyName: result.companyProfile.companyName,
+          email: result.companyProfile.executiveEmail || "",
+        }),
       });
       if (!res.ok) throw new Error("Checkout failed.");
       const data = await res.json();
@@ -130,7 +159,32 @@ function ReportPage() {
       setError("Unable to start checkout. Please try again.");
       setCheckoutLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, result]);
+
+  // Promo code handler
+  const handlePromoCode = useCallback(async () => {
+    if (!sessionId || !promoCode.trim()) return;
+    setPromoLoading(true);
+    setPromoError(null);
+    try {
+      const res = await fetch("/api/payment/bypass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, promoCode: promoCode.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPromoError(data.error || "Invalid promo code");
+        setPromoLoading(false);
+        return;
+      }
+      // Success — reload the page to show the full report
+      window.location.reload();
+    } catch {
+      setPromoError("Unable to verify promo code. Please try again.");
+      setPromoLoading(false);
+    }
+  }, [sessionId, promoCode]);
 
   // ---------- Loading state ----------
   if (phase === "loading") {
@@ -198,30 +252,41 @@ function ReportPage() {
 
       {/* Overall Score Hero */}
       {result && (
-        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div>
-              <p className="text-[11px] font-semibold text-navy/50 tracking-[0.3em] uppercase mb-2">
-                {result.companyProfile.companyName}
-              </p>
-              <h1 className="text-3xl md:text-4xl font-bold text-navy tracking-tight mb-2">
-                AI Maturity Diagnostic
-              </h1>
-              <p className="text-sm text-foreground/40 leading-relaxed mb-3 max-w-md">
-                Framework developed by Ryan King across a decade advising CIOs
-                and technology executives at McKinsey, Deloitte, and now at RLK
-                Consulting.
-              </p>
-              <p className="text-sm text-foreground/40 font-medium">
+        <section className="bg-white border border-light overflow-hidden mb-10 shadow-sm">
+          {/* Decorative top gradient bar */}
+          <div className="h-1.5 bg-gradient-to-r from-navy via-navy/70 to-navy/30" />
+
+          <div className="px-6 md:px-10 lg:px-14 pt-10 md:pt-14 pb-8 md:pb-10 text-center">
+            {/* Company name */}
+            <p className="text-[11px] md:text-xs font-semibold text-navy/40 tracking-[0.35em] uppercase mb-3">
+              Prepared for
+            </p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-navy tracking-tight mb-1">
+              {result.companyProfile.companyName}
+            </h1>
+            <div className="mx-auto w-12 h-px bg-navy/15 my-5" />
+            <h2 className="text-base md:text-lg font-semibold text-navy/70 tracking-wide uppercase mb-8">
+              AI Maturity Diagnostic
+            </h2>
+
+            {/* Score gauge — centered hero element */}
+            <div className="mb-8">
+              <ScoreGauge score={result.overallScore} />
+            </div>
+
+            {/* Meta line */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs text-foreground/35">
+              <span>
                 Completed{" "}
                 {new Date(result.completedAt).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
                 })}
-              </p>
+              </span>
+              <span className="hidden sm:inline text-foreground/15">|</span>
+              <span>RLK Consulting Framework</span>
             </div>
-            <ScoreGauge score={result.overallScore} />
           </div>
         </section>
       )}
@@ -526,7 +591,35 @@ function ReportPage() {
                 Secure payment via Stripe. Includes downloadable PDF
                 formatted for executive review.
               </p>
-              <p className="text-white/30 text-xs mt-2">
+
+              {/* Promo code input */}
+              <div className="mt-6 pt-5 border-t border-white/10">
+                <p className="text-white/40 text-[10px] tracking-widest uppercase mb-2">
+                  Have a promo code?
+                </p>
+                <div className="flex items-center justify-center gap-2 max-w-xs mx-auto">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(null); }}
+                    onKeyDown={(e) => e.key === "Enter" && handlePromoCode()}
+                    placeholder="Enter code"
+                    className="bg-white/10 border border-white/20 text-white text-xs px-3 py-2 flex-1 placeholder:text-white/30 focus:outline-none focus:border-white/40"
+                  />
+                  <button
+                    onClick={handlePromoCode}
+                    disabled={promoLoading || !promoCode.trim()}
+                    className="bg-white/15 border border-white/20 text-white text-xs px-4 py-2 font-semibold hover:bg-white/25 transition-colors disabled:opacity-40"
+                  >
+                    {promoLoading ? "..." : "Apply"}
+                  </button>
+                </div>
+                {promoError && (
+                  <p className="text-red-300 text-[11px] mt-2">{promoError}</p>
+                )}
+              </div>
+
+              <p className="text-white/30 text-xs mt-4">
                 Built on frameworks honed across years of advising CIOs and
                 technology executives at McKinsey, Deloitte, and now at RLK
                 Consulting.
@@ -2248,18 +2341,18 @@ function ScoreGauge({ score }: { score: number }) {
   return (
     <div className="flex flex-col items-center">
       <div
-        className="w-28 h-28 rounded-full border-[6px] flex items-center justify-center"
+        className="w-32 h-32 md:w-36 md:h-36 rounded-full border-[6px] flex items-center justify-center shadow-[0_0_0_6px_rgba(11,29,58,0.04)]"
         style={{ borderColor: color }}
       >
         <div className="text-center">
-          <div className="text-3xl font-bold" style={{ color }}>
+          <div className="text-4xl md:text-5xl font-bold" style={{ color }}>
             {score}
           </div>
           <div className="text-[10px] text-tertiary -mt-0.5">/ 100</div>
         </div>
       </div>
       <div
-        className="mt-2 text-xs font-semibold tracking-wider uppercase"
+        className="mt-3 text-xs font-semibold tracking-[0.2em] uppercase"
         style={{ color }}
       >
         {label}
@@ -3235,52 +3328,74 @@ function CompetitiveMatrix({
             style={{ aspectRatio: "1 / 1" }}
           >
             <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-              {quadrants.map((q) => (
-                <div
-                  key={q.label}
-                  className="relative flex flex-col items-center justify-center p-3 border border-light/50"
-                  style={{
-                    backgroundColor: q.bg,
-                    gridRow: q.row + 1,
-                    gridColumn: q.col + 1,
-                  }}
-                >
-                  {/* Quadrant label with solid background so it's always readable */}
-                  <div className="z-20 px-2 py-1 rounded" style={{ backgroundColor: q.bg }}>
-                    <p className="text-xs font-semibold text-secondary text-center leading-tight">
-                      {q.label}
-                    </p>
-                    <p className="text-[9px] text-tertiary text-center mt-0.5">
-                      {q.sublabel}
-                    </p>
+              {quadrants.map((q) => {
+                // Position labels at far corners so they never overlap the company dot
+                // Top-left quadrant (row 0, col 0) → label top-left
+                // Top-right quadrant (row 0, col 1) → label top-right
+                // Bottom-left quadrant (row 1, col 0) → label bottom-left
+                // Bottom-right quadrant (row 1, col 1) → label bottom-right
+                const alignItems = q.col === 0 ? "items-start" : "items-end";
+                const justifyContent = q.row === 0 ? "justify-start" : "justify-end";
+                const textAlign = q.col === 0 ? "text-left" : "text-right";
+
+                return (
+                  <div
+                    key={q.label}
+                    className={`relative flex flex-col ${alignItems} ${justifyContent} p-2.5 md:p-3.5 border border-light/50`}
+                    style={{
+                      backgroundColor: q.bg,
+                      gridRow: q.row + 1,
+                      gridColumn: q.col + 1,
+                    }}
+                  >
+                    <div className="z-20">
+                      <p className={`text-[10px] md:text-xs font-semibold text-secondary ${textAlign} leading-tight`}>
+                        {q.label}
+                      </p>
+                      <p className={`text-[8px] md:text-[9px] text-tertiary ${textAlign} mt-0.5`}>
+                        {q.sublabel}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* Company position dot — label positioned to avoid quadrant text */}
+            {/* Company position dot — always placed in the interior of its quadrant */}
             {(() => {
-              // Determine label placement based on dot position
-              // If dot is near center of any quadrant, offset label to avoid overlapping quadrant title
-              const labelAbove = dotBottom < 45; // low on chart → show label above dot
+              // Nudge dot away from the center crosshairs (45-55% dead zone)
+              // and away from edges, keeping it clearly inside its quadrant
+              let x = dotLeft;
+              let y = dotBottom;
+              // If dot is very close to center axis, push it towards the interior
+              if (x >= 42 && x <= 58) x = x < 50 ? 38 : 62;
+              if (y >= 42 && y <= 58) y = y < 50 ? 38 : 62;
+              // Clamp to safe zone (12%-88%) so dot+label never clip the edge
+              x = Math.max(12, Math.min(88, x));
+              y = Math.max(12, Math.min(88, y));
+
+              // Position the company name label toward the center of the grid
+              // (opposite from where the quadrant label sits in the corner)
+              const labelAbove = y > 50;
               const labelStyle: React.CSSProperties = labelAbove
-                ? { bottom: "100%", left: "50%", transform: "translateX(-50%)", marginBottom: 4 }
-                : { top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 4 };
-              // If near the left or right edge, shift label horizontally
-              if (dotLeft < 20) {
+                ? { bottom: "100%", left: "50%", transform: "translateX(-50%)", marginBottom: 6 }
+                : { top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 6 };
+              // Prevent horizontal clipping
+              if (x < 25) {
                 labelStyle.left = 0;
                 labelStyle.transform = "none";
-              } else if (dotLeft > 80) {
+              } else if (x > 75) {
                 labelStyle.left = "auto";
                 labelStyle.right = 0;
                 labelStyle.transform = "none";
               }
+
               return (
                 <div
-                  className="absolute z-10"
+                  className="absolute z-30"
                   style={{
-                    left: `${dotLeft}%`,
-                    bottom: `${dotBottom}%`,
+                    left: `${x}%`,
+                    bottom: `${y}%`,
                     transform: "translate(-50%, 50%)",
                   }}
                 >
@@ -3293,7 +3408,7 @@ function CompetitiveMatrix({
                       }}
                     />
                     <div
-                      className="absolute px-2 py-0.5 text-[9px] font-bold text-white whitespace-nowrap"
+                      className="absolute px-2 py-0.5 text-[9px] font-bold text-white whitespace-nowrap rounded-sm"
                       style={{
                         backgroundColor: "#0B1D3A",
                         ...labelStyle,

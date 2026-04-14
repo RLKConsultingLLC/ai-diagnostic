@@ -38,8 +38,8 @@ export async function createCheckoutSession(
     mode: 'payment',
     customer_email: email,
     client_reference_id: assessmentId,
-    success_url: `${appUrl}/report?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/assessment?canceled=true`,
+    success_url: `${appUrl}/report?sessionId=${assessmentId}&stripe_session={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${appUrl}/report?sessionId=${assessmentId}&canceled=true`,
     metadata: {
       assessmentId,
       companyName,

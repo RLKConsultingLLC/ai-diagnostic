@@ -14,6 +14,7 @@
 // 3. By the time they finish, we have a deep company profile ready
 // =============================================================================
 
+import { Redis } from '@upstash/redis';
 import { CompanyProfile } from '@/types/diagnostic';
 import { ResearchJob, CompanyResearchProfile } from '@/types/research';
 import {
@@ -23,17 +24,32 @@ import {
   fetchCompanyWebContent,
 } from './sources';
 import { synthesizeResearchProfile } from './synthesize';
-import { promises as fs } from 'fs';
-import path from 'path';
 
-// In-memory job tracker (supplemented by file persistence)
-const activeJobs = new Map<string, ResearchJob>();
+// ---------------------------------------------------------------------------
+// Redis client (singleton, shared with store.ts pattern)
+// ---------------------------------------------------------------------------
 
-const DATA_DIR = path.join(process.cwd(), 'data', 'research');
+let _redis: Redis | null = null;
 
-async function ensureDataDir(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+function getRedis(): Redis {
+  if (!_redis) {
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) {
+      throw new Error(
+        'UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN must be set.'
+      );
+    }
+    _redis = new Redis({ url, token });
+  }
+  return _redis;
 }
+
+const RESEARCH_PREFIX = 'research:';
+const RESEARCH_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 days
+
+// In-memory job tracker for real-time progress during active research
+const activeJobs = new Map<string, ResearchJob>();
 
 // ---------------------------------------------------------------------------
 // PUBLIC API
@@ -82,16 +98,16 @@ export function startBackgroundResearch(
  * Get the current status of a research job.
  */
 export async function getResearchStatus(sessionId: string): Promise<ResearchJob | null> {
-  // Check in-memory first
+  // Check in-memory first (active jobs have real-time progress)
   const memJob = activeJobs.get(sessionId);
   if (memJob) return memJob;
 
-  // Check persisted
+  // Check Redis persistence
   try {
-    await ensureDataDir();
-    const filePath = path.join(DATA_DIR, `${sessionId}.json`);
-    const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data) as ResearchJob;
+    const redis = getRedis();
+    const raw = await redis.get<string>(`${RESEARCH_PREFIX}${sessionId}`);
+    if (!raw) return null;
+    return typeof raw === 'string' ? JSON.parse(raw) : (raw as unknown as ResearchJob);
   } catch {
     return null;
   }
@@ -185,15 +201,18 @@ async function executeResearch(
     `Confidence: ${researchProfile.confidenceLevel}`
   );
 
-  // Persist to disk
+  // Persist to Redis
   await persistJob(job);
 }
 
 async function persistJob(job: ResearchJob): Promise<void> {
   try {
-    await ensureDataDir();
-    const filePath = path.join(DATA_DIR, `${job.sessionId}.json`);
-    await fs.writeFile(filePath, JSON.stringify(job, null, 2));
+    const redis = getRedis();
+    await redis.set(
+      `${RESEARCH_PREFIX}${job.sessionId}`,
+      JSON.stringify(job),
+      { ex: RESEARCH_TTL_SECONDS }
+    );
   } catch (error) {
     console.error(`[Research] Failed to persist job ${job.sessionId}:`, error);
   }

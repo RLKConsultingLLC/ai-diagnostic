@@ -1,16 +1,37 @@
 // =============================================================================
-// RLK AI Diagnostic — File-Based Session Store
+// RLK AI Diagnostic — Redis Session Store (Upstash)
 // =============================================================================
-// MVP persistence layer: one JSON file per AssessmentSession in data/sessions/.
-// Swap this out for a real database when ready.
+// Serverless-compatible persistence via Upstash Redis REST API.
+// Each session is stored as a JSON string keyed by "session:{id}".
+// Sessions auto-expire after 30 days.
 // =============================================================================
 
-import { promises as fs } from 'fs';
-import path from 'path';
+import { Redis } from '@upstash/redis';
 import { v4 as uuidv4 } from 'uuid';
 import type { AssessmentSession, CompanyProfile, Industry } from '@/types/diagnostic';
 
-const DATA_DIR = path.join(process.cwd(), 'data', 'sessions');
+// ---------------------------------------------------------------------------
+// Redis client (singleton)
+// ---------------------------------------------------------------------------
+
+let _redis: Redis | null = null;
+
+function getRedis(): Redis {
+  if (!_redis) {
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) {
+      throw new Error(
+        'UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN must be set.'
+      );
+    }
+    _redis = new Redis({ url, token });
+  }
+  return _redis;
+}
+
+const SESSION_PREFIX = 'session:';
+const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 days
 
 // ---------------------------------------------------------------------------
 // Backward compatibility: map old industry slugs to new ones
@@ -22,9 +43,9 @@ const INDUSTRY_SLUG_MIGRATION: Record<string, Industry> = {
   technology_hardware: 'hardware_electronics',
   real_estate_property: 'real_estate_commercial',
   professional_services: 'consulting_services',
-  travel_hospitality: 'retail',                // closest match
-  education_higher: 'consulting_services',     // closest match
-  education_k12: 'consulting_services',        // closest match
+  travel_hospitality: 'retail',
+  education_higher: 'consulting_services',
+  education_k12: 'consulting_services',
 };
 
 function normalizeSession(session: AssessmentSession): AssessmentSession {
@@ -42,25 +63,13 @@ function normalizeSession(session: AssessmentSession): AssessmentSession {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function ensureDataDir(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-function sessionPath(id: string): string {
-  return path.join(DATA_DIR, `${id}.json`);
-}
-
-// ---------------------------------------------------------------------------
 // CRUD operations
 // ---------------------------------------------------------------------------
 
 export async function createSession(
   profile: CompanyProfile
 ): Promise<AssessmentSession> {
-  await ensureDataDir();
+  const redis = getRedis();
 
   const session: AssessmentSession = {
     id: uuidv4(),
@@ -71,22 +80,25 @@ export async function createSession(
     status: 'intake',
   };
 
-  await fs.writeFile(sessionPath(session.id), JSON.stringify(session, null, 2));
+  await redis.set(
+    `${SESSION_PREFIX}${session.id}`,
+    JSON.stringify(session),
+    { ex: SESSION_TTL_SECONDS }
+  );
   return session;
 }
 
 export async function getSession(
   id: string
 ): Promise<AssessmentSession | null> {
-  try {
-    const raw = await fs.readFile(sessionPath(id), 'utf-8');
-    return normalizeSession(JSON.parse(raw) as AssessmentSession);
-  } catch (err: unknown) {
-    if (err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'ENOENT') {
-      return null;
-    }
-    throw err;
-  }
+  const redis = getRedis();
+  const raw = await redis.get<string>(`${SESSION_PREFIX}${id}`);
+  if (!raw) return null;
+
+  // Upstash may return parsed JSON or string depending on how it was stored
+  const session: AssessmentSession =
+    typeof raw === 'string' ? JSON.parse(raw) : (raw as unknown as AssessmentSession);
+  return normalizeSession(session);
 }
 
 export async function updateSession(
@@ -99,17 +111,17 @@ export async function updateSession(
   }
 
   const updated: AssessmentSession = { ...session, ...updates, id: session.id };
-  await fs.writeFile(sessionPath(id), JSON.stringify(updated, null, 2));
+
+  const redis = getRedis();
+  await redis.set(
+    `${SESSION_PREFIX}${id}`,
+    JSON.stringify(updated),
+    { ex: SESSION_TTL_SECONDS }
+  );
   return updated;
 }
 
 export async function deleteSession(id: string): Promise<void> {
-  try {
-    await fs.unlink(sessionPath(id));
-  } catch (err: unknown) {
-    if (err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'ENOENT') {
-      return; // Already gone — treat as success
-    }
-    throw err;
-  }
+  const redis = getRedis();
+  await redis.del(`${SESSION_PREFIX}${id}`);
 }

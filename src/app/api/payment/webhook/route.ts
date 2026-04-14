@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/payment/stripe';
-import type { AssessmentSession } from '@/types/diagnostic';
+import { updateSession } from '@/lib/db/store';
 
 /**
  * Stripe sends the raw body, so we must NOT parse it as JSON before
@@ -38,14 +38,6 @@ export async function POST(request: NextRequest) {
       const companyName = session.metadata?.companyName ?? 'unknown';
       const customerEmail = session.customer_email ?? session.customer_details?.email ?? 'unknown';
 
-      // TODO: Replace with actual DB update once the persistence layer is built.
-      // This should mark the AssessmentSession.status as 'paid' and store the
-      // Stripe session ID as AssessmentSession.paymentId.
-      const statusUpdate: Pick<AssessmentSession, 'status' | 'paymentId'> = {
-        status: 'paid',
-        paymentId: session.id,
-      };
-
       console.log('[stripe:webhook] checkout.session.completed', {
         assessmentId,
         companyName,
@@ -54,8 +46,20 @@ export async function POST(request: NextRequest) {
         amountTotal: session.amount_total,
         currency: session.currency,
         stripeSessionId: session.id,
-        statusUpdate,
       });
+
+      // Mark the assessment session as paid
+      if (assessmentId) {
+        try {
+          await updateSession(assessmentId, {
+            status: 'paid',
+            paymentId: session.id,
+          });
+          console.log(`[stripe:webhook] Session ${assessmentId} marked as paid`);
+        } catch (err) {
+          console.error(`[stripe:webhook] Failed to update session ${assessmentId}:`, err);
+        }
+      }
 
       break;
     }
