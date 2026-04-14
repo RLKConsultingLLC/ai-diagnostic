@@ -300,7 +300,7 @@ export default function Home() {
                   alt="Ryan King, Founder of RLK Consulting"
                   width={72}
                   height={72}
-                  className="rounded-full object-cover w-[72px] h-[72px] shrink-0 border border-light shadow-sm"
+                  className="rounded-full object-cover object-[center_25%] w-[72px] h-[72px] shrink-0 border border-light shadow-sm"
                 />
                 <div>
                   <p className="text-sm font-semibold text-navy">Ryan L. King</p>
