@@ -8,7 +8,6 @@ import {
 } from "@/lib/diagnostic/scoring";
 import { STAGE_DEFINITIONS } from "@/lib/diagnostic/stages";
 import { REFERENCE_LIBRARY } from "@/lib/data/reference-library";
-import { DIAGNOSTIC_QUESTIONS } from "@/lib/diagnostic/questions";
 
 interface MethodologySectionProps {
   result: DiagnosticResult;
@@ -20,11 +19,6 @@ const COMPOSITE_INDEX_META: Record<string, { questionId: string; weight: number 
   decision_velocity: DECISION_VELOCITY_COMPONENTS,
   economic_translation: ECONOMIC_TRANSLATION_COMPONENTS,
 };
-
-function getQuestionLabel(questionId: string): string {
-  const q = DIAGNOSTIC_QUESTIONS.find((q) => q.id === questionId);
-  return q ? `${questionId}: ${q.text.slice(0, 60)}${q.text.length > 60 ? '...' : ''}` : questionId;
-}
 
 export default function MethodologySection({ result, sectionNumber }: MethodologySectionProps) {
   const conf = Math.min(99, Math.max(65, Math.round(result.stageClassification.confidence * 100)));

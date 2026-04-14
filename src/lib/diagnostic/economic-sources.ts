@@ -5,14 +5,7 @@
 // defensible when a CFO asks "where did you get these numbers?"
 // =============================================================================
 
-import type { Industry, StageNumber } from '@/types/diagnostic';
-
-export interface EconomicSource {
-  name: string;
-  metric: string;
-  year: number;
-  url?: string;
-}
+import type { Industry, EconomicSource } from '@/types/diagnostic';
 
 // ---------------------------------------------------------------------------
 // PRODUCTIVITY POTENTIAL SOURCES

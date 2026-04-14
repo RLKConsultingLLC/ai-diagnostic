@@ -7,10 +7,8 @@ import type {
   DiagnosticResult,
   GeneratedReport,
   DimensionScore,
-  CompositeIndex,
   StageClassification,
   EconomicEstimate,
-  ReportSection,
   CompanyProfile,
 } from "@/types/diagnostic";
 import MethodologySection from "@/app/report/components/MethodologySection";
@@ -233,7 +231,7 @@ function ReportPage() {
         <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
           <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Stage Classification</h2>
           <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
-          <StageDisplay stage={result.stageClassification} overallScore={result.overallScore} dimensionScores={result.dimensionScores} />
+          <StageDisplay stage={result.stageClassification} dimensionScores={result.dimensionScores} />
         </section>
       )}
 
@@ -326,7 +324,6 @@ function ReportPage() {
           result.companyProfile.revenue,
           result.companyProfile.employeeCount,
           sorted[0].dimension,
-          sorted[sorted.length - 1].dimension,
         );
         return (
           <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
@@ -1788,7 +1785,6 @@ function ReportPage() {
                   (a, b) => a.normalizedScore - b.normalizedScore
                 )[0]?.dimension || "adoption_behavior"
               }
-              industry={result.companyProfile.industry}
               stage={result.stageClassification.primaryStage}
               dimensionScores={result.dimensionScores}
             />
@@ -2276,7 +2272,7 @@ function ScoreGauge({ score }: { score: number }) {
 // Stage Display
 // ---------------------------------------------------------------------------
 
-function StageDisplay({ stage, overallScore, dimensionScores }: { stage: StageClassification; overallScore?: number; dimensionScores?: DimensionScore[] }) {
+function StageDisplay({ stage, dimensionScores }: { stage: StageClassification; dimensionScores?: DimensionScore[] }) {
   const stageColors = ["#CED5DD", "#A8B5C4", "#6B7F99", "#364E6E", "#0B1D3A"];
   const stageNames = ["Initial", "Exploring", "Managed Deployment", "Scaling", "Optimized"];
   const stageDescriptions = [
@@ -2287,7 +2283,6 @@ function StageDisplay({ stage, overallScore, dimensionScores }: { stage: StageCl
     "AI is an organizational differentiator. Proprietary models, AI-native products, and a culture that treats AI as infrastructure rather than initiative.",
   ];
 
-  const score = overallScore || 0;
   const current = stage.primaryStage;
 
   // Why not higher — narrative, not math
@@ -2448,29 +2443,6 @@ function DimensionBar({ score }: { score: DimensionScore }) {
 // Composite Index Card
 // ---------------------------------------------------------------------------
 
-function CompositeCard({ index }: { index: CompositeIndex }) {
-  const color =
-    index.score >= 70
-      ? "#0B1D3A"
-      : index.score >= 40
-      ? "#6B7F99"
-      : "#A8B5C4";
-
-  return (
-    <div className="bg-offwhite border border-light p-5">
-      <div className="text-xs font-semibold text-tertiary tracking-wider uppercase mb-3">
-        {index.name}
-      </div>
-      <div className="text-3xl font-bold mb-2" style={{ color }}>
-        {index.score}
-      </div>
-      <p className="text-xs text-foreground/60 leading-relaxed">
-        {index.interpretation}
-      </p>
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Economic Summary
 // ---------------------------------------------------------------------------
@@ -2529,18 +2501,6 @@ function Metric({ label, value }: { label: string; value: string }) {
 // Report Section Card
 // ---------------------------------------------------------------------------
 
-function ReportSectionCard({ section }: { section: ReportSection }) {
-  return (
-    <section className="bg-white border border-light p-6 md:p-10">
-      <h2 className="text-lg font-semibold text-secondary mb-4">
-        {section.title}
-      </h2>
-      <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed whitespace-pre-line">
-        {section.content}
-      </div>
-    </section>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Industry label formatter
@@ -3303,7 +3263,6 @@ function CompetitiveMatrix({
               // Determine label placement based on dot position
               // If dot is near center of any quadrant, offset label to avoid overlapping quadrant title
               const labelAbove = dotBottom < 45; // low on chart → show label above dot
-              const labelRight = dotLeft < 40;   // left side → show label to the right
               const labelStyle: React.CSSProperties = labelAbove
                 ? { bottom: "100%", left: "50%", transform: "translateX(-50%)", marginBottom: 4 }
                 : { top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 4 };
@@ -3583,13 +3542,11 @@ function RiskMatrix({
 function ActionTimeline({
   overallScore,
   weakestDimension,
-  industry,
   stage,
   dimensionScores,
 }: {
   overallScore: number;
   weakestDimension: string;
-  industry?: string;
   stage?: number;
   dimensionScores?: DimensionScore[];
 }) {
@@ -3949,28 +3906,6 @@ function compositeIndexRisks(slug: string, score: number): string {
   return risks[slug]?.[tier] || "Monitor for emerging risks as your maturity evolves. See Section 7 for the full risk assessment.";
 }
 
-function compositeIndexNextSteps(slug: string, score: number): string {
-  const steps: Record<string, Record<string, string>> = {
-    authority_friction: {
-      high: "Focus on distributed governance: empower business units with guardrails and pre-approved deployment categories rather than centralized approval for every initiative. Target federated AI ownership where central sets standards but units execute autonomously within bounds.",
-      mid: "Standardize governance frameworks across all business units within 60 days. Establish pre-approved fast-track paths for low-risk AI deployments (defined risk categories, spending thresholds, data classification). Eliminate redundant approval layers — target 2 or fewer decision points for standard deployments.",
-      low: "Immediate priority: establish a foundational AI governance charter, designate a single accountable AI owner with budget authority, and create a basic approval framework within 30 days. This is prerequisite infrastructure — no other AI investment will yield returns until authority structures exist.",
-    },
-    decision_velocity: {
-      high: "Optimize for AI portfolio management: run parallel initiatives on shared infrastructure, systematize organizational learning across deployments, and build reusable components that accelerate future projects. Your velocity advantage compounds — invest in making it structural.",
-      mid: "Reduce approval layers for standard AI deployments to 2 or fewer. Establish a pre-approved AI tool catalog that teams can deploy without per-project approval. Set target cycle times: < 30 days for pilot approval, < 90 days for scale decisions. Benchmark against top-quartile deployment timelines quarterly.",
-      low: "Start with a single fast-track pilot designed to demonstrate achievable velocity — pick a use case with low regulatory risk, clear metrics, and an enthusiastic team. Complete it in 45 days. Use the success to build organizational evidence that faster cycles are possible and to justify streamlined processes.",
-    },
-    economic_translation: {
-      high: "Expand the measurement framework beyond cost savings and efficiency gains. Target AI-enabled revenue generation, new product development, and strategic capabilities that create competitive moats. Integrate AI economics into quarterly financial reporting and capital allocation processes.",
-      mid: "Implement standardized ROI measurement across all AI initiatives within 90 days. Define baseline metrics before launching new projects — not after. Require every AI initiative to specify measurable financial outcomes at approval and report against them quarterly.",
-      low: "Start with 2-3 use cases where financial value is easiest to isolate and measure: process automation with clear before/after metrics, error reduction with quantifiable cost-per-error, or capacity creation with measurable reallocation. Build measurement credibility on easy wins before attempting to quantify harder-to-measure value.",
-    },
-  };
-  const tier = score >= 70 ? "high" : score >= 40 ? "mid" : "low";
-  return steps[slug]?.[tier] || "Focus on the highest-leverage next step based on your current maturity position and the recommendations in Section 9.";
-}
-
 // ---------------------------------------------------------------------------
 // Competitive Positioning Helpers
 // ---------------------------------------------------------------------------
@@ -4103,9 +4038,7 @@ function getFreeMaturityAnalysis(
   revenue: number,
   employeeCount: number,
   weakestDimension: string,
-  strongestDimension: string,
 ): FreeMaturityAnalysis {
-  const ind = industryLabel(industry);
   const rev = fmtUSD(revenue);
 
   // Stage-specific headlines
@@ -4241,8 +4174,6 @@ function getPnLImpact(
   const unrealizedMid = Math.round((unrealizedLow + unrealizedHigh) / 2);
   const getScore = (dim: string) => dimensionScores.find((d) => d.dimension === dim)?.normalizedScore || 50;
   const weakest = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0];
-  const strongest = [...dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[0];
-  const isSmall = employeeCount <= 200;
   const isMid = employeeCount > 200 && employeeCount <= 2000;
   const isLarge = employeeCount > 2000;
   const highReg = regulatoryIntensity === 'high' || ['insurance','banking','capital_markets','healthcare_providers','healthcare_payers','life_sciences_pharma','government_federal','defense_contractors'].includes(industry);
@@ -5521,7 +5452,7 @@ function getBoardSupportNarrative(stage: number): string {
   return `At Stage ${stage}, the board's role evolves to strategic partnership on AI-driven competitive positioning. NACD recommends boards at advanced stages: (1) integrate AI into strategic planning and capital allocation discussions (not as a separate agenda item), (2) evaluate whether AI investments are creating defensible competitive moats, (3) assess management's AI talent and leadership pipeline, and (4) ensure ethical AI governance keeps pace with capability deployment. The board should also consider whether AI capabilities should inform M&A strategy and new market entry decisions.`;
 }
 
-function getBoardActions(stage: number, industry: string): { action: string; rationale: string; owner: string }[] {
+function getBoardActions(stage: number, _industry: string): { action: string; rationale: string; owner: string }[] {
   if (stage <= 2) {
     return [
       { action: "Request AI maturity baseline and 12-month improvement targets", rationale: "Establish accountability for measurable progress, not just activity. Metrics should include adoption rates, value captured, and governance maturity.", owner: "Board request to CEO/CIO" },

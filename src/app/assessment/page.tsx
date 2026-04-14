@@ -373,7 +373,8 @@ export default function AssessmentPage() {
         setInsightLoading(false);
       }
     },
-    [questions, responses, insightCache, completedDimensions, companyName, industry, employeeCount, revenue, dimensionInsight]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [questions, responses, insightCache, completedDimensions, companyName, industry, employeeCount, revenue, sessionId]
   );
 
   // Submit intake to create a session and get questions
@@ -457,7 +458,6 @@ export default function AssessmentPage() {
 
     const isLastInDimension =
       currentQInDim >= currentGroup.questions.length - 1;
-    const isLastDimension = currentDimIndex >= dimensionGroups.length - 1;
 
     if (isLastInDimension) {
       // Mark dimension complete
@@ -479,8 +479,6 @@ export default function AssessmentPage() {
   }, [
     currentGroup,
     currentQInDim,
-    currentDimIndex,
-    dimensionGroups.length,
     fetchDimensionInsight,
   ]);
 
@@ -570,11 +568,6 @@ export default function AssessmentPage() {
   );
 
   // ---------- Progress helpers ----------
-
-  // Count answered in current dimension
-  const answeredInCurrentDim = currentGroup
-    ? currentGroup.questions.filter((q) => responses[q.id]).length
-    : 0;
 
   // Compute which question number we are on overall (1-indexed)
   const overallQuestionIndex = (() => {
@@ -832,7 +825,7 @@ export default function AssessmentPage() {
                   <input
                     type="number"
                     value={revenue}
-                    onChange={(e) => { setRevenue(e.target.value); setValidationErrors((prev) => { const { revenue: _, ...rest } = prev; return rest; }); }}
+                    onChange={(e) => { setRevenue(e.target.value); setValidationErrors(({ revenue: _r, ...rest }) => rest); }}
                     className="form-input"
                     placeholder="e.g. 500000000"
                     min={0}
@@ -842,7 +835,7 @@ export default function AssessmentPage() {
                   <input
                     type="number"
                     value={employeeCount}
-                    onChange={(e) => { setEmployeeCount(e.target.value); setValidationErrors((prev) => { const { employeeCount: _, ...rest } = prev; return rest; }); }}
+                    onChange={(e) => { setEmployeeCount(e.target.value); setValidationErrors(({ employeeCount: _ec, ...rest }) => rest); }}
                     className="form-input"
                     placeholder="e.g. 5000"
                     min={1}

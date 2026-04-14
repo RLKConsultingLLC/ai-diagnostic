@@ -52,6 +52,16 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      // Verify submitted score matches the actual option score (prevents tampering)
+      if (question) {
+        const expectedScore = question.options[r.selectedOptionIndex]?.score;
+        if (expectedScore !== undefined && r.score !== expectedScore) {
+          return NextResponse.json(
+            { error: `Score mismatch for question ${r.questionId}` },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     // Fetch session

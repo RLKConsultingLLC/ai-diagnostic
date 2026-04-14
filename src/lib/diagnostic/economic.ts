@@ -284,7 +284,9 @@ function buildBenchmarkNarrative(
   unrealizedHigh: number,
   revenue: number
 ): string {
-  const unrealizedPercent = ((unrealizedLow + unrealizedHigh) / 2 / revenue) * 100;
+  const unrealizedPercent = revenue > 0
+    ? ((unrealizedLow + unrealizedHigh) / 2 / revenue) * 100
+    : 0;
   const stageLabel = [
     '',
     'Tool Curiosity',

@@ -5,7 +5,7 @@
 // Each fetcher returns structured data that feeds into Claude synthesis.
 // =============================================================================
 
-import { CompanyProfile, Industry } from '@/types/diagnostic';
+import { Industry } from '@/types/diagnostic';
 
 // ---------------------------------------------------------------------------
 // SEC EDGAR — 10-K / 10-Q Filings
@@ -26,10 +26,10 @@ export async function searchSECFilings(
   try {
     // SEC EDGAR full-text search API (free, no auth required)
     const query = ticker || companyName;
-    const url = `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(query)}%22&dateRange=custom&startdt=${getOneYearAgo()}&enddt=${getToday()}&forms=10-K,10-Q,8-K&hits.hits.total.value=10`;
+    const url = `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(query)}%22&forms=10-K,10-Q&dateRange=custom&startdt=${getOneYearAgo()}&enddt=${getToday()}`;
 
     const response = await fetch(
-      `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(query)}%22&forms=10-K,10-Q&dateRange=custom&startdt=${getOneYearAgo()}&enddt=${getToday()}`,
+      url,
       {
         headers: {
           'User-Agent': 'RLK Consulting research@rlkconsultingco.com',
@@ -51,7 +51,9 @@ export async function searchSECFilings(
         filedDate: (source.file_date as string) || '',
         accessionNumber: (source.accession_no as string) || '',
         primaryDocument: (source.file_name as string) || '',
-        filingUrl: `https://www.sec.gov/Archives/edgar/data/${source.entity_id}/${source.accession_no}`,
+        filingUrl: source.entity_id && source.accession_no
+          ? `https://www.sec.gov/Archives/edgar/data/${source.entity_id}/${source.accession_no}`
+          : '',
       };
     });
 

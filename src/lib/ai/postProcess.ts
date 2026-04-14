@@ -118,7 +118,7 @@ function parseSections(
 
     // Find the section in the cleaned output
     const pattern = new RegExp(
-      `=== SECTION \\d+:.*?\\(slug: ${slug}\\) ===\\n([\\s\\S]*?)(?==== SECTION|$)`
+      `=== SECTION \\d+:.*?\\(slug: ${slug}\\) ===\\n([\\s\\S]*?)(?==== SECTION \\d|$)`
     );
     const match = text.match(pattern);
 

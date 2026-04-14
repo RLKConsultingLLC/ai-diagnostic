@@ -250,7 +250,7 @@ function buildMixedStageNarrative(
   };
 
   // Identify strongest and weakest dimensions
-  const sorted = dimensionScores.sort((a, b) => b.normalizedScore - a.normalizedScore);
+  const sorted = [...dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore);
   const strongest = sorted[0];
   const weakest = sorted[sorted.length - 1];
 
@@ -291,9 +291,6 @@ export function getStageRecommendations(
 ): StageRecommendation[] {
   const recommendations: StageRecommendation[] = [];
   const sorted = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore);
-
-  // Always address weakest dimension first
-  const weakest = sorted[0];
 
   const recommendationMap: Record<Dimension, Record<StageNumber, StageRecommendation>> = {
     adoption_behavior: {
