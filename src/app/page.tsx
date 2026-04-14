@@ -299,8 +299,8 @@ export default function Home() {
                   src="/ryan-king.jpg"
                   alt="Ryan King, Founder of RLK Consulting"
                   width={72}
-                  height={72}
-                  className="rounded-full object-cover object-[center_25%] w-[72px] h-[72px] shrink-0 border border-light shadow-sm"
+                  height={80}
+                  className="rounded-lg object-cover object-[center_20%] w-[72px] h-[80px] shrink-0 border border-light shadow-sm"
                 />
                 <div>
                   <p className="text-sm font-semibold text-navy">Ryan L. King</p>
@@ -368,6 +368,36 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+              <a
+                href="https://www.rlkconsultingco.com/general-7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 bg-white border border-light p-6 flex items-center gap-5 group hover:border-accent transition-colors block"
+              >
+                <Image
+                  src="/book-cover.jpg"
+                  alt="The Human and Machine Company by Ryan King"
+                  width={80}
+                  height={120}
+                  className="shadow-md shrink-0 group-hover:shadow-lg transition-shadow"
+                />
+                <div>
+                  <p className="text-tertiary text-[10px] font-semibold tracking-widest uppercase mb-1.5">
+                    The Book
+                  </p>
+                  <p className="text-sm font-semibold text-navy mb-1">
+                    The Human and Machine Company
+                  </p>
+                  <p className="text-xs text-foreground/60 leading-relaxed mb-2">
+                    How organizations must restructure authority, governance,
+                    and decision-making to capture value from AI.
+                  </p>
+                  <span className="text-xs font-semibold text-navy group-hover:underline">
+                    Read more &rarr;
+                  </span>
+                </div>
+              </a>
 
               <div className="mt-6 bg-white border border-light p-8">
                 <p className="text-tertiary text-xs font-semibold tracking-widest uppercase mb-4">
