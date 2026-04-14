@@ -26,7 +26,9 @@ Rules you must follow in every response:
 - Use specific numbers from the diagnostic data provided. Do not invent statistics.
 - Write in markdown with headers. Do not use bullet-point walls — use short, punchy paragraphs.
 - Tone: authoritative, direct, peer-level. No jargon. No filler.
-- Never use em dashes or double dashes. Use commas, periods, or colons instead.`;
+- Never use em dashes or double dashes. Use commas, periods, or colons instead.
+- NEVER cite a named report, study, or white paper unless it appears in the COMPANY INTELLIGENCE data block. If no company-specific research data is provided, do not fabricate citations. You may reference industry patterns without attribution.
+- When referencing competitor activity, ONLY use competitors and activities from the COMPANY INTELLIGENCE data. If no competitor data is available, discuss industry-level competitive dynamics without naming specific competitors.`;
 
 function formatCurrency(value: number): string {
   if (value >= 1_000_000_000) {
@@ -193,6 +195,10 @@ ${serializeEconomicEstimate(result.economicEstimate)}`;
   const qualityBlock = serializeResponseQuality(result);
   if (qualityBlock) {
     block += `\n\n${qualityBlock}`;
+  }
+
+  if (result.researchAlignment) {
+    block += `\n\nRESEARCH-DIAGNOSTIC ALIGNMENT:\n${result.researchAlignment}`;
   }
 
   if (research) {
@@ -527,7 +533,7 @@ Analysis framework:
 
 Be direct about competitive risk. If the organization is behind, say so plainly. If it has advantages, name them specifically.
 
-The organization is ${result.companyProfile.publicOrPrivate}. ${result.companyProfile.publicOrPrivate === 'public' ? 'Consider shareholder and analyst expectations around AI investment.' : 'Consider how private-company advantages (longer time horizons, less quarterly pressure) can be leveraged.'}${research?.competitorAIActivity?.length ? '\n\nCRITICAL: You have specific competitor AI activity data. Name these competitors and their moves. This is what makes this section worth $50K — the customer sees their actual competitive landscape, not generic benchmarks.' : ''}
+The organization is ${result.companyProfile.publicOrPrivate}. ${result.companyProfile.publicOrPrivate === 'public' ? 'Consider shareholder and analyst expectations around AI investment.' : 'Consider how private-company advantages (longer time horizons, less quarterly pressure) can be leveraged.'}${research?.competitorAIActivity?.length ? '\n\nCRITICAL: You have specific competitor AI activity data from public research. Name these competitors and their moves. Only reference competitors listed in the COMPANY INTELLIGENCE data block.' : '\n\nNOTE: No company-specific competitor data is available. Discuss competitive dynamics at the industry level without naming specific competitors. Label these as general industry patterns, not company-specific intelligence.'}
 
 DIAGNOSTIC DATA:
 ${buildDiagnosticDataBlock(result, research)}

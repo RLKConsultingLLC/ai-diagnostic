@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession, updateSession } from '@/lib/db/store';
 import { generateFullReport } from '@/lib/ai/generate';
 import { getResearchProfile, getResearchStatus } from '@/lib/research/engine';
+import { computeResearchAdjustments } from '@/lib/diagnostic/research-integration';
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,6 +56,36 @@ export async function POST(request: NextRequest) {
         `[Report] No research available (status: ${researchStatus?.status || 'not started'}). ` +
         `Generating report with diagnostic data only.`
       );
+    }
+
+    // Run research-diagnostic integration if research is available
+    if (researchProfile && session.diagnosticResult) {
+      const adjustments = computeResearchAdjustments(
+        session.diagnosticResult,
+        researchProfile
+      );
+
+      // Attach research alignment narrative for AI prompt context
+      session.diagnosticResult.researchAlignment = adjustments.narrative;
+
+      // Apply confidence modifier
+      if (adjustments.confidenceModifier !== 0) {
+        session.diagnosticResult.stageClassification.confidence = Math.max(
+          0.65,
+          Math.min(
+            1.0,
+            session.diagnosticResult.stageClassification.confidence +
+              adjustments.confidenceModifier
+          )
+        );
+      }
+
+      if (adjustments.discrepancies.length > 0) {
+        console.log(
+          `[Report] Research-diagnostic discrepancies: ${adjustments.discrepancies.length} found. ` +
+          `Confidence modifier: ${adjustments.confidenceModifier > 0 ? '+' : ''}${adjustments.confidenceModifier.toFixed(2)}`
+        );
+      }
     }
 
     // Generate the full AI report — enriched with research if available

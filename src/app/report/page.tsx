@@ -13,6 +13,7 @@ import type {
   ReportSection,
   CompanyProfile,
 } from "@/types/diagnostic";
+import { REFERENCE_LIBRARY } from "@/lib/data/reference-library";
 
 // ---------------------------------------------------------------------------
 // Wrapper -- useSearchParams requires Suspense in Next.js app router
@@ -2197,58 +2198,19 @@ function ReportPage() {
               </div>
             </div>
 
-            {/* Research & Citations */}
+            {/* Industry Reference Library */}
             <div className="mt-8 pt-6 border-t border-light">
               <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-4">
-                Research & Citations
+                Industry Reference Library
               </p>
             <div className="grid md:grid-cols-2 gap-x-8 gap-y-1">
-              {[
-                { cat: "Industry Research", sources: [
-                  "McKinsey & Company, \"The State of AI in 2024: Gen AI's Breakout Year,\" Global AI Survey, 2024",
-                  "BCG Henderson Institute, \"From Potential to Profit: The AI Advantage Report,\" 2024",
-                  "Deloitte, \"State of AI in the Enterprise, 6th Edition,\" 2024",
-                  "Gartner, \"AI Maturity Model for Enterprise Organizations,\" 2024",
-                  "Accenture, \"Technology Vision 2024: Human by Design\"",
-                  "Goldman Sachs, \"Generative AI: The Economic Impact,\" Global Economics Research, 2024",
-                ]},
-                { cat: "Governance & Board Oversight", sources: [
-                  "National Association of Corporate Directors (NACD), \"Board Oversight of AI,\" 2024",
-                  "World Economic Forum, \"AI Governance Alliance: Responsible AI Framework,\" 2024",
-                  "Gartner, \"AI Trust, Risk and Security Management (AI TRiSM),\" 2024",
-                  "IBM, \"Cost of a Data Breach Report,\" 2024",
-                ]},
-                { cat: "Regulatory & Compliance", sources: [
-                  "European Union, \"EU AI Act\" (Regulation 2024/1689), effective August 2025",
-                  "State of Colorado, \"Colorado AI Act\" (SB21-169), consumer protections",
-                  "California Legislature, \"AI Transparency Act\" and related proposals",
-                  "White House Executive Order on Safe, Secure, and Trustworthy AI, October 2023",
-                ]},
-                { cat: "Vendor & Market Intelligence", sources: [
-                  "Gartner Magic Quadrant for Cloud AI Developer Services, 2024",
-                  "Forrester Wave: AI Foundation Models, 2024",
-                  "Forrester Wave: AI Strategy Consulting, 2024",
-                  "Gartner Market Guide for AI Trust, Risk and Security Management, 2024",
-                ]},
-                { cat: "Economic Methodology", sources: [
-                  "Bureau of Labor Statistics, Occupational Employment and Wage Statistics, 2024",
-                  "McKinsey Global Institute, \"The Economic Potential of Generative AI,\" 2024",
-                  "BCG, \"Where Value Comes from in AI,\" 2024",
-                  "Deloitte, \"Measuring AI ROI: A Practical Guide for Enterprises,\" 2024",
-                ]},
-                { cat: "Industry-Specific Sources", sources: [
-                  `Company 10-K and 10-Q filings via SEC EDGAR (for public company analysis)`,
-                  "Google News intelligence aggregation (company and industry signals)",
-                  "Industry analyst reports and conference proceedings (sector-specific)",
-                  "Patent filings and R&D disclosures (competitive intelligence)",
-                ]},
-              ].map((group) => (
-                <div key={group.cat} className="mb-4">
-                  <p className="text-xs font-semibold text-navy tracking-wider uppercase mb-2">{group.cat}</p>
+              {REFERENCE_LIBRARY.map((group) => (
+                <div key={group.category} className="mb-4">
+                  <p className="text-xs font-semibold text-navy tracking-wider uppercase mb-2">{group.category}</p>
                   <div className="space-y-1">
                     {group.sources.map((s, i) => (
                       <p key={i} className="text-[11px] text-foreground/50 leading-relaxed pl-3 border-l-2 border-light">
-                        {s}
+                        {s.citation}
                       </p>
                     ))}
                   </div>

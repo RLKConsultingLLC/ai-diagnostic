@@ -26,6 +26,72 @@ import { RawNewsResult, SECFiling } from './sources';
 const client = new Anthropic();
 
 // ---------------------------------------------------------------------------
+// RESEARCH CONFIDENCE — Quality-weighted instead of count-based
+// ---------------------------------------------------------------------------
+
+function computeResearchConfidence(
+  rawData: {
+    secFilings: SECFiling[];
+    companyNews: RawNewsResult[];
+    aiNews: RawNewsResult[];
+    industryNews: RawNewsResult[];
+    webContent: { aboutText: string; newsroomItems: string[]; aiReferences: string[] };
+  },
+  synthesized: {
+    newsItems: NewsItem[];
+    aiMentions: AIMention[];
+    aiInvestments: AIInvestment[];
+    leadershipInsights: LeadershipInsight[];
+    earnings: EarningsInsight[];
+  }
+): 'high' | 'moderate' | 'low' {
+  let score = 0;
+
+  // SEC filings (+30) — strongest credibility signal
+  if (rawData.secFilings.length > 0) score += 30;
+
+  // AI-specific news coverage (+20)
+  if (rawData.aiNews.length >= 3) score += 20;
+  else if (rawData.aiNews.length >= 1) score += 10;
+
+  // Recency (+15) — recent news within last 6 months
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const recentNews = synthesized.newsItems.filter((n) => {
+    try { return new Date(n.date) >= sixMonthsAgo; } catch { return false; }
+  });
+  if (recentNews.length >= 3) score += 15;
+  else if (recentNews.length >= 1) score += 8;
+
+  // Leadership quotes (+10) — direct executive signals
+  if (synthesized.leadershipInsights.length >= 2) score += 10;
+  else if (synthesized.leadershipInsights.length >= 1) score += 5;
+
+  // Company web content (+10) — direct company data
+  const hasWebContent =
+    rawData.webContent.aboutText.length > 100 ||
+    rawData.webContent.newsroomItems.length > 0 ||
+    rawData.webContent.aiReferences.length > 0;
+  if (hasWebContent) score += 10;
+
+  // Source diversity (+10) — multiple source types
+  const sourceTypes = [
+    rawData.secFilings.length > 0,
+    rawData.companyNews.length > 0,
+    rawData.aiNews.length > 0,
+    rawData.industryNews.length > 0,
+    hasWebContent,
+  ].filter(Boolean).length;
+  if (sourceTypes >= 4) score += 10;
+  else if (sourceTypes >= 3) score += 5;
+
+  // Thresholds
+  if (score >= 60) return 'high';
+  if (score >= 30) return 'moderate';
+  return 'low';
+}
+
+// ---------------------------------------------------------------------------
 // MAIN SYNTHESIS — Orchestrates Claude to build the full research profile
 // ---------------------------------------------------------------------------
 
@@ -91,7 +157,13 @@ export async function synthesizeResearchProfile(
     opportunities: executiveSynthesis.opportunities,
     researchCompletedAt: new Date().toISOString(),
     sourcesConsulted,
-    confidenceLevel: sourcesConsulted > 15 ? 'high' : sourcesConsulted > 5 ? 'moderate' : 'low',
+    confidenceLevel: computeResearchConfidence(rawData, {
+      newsItems: newsAnalysis.newsItems,
+      aiMentions: aiIntelligence.mentions,
+      aiInvestments: aiIntelligence.investments,
+      leadershipInsights: strategicAnalysis.leadershipInsights,
+      earnings: strategicAnalysis.earnings,
+    }),
   };
 }
 
@@ -237,7 +309,7 @@ Extract and synthesize into this JSON structure:
   ]
 }
 
-If information is sparse, infer what you can from industry context. Include 2-3 competitor activities based on industry knowledge even if not directly from the news.`,
+If information is sparse, return empty arrays rather than fabricating competitor data. Only include competitor activities that are directly supported by the news and web content provided above.`,
       },
     ],
   });

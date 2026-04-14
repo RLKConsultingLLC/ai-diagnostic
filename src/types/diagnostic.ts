@@ -175,6 +175,7 @@ export interface DiagnosticResult {
   overallScore: number; // 0–100 composite
   responseQuality?: ResponseQualityMetrics;
   consistencyFlags?: ConsistencyFlag[];
+  researchAlignment?: string; // Narrative from research-scoring integration
 }
 
 export interface ReportSection {
