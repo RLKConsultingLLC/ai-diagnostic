@@ -176,6 +176,24 @@ export interface DiagnosticResult {
   responseQuality?: ResponseQualityMetrics;
   consistencyFlags?: ConsistencyFlag[];
   researchAlignment?: string; // Narrative from research-scoring integration
+  sensitivityAnalysis?: SensitivityResult;
+}
+
+export interface SensitivityItem {
+  questionId: string;
+  questionText: string;
+  dimension: string;
+  currentScore: number;
+  hypotheticalScore: number;
+  overallDelta: number;
+  stageDelta: number;
+  dimensionDelta: number;
+}
+
+export interface SensitivityResult {
+  topImpactQuestions: SensitivityItem[];
+  highestLeverageDimension: string;
+  averageDelta: number;
 }
 
 export interface ReportSection {

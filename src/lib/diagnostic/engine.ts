@@ -16,6 +16,7 @@ import { classifyStage } from './stages';
 import { computeEconomicEstimate } from './economic';
 import { assessResponseQuality } from './quality';
 import { checkConsistency } from './consistency';
+import { computeSensitivityAnalysis } from './sensitivity';
 import { DIAGNOSTIC_QUESTIONS } from './questions';
 
 export function runDiagnostic(
@@ -46,6 +47,9 @@ export function runDiagnostic(
   // Step 6: Compute overall score
   const overallScore = computeOverallScore(dimensionScores);
 
+  // Step 7: Sensitivity analysis — which questions have the most leverage?
+  const sensitivityAnalysis = computeSensitivityAnalysis(responses, profile);
+
   return {
     id: uuidv4(),
     completedAt: new Date().toISOString(),
@@ -58,5 +62,6 @@ export function runDiagnostic(
     overallScore,
     responseQuality,
     consistencyFlags,
+    sensitivityAnalysis,
   };
 }

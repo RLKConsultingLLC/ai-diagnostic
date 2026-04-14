@@ -77,7 +77,7 @@ export function computeDimensionScores(
 // Note: This is an INVERSE index — higher score = LESS friction
 // ---------------------------------------------------------------------------
 
-const AUTHORITY_FRICTION_COMPONENTS: { questionId: string; weight: number }[] = [
+export const AUTHORITY_FRICTION_COMPONENTS: { questionId: string; weight: number }[] = [
   { questionId: 'AS-01', weight: 1.5 },  // Approval layers
   { questionId: 'AS-03', weight: 1.2 },  // Budget reallocation speed
   { questionId: 'AS-04', weight: 1.0 },  // Process conflict resolution
@@ -94,7 +94,7 @@ const AUTHORITY_FRICTION_COMPONENTS: { questionId: string; weight: number }[] = 
 // Sources: DV-01, DV-02, DV-03, DV-04, DV-05, AS-01, AS-03
 // ---------------------------------------------------------------------------
 
-const DECISION_VELOCITY_COMPONENTS: { questionId: string; weight: number }[] = [
+export const DECISION_VELOCITY_COMPONENTS: { questionId: string; weight: number }[] = [
   { questionId: 'DV-01', weight: 1.5 },  // Idea to funded pilot
   { questionId: 'DV-02', weight: 1.5 },  // Pilot to scale
   { questionId: 'DV-03', weight: 1.3 },  // Re-approval frequency
@@ -111,7 +111,7 @@ const DECISION_VELOCITY_COMPONENTS: { questionId: string; weight: number }[] = [
 // Sources: ET-01, ET-02, ET-03, ET-04, ET-05, ET-07
 // ---------------------------------------------------------------------------
 
-const ECONOMIC_TRANSLATION_COMPONENTS: { questionId: string; weight: number }[] = [
+export const ECONOMIC_TRANSLATION_COMPONENTS: { questionId: string; weight: number }[] = [
   { questionId: 'ET-01', weight: 1.5 },  // Financial measurement
   { questionId: 'ET-02', weight: 1.3 },  // Capacity reallocation
   { questionId: 'ET-03', weight: 1.0 },  // Board justification

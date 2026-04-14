@@ -197,6 +197,15 @@ ${serializeEconomicEstimate(result.economicEstimate)}`;
     block += `\n\n${qualityBlock}`;
   }
 
+  if (result.sensitivityAnalysis && result.sensitivityAnalysis.topImpactQuestions.length > 0) {
+    const top5 = result.sensitivityAnalysis.topImpactQuestions.slice(0, 5);
+    block += '\n\nSENSITIVITY ANALYSIS (highest-leverage questions):';
+    for (const item of top5) {
+      block += `\n- ${item.questionId} (${item.dimension}): +${item.overallDelta.toFixed(1)} overall impact${item.stageDelta > 0 ? ` [STAGE CHANGE: +${item.stageDelta}]` : ''}`;
+    }
+    block += `\nHighest-leverage dimension: ${result.sensitivityAnalysis.highestLeverageDimension}`;
+  }
+
   if (result.researchAlignment) {
     block += `\n\nRESEARCH-DIAGNOSTIC ALIGNMENT:\n${result.researchAlignment}`;
   }

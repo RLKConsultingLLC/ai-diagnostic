@@ -50,6 +50,7 @@ Your mandate:
 1. DEDUPLICATION: Identify sentences, paragraphs, or statistics that appear nearly verbatim across multiple sections. When a point is made in an earlier section, later sections should reference "as noted in Section X" or rephrase with new context rather than repeating. A statistic cited in 1-2 sections is fine; the same stat in 3+ sections is duplicative.
 2. TYPOS & GRAMMAR: Fix spelling errors, grammatical issues, and inconsistent formatting. Ensure professional tone throughout.
 3. CONSISTENCY: Verify that section cross-references (e.g., "See Section 5") are internally consistent. Flag any contradictions in data or recommendations across sections.
+4. CONTRADICTORY RECOMMENDATIONS: If one section recommends an approach and another section contradicts it (e.g., "move fast" vs. "take a phased approach"), resolve the contradiction by aligning with the section that has the strongest analytical support.
 
 Rules:
 - Do NOT add new content, analysis, or recommendations
