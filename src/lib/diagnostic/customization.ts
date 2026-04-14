@@ -342,6 +342,7 @@ export const INDUSTRY_THEMES: Record<Industry, {
   regulatoryContext: string;
   keyUseCases: string[];
   lastUpdated: string; // YYYY-MM-DD — review and refresh quarterly
+  dimensionEmphasis?: Partial<Record<Dimension, number>>; // 0.8-1.2 multiplier for report emphasis
 }> = {
   insurance: {
     primaryValueDriver: 'Claims processing acceleration, underwriting precision, actuarial modeling, and customer experience automation.',

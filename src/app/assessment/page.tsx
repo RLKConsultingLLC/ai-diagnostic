@@ -420,7 +420,7 @@ export default function AssessmentPage() {
 
       if (fetchedQuestions.length === 0) {
         try {
-          const qRes = await fetch("/api/assessment/questions");
+          const qRes = await fetch(`/api/assessment/questions?industry=${encodeURIComponent(industry)}`);
           if (qRes.ok) {
             const qData = await qRes.json();
             fetchedQuestions = qData.questions || qData || [];

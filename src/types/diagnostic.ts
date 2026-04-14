@@ -22,6 +22,7 @@ export interface DiagnosticQuestion {
   options: AnswerOption[];
   weight: number; // Base weight (1.0 = normal, can be adjusted by customization)
   tags: string[]; // For customization matching (e.g., 'governance', 'financial')
+  industryExamples?: Partial<Record<Industry, string>>; // Industry-specific subtext
 }
 
 export interface CompanyProfile {

@@ -47,6 +47,14 @@ const adoptionBehavior: DiagnosticQuestion[] = [
     ],
     weight: 1.3,
     tags: ['adoption', 'sentiment'],
+    industryExamples: {
+      insurance: 'Think about claims adjusters, underwriters, and customer service reps using AI tools.',
+      banking: 'Think about loan officers, relationship managers, and compliance analysts using AI.',
+      healthcare_providers: 'Think about clinicians, nurses, and administrative staff using AI diagnostic or documentation tools.',
+      manufacturing_discrete: 'Think about plant operators, quality inspectors, and production planners using AI tools.',
+      software_saas: 'Think about engineers, product managers, and customer success teams using AI.',
+      retail: 'Think about store associates, merchandisers, and supply chain planners using AI tools.',
+    },
   },
   {
     id: 'AB-03',
@@ -75,6 +83,14 @@ const adoptionBehavior: DiagnosticQuestion[] = [
     ],
     weight: 1.1,
     tags: ['adoption', 'strategy'],
+    industryExamples: {
+      insurance: 'E.g., claims automation, underwriting efficiency, fraud detection, policyholder self-service.',
+      banking: 'E.g., credit risk modeling, fraud detection, customer onboarding, regulatory reporting.',
+      healthcare_providers: 'E.g., clinical decision support, patient scheduling optimization, documentation automation.',
+      manufacturing_discrete: 'E.g., predictive maintenance, quality control, supply chain optimization, demand forecasting.',
+      software_saas: 'E.g., code generation, customer support automation, product analytics, security monitoring.',
+      energy_oil_gas: 'E.g., reservoir modeling, pipeline monitoring, trading optimization, safety compliance.',
+    },
   },
   {
     id: 'AB-05',
@@ -266,6 +282,13 @@ const authorityStructure: DiagnosticQuestion[] = [
     ],
     weight: 1.2,
     tags: ['authority', 'legal', 'compliance', 'governance'],
+    industryExamples: {
+      insurance: 'Consider state insurance regulations, NAIC model laws, and fair pricing compliance.',
+      banking: 'Consider OCC/Fed model risk guidance (SR 11-7), ECOA fair lending, BSA/AML.',
+      healthcare_providers: 'Consider HIPAA, FDA AI/ML device regulations, and clinical practice standards.',
+      capital_markets: 'Consider SEC/FINRA oversight, algorithmic trading rules, and best execution obligations.',
+      government_federal: 'Consider FedRAMP, NIST AI RMF, and OMB AI governance directives.',
+    },
   },
   {
     id: 'AS-06',
@@ -308,6 +331,12 @@ const authorityStructure: DiagnosticQuestion[] = [
     ],
     weight: 1.2,
     tags: ['authority', 'ethics', 'responsible_ai'],
+    industryExamples: {
+      insurance: 'Consider fair pricing, claims denial bias, protected class impacts, and state regulatory scrutiny.',
+      banking: 'Consider fair lending (ECOA), disparate impact in credit decisions, and model risk management.',
+      healthcare_providers: 'Consider clinical AI bias, diagnostic equity, HIPAA, and patient safety oversight.',
+      government_federal: 'Consider OMB AI governance mandates, equity impact assessments, and public trust.',
+    },
   },
   {
     id: 'AS-09',
@@ -386,6 +415,14 @@ const workflowIntegration: DiagnosticQuestion[] = [
     ],
     weight: 1.3,
     tags: ['workflow', 'integration', 'systems'],
+    industryExamples: {
+      insurance: 'E.g., policy admin systems (Guidewire, Duck Creek), claims platforms, agent portals.',
+      banking: 'E.g., core banking (FIS, Temenos), CRM, loan origination, trading platforms.',
+      healthcare_providers: 'E.g., EMR/EHR systems (Epic, Cerner), PACS imaging, scheduling systems.',
+      manufacturing_discrete: 'E.g., ERP (SAP, Oracle), MES, SCADA, quality management systems.',
+      retail: 'E.g., POS systems, inventory management, e-commerce platforms, CRM.',
+      consulting_services: 'E.g., project management, CRM, knowledge management, time tracking.',
+    },
   },
   {
     id: 'WI-02',
@@ -400,6 +437,12 @@ const workflowIntegration: DiagnosticQuestion[] = [
     ],
     weight: 1.2,
     tags: ['workflow', 'automation'],
+    industryExamples: {
+      insurance: 'E.g., AI underwrites a policy: does it auto-bind, or does an underwriter re-key it?',
+      healthcare_providers: 'E.g., AI suggests a diagnosis: does it auto-populate the chart, or does the physician re-enter it?',
+      banking: 'E.g., AI flags a suspicious transaction: does it auto-hold, or does an analyst manually review every alert?',
+      manufacturing_discrete: 'E.g., AI detects a quality defect: does it auto-halt the line, or does an operator verify manually?',
+    },
   },
   {
     id: 'WI-03',
@@ -414,6 +457,13 @@ const workflowIntegration: DiagnosticQuestion[] = [
     ],
     weight: 1.1,
     tags: ['workflow', 'data', 'infrastructure'],
+    industryExamples: {
+      insurance: 'Consider claims data, policy systems, actuarial data, and third-party data providers.',
+      banking: 'Consider transaction data, customer data, market data feeds, and regulatory reporting systems.',
+      healthcare_providers: 'Consider EMR data, lab results, imaging data, and claims/billing systems.',
+      manufacturing_discrete: 'Consider IoT sensor data, MES production data, ERP, and supply chain data.',
+      retail: 'Consider POS transaction data, inventory systems, customer behavior data, and supplier feeds.',
+    },
   },
   {
     id: 'WI-04',
@@ -442,6 +492,12 @@ const workflowIntegration: DiagnosticQuestion[] = [
     ],
     weight: 1.4,
     tags: ['workflow', 'production', 'scale'],
+    industryExamples: {
+      insurance: 'Count AI in production claims handling, underwriting, or customer service vs. still in pilot.',
+      banking: 'Count AI in production credit decisioning, fraud detection, or compliance vs. still in pilot.',
+      healthcare_providers: 'Count AI in production clinical workflows, scheduling, or billing vs. still in pilot.',
+      manufacturing_discrete: 'Count AI in production quality control, maintenance, or planning vs. still in pilot.',
+    },
   },
   {
     id: 'WI-06',
@@ -675,6 +731,11 @@ const decisionVelocity: DiagnosticQuestion[] = [
     ],
     weight: 1.0,
     tags: ['velocity', 'agility', 'pivot'],
+    industryExamples: {
+      insurance: 'E.g., switching from rules-based to ML-based underwriting, or pivoting a claims AI from auto-adjudication to triage.',
+      healthcare_providers: 'E.g., pivoting a clinical decision support tool from one specialty to another, or changing AI imaging vendors.',
+      banking: 'E.g., restructuring a credit scoring model approach, or pivoting fraud detection from rule-based to deep learning.',
+    },
   },
   {
     id: 'DV-09',
@@ -753,6 +814,13 @@ const economicTranslation: DiagnosticQuestion[] = [
     ],
     weight: 1.4,
     tags: ['economic', 'measurement', 'financial'],
+    industryExamples: {
+      insurance: 'E.g., loss ratio improvement from AI underwriting, claims processing cost per claim, NPS impact.',
+      banking: 'E.g., fraud losses prevented, cost per loan origination, customer acquisition cost reduction.',
+      healthcare_providers: 'E.g., revenue per physician hour, readmission rate reduction, documentation time savings.',
+      manufacturing_discrete: 'E.g., OEE improvement, defect rate reduction, unplanned downtime cost avoidance.',
+      consulting_services: 'E.g., utilization rate improvement, proposal win rate, knowledge leverage ratio.',
+    },
   },
   {
     id: 'ET-02',
@@ -865,6 +933,14 @@ const economicTranslation: DiagnosticQuestion[] = [
     ],
     weight: 1.3,
     tags: ['economic', 'revenue', 'innovation'],
+    industryExamples: {
+      insurance: 'E.g., AI-powered parametric products, usage-based pricing, embedded insurance.',
+      banking: 'E.g., AI-driven robo-advisory, personalized product recommendations, new risk assessment products.',
+      healthcare_providers: 'E.g., AI-enabled remote monitoring services, precision medicine programs, predictive health subscriptions.',
+      software_saas: 'E.g., AI-native product features, AI copilot offerings, data-as-a-service.',
+      manufacturing_discrete: 'E.g., predictive maintenance as a service, AI-optimized custom manufacturing.',
+      retail: 'E.g., AI-powered personal shopping, dynamic pricing, hyper-personalized marketing.',
+    },
   },
   {
     id: 'ET-10',
@@ -879,6 +955,13 @@ const economicTranslation: DiagnosticQuestion[] = [
     ],
     weight: 1.0,
     tags: ['economic', 'benchmarking', 'investment'],
+    industryExamples: {
+      insurance: 'Insurance AI spend benchmarks: top carriers invest 2-5% of revenue in technology transformation.',
+      banking: 'Banking AI spend benchmarks: leading banks invest 3-7% of revenue in technology and AI.',
+      healthcare_providers: 'Healthcare AI spend benchmarks: leading systems invest 2-4% of operating revenue in digital and AI.',
+      software_saas: 'Tech AI spend benchmarks: leading SaaS companies invest 15-25% of revenue in R&D including AI.',
+      manufacturing_discrete: 'Manufacturing AI spend benchmarks: Industry 4.0 leaders invest 1-3% of revenue in digital manufacturing.',
+    },
   },
   {
     id: 'ET-11',
