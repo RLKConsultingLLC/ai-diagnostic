@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -293,13 +294,25 @@ export default function Home() {
                 This diagnostic was not built by a software company.
                 It was built by a consultant who has done this work by hand.
               </h2>
+              <div className="flex items-start gap-5 mb-6">
+                <Image
+                  src="/ryan-king.jpg"
+                  alt="Ryan King, Founder of RLK Consulting"
+                  width={72}
+                  height={72}
+                  className="rounded-full object-cover w-[72px] h-[72px] shrink-0 border border-light shadow-sm"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-navy">Ryan L. King</p>
+                  <p className="text-xs text-tertiary">Founder, RLK Consulting</p>
+                </div>
+              </div>
               <p className="text-foreground/70 leading-relaxed mb-5">
-                Ryan King is the founder of RLK Consulting. She has spent
-                nearly 15 years in consulting, including a decade across
-                McKinsey &amp; Company and Deloitte, advising CIOs, CTOs,
-                and senior technology leaders on strategy, performance, and
-                organizational transformation. She is the author of{" "}
-                <em>The Human and Machine Company</em> (2026).
+                Ryan has spent nearly 15 years in consulting, including a
+                decade across McKinsey &amp; Company and Deloitte, advising
+                CIOs, CTOs, and senior technology leaders on strategy,
+                performance, and organizational transformation. She is the
+                author of <em>The Human and Machine Company</em> (2026).
               </p>
               <p className="text-foreground/70 leading-relaxed mb-5">
                 Her work sits at the intersection of technology strategy
