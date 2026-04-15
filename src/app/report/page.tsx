@@ -753,7 +753,7 @@ function ReportPage() {
 
                     {/* Detailed findings */}
                     <div className="md:col-span-2 space-y-1">
-                      <SubCollapsible title="The Structural Reality" hint="View dimension analysis" defaultOpen>
+                      <SubCollapsible title="The Structural Reality" hint="View dimension analysis" defaultOpen icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           Across five behavioral dimensions, {result.companyProfile.companyName}&apos;s strongest area
                           is <strong className="text-navy">{dimensionLabel(strongest?.dimension || "")}</strong> ({strongest?.normalizedScore}/100),
@@ -766,7 +766,7 @@ function ReportPage() {
                         </p>
                       </SubCollapsible>
 
-                      <SubCollapsible title="The Economic Opportunity" hint="View financial impact">
+                      <SubCollapsible title="The Economic Opportunity" hint="View financial impact" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           The diagnostic estimates <strong className="text-navy">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
                           {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value -
@@ -780,7 +780,7 @@ function ReportPage() {
                         </p>
                       </SubCollapsible>
 
-                      <SubCollapsible title="The Competitive Context" hint="View positioning">
+                      <SubCollapsible title="The Competitive Context" hint="View positioning" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           {result.companyProfile.companyName} sits in the{" "}
                           <strong className="text-navy">{(() => {
@@ -801,7 +801,7 @@ function ReportPage() {
                         </p>
                       </SubCollapsible>
 
-                      <SubCollapsible title="The Path Forward" hint="View next steps">
+                      <SubCollapsible title="The Path Forward" hint="View next steps" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           Section 7 maps the <strong className="text-secondary">security and governance risks</strong> your current posture creates.
                           Section 9 provides <strong className="text-secondary">messages for the board</strong> with specific decision items and investment asks.
@@ -1051,6 +1051,7 @@ function ReportPage() {
                     title={`${ci.name}: ${ci.score}/100 (${ciTier})`}
                     hint="View detailed analysis"
                     defaultOpen={ci.score < 50}
+                    icon={compositeIndexIcon(ci.slug)}
                   >
                   <div
                     className="border border-light p-4 md:p-6"
@@ -1305,7 +1306,7 @@ function ReportPage() {
             </p>
 
             {/* Methodology credibility block */}
-            <SubCollapsible title="How We Calculate These Numbers" hint="View methodology">
+            <SubCollapsible title="How We Calculate These Numbers" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" /></svg>}>
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
                   <p>
@@ -1351,12 +1352,12 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Waterfall / Funnel visualization */}
-            <SubCollapsible title="Value Waterfall" defaultOpen>
+            <SubCollapsible title="Value Waterfall" defaultOpen icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>}>
               <EconomicWaterfall estimate={result.economicEstimate} profile={result.companyProfile} />
             </SubCollapsible>
 
             {/* Cost of delay */}
-            <SubCollapsible title="Cost of Inaction" defaultOpen>
+            <SubCollapsible title="Cost of Inaction" defaultOpen icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
               <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
                 <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
                   <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
@@ -1576,7 +1577,7 @@ function ReportPage() {
             </p>
 
             {/* Detailed risk context */}
-            <SubCollapsible title="Understanding This Assessment" hint="View methodology">
+            <SubCollapsible title="Understanding This Assessment" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
               <div className="bg-offwhite border border-light p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed mb-3">
                   Your risk profile is derived from inverting your dimension scores: low governance
@@ -1634,7 +1635,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Risk Matrix visualization */}
-            <SubCollapsible title="Risk Matrix (Likelihood x Impact)" hint="View matrix">
+            <SubCollapsible title="Risk Matrix (Likelihood x Impact)" hint="View matrix" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>}>
               <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
             </SubCollapsible>
 
@@ -1692,17 +1693,18 @@ function ReportPage() {
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                   {[
-                    { label: "Fit", desc: "Use case alignment" },
-                    { label: "Scale", desc: "Enterprise readiness" },
-                    { label: "Cost", desc: "TCO & pricing" },
-                    { label: "Risk", desc: "Lock-in & continuity" },
-                    { label: "Support", desc: "Implementation depth" },
-                    { label: "Ecosystem", desc: "Integration breadth" },
+                    { label: "Fit", desc: "Use case alignment", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg> },
+                    { label: "Scale", desc: "Enterprise readiness", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg> },
+                    { label: "Cost", desc: "TCO & pricing", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg> },
+                    { label: "Risk", desc: "Lock-in & continuity", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg> },
+                    { label: "Support", desc: "Implementation depth", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.712 4.33a9.027 9.027 0 011.652 1.306c.51.51.944 1.064 1.306 1.652M16.712 4.33l-3.448 4.138m3.448-4.138a9.014 9.014 0 00-9.424 0M19.67 7.288l-4.138 3.448m4.138-3.448a9.014 9.014 0 010 9.424m-4.138-5.976a3.736 3.736 0 00-.88-1.388 3.737 3.737 0 00-1.388-.88m2.268 2.268a3.765 3.765 0 010 2.528m-2.268-4.796a3.765 3.765 0 00-2.528 0m4.796 4.796c-.181.506-.475.982-.88 1.388a3.736 3.736 0 01-1.388.88m2.268-2.268l4.138 3.448m0 0a9.027 9.027 0 01-1.306 1.652 9.027 9.027 0 01-1.652 1.306m0 0l-3.448-4.138m3.448 4.138a9.014 9.014 0 01-9.424 0m5.976-4.138a3.765 3.765 0 01-2.528 0m0 0a3.736 3.736 0 01-1.388-.88 3.737 3.737 0 01-.88-1.388m0 0l-4.138-3.448m0 0a9.027 9.027 0 01-1.306-1.652A9.014 9.014 0 014.33 7.288m5.976 4.138l-4.138 3.448m0 0a9.014 9.014 0 000-9.424m4.138 5.976a3.765 3.765 0 010-2.528m0 0c.181-.506.475-.982.88-1.388a3.736 3.736 0 011.388-.88" /></svg> },
+                    { label: "Ecosystem", desc: "Integration breadth", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.193-5.615a4.5 4.5 0 00-6.364-6.364L4.5 5.7a4.5 4.5 0 001.242 7.244" /></svg> },
                   ].map((crit) => (
                     <div
                       key={crit.label}
                       className="bg-white border border-light p-3 text-center"
                     >
+                      <div className="flex justify-center text-navy/50 mb-1.5">{crit.icon}</div>
                       <p className="text-xs font-semibold text-secondary">
                         {crit.label}
                       </p>
@@ -1800,31 +1802,40 @@ function ReportPage() {
                   {[
                     {
                       lever: "Declining Unit Economics",
-                      description: `AI inference costs drop 30-50% annually as models become more efficient. ${result.stageClassification.primaryStage <= 2 ? `As ${result.companyProfile.companyName} enters new AI contracts, build` : `In ${result.companyProfile.companyName}'s existing and future contracts, ensure`} automatic price reductions — 15-20% annual step-downs are reasonable. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying on AI compute by even 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.`,
+                      icon: <svg className="w-4 h-4 text-navy/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" /></svg>,
+                      description: `AI inference costs drop 30-50% annually as models become more efficient. ${result.stageClassification.primaryStage <= 2 ? `As ${result.companyProfile.companyName} enters new AI contracts, build` : `In ${result.companyProfile.companyName}'s existing and future contracts, ensure`} automatic price reductions - 15-20% annual step-downs are reasonable. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying on AI compute by even 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.`,
                     },
                     {
                       lever: "Data Portability Guarantees",
-                      description: `Insist on full data export in standard formats with ≤30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, data portability is not just a commercial issue — it's a regulatory requirement. Your patient data, financial records, and compliance models must be extractable on demand.` : `${result.companyProfile.companyName}'s training data and fine-tuned models are proprietary IP — vendor lock-in happens when you cannot take them with you.`}`,
+                      icon: <svg className="w-4 h-4 text-navy/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>,
+                      description: `Insist on full data export in standard formats with ≤30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, data portability is not just a commercial issue - it's a regulatory requirement. Your patient data, financial records, and compliance models must be extractable on demand.` : `${result.companyProfile.companyName}'s training data and fine-tuned models are proprietary IP - vendor lock-in happens when you cannot take them with you.`}`,
                     },
                     {
                       lever: "Model-Agnostic Architecture",
-                      description: `Structure contracts to allow model swaps without renegotiation. The LLM landscape shifts quarterly — ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid committing to a single model provider before understanding which capabilities matter most for ${industryLabel(result.companyProfile.industry)} use cases` : `${result.companyProfile.companyName} should ensure existing integrations support model substitution as better options emerge`}. Require API-compatible alternatives.`,
+                      icon: <svg className="w-4 h-4 text-navy/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>,
+                      description: `Structure contracts to allow model swaps without renegotiation. The LLM landscape shifts quarterly - ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid committing to a single model provider before understanding which capabilities matter most for ${industryLabel(result.companyProfile.industry)} use cases` : `${result.companyProfile.companyName} should ensure existing integrations support model substitution as better options emerge`}. Require API-compatible alternatives.`,
                     },
                     {
                       lever: "Usage-Based Pricing with Caps",
-                      description: `Negotiate consumption-based pricing with hard budget caps and volume discounts. ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid flat enterprise licenses until AI usage patterns stabilize — organizations at Stage ${result.stageClassification.primaryStage} typically overpay by 40-60% in year one because adoption is uneven.` : `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} has enough usage data to negotiate volume tiers that match actual consumption. Push for 25-40% volume discounts at your scale.`}`,
+                      icon: <svg className="w-4 h-4 text-navy/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+                      description: `Negotiate consumption-based pricing with hard budget caps and volume discounts. ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid flat enterprise licenses until AI usage patterns stabilize - organizations at Stage ${result.stageClassification.primaryStage} typically overpay by 40-60% in year one because adoption is uneven.` : `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} has enough usage data to negotiate volume tiers that match actual consumption. Push for 25-40% volume discounts at your scale.`}`,
                     },
                     {
                       lever: "Performance SLAs with Teeth",
-                      description: `Tie payments to measurable outcomes: latency, accuracy, uptime, not just availability. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, model accuracy degradation can create compliance liability — your contracts must include drift monitoring and penalty clauses for performance degradation below agreed thresholds.` : `AI outputs can drift over time as data distributions change. ${result.companyProfile.companyName}'s contracts should include penalty clauses for model degradation below agreed accuracy thresholds.`}`,
+                      icon: <svg className="w-4 h-4 text-navy/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>,
+                      description: `Tie payments to measurable outcomes: latency, accuracy, uptime, not just availability. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, model accuracy degradation can create compliance liability - your contracts must include drift monitoring and penalty clauses for performance degradation below agreed thresholds.` : `AI outputs can drift over time as data distributions change. ${result.companyProfile.companyName}'s contracts should include penalty clauses for model degradation below agreed accuracy thresholds.`}`,
                     },
                     {
                       lever: "Termination Without Penalty",
-                      description: `Negotiate 90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName}'s AI strategy will evolve significantly — 3-year lock-ins made today will be regretted in 18 months. Insist on flexibility.` : `Even at Stage ${result.stageClassification.primaryStage}, the AI vendor landscape is volatile enough that long-term lock-ins carry material risk. If the product delivers value, ${result.companyProfile.companyName} will stay anyway.`}`,
+                      icon: <svg className="w-4 h-4 text-navy/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>,
+                      description: `Negotiate 90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName}'s AI strategy will evolve significantly - 3-year lock-ins made today will be regretted in 18 months. Insist on flexibility.` : `Even at Stage ${result.stageClassification.primaryStage}, the AI vendor landscape is volatile enough that long-term lock-ins carry material risk. If the product delivers value, ${result.companyProfile.companyName} will stay anyway.`}`,
                     },
                   ].map((item) => (
                     <SubCollapsible key={item.lever} title={item.lever} hint="View negotiation details">
-                      <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
+                        <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
+                      </div>
                     </SubCollapsible>
                   ))}
                 </div>
@@ -1863,7 +1874,7 @@ function ReportPage() {
             </p>
 
             {/* Peer board intelligence */}
-            <SubCollapsible title="What Peer Boards Are Doing" hint="View peer actions">
+            <SubCollapsible title="What Peer Boards Are Doing" hint="View peer actions" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" /></svg>}>
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3">
                   {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
@@ -2737,9 +2748,9 @@ function CollapsibleSection({
 // ---------------------------------------------------------------------------
 
 function SubCollapsible({
-  title, children, defaultOpen = false, hint,
+  title, children, defaultOpen = false, hint, icon,
 }: {
-  title: string; children: React.ReactNode; defaultOpen?: boolean; hint?: string;
+  title: string; children: React.ReactNode; defaultOpen?: boolean; hint?: string; icon?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -2756,6 +2767,7 @@ function SubCollapsible({
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
+        {icon && <span className="flex-shrink-0 text-navy/40">{icon}</span>}
         <span className={`text-sm font-semibold flex-1 transition-colors ${open ? "text-navy" : "text-secondary group-hover:text-navy/80"}`}>{title}</span>
         {!open && (
           <span className="text-[10px] text-tertiary/60 tracking-wide uppercase font-medium hidden sm:inline">
@@ -4062,6 +4074,15 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
     || (isStrength
       ? `This behavioral signal indicates organizational capability above ${ind} norms — a foundation that accelerates value capture from AI investment.`
       : `This behavioral gap constrains AI value capture in ${ind}. Addressing it unlocks disproportionate returns relative to the effort required.`);
+}
+
+function compositeIndexIcon(slug: string): React.ReactNode {
+  const icons: Record<string, React.ReactNode> = {
+    authority_friction: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>,
+    decision_velocity: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>,
+    economic_translation: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>,
+  };
+  return icons[slug] || null;
 }
 
 function compositeIndexDescription(slug: string, score: number, industry: string): string {
