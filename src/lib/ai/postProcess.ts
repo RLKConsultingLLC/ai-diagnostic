@@ -27,7 +27,7 @@ function getClient(): Anthropic {
   return _client;
 }
 
-const MODEL = 'claude-3-5-sonnet-20241022';
+const MODEL = 'claude-sonnet-4-6';
 
 // ---------------------------------------------------------------------------
 // Deduplication + Quality Pass
