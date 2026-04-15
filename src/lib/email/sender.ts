@@ -1,8 +1,8 @@
 // =============================================================================
 // RLK AI Diagnostic — Email Sender
 // =============================================================================
-// Sends diagnostic report emails via Resend. Reads RESEND_API_KEY from
-// environment variables. Wraps the template builder for a single-call API.
+// Sends diagnostic report emails via Resend with PDF attachment.
+// Reads RESEND_API_KEY from environment variables.
 // =============================================================================
 
 import { Resend } from 'resend';
@@ -21,6 +21,7 @@ export interface SendReportEmailInput {
   unrealizedValueHigh: number;
   overallScore: number;
   reportUrl: string;
+  pdfBuffer?: Buffer; // Optional PDF attachment
 }
 
 export interface SendReportEmailResult {
@@ -32,7 +33,7 @@ export interface SendReportEmailResult {
 export async function sendReportEmail(
   input: SendReportEmailInput
 ): Promise<SendReportEmailResult> {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
     throw new Error(
       'RESEND_API_KEY environment variable is not set. Cannot send email.'
@@ -41,8 +42,18 @@ export async function sendReportEmail(
 
   const resend = new Resend(apiKey);
 
-  const { to, ...templateInput } = input;
+  const { to, pdfBuffer, ...templateInput } = input;
   const { subject, html, text } = buildReportEmail(templateInput);
+
+  // Build attachments array if PDF is provided
+  const attachments = pdfBuffer
+    ? [
+        {
+          filename: `RLK-AI-Diagnostic-${input.companyName.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`,
+          content: pdfBuffer,
+        },
+      ]
+    : undefined;
 
   const { data, error } = await resend.emails.send({
     from: `${FROM_NAME} <${FROM_ADDRESS}>`,
@@ -50,6 +61,7 @@ export async function sendReportEmail(
     subject,
     html,
     text,
+    attachments,
   });
 
   if (error) {

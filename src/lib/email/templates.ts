@@ -3,6 +3,7 @@
 // =============================================================================
 // Branded email builder for delivering AI diagnostic reports to executives.
 // Uses inline CSS and table-based layout for maximum email client compatibility.
+// Matches RLK navy color scheme.
 // =============================================================================
 
 export interface ReportEmailInput {
@@ -32,6 +33,15 @@ function formatCurrency(value: number): string {
   return `$${value.toLocaleString()}`;
 }
 
+// RLK Brand Colors
+const NAVY = '#0B1D3A';
+const SECONDARY = '#364E6E';
+const TERTIARY = '#6B7F99';
+const ACCENT = '#A8B5C4';
+const LIGHT = '#CED5DD';
+const OFFWHITE = '#F7F8FA';
+const BODY_TEXT = '#2D2D2D';
+
 export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
   const {
     recipientName,
@@ -47,7 +57,7 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
   const valueLow = formatCurrency(unrealizedValueLow);
   const valueHigh = formatCurrency(unrealizedValueHigh);
 
-  const subject = 'Your AI Strategy Diagnostic Report | RLK Consulting';
+  const subject = `Your AI Diagnostic Report | ${companyName}`;
 
   const html = `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -66,35 +76,45 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
   </noscript>
   <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Georgia,'Times New Roman',Times,serif;">
+<body style="margin:0;padding:0;background-color:${OFFWHITE};font-family:Calibri,'Segoe UI',system-ui,-apple-system,sans-serif;">
   <!-- Outer wrapper -->
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f5f7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};">
     <tr>
       <td align="center" style="padding:32px 16px;">
         <!-- Inner container -->
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:4px;overflow:hidden;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;overflow:hidden;">
 
-          <!-- Header -->
+          <!-- RLK Gradient Bar -->
           <tr>
-            <td style="background-color:#1a2332;padding:32px 40px;text-align:center;">
+            <td style="font-size:0;line-height:0;height:5px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:24px;font-weight:bold;color:#c9a84c;letter-spacing:1px;text-align:center;">
-                    RLK CONSULTING
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8a95a5;letter-spacing:2px;text-transform:uppercase;text-align:center;padding-top:8px;">
-                    AI Strategy &amp; Transformation
-                  </td>
+                  <td style="width:20%;background-color:${NAVY};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${SECONDARY};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${TERTIARY};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${ACCENT};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${LIGHT};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Gold accent bar -->
+          <!-- Header -->
           <tr>
-            <td style="background-color:#c9a84c;height:3px;font-size:1px;line-height:1px;">&nbsp;</td>
+            <td style="background-color:${NAVY};padding:32px 40px;text-align:center;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:13px;font-weight:bold;color:#ffffff;letter-spacing:4px;text-transform:uppercase;text-align:center;">
+                    RLK CONSULTING
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${ACCENT};letter-spacing:2px;text-transform:uppercase;text-align:center;padding-top:8px;">
+                    AI Diagnostic Report
+                  </td>
+                </tr>
+              </table>
+            </td>
           </tr>
 
           <!-- Body content -->
@@ -103,30 +123,35 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
               <!-- Greeting -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:18px;color:#1a2332;line-height:28px;padding-bottom:24px;">
-                    Dear ${recipientName},
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:18px;color:${NAVY};line-height:28px;padding-bottom:24px;font-weight:600;">
+                    ${recipientName},
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:15px;color:#333333;line-height:26px;padding-bottom:24px;">
-                    Thank you for completing the RLK AI Strategy Diagnostic on behalf of ${companyName}. Your results have been analyzed against our proprietary AI Maturity Framework, and your full report is now available.
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:15px;color:${BODY_TEXT};line-height:26px;padding-bottom:24px;">
+                    Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete. The full report is attached as a PDF for your review.
                   </td>
                 </tr>
               </table>
 
               <!-- Findings summary box -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8f9fa;border-left:4px solid #c9a84c;border-radius:2px;margin-bottom:24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};border-left:3px solid ${NAVY};margin-bottom:24px;">
                 <tr>
                   <td style="padding:24px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8a95a5;letter-spacing:1.5px;text-transform:uppercase;padding-bottom:12px;">
+                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${TERTIARY};letter-spacing:2px;text-transform:uppercase;padding-bottom:14px;font-weight:600;">
                           Key Findings
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:15px;color:#333333;line-height:26px;">
-                          ${companyName} is currently positioned at <strong style="color:#1a2332;">Stage ${stageNumber}: ${stageName}</strong> in AI maturity, with an overall readiness score of <strong style="color:#1a2332;">${overallScore} out of 100</strong>. Our analysis indicates an estimated <strong style="color:#1a2332;">${valueLow} to ${valueHigh}</strong> in unrealized annual value from AI capabilities that are within reach given your current organizational profile. The full report details specific dimensions where targeted action will yield the most significant returns.
+                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
+                          <strong style="color:${NAVY};">Stage ${stageNumber}: ${stageName}</strong> &nbsp;|&nbsp; Overall Score: <strong style="color:${NAVY};">${overallScore}/100</strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-top:8px;">
+                          Estimated unrealized AI value: <strong style="color:${NAVY};">${valueLow} &ndash; ${valueHigh}</strong> annually
                         </td>
                       </tr>
                     </table>
@@ -134,39 +159,50 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                 </tr>
               </table>
 
-              <!-- CTA button -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+              <!-- What's in the report -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
                 <tr>
-                  <td align="center" style="padding:8px 0;">
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
+                    Your attached report includes:
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:26px;padding-top:8px;padding-left:16px;">
+                    &bull;&nbsp; Five-dimension AI maturity scoring with benchmarks<br/>
+                    &bull;&nbsp; Competitive positioning and industry context<br/>
+                    &bull;&nbsp; Economic impact analysis with ROI estimates<br/>
+                    &bull;&nbsp; Prioritized 90-day action roadmap
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Separator -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+                <tr>
+                  <td style="border-top:1px solid ${LIGHT};font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </table>
+
+              <!-- CTA -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+                <tr>
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
+                    Want to discuss these findings with your leadership team? We offer a complimentary 30-minute strategy session to walk through the results and identify quick wins.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top:16px;" align="center">
                     <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${reportUrl}" style="height:52px;v-text-anchor:middle;width:320px;" arcsize="6%" strokecolor="#c9a84c" fillcolor="#c9a84c">
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="mailto:ryan.king@rlkconsultingco.com?subject=AI Diagnostic Follow-Up" style="height:48px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="${NAVY}" fillcolor="${NAVY}">
                       <w:anchorlock/>
-                      <center style="color:#1a2332;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">VIEW YOUR FULL REPORT</center>
+                      <center style="color:#ffffff;font-family:Calibri,sans-serif;font-size:14px;font-weight:bold;">SCHEDULE A STRATEGY SESSION</center>
                     </v:roundrect>
                     <![endif]-->
                     <!--[if !mso]><!-->
-                    <a href="${reportUrl}" target="_blank" style="display:inline-block;background-color:#c9a84c;color:#1a2332;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;text-decoration:none;padding:16px 48px;border-radius:3px;letter-spacing:0.5px;">
-                      VIEW YOUR FULL REPORT
+                    <a href="mailto:ryan.king@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20%E2%80%94%20${encodeURIComponent(companyName)}" target="_blank" style="display:inline-block;background-color:${NAVY};color:#ffffff;font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:14px 36px;letter-spacing:1px;text-transform:uppercase;">
+                      Schedule a Strategy Session
                     </a>
                     <!--<![endif]-->
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Credibility section -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #e8e8e8;margin-bottom:24px;">
-                <tr>
-                  <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:14px;color:#555555;line-height:24px;padding-top:24px;font-style:italic;">
-                    This diagnostic is based on RLK Consulting's proprietary AI Maturity Framework, developed from engagements with over 200 enterprise organizations.
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Closing invitation -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
-                <tr>
-                  <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:15px;color:#333333;line-height:26px;">
-                    We would welcome the opportunity to discuss these findings with your leadership team. A brief conversation can help translate these results into a concrete action plan tailored to ${companyName}'s strategic priorities.
                   </td>
                 </tr>
               </table>
@@ -175,25 +211,24 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
 
           <!-- Signature -->
           <tr>
-            <td style="padding:0 40px 40px 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #e8e8e8;">
+            <td style="padding:0 40px 32px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid ${LIGHT};">
                 <tr>
-                  <td style="padding-top:24px;">
+                  <td style="padding-top:20px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:15px;color:#1a2332;line-height:24px;">
-                          With regard,
+                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${NAVY};line-height:22px;font-weight:600;">
+                          Ryan King
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Georgia,'Times New Roman',Times,serif;font-size:15px;color:#1a2332;line-height:24px;padding-top:16px;font-weight:bold;">
-                          RLK Consulting
+                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
+                          Founder, RLK Consulting
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#8a95a5;line-height:20px;letter-spacing:0.5px;">
-                          AI Strategy &amp; Transformation<br/>
-                          <a href="mailto:hello@rlkconsultingco.com" style="color:#c9a84c;text-decoration:none;">hello@rlkconsultingco.com</a>
+                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
+                          <a href="mailto:ryan.king@rlkconsultingco.com" style="color:${SECONDARY};text-decoration:none;">ryan.king@rlkconsultingco.com</a>
                         </td>
                       </tr>
                     </table>
@@ -205,17 +240,34 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
 
           <!-- Footer -->
           <tr>
-            <td style="background-color:#1a2332;padding:24px 40px;text-align:center;">
+            <td style="background-color:${NAVY};padding:24px 40px;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8a95a5;line-height:18px;text-align:center;">
-                    RLK Consulting | AI Strategy &amp; Transformation
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${ACCENT};text-align:center;padding-bottom:8px;">
+                    <a href="https://www.rlkconsultingco.com" target="_blank" rel="noopener noreferrer" style="color:${ACCENT};text-decoration:none;font-weight:600;">
+                      www.rlkconsultingco.com
+                    </a>
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#5a6577;line-height:18px;text-align:center;padding-top:8px;">
-                    This report was generated by the RLK AI Diagnostic diagnostic platform.
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${TERTIARY};text-align:center;">
+                    RLK Consulting, LLC &nbsp;|&nbsp; AI Strategy &amp; Transformation
                   </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Bottom gradient bar -->
+          <tr>
+            <td style="font-size:0;line-height:0;height:4px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="width:20%;background-color:${NAVY};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${SECONDARY};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${TERTIARY};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${ACCENT};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
+                  <td style="width:20%;background-color:${LIGHT};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
                 </tr>
               </table>
             </td>
@@ -230,38 +282,35 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
 </body>
 </html>`;
 
-  const text = `YOUR AI STRATEGY DIAGNOSTIC REPORT
-RLK Consulting | AI Strategy & Transformation
+  const text = `RLK CONSULTING | AI DIAGNOSTIC REPORT
 ${'='.repeat(52)}
 
-Dear ${recipientName},
+${recipientName},
 
-Thank you for completing the RLK AI Strategy Diagnostic on behalf of ${companyName}. Your results have been analyzed against our proprietary AI Maturity Framework, and your full report is now available.
+Your RLK AI Diagnostic for ${companyName} is complete. The full report is attached as a PDF.
 
 KEY FINDINGS
 ${'-'.repeat(52)}
-${companyName} is currently positioned at Stage ${stageNumber}: ${stageName} in AI maturity, with an overall readiness score of ${overallScore} out of 100.
+Stage ${stageNumber}: ${stageName} | Overall Score: ${overallScore}/100
+Estimated unrealized AI value: ${valueLow} - ${valueHigh} annually
 
-Our analysis indicates an estimated ${valueLow} to ${valueHigh} in unrealized annual value from AI capabilities that are within reach given your current organizational profile.
-
-The full report details specific dimensions where targeted action will yield the most significant returns.
-
-VIEW YOUR FULL REPORT:
-${reportUrl}
+Your report includes:
+  - Five-dimension AI maturity scoring with benchmarks
+  - Competitive positioning and industry context
+  - Economic impact analysis with ROI estimates
+  - Prioritized 90-day action roadmap
 
 ${'-'.repeat(52)}
-This diagnostic is based on RLK Consulting's proprietary AI Maturity Framework, developed from engagements with over 200 enterprise organizations.
 
-We would welcome the opportunity to discuss these findings with your leadership team. A brief conversation can help translate these results into a concrete action plan tailored to ${companyName}'s strategic priorities.
+Want to discuss these findings? We offer a complimentary 30-minute strategy session. Reply to this email or contact ryan.king@rlkconsultingco.com.
 
-With regard,
-
-RLK Consulting
-AI Strategy & Transformation
+Ryan King
+Founder, RLK Consulting
+ryan.king@rlkconsultingco.com
 
 ${'='.repeat(52)}
-RLK Consulting | AI Strategy & Transformation
-This report was generated by the RLK AI Diagnostic diagnostic platform.
+www.rlkconsultingco.com
+RLK Consulting, LLC | AI Strategy & Transformation
 `;
 
   return { subject, html, text };

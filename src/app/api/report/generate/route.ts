@@ -11,8 +11,6 @@ import { getSession, updateSession } from '@/lib/db/store';
 import { generateFullReport } from '@/lib/ai/generate';
 import { getResearchProfile, getResearchStatus } from '@/lib/research/engine';
 import { computeResearchAdjustments } from '@/lib/diagnostic/research-integration';
-import { sendReportEmail } from '@/lib/email/sender';
-
 // Report generation calls Claude and can take 30-90s
 export const maxDuration = 120;
 
@@ -99,38 +97,6 @@ export async function POST(request: NextRequest) {
       generatedReport: report,
       status: 'report_generated',
     });
-
-    // Send the report delivery email if an executive email was provided
-    const executiveEmail = session.companyProfile.executiveEmail;
-    if (executiveEmail && process.env.RESEND_API_KEY) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ai-diagnostic-silk.vercel.app';
-      const reportUrl = `${appUrl}/report?sessionId=${sessionId}`;
-
-      try {
-        const emailResult = await sendReportEmail({
-          to: executiveEmail,
-          recipientName: session.companyProfile.executiveName || 'Executive',
-          companyName: session.companyProfile.companyName,
-          stageName: session.diagnosticResult.stageClassification.stageName,
-          stageNumber: session.diagnosticResult.stageClassification.primaryStage,
-          unrealizedValueLow: session.diagnosticResult.economicEstimate.unrealizedValueLow,
-          unrealizedValueHigh: session.diagnosticResult.economicEstimate.unrealizedValueHigh,
-          overallScore: session.diagnosticResult.overallScore,
-          reportUrl,
-        });
-
-        if (emailResult.success) {
-          console.log(`[Report] Email sent to ${executiveEmail} (id: ${emailResult.id})`);
-        } else {
-          console.error(`[Report] Email failed for ${executiveEmail}: ${emailResult.error}`);
-        }
-      } catch (emailErr) {
-        // Don't fail the report generation if email fails
-        console.error('[Report] Email delivery error:', emailErr);
-      }
-    } else if (executiveEmail && !process.env.RESEND_API_KEY) {
-      console.log('[Report] Skipping email — RESEND_API_KEY not configured');
-    }
 
     return NextResponse.json({
       report,
