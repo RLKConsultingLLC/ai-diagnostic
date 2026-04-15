@@ -23,7 +23,7 @@ function getClient(): Anthropic {
   return _client;
 }
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-3-5-sonnet-20241022';
 
 const DIMENSION_LABELS: Record<string, string> = {
   adoption_behavior: 'Adoption Behavior',

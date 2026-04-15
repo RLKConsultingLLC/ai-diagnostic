@@ -184,7 +184,7 @@ async function synthesizeNews(
     .join('\n\n');
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 2048,
     system: 'You are a senior research analyst at a management consulting firm. Analyze news articles and extract structured intelligence. Respond ONLY with valid JSON.',
     messages: [
@@ -264,7 +264,7 @@ async function synthesizeAIIntelligence(
   ].join('\n');
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 2048,
     system: 'You are a senior AI strategy analyst at a top-tier consulting firm. Extract AI-specific intelligence from company data. Respond ONLY with valid JSON.',
     messages: [
@@ -348,7 +348,7 @@ async function synthesizeStrategicIntel(
     .join('\n\n');
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 2048,
     system: 'You are a senior strategy consultant. Extract leadership, strategic, and earnings intelligence. Respond ONLY with valid JSON.',
     messages: [
@@ -428,7 +428,7 @@ async function synthesizeIndustryContext(
     .join('\n\n');
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 2048,
     system: 'You are a senior industry analyst specializing in AI adoption across enterprise sectors. Respond ONLY with valid JSON.',
     messages: [
@@ -520,7 +520,7 @@ async function synthesizeVendorAnalysis(
     : 'general enterprise AI';
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 3000,
     system: `You are a senior technology analyst at Gartner or Forrester. Analyze the AI vendor landscape for this company's specific industry and use cases. Be specific about vendor names, capabilities, and limitations. Your analysis should help a CIO evaluate whether their current vendor investments are optimal. Respond ONLY with valid JSON.`,
     messages: [
@@ -631,7 +631,7 @@ ${industryContext.regulatory.slice(0, 3).map((r) => `- ${r.regulation}: ${r.impa
 `;
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 2048,
     system: `You are a senior partner at a top-tier management consulting firm preparing an executive briefing for a C-suite client. Your tone is authoritative, specific, and actionable. You never hedge or use filler. Every sentence carries weight. Do not use the word "journey." Do not use generic AI maturity language.`,
     messages: [
