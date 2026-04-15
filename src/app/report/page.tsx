@@ -969,7 +969,7 @@ function ReportPage() {
             </div>
 
             {/* AI narrative for AI Posture Diagnosis */}
-            <div className="mt-8 pt-6 border-t border-light">
+            <SubCollapsible title="AI-Generated Posture Analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -977,7 +977,7 @@ function ReportPage() {
                   )?.content || ""
                 }
               />
-            </div>
+            </SubCollapsible>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1164,7 +1164,7 @@ function ReportPage() {
             </div>
 
             {/* Structural constraints narrative */}
-            <div className="mt-8 pt-6 border-t border-light">
+            <SubCollapsible title="AI-Generated Structural Constraints Analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -1172,7 +1172,7 @@ function ReportPage() {
                   )?.content || ""
                 }
               />
-            </div>
+            </SubCollapsible>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1295,7 +1295,7 @@ function ReportPage() {
             </div>
 
             {/* Competitive positioning narrative */}
-            <div className="mt-8 pt-6 border-t border-light">
+            <SubCollapsible title="AI-Generated Competitive Intelligence">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -1303,7 +1303,7 @@ function ReportPage() {
                   )?.content || ""
                 }
               />
-            </div>
+            </SubCollapsible>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1321,108 +1321,110 @@ function ReportPage() {
             </p>
 
             {/* Methodology credibility block */}
-            <div className="bg-offwhite border border-light p-4 md:p-5 mb-8">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                How We Calculate These Numbers
-              </p>
-              <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
-                <p>
-                  <strong className="text-secondary">Step 1: Total labor cost.</strong>{" "}
-                  {result.companyProfile.employeeCount.toLocaleString()} employees x ~$85,000
-                  average fully-loaded cost = {fmtUSD(Math.round(result.companyProfile.employeeCount * 85000))}.
-                  This uses BLS median for {industryLabel(result.companyProfile.industry)} roles
-                  adjusted for benefits and overhead. Your actual figure may differ — substitute your
-                  real number to refine.
-                </p>
-                <p>
-                  <strong className="text-secondary">Step 2: AI-addressable share.</strong>{" "}
-                  McKinsey&apos;s 2024 research estimates {result.economicEstimate.productivityPotentialPercent}%
-                  of labor tasks in {industryLabel(result.companyProfile.industry)} are
-                  automatable or augmentable with current AI. This is not &quot;replace all workers&quot; —
-                  it means {result.economicEstimate.productivityPotentialPercent}% of time across the
-                  workforce could be redirected to higher-value work. Accenture and Goldman Sachs
-                  research produces similar estimates (18-30% range for most industries).
-                </p>
-                <p>
-                  <strong className="text-secondary">Step 3: Current capture rate.</strong>{" "}
-                  Your diagnostic scores indicate you currently capture approximately{" "}
-                  {result.economicEstimate.currentCapturePercent}% of this potential. This is
-                  derived from your Composite Index scores — particularly Value Capture Efficiency
-                  ({result.compositeIndices.find(c => c.slug === ("economic_translation" as string))?.score || result.compositeIndices[1]?.score || "—"}/100).
-                  Organizations at your maturity stage typically capture 15-35% (BCG 2024).
-                </p>
-                <p>
-                  <strong className="text-secondary">Step 4: The gap.</strong>{" "}
-                  The difference between potential and current capture is the unrealized value:{" "}
-                  {fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
-                  {fmtUSD(result.economicEstimate.unrealizedValueHigh)}. The range reflects
-                  uncertainty in adoption speed and implementation quality. Even the conservative
-                  end assumes only modest improvement over current capture rates.
+            <SubCollapsible title="How We Calculate These Numbers">
+              <div className="bg-offwhite border border-light p-4 md:p-5">
+                <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
+                  <p>
+                    <strong className="text-secondary">Step 1: Total labor cost.</strong>{" "}
+                    {result.companyProfile.employeeCount.toLocaleString()} employees x ~$85,000
+                    average fully-loaded cost = {fmtUSD(Math.round(result.companyProfile.employeeCount * 85000))}.
+                    This uses BLS median for {industryLabel(result.companyProfile.industry)} roles
+                    adjusted for benefits and overhead. Your actual figure may differ — substitute your
+                    real number to refine.
+                  </p>
+                  <p>
+                    <strong className="text-secondary">Step 2: AI-addressable share.</strong>{" "}
+                    McKinsey&apos;s 2024 research estimates {result.economicEstimate.productivityPotentialPercent}%
+                    of labor tasks in {industryLabel(result.companyProfile.industry)} are
+                    automatable or augmentable with current AI. This is not &quot;replace all workers&quot; —
+                    it means {result.economicEstimate.productivityPotentialPercent}% of time across the
+                    workforce could be redirected to higher-value work. Accenture and Goldman Sachs
+                    research produces similar estimates (18-30% range for most industries).
+                  </p>
+                  <p>
+                    <strong className="text-secondary">Step 3: Current capture rate.</strong>{" "}
+                    Your diagnostic scores indicate you currently capture approximately{" "}
+                    {result.economicEstimate.currentCapturePercent}% of this potential. This is
+                    derived from your Composite Index scores — particularly Value Capture Efficiency
+                    ({result.compositeIndices.find(c => c.slug === ("economic_translation" as string))?.score || result.compositeIndices[1]?.score || "—"}/100).
+                    Organizations at your maturity stage typically capture 15-35% (BCG 2024).
+                  </p>
+                  <p>
+                    <strong className="text-secondary">Step 4: The gap.</strong>{" "}
+                    The difference between potential and current capture is the unrealized value:{" "}
+                    {fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
+                    {fmtUSD(result.economicEstimate.unrealizedValueHigh)}. The range reflects
+                    uncertainty in adoption speed and implementation quality. Even the conservative
+                    end assumes only modest improvement over current capture rates.
+                  </p>
+                </div>
+                <p className="text-[10px] text-tertiary mt-3 italic">
+                  Challenge these assumptions. The model is designed to be stress-tested, not accepted
+                  on faith. Adjust labor cost, AI-addressable percentage, or capture rate to reflect
+                  your internal data.
                 </p>
               </div>
-              <p className="text-[10px] text-tertiary mt-3 italic">
-                Challenge these assumptions. The model is designed to be stress-tested, not accepted
-                on faith. Adjust labor cost, AI-addressable percentage, or capture rate to reflect
-                your internal data.
-              </p>
-            </div>
+            </SubCollapsible>
 
             {/* Waterfall / Funnel visualization */}
-            <EconomicWaterfall estimate={result.economicEstimate} profile={result.companyProfile} />
+            <SubCollapsible title="Value Waterfall" defaultOpen>
+              <EconomicWaterfall estimate={result.economicEstimate} profile={result.companyProfile} />
+            </SubCollapsible>
 
             {/* Cost of delay */}
-            <div className="mt-8 grid sm:grid-cols-2 gap-4 md:gap-6">
-              <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
-                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                  Quarterly Cost of Inaction
-                </p>
-                <p className="text-xl md:text-2xl font-bold text-navy">
-                  {fmtUSD(
-                    Math.round(
-                      (result.economicEstimate.unrealizedValueLow +
-                        result.economicEstimate.unrealizedValueHigh) /
-                        2 /
-                        4
-                    )
-                  )}
-                </p>
-                <p className="text-xs text-foreground/50 mt-2">
-                  Midpoint of unrealized annual value, divided by four. This is not
-                  &quot;money you are losing&quot; — it is productivity improvement you
-                  are not capturing while your competitors in{" "}
-                  {industryLabel(result.companyProfile.industry)} are. See Section 6
-                  for P&L impact and Section 4 for what competitors are doing.
-                </p>
+            <SubCollapsible title="Cost of Inaction" defaultOpen>
+              <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
+                <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
+                  <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
+                    Quarterly Cost of Inaction
+                  </p>
+                  <p className="text-xl md:text-2xl font-bold text-navy">
+                    {fmtUSD(
+                      Math.round(
+                        (result.economicEstimate.unrealizedValueLow +
+                          result.economicEstimate.unrealizedValueHigh) /
+                          2 /
+                          4
+                      )
+                    )}
+                  </p>
+                  <p className="text-xs text-foreground/50 mt-2">
+                    Midpoint of unrealized annual value, divided by four. This is not
+                    &quot;money you are losing&quot; — it is productivity improvement you
+                    are not capturing while your competitors in{" "}
+                    {industryLabel(result.companyProfile.industry)} are. See Section 6
+                    for P&L impact and Section 4 for what competitors are doing.
+                  </p>
+                </div>
+                <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
+                  <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
+                    Annual Cost per Employee
+                  </p>
+                  <p className="text-xl md:text-2xl font-bold text-navy">
+                    {fmtUSD(result.economicEstimate.costPerEmployee)}
+                  </p>
+                  <p className="text-xs text-foreground/50 mt-2">
+                    Per-employee unrealized value. For context, the average enterprise
+                    AI software license costs $1,200-$3,600/employee/year. If your per-employee
+                    gap exceeds your per-employee AI investment by 3x+, the ROI case is clear.
+                  </p>
+                </div>
               </div>
-              <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
-                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                  Annual Cost per Employee
-                </p>
-                <p className="text-xl md:text-2xl font-bold text-navy">
-                  {fmtUSD(result.economicEstimate.costPerEmployee)}
-                </p>
-                <p className="text-xs text-foreground/50 mt-2">
-                  Per-employee unrealized value. For context, the average enterprise
-                  AI software license costs $1,200-$3,600/employee/year. If your per-employee
-                  gap exceeds your per-employee AI investment by 3x+, the ROI case is clear.
-                </p>
-              </div>
-            </div>
+            </SubCollapsible>
 
             {/* Industry benchmark bar */}
             {result.economicEstimate.industryBenchmark && (
-              <div className="mt-6 bg-offwhite border border-light p-4 md:p-5">
-                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                  Industry Benchmark Context
-                </p>
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  {result.economicEstimate.industryBenchmark}
-                </p>
-              </div>
+              <SubCollapsible title="Industry Benchmark Context">
+                <div className="bg-offwhite border border-light p-4 md:p-5">
+                  <p className="text-sm text-foreground/70 leading-relaxed">
+                    {result.economicEstimate.industryBenchmark}
+                  </p>
+                </div>
+              </SubCollapsible>
             )}
 
             {/* Financial impact narrative */}
-            <div className="mt-8 pt-6 border-t border-light">
+            <SubCollapsible title="AI-Generated Financial Impact Analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -1430,7 +1432,7 @@ function ReportPage() {
                   )?.content || ""
                 }
               />
-            </div>
+            </SubCollapsible>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1561,11 +1563,11 @@ function ReportPage() {
 
                   {/* Optional AI narrative */}
                   {report?.sections?.find((s) => s.slug === "pnl-business-case")?.content && (
-                    <div className="mt-6 pt-6 border-t border-light">
+                    <SubCollapsible title="AI-Generated P&L Analysis">
                       <MarkdownContent
                         content={report.sections.find((s) => s.slug === "pnl-business-case")?.content || ""}
                       />
-                    </div>
+                    </SubCollapsible>
                   )}
                 </div>
               );
@@ -1588,87 +1590,89 @@ function ReportPage() {
             </p>
 
             {/* Detailed risk context */}
-            <div className="bg-offwhite border border-light p-5 mb-8">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Understanding This Assessment
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed mb-3">
-                Your risk profile is derived from inverting your dimension scores: low governance
-                maturity translates to high governance risk, low adoption structure translates to high
-                shadow AI risk, and so on. Each risk is mapped on a 4x4 matrix of <strong className="text-secondary">Likelihood</strong> (how
-                probable the risk materializes based on your current posture) versus <strong className="text-secondary">Impact</strong> (the
-                potential business consequence if it does).
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                According to Gartner&apos;s 2024 AI Risk Management survey, 62% of organizations have
-                experienced at least one AI-related risk event (data leak, biased output, compliance
-                violation) in the past 18 months. Organizations with formal AI governance frameworks
-                experienced 73% fewer material incidents. The EU AI Act (effective August 2025) and
-                state-level US regulations (Colorado AI Act, California AI Transparency Act) are
-                increasing the regulatory cost of inadequate governance.
-              </p>
-            </div>
-
-            {/* Risk severity legend */}
-            <div className="flex items-center gap-5 mb-4">
-              <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Severity:</p>
-              {[
-                { label: "High", color: "#FCA5A5" },
-                { label: "Medium", color: "#FCD34D" },
-                { label: "Low", color: "#86EFAC" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: item.color }} />
-                  <span className="text-[10px] text-foreground/50">{item.label}</span>
-                </div>
-              ))}
-            </div>
+            <SubCollapsible title="Understanding This Assessment">
+              <div className="bg-offwhite border border-light p-5">
+                <p className="text-sm text-foreground/70 leading-relaxed mb-3">
+                  Your risk profile is derived from inverting your dimension scores: low governance
+                  maturity translates to high governance risk, low adoption structure translates to high
+                  shadow AI risk, and so on. Each risk is mapped on a 4x4 matrix of <strong className="text-secondary">Likelihood</strong> (how
+                  probable the risk materializes based on your current posture) versus <strong className="text-secondary">Impact</strong> (the
+                  potential business consequence if it does).
+                </p>
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  According to Gartner&apos;s 2024 AI Risk Management survey, 62% of organizations have
+                  experienced at least one AI-related risk event (data leak, biased output, compliance
+                  violation) in the past 18 months. Organizations with formal AI governance frameworks
+                  experienced 73% fewer material incidents. The EU AI Act (effective August 2025) and
+                  state-level US regulations (Colorado AI Act, California AI Transparency Act) are
+                  increasing the regulatory cost of inadequate governance.
+                </p>
+              </div>
+            </SubCollapsible>
 
             {/* Risk breakdown cards */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).map((risk, idx) => (
-                <div key={idx} className="border border-light p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div
-                      className="w-3 h-3 flex-shrink-0"
-                      style={{
-                        backgroundColor: risk.severity === "high" ? "#FCA5A5" : risk.severity === "medium" ? "#FCD34D" : "#86EFAC",
-                      }}
-                    />
-                    <p className="text-sm font-semibold text-secondary">{risk.label}</p>
+            <SubCollapsible title={`Risk Breakdown (${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).length} risks identified)`} defaultOpen>
+              <div className="flex items-center gap-5 mb-4">
+                <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Severity:</p>
+                {[
+                  { label: "High", color: "#FCA5A5" },
+                  { label: "Medium", color: "#FCD34D" },
+                  { label: "Low", color: "#86EFAC" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-[10px] text-foreground/50">{item.label}</span>
                   </div>
-                  <p className="text-xs text-foreground/60 leading-relaxed mb-2">{risk.description}</p>
-                  <div className="bg-offwhite border border-light p-2 mt-2">
-                    <p className="text-[10px] font-semibold text-tertiary uppercase tracking-wider">Mitigation</p>
-                    <p className="text-xs text-foreground/60 leading-relaxed">{risk.mitigation}</p>
+                ))}
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).map((risk, idx) => (
+                  <div key={idx} className="border border-light p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div
+                        className="w-3 h-3 flex-shrink-0"
+                        style={{
+                          backgroundColor: risk.severity === "high" ? "#FCA5A5" : risk.severity === "medium" ? "#FCD34D" : "#86EFAC",
+                        }}
+                      />
+                      <p className="text-sm font-semibold text-secondary">{risk.label}</p>
+                    </div>
+                    <p className="text-xs text-foreground/60 leading-relaxed mb-2">{risk.description}</p>
+                    <div className="bg-offwhite border border-light p-2 mt-2">
+                      <p className="text-[10px] font-semibold text-tertiary uppercase tracking-wider">Mitigation</p>
+                      <p className="text-xs text-foreground/60 leading-relaxed">{risk.mitigation}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </SubCollapsible>
 
             {/* Risk Matrix visualization */}
-            <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
+            <SubCollapsible title="Risk Matrix (Likelihood x Impact)">
+              <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
+            </SubCollapsible>
 
             {/* Regulatory landscape context */}
-            <div className="mt-6 border border-light p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Regulatory Landscape for {industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c) => c.toUpperCase())}
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                {getRegulatoryContext(result.companyProfile.industry, result.companyProfile.regulatoryIntensity)}
-              </p>
-            </div>
+            <SubCollapsible title={`Regulatory Landscape for ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())}`}>
+              <div className="border border-light p-5">
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  {getRegulatoryContext(result.companyProfile.industry, result.companyProfile.regulatoryIntensity)}
+                </p>
+              </div>
+            </SubCollapsible>
 
             {/* Security narrative */}
-            <div className="mt-8 pt-6 border-t border-light">
-              <MarkdownContent
-                content={
-                  report?.sections?.find(
-                    (s) => s.slug === "security-governance-risk"
-                  )?.content || ""
-                }
-              />
-            </div>
+            <SubCollapsible title="AI-Generated Security & Governance Analysis">
+              <div className="pt-2">
+                <MarkdownContent
+                  content={
+                    report?.sections?.find(
+                      (s) => s.slug === "security-governance-risk"
+                    )?.content || ""
+                  }
+                />
+              </div>
+            </SubCollapsible>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1688,48 +1692,44 @@ function ReportPage() {
             </p>
 
             {/* Vendor evaluation framework */}
-            <div className="bg-offwhite border border-light p-4 md:p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Evaluation Framework
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                Every vendor relationship is a bet on your AI future. We evaluate across six
-                dimensions, weighted for your maturity stage. At Stage{" "}
-                {result.stageClassification.primaryStage}, the priorities that matter most for
-                {" "}{result.companyProfile.companyName} are{" "}
-                {result.stageClassification.primaryStage <= 2
-                  ? "Fit and Support — you need tools that work fast with teams that help you deploy."
-                  : "Scale, Risk, and Ecosystem — you need platforms that grow with you without locking you in."}
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-                {[
-                  { label: "Fit", desc: "Use case alignment" },
-                  { label: "Scale", desc: "Enterprise readiness" },
-                  { label: "Cost", desc: "TCO & pricing" },
-                  { label: "Risk", desc: "Lock-in & continuity" },
-                  { label: "Support", desc: "Implementation depth" },
-                  { label: "Ecosystem", desc: "Integration breadth" },
-                ].map((crit) => (
-                  <div
-                    key={crit.label}
-                    className="bg-white border border-light p-3 text-center"
-                  >
-                    <p className="text-xs font-semibold text-secondary">
-                      {crit.label}
-                    </p>
-                    <p className="text-[10px] text-tertiary mt-1">
-                      {crit.desc}
-                    </p>
-                  </div>
-                ))}
+            <SubCollapsible title="Evaluation Framework">
+              <div className="bg-offwhite border border-light p-4 md:p-5">
+                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                  Every vendor relationship is a bet on your AI future. We evaluate across six
+                  dimensions, weighted for your maturity stage. At Stage{" "}
+                  {result.stageClassification.primaryStage}, the priorities that matter most for
+                  {" "}{result.companyProfile.companyName} are{" "}
+                  {result.stageClassification.primaryStage <= 2
+                    ? "Fit and Support — you need tools that work fast with teams that help you deploy."
+                    : "Scale, Risk, and Ecosystem — you need platforms that grow with you without locking you in."}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                  {[
+                    { label: "Fit", desc: "Use case alignment" },
+                    { label: "Scale", desc: "Enterprise readiness" },
+                    { label: "Cost", desc: "TCO & pricing" },
+                    { label: "Risk", desc: "Lock-in & continuity" },
+                    { label: "Support", desc: "Implementation depth" },
+                    { label: "Ecosystem", desc: "Integration breadth" },
+                  ].map((crit) => (
+                    <div
+                      key={crit.label}
+                      className="bg-white border border-light p-3 text-center"
+                    >
+                      <p className="text-xs font-semibold text-secondary">
+                        {crit.label}
+                      </p>
+                      <p className="text-[10px] text-tertiary mt-1">
+                        {crit.desc}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* Gartner-style quadrant reference */}
-            <div className="border border-light p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Market Positioning Context (Gartner / Forrester)
-              </p>
+            <SubCollapsible title="Market Positioning Context (Gartner / Forrester)">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 {getGartnerContext(result.companyProfile.industry, result.stageClassification.primaryStage)}
               </p>
@@ -1743,9 +1743,10 @@ function ReportPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* Buy/Build/Partner Decision Framework */}
+            <SubCollapsible title="Buy / Build / Partner Recommendation" defaultOpen>
             <div className="border border-light p-5 mb-6">
               <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
                 Buy / Build / Partner Recommendation
@@ -1793,60 +1794,60 @@ function ReportPage() {
                 ))}
               </div>
             </div>
+            </SubCollapsible>
 
             {/* AI Contract Value Levers */}
-            <div className="border border-light p-4 md:p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Contract Value Levers: How to Negotiate Smarter AI Deals
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                AI vendor contracts are not software licenses. The economics are different,
-                the risks are different, and the leverage points are different.
-                {result.stageClassification.primaryStage <= 2
-                  ? ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} is likely entering its first significant AI vendor relationships — getting these contracts right from the start avoids costly renegotiations later.`
-                  : ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} likely has existing AI vendor relationships that should be audited against these levers — renegotiation windows are leverage points.`}
-                {result.companyProfile.regulatoryIntensity === 'high'
-                  ? ` In ${industryLabel(result.companyProfile.industry)}, data sovereignty and compliance provisions are non-negotiable and should be explicit in every AI contract.`
-                  : ''}
-              </p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {[
-                  {
-                    lever: "Declining Unit Economics",
-                    description: `AI inference costs drop 30-50% annually as models become more efficient. ${result.stageClassification.primaryStage <= 2 ? `As ${result.companyProfile.companyName} enters new AI contracts, build` : `In ${result.companyProfile.companyName}'s existing and future contracts, ensure`} automatic price reductions — 15-20% annual step-downs are reasonable. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying on AI compute by even 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.`,
-                  },
-                  {
-                    lever: "Data Portability Guarantees",
-                    description: `Insist on full data export in standard formats with ≤30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, data portability is not just a commercial issue — it's a regulatory requirement. Your patient data, financial records, and compliance models must be extractable on demand.` : `${result.companyProfile.companyName}'s training data and fine-tuned models are proprietary IP — vendor lock-in happens when you cannot take them with you.`}`,
-                  },
-                  {
-                    lever: "Model-Agnostic Architecture",
-                    description: `Structure contracts to allow model swaps without renegotiation. The LLM landscape shifts quarterly — ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid committing to a single model provider before understanding which capabilities matter most for ${industryLabel(result.companyProfile.industry)} use cases` : `${result.companyProfile.companyName} should ensure existing integrations support model substitution as better options emerge`}. Require API-compatible alternatives.`,
-                  },
-                  {
-                    lever: "Usage-Based Pricing with Caps",
-                    description: `Negotiate consumption-based pricing with hard budget caps and volume discounts. ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid flat enterprise licenses until AI usage patterns stabilize — organizations at Stage ${result.stageClassification.primaryStage} typically overpay by 40-60% in year one because adoption is uneven.` : `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} has enough usage data to negotiate volume tiers that match actual consumption. Push for 25-40% volume discounts at your scale.`}`,
-                  },
-                  {
-                    lever: "Performance SLAs with Teeth",
-                    description: `Tie payments to measurable outcomes: latency, accuracy, uptime, not just availability. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, model accuracy degradation can create compliance liability — your contracts must include drift monitoring and penalty clauses for performance degradation below agreed thresholds.` : `AI outputs can drift over time as data distributions change. ${result.companyProfile.companyName}'s contracts should include penalty clauses for model degradation below agreed accuracy thresholds.`}`,
-                  },
-                  {
-                    lever: "Termination Without Penalty",
-                    description: `Negotiate 90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName}'s AI strategy will evolve significantly — 3-year lock-ins made today will be regretted in 18 months. Insist on flexibility.` : `Even at Stage ${result.stageClassification.primaryStage}, the AI vendor landscape is volatile enough that long-term lock-ins carry material risk. If the product delivers value, ${result.companyProfile.companyName} will stay anyway.`}`,
-                  },
-                ].map((item) => (
-                  <div key={item.lever} className="bg-offwhite border border-light p-3 md:p-4">
-                    <p className="text-sm font-semibold text-secondary mb-1">{item.lever}</p>
-                    <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
-                  </div>
-                ))}
+            <SubCollapsible title="Contract Value Levers: How to Negotiate Smarter AI Deals">
+              <div className="border border-light p-4 md:p-5">
+                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                  AI vendor contracts are not software licenses. The economics are different,
+                  the risks are different, and the leverage points are different.
+                  {result.stageClassification.primaryStage <= 2
+                    ? ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} is likely entering its first significant AI vendor relationships — getting these contracts right from the start avoids costly renegotiations later.`
+                    : ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} likely has existing AI vendor relationships that should be audited against these levers — renegotiation windows are leverage points.`}
+                  {result.companyProfile.regulatoryIntensity === 'high'
+                    ? ` In ${industryLabel(result.companyProfile.industry)}, data sovereignty and compliance provisions are non-negotiable and should be explicit in every AI contract.`
+                    : ''}
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {[
+                    {
+                      lever: "Declining Unit Economics",
+                      description: `AI inference costs drop 30-50% annually as models become more efficient. ${result.stageClassification.primaryStage <= 2 ? `As ${result.companyProfile.companyName} enters new AI contracts, build` : `In ${result.companyProfile.companyName}'s existing and future contracts, ensure`} automatic price reductions — 15-20% annual step-downs are reasonable. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying on AI compute by even 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.`,
+                    },
+                    {
+                      lever: "Data Portability Guarantees",
+                      description: `Insist on full data export in standard formats with ≤30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, data portability is not just a commercial issue — it's a regulatory requirement. Your patient data, financial records, and compliance models must be extractable on demand.` : `${result.companyProfile.companyName}'s training data and fine-tuned models are proprietary IP — vendor lock-in happens when you cannot take them with you.`}`,
+                    },
+                    {
+                      lever: "Model-Agnostic Architecture",
+                      description: `Structure contracts to allow model swaps without renegotiation. The LLM landscape shifts quarterly — ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid committing to a single model provider before understanding which capabilities matter most for ${industryLabel(result.companyProfile.industry)} use cases` : `${result.companyProfile.companyName} should ensure existing integrations support model substitution as better options emerge`}. Require API-compatible alternatives.`,
+                    },
+                    {
+                      lever: "Usage-Based Pricing with Caps",
+                      description: `Negotiate consumption-based pricing with hard budget caps and volume discounts. ${result.stageClassification.primaryStage <= 2 ? `${result.companyProfile.companyName} should avoid flat enterprise licenses until AI usage patterns stabilize — organizations at Stage ${result.stageClassification.primaryStage} typically overpay by 40-60% in year one because adoption is uneven.` : `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} has enough usage data to negotiate volume tiers that match actual consumption. Push for 25-40% volume discounts at your scale.`}`,
+                    },
+                    {
+                      lever: "Performance SLAs with Teeth",
+                      description: `Tie payments to measurable outcomes: latency, accuracy, uptime, not just availability. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, model accuracy degradation can create compliance liability — your contracts must include drift monitoring and penalty clauses for performance degradation below agreed thresholds.` : `AI outputs can drift over time as data distributions change. ${result.companyProfile.companyName}'s contracts should include penalty clauses for model degradation below agreed accuracy thresholds.`}`,
+                    },
+                    {
+                      lever: "Termination Without Penalty",
+                      description: `Negotiate 90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName}'s AI strategy will evolve significantly — 3-year lock-ins made today will be regretted in 18 months. Insist on flexibility.` : `Even at Stage ${result.stageClassification.primaryStage}, the AI vendor landscape is volatile enough that long-term lock-ins carry material risk. If the product delivers value, ${result.companyProfile.companyName} will stay anyway.`}`,
+                    },
+                  ].map((item) => (
+                    <div key={item.lever} className="bg-offwhite border border-light p-3 md:p-4">
+                      <p className="text-sm font-semibold text-secondary mb-1">{item.lever}</p>
+                      <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </SubCollapsible>
 
             {report?.sections?.find((s) => s.slug === "vendor-landscape")
               ?.content ? (
-              <div className="mt-6 pt-6 border-t border-light">
+              <SubCollapsible title="AI-Generated Vendor Landscape Analysis">
                 <MarkdownContent
                   content={
                     report?.sections?.find(
@@ -1854,15 +1855,18 @@ function ReportPage() {
                     )?.content || ""
                   }
                 />
-              </div>
+              </SubCollapsible>
             ) : null}
           </CollapsibleSection>
 
           {/* ================================================================= */}
           {/* SECTION 9: MESSAGES FOR THE BOARD                          */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={9} title="Messages for the Board" />
+          <CollapsibleSection
+            number={9}
+            title="Messages for the Board"
+            summary={`Board-ready findings structured as decision items for ${result.companyProfile.companyName}. Includes peer board intelligence, ${getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).length} recommended asks, and governance recommendations aligned to NACD best practices.`}
+          >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               These findings are structured for direct board presentation. Each item
               below is a decision point, not an informational update. NACD&apos;s 2024
@@ -1872,32 +1876,28 @@ function ReportPage() {
             </p>
 
             {/* Peer board intelligence */}
-            <div className="bg-offwhite border border-light p-4 md:p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                What Peer Boards Are Doing
-              </p>
-              <div className="space-y-3">
-                {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
-                    <div>
-                      <p className="text-sm text-foreground/70 leading-relaxed">
-                        <strong className="text-secondary">{peer.company}:</strong> {peer.action}
-                      </p>
-                      <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
+            <SubCollapsible title="What Peer Boards Are Doing">
+              <div className="bg-offwhite border border-light p-4 md:p-5">
+                <div className="space-y-3">
+                  {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
+                      <div>
+                        <p className="text-sm text-foreground/70 leading-relaxed">
+                          <strong className="text-secondary">{peer.company}:</strong> {peer.action}
+                        </p>
+                        <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* Board-ready headline findings */}
-            <div className="border-2 border-navy p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary">
-                  Board-Ready Headline Findings
-                </p>
-                <div className="flex items-center gap-4">
+            <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).length} items)`} defaultOpen>
+              <div className="border-2 border-navy p-6">
+                <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5" style={{ backgroundColor: "#0B1D3A" }} />
                     <span className="text-[10px] text-foreground/50">Critical</span>
@@ -1911,24 +1911,24 @@ function ReportPage() {
                     <span className="text-[10px] text-foreground/50">Informational</span>
                   </div>
                 </div>
-              </div>
-              <div className="space-y-4">
-                {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).map((finding, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div
-                      className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
-                      style={{ backgroundColor: finding.severity === "critical" ? "#0B1D3A" : finding.severity === "high" ? "#364E6E" : "#A8B5C4" }}
-                    >
-                      {idx + 1}
+                <div className="space-y-4">
+                  {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).map((finding, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div
+                        className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
+                        style={{ backgroundColor: finding.severity === "critical" ? "#0B1D3A" : finding.severity === "high" ? "#364E6E" : "#A8B5C4" }}
+                      >
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-secondary">{finding.headline}</p>
+                        <p className="text-xs text-foreground/60 leading-relaxed mt-1">{finding.detail}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-secondary">{finding.headline}</p>
-                      <p className="text-xs text-foreground/60 leading-relaxed mt-1">{finding.detail}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* How boards at this stage support AI transformation */}
             <SubCollapsible title={`How Boards Can Support Organizations at Stage ${result.stageClassification.primaryStage}`}>
@@ -1972,7 +1972,7 @@ function ReportPage() {
                 </div>
               </div>
             </SubCollapsible>
-          </section>
+          </CollapsibleSection>
 
           {/* ================================================================= */}
           {/* SECTION 10: METHODOLOGY, DATA SOURCES & CITATIONS              */}
@@ -4049,15 +4049,159 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
       { area: "Ambient Clinical Documentation", detail: "AI scribes (Nuance DAX, Abridge, DeepScribe) are reducing physician documentation burden by 50-70%. Adoption is accelerating rapidly across health systems.", source: "Source: AMA Physician AI Adoption Study 2024" },
       { area: "Population Health & Predictive Analytics", detail: "Payers and providers are using AI to identify high-risk patients and intervene proactively. UnitedHealth, Humana, and Anthem/Elevance are investing heavily.", source: "Source: Gartner Healthcare Provider AI Survey 2024" },
     ],
+    retail: [
+      { area: "AI-Powered Demand Forecasting & Inventory", detail: "Walmart's AI demand forecasting improved accuracy 20% and cut waste by $1B+. Target's AI-driven inventory system reduced out-of-stocks 30%. Amazon's anticipatory shipping pre-positions inventory before orders are placed. Static replenishment models are becoming a margin liability.", source: "Source: Walmart 2024 Investor Day; Target Q3 2024 Earnings; NRF Retail Technology Report 2024" },
+      { area: "Personalization & Recommendation Engines", detail: "Amazon attributes 35% of revenue to ML-powered recommendations. Starbucks Deep Brew personalizes 400M offers/week. Sephora's AI-driven personalization increased conversion 11%. Your competitors know what your customers want before they do.", source: "Source: McKinsey Retail Practice 2024; Amazon Annual Report 2024; Starbucks Technology Summit 2024" },
+      { area: "Computer Vision for Loss Prevention", detail: "Walmart, Target, and Kroger are deploying AI camera systems that reduced shrink 25-35%. Self-checkout fraud detection using CV saves US retailers an estimated $3B annually. Your shrink problem likely has an AI solution your competitors are already using.", source: "Source: NRF Loss Prevention Survey 2024; Gartner Retail Technology Report 2024" },
+      { area: "Dynamic Pricing & Markdown Optimization", detail: "Best Buy's AI pricing engine adjusts 50K+ prices daily. Zara's parent Inditex uses ML to optimize markdowns, improving full-price sell-through 15%. Kroger's dynamic pricing boosted margin 200bps on targeted categories.", source: "Source: BCG Retail AI Report 2024; Inditex Annual Report 2024" },
+      { area: "AI-Enabled Supply Chain Optimization", detail: "Nike's AI supply chain platform reduced lead times 50%. H&M uses ML for production planning, cutting unsold inventory 21%. Costco's AI-powered logistics optimization saved $300M in transportation costs.", source: "Source: Nike FY2024 10-K; H&M Sustainability Report 2024; Gartner Supply Chain Top 25" },
+      { area: "Generative AI for Customer Service & Content", detail: "Shopify's Sidekick AI handles merchant support queries. Instacart's AI generates personalized meal plans. Wayfair uses GenAI to create room visualizations from product catalogs. The customer experience is being rebuilt around AI.", source: "Source: Shopify Editions 2024; NRF Innovation Lab Report 2024" },
+    ],
+    ecommerce_digital: [
+      { area: "AI-Powered Search & Discovery", detail: "Amazon's AI search processes 300M+ queries daily with personalized results. Shopify's AI product search increased conversion 12%. Algolia and Elasticsearch ML-powered search is becoming table stakes for digital commerce.", source: "Source: Amazon Technology Blog 2024; Shopify Unite 2024" },
+      { area: "Generative AI for Product Content", detail: "eBay uses AI to generate listing descriptions for 1.3B+ items. Amazon auto-generates product summaries from reviews. Etsy's AI creates lifestyle images from product photos, increasing click-through 15%.", source: "Source: eBay Q3 2024 Earnings; Amazon Seller Central Updates 2024" },
+      { area: "Dynamic Pricing & Revenue Optimization", detail: "Booking.com processes 1B+ pricing decisions daily using ML. Uber's AI pricing engine optimizes across 10,000+ cities. E-commerce leaders are seeing 5-15% revenue lift from AI-driven pricing.", source: "Source: BCG Digital Commerce Report 2024; Booking Holdings Investor Day 2024" },
+      { area: "AI Fraud Detection & Trust Systems", detail: "PayPal's AI fraud engine prevents $25B+ in fraudulent transactions annually. Stripe Radar processes billions of signals to block fraud. Shopify's AI reduced chargebacks 40% for merchants.", source: "Source: PayPal 2024 Annual Report; Stripe Developer Conference 2024" },
+      { area: "Conversational Commerce & AI Assistants", detail: "Klarna's AI assistant handles 2.3M customer conversations/month, equivalent to 700 full-time agents. Amazon's Rufus AI shopping assistant processes millions of product queries daily.", source: "Source: Klarna Q2 2024 Report; Amazon Devices & Services Event 2024" },
+      { area: "Predictive Logistics & Last-Mile Optimization", detail: "Amazon's AI delivery prediction is accurate within 30-minute windows. DoorDash's ML optimizes 1.5B+ deliveries/year. FedEx SurroUnd uses AI to predict delivery issues before they occur.", source: "Source: Amazon Logistics Innovation 2024; DoorDash Engineering Blog 2024" },
+    ],
+    software_saas: [
+      { area: "AI-Augmented Software Development", detail: "GitHub Copilot has 1.3M+ paid subscribers, with adopters completing tasks 55% faster. Google's Gemini Code Assist is embedded in 500K+ developer workflows. AI code review tools reduce bugs 20-30%.", source: "Source: GitHub Octoverse 2024; Google Cloud Next 2024; Stack Overflow Developer Survey 2024" },
+      { area: "AI-Native Product Features", detail: "Salesforce Einstein GPT generates 1T+ predictions/week. Notion AI, Canva AI, and Figma AI are table stakes features. Products without AI copilots are losing competitive trials at 2x the rate.", source: "Source: Salesforce Q3 2024 Earnings; Bessemer State of the Cloud 2024" },
+      { area: "ML-Powered Customer Success & Churn Prevention", detail: "Gainsight's AI identifies at-risk accounts 90 days before churn. Amplitude's ML-powered engagement scoring improved retention 18% for B2B SaaS. HubSpot's AI lead scoring increased conversion 25%.", source: "Source: Gainsight Pulse 2024; SaaStr Annual Report 2024" },
+      { area: "AI for Revenue Operations", detail: "Gong's AI analyzes 1B+ sales interactions to predict deal outcomes. Clari's AI revenue platform forecasts with 95%+ accuracy. 6sense uses AI intent data to identify in-market buyers 6 months earlier.", source: "Source: Gong Revenue Intelligence Report 2024; Forrester Wave RevOps 2024" },
+      { area: "Automated Testing & Quality Engineering", detail: "AI-powered testing tools (Testim, Mabl, Applitools) reduce QA cycles 40-60%. Meta's AI generates test cases for 50%+ of new code changes. Continuous testing powered by ML is replacing manual QA.", source: "Source: World Quality Report 2024; Meta Engineering Blog 2024" },
+      { area: "AI Infrastructure & MLOps", detail: "Databricks, Snowflake, and AWS are in an AI infrastructure arms race. Companies spending 5-10% of engineering budget on AI/ML infrastructure see 3x faster time-to-value on AI initiatives.", source: "Source: a16z AI Infrastructure Report 2024; Databricks Data+AI Summit 2024" },
+    ],
+    manufacturing_discrete: [
+      { area: "Predictive Maintenance & Quality Control", detail: "Siemens AI-powered predictive maintenance reduces unplanned downtime 30-50%. BMW's AI vision systems inspect 100% of parts vs. 5% manual sampling. Bosch deploys AI quality control across 130+ plants.", source: "Source: McKinsey Manufacturing Practice 2024; Siemens Digital Industries Report 2024" },
+      { area: "AI-Driven Supply Chain Resilience", detail: "Toyota's AI supply chain platform monitors 60,000+ tier-1 through tier-3 suppliers for disruption risk. GE uses digital twins with ML to optimize $15B+ in procurement. Resilinc's AI predicted 85% of supply disruptions in 2024.", source: "Source: Gartner Supply Chain Top 25 2024; Toyota Annual Report 2024" },
+      { area: "Generative Design & Engineering", detail: "Autodesk's AI generative design reduced part weight 40% for Airbus brackets. NVIDIA Omniverse enables real-time factory simulation. PTC's AI-powered CAD tools accelerate design cycles 25%.", source: "Source: Autodesk University 2024; NVIDIA GTC 2024; PTC LiveWorx 2024" },
+      { area: "AI-Optimized Production Scheduling", detail: "Siemens Opcenter uses ML to optimize production scheduling, improving OEE 10-15%. Rockwell Automation's AI scheduling reduces changeover time 20%. ABB's AI manufacturing execution saves 5-8% on energy costs.", source: "Source: BCG Smart Factory Report 2024; Rockwell Automation Fair 2024" },
+      { area: "Computer Vision for Safety & Compliance", detail: "Amazon's AI monitors workplace safety across 1,500+ facilities. Honeywell's AI safety systems reduced OSHA recordable incidents 25% at client sites. Verizon's AI camera analytics detect PPE violations in real-time.", source: "Source: Amazon Safety Report 2024; Honeywell Connected Worker Report 2024" },
+      { area: "Digital Twins & Process Optimization", detail: "GE's digital twin platform manages $1T+ in industrial assets. Siemens' digital twins simulate entire factories before physical buildout. Tesla's AI-powered manufacturing continuously optimizes across 6 gigafactories.", source: "Source: GE Vernova Technology Report 2024; Deloitte Smart Factory Study 2024" },
+    ],
+    manufacturing_process: [
+      { area: "AI Process Control & Optimization", detail: "BASF uses AI to optimize chemical reactions, improving yield 3-8% per batch. Dow Chemical's ML models predict quality deviations 30 minutes before they occur. Real-time AI process control is replacing manual adjustments across the sector.", source: "Source: McKinsey Chemicals Practice 2024; BASF Annual Report 2024" },
+      { area: "Predictive Maintenance for Continuous Operations", detail: "Shell deploys AI-powered predictive maintenance across 30,000+ rotating equipment items. Unplanned downtime in process manufacturing costs $260K/hour on average. AI-enabled plants see 35-45% fewer unplanned stops.", source: "Source: Deloitte Process Manufacturing Report 2024; Shell Technology Report 2024" },
+      { area: "AI-Driven Energy Management", detail: "Process manufacturers are using ML to optimize energy consumption, with leaders achieving 10-15% reduction. Schneider Electric's EcoStruxure AI manages energy across 500+ industrial sites.", source: "Source: IEA Industrial Energy Efficiency Report 2024; Schneider Electric Innovation Summit 2024" },
+      { area: "Quality Prediction & Specification Optimization", detail: "AI models predict product quality from process parameters, reducing off-spec production 20-40%. Procter & Gamble's AI quality systems monitor 100B+ data points across manufacturing.", source: "Source: BCG Operations Excellence Report 2024; P&G Technology Update 2024" },
+      { area: "Supply Chain AI for Raw Material Optimization", detail: "AI-driven raw material sourcing and blending optimization saves 2-5% on input costs. ArcelorMittal uses ML to optimize ore blending across 60+ plants.", source: "Source: McKinsey Metals & Mining Practice 2024; ArcelorMittal Investor Day 2024" },
+      { area: "Environmental Compliance & Emissions Monitoring", detail: "AI-powered emissions monitoring enables real-time compliance tracking. Honeywell's AI environmental systems reduce reporting burden 60% while improving accuracy. ESG-linked AI investments are accelerating.", source: "Source: Gartner ESG Technology Report 2024; EPA Industrial Compliance Trends 2024" },
+    ],
+    energy_oil_gas: [
+      { area: "AI-Powered Reservoir Modeling & Exploration", detail: "ExxonMobil uses ML to analyze seismic data 90% faster than conventional methods. BP's AI exploration tools identified $2B+ in previously missed reserves. Chevron's AI geoscience platform processes petabytes of subsurface data.", source: "Source: McKinsey Oil & Gas Practice 2024; ExxonMobil Technology Report 2024" },
+      { area: "Predictive Maintenance for Critical Infrastructure", detail: "Shell's AI-powered predictive maintenance across refineries prevents $500M+ in unplanned downtime annually. Baker Hughes deploys AI monitoring across 50,000+ pieces of equipment for upstream operators.", source: "Source: Shell Annual Report 2024; Baker Hughes Investor Day 2024" },
+      { area: "AI-Driven Production Optimization", detail: "AI well optimization systems improve production 5-10% per well. SLB (Schlumberger) Lumi AI platform manages production across 100,000+ wells. Halliburton's AI completions optimization reduces costs 15%.", source: "Source: BCG Energy Practice 2024; SLB Q3 2024 Earnings; SPE Digital Energy Conference 2024" },
+      { area: "Carbon Capture & Emissions AI", detail: "Occidental's AI-optimized direct air capture technology is scaling to megatons. TotalEnergies uses ML to monitor methane emissions in real-time across operations. AI is central to energy transition compliance.", source: "Source: IEA World Energy Outlook 2024; Occidental 2024 Sustainability Report" },
+      { area: "AI for Trading & Risk Management", detail: "Vitol and Trafigura use AI models for commodity trading decisions. AI-powered risk models process 10,000+ market scenarios per second. Energy traders using AI report 15-25% improved Sharpe ratios.", source: "Source: S&P Global Commodity Insights 2024; BCG Trading & Risk Report 2024" },
+      { area: "Autonomous Operations & Digital Twins", detail: "BP and Chevron operate AI-powered digital twins of entire refineries. Equinor's autonomous drilling AI has reduced well delivery time 20%. The industry is moving toward lights-out operations.", source: "Source: Deloitte Oil & Gas Technology Report 2024; Equinor Innovation Update 2024" },
+    ],
+    automotive: [
+      { area: "Autonomous Driving & ADAS", detail: "Tesla's FSD has logged 2B+ miles of AI driving data. Waymo operates 100K+ paid robotaxi rides/week. GM's Cruise, Mobileye, and NVIDIA DRIVE are accelerating L2-L4 deployment across OEMs.", source: "Source: Tesla AI Day 2024; Waymo Safety Report 2024; NVIDIA GTC 2024" },
+      { area: "AI-Powered Manufacturing & Quality", detail: "BMW's AI vision systems inspect 100% of vehicle components. Toyota's AI manufacturing reduces defects per vehicle 15%. VW's AI-driven production optimization saves EUR 200M+ annually across plants.", source: "Source: McKinsey Automotive Practice 2024; BMW Annual Report 2024" },
+      { area: "Connected Vehicle AI & OTA Updates", detail: "Tesla pushes 50+ OTA updates/year using AI-driven feature deployment. Ford's AI-powered BlueCruise learns from fleet data across 600M+ miles driven. Software-defined vehicles generate $10K+ in lifetime software revenue.", source: "Source: BCG Automotive Software Report 2024; Tesla Earnings 2024" },
+      { area: "AI for EV Battery Optimization", detail: "CATL and Samsung SDI use AI to optimize battery chemistry, improving energy density 15% per generation. Tesla's AI battery management extends range 8-12%. AI-driven battery recycling is a $20B emerging market.", source: "Source: BloombergNEF Battery Report 2024; CATL Technology Day 2024" },
+      { area: "AI-Driven Supply Chain & Procurement", detail: "Toyota's AI supply chain monitors 60,000+ suppliers for disruption risk. Tesla's AI procurement negotiation tool saved $400M in 2024. Bosch uses AI to manage 50,000+ component variants across OEM customers.", source: "Source: Gartner Automotive Supply Chain 2024; Tesla Investor Day 2024" },
+      { area: "Generative AI for Vehicle Design", detail: "GM uses AI generative design for lightweighting, reducing part weight 40%. Porsche's AI aerodynamics optimization improved Taycan efficiency 6%. AI-designed components are entering production at scale.", source: "Source: Autodesk Manufacturing Report 2024; GM Technology Center Update 2024" },
+    ],
+    telecommunications: [
+      { area: "AI Network Optimization & Self-Healing", detail: "AT&T's AI manages 250M+ network elements, predicting and resolving 70% of issues before customer impact. T-Mobile's AI network optimization improved 5G speeds 25%. Ericsson's AI RAN optimization reduces energy consumption 15%.", source: "Source: AT&T Technology Report 2024; T-Mobile Q3 2024 Earnings; Ericsson Investor Day 2024" },
+      { area: "AI-Powered Customer Experience", detail: "Verizon's AI handles 60M+ customer interactions/year, resolving 40% without human intervention. Comcast's AI reduced call handle time 30%. AI-powered churn prediction saves major telcos $500M+ annually.", source: "Source: J.D. Power Telecom Study 2024; Verizon Annual Report 2024" },
+      { area: "Generative AI for Field Operations", detail: "T-Mobile's AI assistant helps 50K+ field technicians diagnose and resolve issues. Vodafone's AI-powered dispatch optimization reduced truck rolls 20%. AI is transforming telecom field service economics.", source: "Source: McKinsey Telecom Practice 2024; T-Mobile Un-carrier Update 2024" },
+      { area: "AI Fraud Detection & Revenue Assurance", detail: "Telecom fraud costs the industry $40B+ annually. AI-powered fraud detection systems identify SIM swap fraud, subscription fraud, and revenue leakage with 95% accuracy. Subex and TEOCO lead the space.", source: "Source: CFCA Global Fraud Loss Survey 2024; Gartner CSP Technology Report 2024" },
+      { area: "AI for Spectrum Management & 5G Planning", detail: "AI-driven spectrum allocation improves 5G capacity 20-30%. Nokia's AI radio planning tool optimizes coverage across 500+ operator networks. DeepMind-style AI models are being applied to wireless network design.", source: "Source: GSMA Mobile Economy Report 2024; Nokia Technology Vision 2024" },
+      { area: "Edge AI & IoT Platform Intelligence", detail: "AWS Wavelength, Azure Edge, and Google Distributed Cloud enable AI at the telecom edge. Telcos managing 10B+ IoT connections are using AI to process data at the edge, reducing latency 80% and bandwidth costs 40%.", source: "Source: IDC Edge Computing Report 2024; AWS re:Invent 2024" },
+    ],
+    consulting_services: [
+      { area: "AI-Augmented Research & Analysis", detail: "McKinsey's Lilli AI assistant serves 30,000+ consultants with instant access to firm knowledge. BCG's AI-powered case analytics accelerate client research 40%. Deloitte's AI research tools process 10M+ documents for due diligence.", source: "Source: McKinsey Technology Report 2024; BCG Annual Report 2024" },
+      { area: "Generative AI for Deliverable Creation", detail: "Bain's AI generates first-draft client presentations in minutes. EY's AI document generation reduced report production time 50%. Consulting firms not augmenting consultants with AI are seeing 20-30% productivity gaps.", source: "Source: Consulting Magazine AI Report 2024; Gartner Professional Services Forecast 2024" },
+      { area: "AI-Powered Client Intelligence", detail: "Accenture's AI analyzes client industry data to identify opportunities before engagement. PwC's AI-driven market sizing models produce estimates in hours vs. weeks. Real-time competitive intelligence via AI is reshaping proposal win rates.", source: "Source: Forrester Consulting Market Report 2024; Accenture Annual Report 2024" },
+      { area: "Knowledge Management & Expert Networks", detail: "McKinsey's AI matches consultants to projects based on skills and domain expertise. Gartner Expert AI recommends the right analyst for each client question. AI-powered knowledge graphs connect 40 years of institutional knowledge.", source: "Source: McKinsey Quarterly 2024; Harvard Business Review Professional Services AI Study" },
+      { area: "AI for Project Staffing & Resource Optimization", detail: "Big 4 firms are using AI to optimize staffing across 100K+ consultants. AI-driven utilization forecasting improved billable rates 5-8%. Partners using AI for pipeline management close 15% more deals.", source: "Source: Kennedy Consulting Research 2024; Deloitte Technology Fast 500" },
+      { area: "Client-Facing AI Products & Platforms", detail: "Consulting firms are building AI-native products alongside advisory services. Accenture's AI platforms generate $3B+ in annual revenue. McKinsey's QuantumBlack has become a standalone AI business unit. Services-only models face margin pressure.", source: "Source: ALM Intelligence Report 2024; Accenture Q3 2024 Earnings" },
+    ],
+    legal_services: [
+      { area: "AI Contract Review & Analysis", detail: "Kira Systems, Luminance, and iManage RAVN process millions of contracts with 95%+ accuracy. Allen & Overy's Harvey AI handles 40K+ queries/month from lawyers. AI contract review is 60-80% faster than manual review.", source: "Source: Thomson Reuters Legal AI Report 2024; Allen & Overy Technology Update 2024" },
+      { area: "Generative AI for Legal Research", detail: "Westlaw's AI assistant and LexisNexis Protege accelerate legal research 50%. CoCounsel (Thomson Reuters) drafts memos, analyzes depositions, and reviews documents at associate-level quality.", source: "Source: ABA Legal Technology Survey 2024; Thomson Reuters Annual Report 2024" },
+      { area: "AI-Powered Litigation Analytics", detail: "Lex Machina and Ravel Law use ML to predict case outcomes with 80%+ accuracy. AI litigation analytics inform settlement decisions and judge selection strategy. Firms not using predictive analytics are litigating blind.", source: "Source: Georgetown Law Technology Review 2024; Lex Machina Benchmark Report 2024" },
+      { area: "E-Discovery & Document Review AI", detail: "Relativity's AI-powered e-discovery reduces document review costs 40-60%. Reveal AI processes billions of documents with TAR 2.0 technology. AI is making large-scale document review economically viable.", source: "Source: EDRM AI Report 2024; Relativity Fest 2024" },
+      { area: "AI for Client Intake & Matter Management", detail: "Intapp and Litera use AI to automate conflicts checks, client screening, and matter planning. AI intake reduces new matter setup time 70% and improves conflicts detection accuracy.", source: "Source: Gartner Legal Technology Report 2024; ILTA Technology Survey 2024" },
+      { area: "AI-Driven Pricing & Profitability", detail: "BigHand and Thomson Reuters Elite use AI to optimize legal pricing and track matter profitability in real-time. AI-powered alternative fee arrangements are winning more client mandates.", source: "Source: Peer Monitor Index 2024; BCG Legal Market Report 2024" },
+    ],
+    government_federal: [
+      { area: "AI for Fraud Detection & Program Integrity", detail: "IRS AI detected $6B+ in fraudulent refund claims in 2024. CMS uses ML to identify $25B+ in improper Medicare/Medicaid payments annually. USDA's AI fraud detection saves $1.4B in SNAP benefit fraud.", source: "Source: GAO AI in Government Report 2024; IRS Commissioner Testimony 2024" },
+      { area: "AI-Powered Citizen Services", detail: "GSA's AI chatbot handles 10M+ citizen inquiries annually. VA's AI triage system reduced veteran wait times 30%. USPS's AI package routing processes 7B+ items/year.", source: "Source: Federal AI Use Case Inventory 2024; VA Digital Modernization Report 2024" },
+      { area: "AI for National Security & Intelligence", detail: "DoD's Project Maven and JADC2 integrate AI into military decision-making. NGA uses AI to process satellite imagery 100x faster. IC agencies process 10M+ intelligence reports/day using NLP.", source: "Source: DoD AI Strategy Update 2024; NSCAI Final Report Implementation Tracker" },
+      { area: "Generative AI for Policy & Regulatory Analysis", detail: "Federal agencies are piloting LLMs for regulatory impact analysis, policy drafting, and public comment summarization. OMB's AI guidance requires agencies to inventory and govern all AI use cases.", source: "Source: OMB M-24-10 AI Governance Memo; White House AI Executive Order Implementation" },
+      { area: "AI for Cybersecurity & Zero Trust", detail: "CISA's AI-powered threat detection monitors federal networks. NSA's AI cybersecurity tools protect classified systems. Federal agencies using AI security detect threats 60% faster.", source: "Source: CISA AI Roadmap 2024; NSA AI Security Center Report 2024" },
+      { area: "Predictive Analytics for Mission Outcomes", detail: "FEMA uses AI to predict disaster impact and pre-position resources. Census Bureau's ML improves population estimates. EPA's AI monitors environmental compliance across 100K+ regulated facilities.", source: "Source: Federal Data Strategy Progress Report 2024; FEMA Innovation Report 2024" },
+    ],
+    media_entertainment: [
+      { area: "AI Content Recommendation & Personalization", detail: "Netflix's AI recommendation engine drives 80% of viewer choices, worth an estimated $1B/year in retained subscriptions. Spotify's AI-curated playlists account for 35% of all listening. TikTok's AI algorithm is the product.", source: "Source: Netflix Technology Blog 2024; Spotify Wrapped Data 2024" },
+      { area: "Generative AI for Content Creation", detail: "Disney uses AI for visual effects production, reducing VFX timelines 30%. Warner Bros. uses AI for script analysis and audience testing. AI-generated music, video, and written content is reshaping production economics.", source: "Source: Disney Technology Showcase 2024; Deloitte TMT Predictions 2024" },
+      { area: "AI for Advertising & Revenue Optimization", detail: "Google's AI-powered Performance Max generates 20%+ higher ROAS. Meta's Advantage+ AI creates and optimizes ad creative at scale. Connected TV advertising powered by AI is growing 30% annually.", source: "Source: eMarketer Digital Ad Forecast 2024; Google Marketing Live 2024" },
+      { area: "AI-Driven Rights Management & Compliance", detail: "YouTube's Content ID AI processes 500+ hours of video uploads per minute. Audible Magic and Pex use AI to track content rights across platforms. AI licensing compliance saves media companies billions in legal exposure.", source: "Source: YouTube Transparency Report 2024; IFPI Global Music Report 2024" },
+      { area: "AI Audience Analytics & Engagement", detail: "Paramount uses AI to predict show performance before greenlighting. Spotify's AI-powered audience insights inform artist development. AI sentiment analysis processes millions of social media reactions in real-time.", source: "Source: Variety Intelligence Platform 2024; Spotify for Artists Report 2024" },
+      { area: "AI for Live Events & Sports Broadcasting", detail: "ESPN's AI automatically generates highlights and personalized content. NFL's Next Gen Stats uses AI to create real-time analytics graphics. Live Nation uses AI for dynamic ticket pricing and fraud prevention.", source: "Source: ESPN Technology Report 2024; NFL Next Gen Stats 2024" },
+    ],
+    real_estate_commercial: [
+      { area: "AI Property Valuation & Investment Analysis", detail: "CoStar's AI processes 10M+ commercial properties with ML-powered valuations. JLL's AI investment analytics identify market opportunities 6 months earlier. CBRE's AI due diligence reduces analysis time 40%.", source: "Source: Deloitte Real Estate AI Report 2024; CoStar Annual Report 2024" },
+      { area: "AI-Powered Tenant Experience & Building Management", detail: "JLL's AI smart building platform manages 5B+ sq ft globally. Honest Buildings (now Procore) uses AI to optimize capital projects. AI HVAC optimization reduces energy costs 15-25%.", source: "Source: JLL Technology Report 2024; CBRE Smart Building Study 2024" },
+      { area: "Predictive Analytics for Market & Lease Intelligence", detail: "CompStak uses AI to analyze lease comps across 1M+ commercial leases. Reonomy's AI identifies off-market opportunities. AI-powered market forecasting improved investment returns 200-400bps for early adopters.", source: "Source: CBRE Research 2024; MIT Real Estate Innovation Lab 2024" },
+      { area: "AI for Property Marketing & Lead Generation", detail: "Matterport AI creates 3D property tours from smartphone video. AI-generated property descriptions and virtual staging reduce listing time 30%. Lead scoring AI identifies qualified tenants with 85% accuracy.", source: "Source: NAR Technology Survey 2024; Matterport Enterprise Report 2024" },
+      { area: "AI Sustainability & ESG Compliance", detail: "AI-powered energy management reduces building emissions 20-30%. Measurabl and Deepki use AI to track ESG metrics across portfolios. EU taxonomy compliance increasingly requires AI-powered data collection.", source: "Source: GRESB Real Estate Assessment 2024; ULI Emerging Trends 2024" },
+      { area: "AI Construction Management & Development", detail: "Procore's AI detects construction defects from photos. AI project scheduling reduces delays 15-20%. Generative AI designs optimize building layouts for cost and sustainability simultaneously.", source: "Source: McKinsey Capital Projects Practice 2024; Procore Groundbreak 2024" },
+    ],
+    aerospace_defense: [
+      { area: "AI for Predictive Maintenance & Fleet Readiness", detail: "Lockheed Martin's AI-powered ALIS/ODIN system manages F-35 fleet maintenance. Boeing's AI predictive maintenance reduces aircraft-on-ground events 25%. Airbus Skywise AI platform connects 16,000+ aircraft.", source: "Source: Lockheed Martin Annual Report 2024; Boeing AnalytX Report 2024" },
+      { area: "AI-Driven Design & Simulation", detail: "SpaceX uses AI for rapid Raptor engine iteration. Northrop Grumman's AI-powered design tools reduced B-21 development timeline 30%. Digital twin simulation with AI saves $2M+ per aircraft test campaign.", source: "Source: Aviation Week Intelligence Network 2024; NVIDIA Omniverse A&D Showcase" },
+      { area: "Autonomous Systems & AI Decision Support", detail: "DARPA's ACE program demonstrated AI dogfighting capability. General Atomics AI-powered autonomous UAVs complete complex missions. Anduril's Lattice AI platform provides battlefield awareness across military domains.", source: "Source: DoD AI Adoption Strategy 2024; DARPA Strategic Plan 2024" },
+      { area: "AI for Supply Chain & Manufacturing", detail: "RTX uses AI to manage 14,000+ suppliers across defense programs. L3Harris AI quality inspection reduces defect rates 40%. GE Aerospace's AI manufacturing optimization saves 200K+ labor hours annually.", source: "Source: Deloitte A&D Outlook 2024; RTX Annual Report 2024" },
+      { area: "AI Cybersecurity for Defense Systems", detail: "Raytheon's AI cybersecurity protects classified weapon systems. Booz Allen's AI threat detection processes 1B+ events/day for defense clients. AI-powered cyber defense is a $15B+ market growing 25% annually.", source: "Source: CSIS Technology & National Security Report 2024; Booz Allen Investor Day 2024" },
+      { area: "AI-Powered Logistics & Mission Planning", detail: "Palantir's AI logistics platform manages DoD supply chains across 4,000+ locations. L3Harris AI mission planning reduces operational planning time 50%. AI-enabled logistics is a top JADC2 priority.", source: "Source: Palantir Government Contract Reports 2024; Army Futures Command Update 2024" },
+    ],
+    transportation: [
+      { area: "AI-Powered Fleet Optimization", detail: "UPS ORION processes 250K+ routes daily, saving $400M annually. FedEx AI routing engine reduced fuel consumption 15%. Uber Freight's AI matches loads to trucks with 92% utilization rates.", source: "Source: UPS 2024 10-K; FedEx Annual Report 2024; Uber Freight Investor Update 2024" },
+      { area: "Autonomous Vehicle Development", detail: "Waymo operates 100K+ paid robotaxi rides/week. Aurora Innovation is deploying autonomous trucks on I-45. TuSimple's AI-powered trucks completed 18-hour autonomous hauls.", source: "Source: Waymo Safety Report 2024; Aurora Innovation Q3 2024 Earnings" },
+      { area: "Predictive Maintenance for Fleet & Infrastructure", detail: "Union Pacific uses AI to monitor 32,000 miles of track, predicting failures 30 days out. Southwest Airlines' AI predictive maintenance prevents 95% of mechanical delays. Transit agencies using AI maintenance see 25% cost reduction.", source: "Source: AAR Technology Report 2024; Southwest Airlines Technology Update 2024" },
+      { area: "AI for Safety & Compliance", detail: "Samsara's AI dashcams monitor 1M+ commercial vehicles. AI driver coaching reduces accidents 22%. FMCSA is evaluating AI-powered compliance monitoring for carriers.", source: "Source: NHTSA Safety Report 2024; Samsara Annual Report 2024" },
+      { area: "Dynamic Pricing & Revenue Management", detail: "Delta's AI pricing engine processes 1M+ fare decisions daily. Uber's surge pricing AI optimizes across 10,000+ cities. AI-powered revenue management improves yield 5-12% for transport operators.", source: "Source: IATA Revenue Management Report 2024; Delta Investor Day 2024" },
+      { area: "AI for Demand Forecasting & Scheduling", detail: "MTA uses AI to optimize subway and bus schedules serving 8M daily riders. Airlines using AI crew scheduling save $200M+ annually. AI demand prediction accuracy exceeds 90% for leading operators.", source: "Source: APTA Transit Technology Report 2024; BCG Transport Practice 2024" },
+    ],
+    utilities: [
+      { area: "AI Grid Management & Optimization", detail: "Duke Energy's AI manages 300,000+ miles of power lines, predicting failures 7 days out. NextEra Energy's AI optimizes renewable output across 30GW of capacity. AI grid management reduces outage duration 30-40%.", source: "Source: EEI Grid Modernization Report 2024; Duke Energy Annual Report 2024" },
+      { area: "AI for Renewable Integration & Forecasting", detail: "DeepMind's AI improved Google wind farm output prediction 20%. AI solar forecasting enables 95%+ accuracy for 48-hour predictions. Utilities using AI for renewable dispatch save $1M+ per GW per year.", source: "Source: IEA Renewables Report 2024; Google Sustainability Report 2024" },
+      { area: "AI-Powered Customer Operations", detail: "Con Edison's AI handles 2M+ customer interactions annually. AI outage prediction and automated communication improve customer satisfaction 25%. Smart meter AI analytics identify theft and billing errors.", source: "Source: J.D. Power Utility Study 2024; Con Edison Technology Report 2024" },
+      { area: "Predictive Maintenance for Infrastructure", detail: "PG&E uses AI and satellite imagery to monitor wildfire risk across 25,000 square miles. AI inspection of transformers and substations prevents 60% of unplanned outages. Drone AI inspection reduces line patrol costs 75%.", source: "Source: PG&E Safety Report 2024; Gartner Utility Technology Report 2024" },
+      { area: "AI for Demand Response & Load Balancing", detail: "Google Nest AI-powered thermostats manage 30M+ homes for demand response. AI load forecasting reduces peak capacity needs 5-10%, deferring $100M+ in grid infrastructure investment.", source: "Source: FERC Demand Response Report 2024; Google Nest Impact Report 2024" },
+      { area: "AI Water & Gas Network Management", detail: "American Water Works uses AI to detect pipe leaks and predict failures across 53,000 miles of pipeline. AI water quality monitoring processes 100K+ samples daily. Gas utilities use AI for methane leak detection and repair prioritization.", source: "Source: AWWA Utility Benchmarking 2024; American Water Annual Report 2024" },
+    ],
+    nonprofit_ngo: [
+      { area: "AI for Donor Analytics & Fundraising", detail: "Red Cross uses AI to identify potential major donors and optimize solicitation timing. AI-powered fundraising platforms improve donation conversion 20-35%. Predictive giving models identify lapsed donors likely to re-engage.", source: "Source: AFP Fundraising Effectiveness Report 2024; Blackbaud Intelligence Report 2024" },
+      { area: "AI-Powered Program Impact Measurement", detail: "Gates Foundation uses AI to track health intervention outcomes across 130+ countries. AI satellite imagery analyzes development program impact. ML models predict program effectiveness before full deployment.", source: "Source: Stanford Social Innovation Review AI Report 2024; Gates Foundation Annual Letter 2024" },
+      { area: "Generative AI for Grant Writing & Reporting", detail: "AI-assisted grant proposals are 40% faster to produce. Instrumentl and Fluxx use AI to match organizations to funding opportunities. LLMs draft progress reports and impact narratives from program data.", source: "Source: National Council of Nonprofits Technology Survey 2024; Candid GuideStar Report 2024" },
+      { area: "AI for Operations & Resource Optimization", detail: "Feeding America uses AI to optimize food distribution across 200+ food banks. AI volunteer matching and scheduling improves engagement 25%. Habitat for Humanity uses AI project planning for construction timelines.", source: "Source: Feeding America Annual Report 2024; Points of Light Volunteer Technology Report 2024" },
+      { area: "AI for Advocacy & Communications", detail: "ACLU uses AI to analyze legislation across 50 states. AI-powered social listening tracks policy sentiment in real-time. Amnesty International uses AI to verify human rights documentation.", source: "Source: TechSoup Digital Literacy Report 2024; ACLU Technology & Liberty Update 2024" },
+      { area: "AI Chatbots for Beneficiary Services", detail: "Crisis Text Line's AI triages 10M+ conversations, routing highest-risk cases to counselors. UNHCR's AI chatbot serves refugees in 15 languages. AI-powered service delivery reaches 3x more beneficiaries at the same cost.", source: "Source: NTEN Nonprofit Technology Report 2024; Crisis Text Line Impact Report 2024" },
+    ],
+    cpg: [
+      { area: "AI-Powered Demand Sensing", detail: "P&G's AI demand sensing improved forecast accuracy 20%, reducing waste $500M+. Unilever's AI processes point-of-sale data from 1M+ stores in real-time. PepsiCo's AI demand planning reduced out-of-stocks 15%.", source: "Source: McKinsey CPG Practice 2024; P&G Investor Day 2024" },
+      { area: "AI for Trade Promotion Optimization", detail: "Kraft Heinz uses AI to optimize $5B+ in annual trade spend, improving ROI 12%. AI trade promotion engines analyze retailer-specific response patterns. Companies optimizing trade spend with AI recapture 3-5% of revenue.", source: "Source: BCG CPG Advantage Report 2024; Kraft Heinz Annual Report 2024" },
+      { area: "Generative AI for Product Innovation", detail: "Coca-Cola used AI to develop its Y3000 flavor. Nestlé's AI R&D platform screens 10,000+ flavor combinations. L'Oréal uses AI to predict beauty trends and formulate products 30% faster.", source: "Source: Coca-Cola Innovation Report 2024; Nestlé R&D Technology Update 2024" },
+      { area: "AI-Driven Direct-to-Consumer", detail: "Nike's AI personalization drives 25% of digital revenue. P&G's AI-powered DTC brands optimize customer acquisition cost 30%. AI retargeting and lifecycle marketing improve CPG customer LTV 40%.", source: "Source: Nike Digital Report 2024; Deloitte Consumer Products Outlook 2024" },
+      { area: "Supply Chain AI & Resilience", detail: "Mars uses AI to monitor 100K+ suppliers across tiers. Nestlé's AI supply chain saved CHF 800M in 2024. AI-powered demand-supply matching reduces CPG logistics costs 8-12%.", source: "Source: Gartner Supply Chain Top 25 2024; Mars Sustainability Report 2024" },
+      { area: "AI for Sustainability & ESG Compliance", detail: "Unilever's AI tracks Scope 3 emissions across 150,000+ suppliers. P&G uses AI to optimize packaging sustainability. AI-powered lifecycle assessment reduces environmental reporting time 60%.", source: "Source: CDP Corporate Environmental Disclosure 2024; Unilever Climate Action Report 2024" },
+    ],
+    shipping_logistics: [
+      { area: "AI-Optimized Route Planning & Fleet Management", detail: "UPS's ORION system processes 250,000+ routes daily using ML, saving 100M+ miles and $400M annually. DHL has deployed AI route optimization across 220 countries. Amazon's AI routing engine now powers same-day delivery in 90+ US metros.", source: "Source: UPS 2024 10-K Filing; DHL Logistics Trend Radar 2024; Amazon Q3 2024 Earnings Call" },
+      { area: "Predictive Maintenance for Fleet & Facilities", detail: "Maersk uses IoT + ML to predict container ship engine failures 30 days in advance, reducing unplanned downtime by 40%. XPO Logistics deploys predictive maintenance across 750+ facilities. UPS's Automotive Predictive Analytics prevents 10,000+ breakdowns annually.", source: "Source: Maersk Technology Review 2024; XPO Investor Day 2024; UPS Sustainability Report 2024" },
+      { area: "Computer Vision for Warehouse Automation", detail: "Amazon operates 750,000+ robots across fulfillment centers using AI vision systems. DHL's OptiCarton uses CV to optimize package sizing, reducing shipping volume 25%. Locus Robotics has completed 3B+ picks.", source: "Source: Amazon Robotics Report 2024; DHL Innovation Center; Locus Robotics Press Release Oct 2024" },
+      { area: "AI-Powered Customer Service & Tracking", detail: "UPS's virtual assistant handles 54M+ customer interactions/year. Maersk's AI chatbot resolves 65% of shipping queries without human intervention. DHL's AI customer service platform reduced call center volume 35%.", source: "Source: UPS Digital Strategy Report 2024; Maersk Q2 2024 Investor Presentation" },
+      { area: "Demand Forecasting & Dynamic Pricing", detail: "C.H. Robinson uses ML to predict freight demand 30 days out with 92% accuracy. Flexport's AI pricing engine adjusts rates in real-time based on 200+ variables. XPO's AI-powered brokerage platform processes $4B+ in freight annually.", source: "Source: C.H. Robinson Q3 2024 Earnings; Flexport Technology Blog 2024; XPO Annual Report 2024" },
+      { area: "Supply Chain Visibility & Risk Prediction", detail: "Maersk tracks 30M+ containers with AI-powered ETA prediction. FourKites, project44, and Transplace use ML to provide real-time supply chain visibility to 1,000+ shippers.", source: "Source: Gartner Supply Chain Top 25 Report 2024; FourKites Industry Benchmark 2024" },
+    ],
   };
-  const shippingLogistics = [
-    { area: "AI-Optimized Route Planning & Fleet Management", detail: "UPS's ORION system processes 250,000+ routes daily using ML, saving 100M+ miles and $400M annually. DHL has deployed AI route optimization across 220 countries. Amazon's AI routing engine now powers same-day delivery in 90+ US metros. If your fleet is still using static routing, you are burning fuel and margin your competitors are not.", source: "Source: UPS 2024 10-K Filing; DHL Logistics Trend Radar 2024; Amazon Q3 2024 Earnings Call" },
-    { area: "Predictive Maintenance for Fleet & Facilities", detail: "Maersk uses IoT + ML to predict container ship engine failures 30 days in advance, reducing unplanned downtime by 40%. XPO Logistics deploys predictive maintenance across 750+ facilities. UPS's Automotive Predictive Analytics prevents 10,000+ breakdowns annually. Your competitors are fixing problems before they happen.", source: "Source: Maersk Technology Review 2024; XPO Investor Day 2024; UPS Sustainability Report 2024" },
-    { area: "Computer Vision for Warehouse Automation", detail: "Amazon operates 750,000+ robots across fulfillment centers using AI vision systems. DHL's OptiCarton uses CV to optimize package sizing, reducing shipping volume 25%. Locus Robotics (deployed by DHL, GEODIS) has completed 3B+ picks. Your competitors are automating the warehouse floor while you are still counting boxes.", source: "Source: Amazon Robotics Report 2024; DHL Innovation Center; Locus Robotics Press Release Oct 2024" },
-    { area: "AI-Powered Customer Service & Tracking", detail: "UPS's virtual assistant handles 54M+ customer interactions/year. Maersk's AI chatbot resolves 65% of shipping queries without human intervention. DHL's AI customer service platform reduced call center volume 35%. Your customers expect real-time, intelligent service — are you delivering it?", source: "Source: UPS Digital Strategy Report 2024; Maersk Q2 2024 Investor Presentation; DHL Digital Transformation Update 2024" },
-    { area: "Demand Forecasting & Dynamic Pricing", detail: "C.H. Robinson uses ML models to predict freight demand 30 days out with 92% accuracy. Flexport's AI pricing engine adjusts rates in real-time based on 200+ variables. XPO's AI-powered brokerage platform processes $4B+ in freight annually. Static pricing is becoming a competitive liability.", source: "Source: C.H. Robinson Q3 2024 Earnings; Flexport Technology Blog 2024; XPO Annual Report 2024" },
-    { area: "Supply Chain Visibility & Risk Prediction", detail: "Maersk's TradeLens (now evolved into new platform) tracks 30M+ containers with AI-powered ETA prediction. FourKites, project44, and Transplace use ML to provide real-time supply chain visibility to 1,000+ shippers. Amazon's supply chain AI predicted and pre-positioned inventory ahead of 2024 disruptions. Visibility is no longer a differentiator — it is table stakes.", source: "Source: Gartner Supply Chain Top 25 Report 2024; FourKites Industry Benchmark 2024; Amazon Logistics Innovation Day 2024" },
-  ];
   const defaults = [
     { area: "Customer-Facing AI (Chatbots, Virtual Assistants)", detail: "Organizations across industries are deploying conversational AI for customer service. Bank of America's Erica handles 1.5B+ interactions/year. Comcast's AI assistant resolves 30% of support calls without agents. If your call center is still fully human-staffed, you are over-spending and under-serving.", source: "Source: Gartner Customer Service AI Survey 2024; Bank of America Q3 2024 Report" },
     { area: "Process Automation & Intelligent Document Processing", detail: "JPMorgan's COiN platform processes 12,000 commercial credit agreements in seconds (previously 360,000 hours of lawyer work). UiPath and Automation Anywhere report 40-60% efficiency gains in document workflows. Your competitors are processing in minutes what takes your teams days.", source: "Source: McKinsey Operations Practice 2024; JPMorgan Technology Report 2024" },
@@ -4066,7 +4210,7 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
     { area: "AI-Powered Cybersecurity & Threat Detection", detail: "CrowdStrike's AI processes 2T+ security events/week. IBM reports organizations using AI security detect breaches 108 days faster and save $1.76M per incident. Your competitors are using AI to defend against threats that are already using AI to attack.", source: "Source: IBM Cost of a Data Breach Report 2024; CrowdStrike Annual Threat Report 2024" },
     { area: "Workforce Intelligence & Talent Optimization", detail: "Microsoft's Viva Copilot Analytics identifies 8.8 hours/week of meeting time that could be redirected to deep work. Unilever uses AI screening for 1.8M annual applications, reducing hiring time 75%. Workday's ML-powered skills intelligence maps talent gaps across 60M+ workers. Your talent strategy is either AI-augmented or falling behind.", source: "Source: Microsoft Work Trend Index 2024; Unilever HR Innovation Report; Workday Rising 2024" },
   ];
-  // Map new industry slugs to their closest match
+  // Map industry slugs to their closest match
   const industryAliases: Record<string, string> = {
     healthcare_providers: 'healthcare',
     healthcare_payers: 'healthcare',
@@ -4079,9 +4223,22 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
     private_equity: 'financial_services',
     venture_capital: 'financial_services',
     hedge_funds: 'financial_services',
+    ecommerce_digital: 'ecommerce_digital',
+    dtc: 'ecommerce_digital',
+    food_beverage: 'cpg',
+    it_services: 'software_saas',
+    hardware_electronics: 'software_saas',
+    chemicals_materials: 'manufacturing_process',
+    industrial_services: 'manufacturing_discrete',
+    construction_engineering: 'real_estate_commercial',
+    real_estate_residential: 'real_estate_commercial',
+    infrastructure_transport: 'transportation',
+    government_state_local: 'government_federal',
+    defense_contractors: 'aerospace_defense',
+    accounting_audit: 'consulting_services',
   };
   const key = industry;
-  return areas[key] || areas[industryAliases[key] || ''] || (industry === "shipping_logistics" ? shippingLogistics : defaults);
+  return areas[key] || areas[industryAliases[key] || ''] || defaults;
 }
 
 // ---------------------------------------------------------------------------
