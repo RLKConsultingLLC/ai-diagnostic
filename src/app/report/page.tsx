@@ -631,6 +631,7 @@ function ReportPage() {
       {/* Full Report Sections (post-payment) */}
       {phase === "full" && result && (
         <div className="mb-8">
+          <SaveAsPDFButton />
           {/* ================================================================= */}
           {/* REPORT COVER / TITLE BLOCK                                        */}
           {/* ================================================================= */}
@@ -1174,7 +1175,7 @@ function ReportPage() {
           <CollapsibleSection
             number={4}
             title="Competitive Positioning & Industry Intelligence"
-            summary={`Where ${result.companyProfile.companyName} stands relative to peers in ${industryLabel(result.companyProfile.industry)}, where competitors are heading, and what it costs if the gap widens.`}
+            summary={`Where ${result.companyProfile.companyName} stands relative to peers in ${industryLabel(result.companyProfile.industry)}. Competitor positions are estimated from industry benchmark data (McKinsey 2024 Global AI Survey, BCG AI Advantage Report, Gartner peer analytics) and anonymized for confidentiality.`}
             preview={
               <>
                 <CompetitiveMatrix
@@ -2130,8 +2131,17 @@ function ReportPage() {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-offwhite">
-      <div className="rlk-gradient-bar" />
-      <header className="bg-white border-b border-light">
+      {/* Print stylesheet — expands all collapsed sections, hides UI chrome */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          .no-print { display: none !important; }
+          .print-cover { display: block !important; }
+          body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          section, [class*="CollapsibleSection"], [class*="SubCollapsible"] { break-inside: avoid; }
+        }
+      `}} />
+      <div className="rlk-gradient-bar no-print" />
+      <header className="bg-white border-b border-light no-print">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <Link
             href="/"
@@ -2146,6 +2156,54 @@ function Shell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sticky "Save as PDF" button
+// ---------------------------------------------------------------------------
+
+function SaveAsPDFButton() {
+  const handlePrint = useCallback(() => {
+    // Before printing, expand all collapsed sections so the PDF is complete
+    const allButtons = document.querySelectorAll('button');
+    const expandedButtons: HTMLButtonElement[] = [];
+    allButtons.forEach((btn) => {
+      // Find collapsed section buttons (they have the chevron that's not rotated)
+      const svg = btn.querySelector('svg');
+      if (svg && !svg.classList.contains('rotate-180') && btn.closest('section')) {
+        btn.click();
+        expandedButtons.push(btn);
+      }
+    });
+    // Also expand all SubCollapsible items
+    const subButtons = document.querySelectorAll('[class*="border-light"] > button');
+    subButtons.forEach((btn) => {
+      const svg = btn.querySelector('svg');
+      if (svg && !svg.classList.contains('rotate-180')) {
+        (btn as HTMLButtonElement).click();
+      }
+    });
+
+    // Short delay to let React re-render expanded content
+    setTimeout(() => {
+      window.print();
+    }, 300);
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={handlePrint}
+      className="no-print fixed right-6 bottom-6 z-50 flex items-center gap-2 px-5 py-3 text-white text-sm font-semibold tracking-wide uppercase shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+      style={{ backgroundColor: '#0B1D3A' }}
+      title="Save this report as a PDF"
+    >
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Save as PDF
+    </button>
   );
 }
 
