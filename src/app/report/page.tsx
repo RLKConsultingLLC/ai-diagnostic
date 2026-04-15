@@ -357,7 +357,7 @@ function ReportPage() {
           />
           <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
             <p className="text-sm text-foreground/70">
-              The full report reveals <strong className="text-navy">exactly where your competitors are investing</strong> in AI,
+              The full report reveals <strong className="text-secondary">exactly where your competitors are investing</strong> in AI,
               with named companies, dollar amounts, and specific use cases.{" "}
               <span className="text-tertiary">See Sections 4-5 in the full report.</span>
             </p>
@@ -374,7 +374,7 @@ function ReportPage() {
           <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
             <p className="text-sm text-foreground/70">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              The full report provides the <strong className="text-navy">transparent step-by-step methodology</strong> and
+              The full report provides the <strong className="text-secondary">transparent step-by-step methodology</strong> and
               industry benchmarks. Your CFO should stress-test these assumptions before sharing with the board.
             </p>
           </div>
@@ -702,8 +702,8 @@ function ReportPage() {
                   {/* Lead paragraph — the headline */}
                   <div className="border-l-4 border-navy pl-5">
                     <p className="text-base text-foreground/80 leading-relaxed">
-                      {result.companyProfile.companyName} scores <strong className="text-navy">{result.overallScore}/100</strong> on
-                      AI organizational maturity, placing it at <strong className="text-navy">Stage {result.stageClassification.primaryStage}: {result.stageClassification.stageName}</strong>.
+                      {result.companyProfile.companyName} scores <strong className="text-secondary">{result.overallScore}/100</strong> on
+                      AI organizational maturity, placing it at <strong className="text-secondary">Stage {result.stageClassification.primaryStage}: {result.stageClassification.stageName}</strong>.
                       {result.overallScore >= 60
                         ? ` This is a competitive position, but the diagnostic reveals specific structural constraints that are preventing your AI investments from reaching their full organizational impact.`
                         : result.overallScore >= 40
@@ -756,9 +756,9 @@ function ReportPage() {
                       <SubCollapsible title="The Structural Reality" hint="View dimension analysis" defaultOpen icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           Across five behavioral dimensions, {result.companyProfile.companyName}&apos;s strongest area
-                          is <strong className="text-navy">{dimensionLabel(strongest?.dimension || "")}</strong> ({strongest?.normalizedScore}/100),
+                          is <strong className="text-secondary">{dimensionLabel(strongest?.dimension || "")}</strong> ({strongest?.normalizedScore}/100),
                           indicating {dimensionInterpretation(strongest?.dimension || "", strongest?.normalizedScore || 0).toLowerCase()} The
-                          primary constraint is <strong className="text-navy">{dimensionLabel(weakest?.dimension || "")}</strong> ({weakest?.normalizedScore}/100):{" "}
+                          primary constraint is <strong className="text-secondary">{dimensionLabel(weakest?.dimension || "")}</strong> ({weakest?.normalizedScore}/100):{" "}
                           {dimensionInterpretation(weakest?.dimension || "", weakest?.normalizedScore || 0).toLowerCase()}{" "}
                           <strong className="text-secondary">Until this dimension improves, it will act as a ceiling on the returns from every other AI investment.</strong>{" "}
                           See Section 2 for the AI posture diagnosis and Section 3 for structural constraints that translate
@@ -768,11 +768,11 @@ function ReportPage() {
 
                       <SubCollapsible title="The Economic Opportunity" hint="View financial impact" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
-                          The diagnostic estimates <strong className="text-navy">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
+                          The diagnostic estimates <strong className="text-secondary">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
                           {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value -
                           productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
-                          competitors in {ind} are. Current capture rate: <strong className="text-navy">{result.economicEstimate.currentCapturePercent}%</strong> of
-                          AI-addressable potential. That translates to approximately <strong className="text-navy">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
+                          competitors in {ind} are. Current capture rate: <strong className="text-secondary">{result.economicEstimate.currentCapturePercent}%</strong> of
+                          AI-addressable potential. That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
                           forfeited per quarter</strong>. Section 5 provides the transparent methodology behind these numbers
                           - your CFO should stress-test these before sharing with the board.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
@@ -783,7 +783,7 @@ function ReportPage() {
                       <SubCollapsible title="The Competitive Context" hint="View positioning" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           {result.companyProfile.companyName} sits in the{" "}
-                          <strong className="text-navy">{(() => {
+                          <strong className="text-secondary">{(() => {
                             const cap = (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
                               (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5;
                             const read = (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
@@ -806,7 +806,7 @@ function ReportPage() {
                           Section 7 maps the <strong className="text-secondary">security and governance risks</strong> your current posture creates.
                           Section 9 provides <strong className="text-secondary">messages for the board</strong> with specific decision items and investment asks.
                           Every finding is supported by methodology and sources documented in Section 10.
-                          <strong className="text-navy"> Contact RLK to build a tailored 90-day operationalization plan from these findings.</strong>
+                          The gap between diagnosis and impact is <strong className="text-secondary">a concrete operationalization plan</strong> - translating these findings into governance structures, vendor decisions, and organizational changes within 90 days.
                         </p>
                       </SubCollapsible>
                     </div>
@@ -1154,7 +1154,7 @@ function ReportPage() {
                         What This Means for {result.companyProfile.companyName}
                       </p>
                       <p className="text-sm text-foreground/70 leading-relaxed">
-                        {ci.interpretation} <strong className="text-navy">Contact RLK Consulting</strong> to build a tailored action plan addressing this gap.
+                        {ci.interpretation} Addressing this gap requires a <strong className="text-secondary">targeted action plan</strong> with specific governance changes and measurable milestones.
                       </p>
                     </div>
                   </div>
@@ -1245,10 +1245,10 @@ function ReportPage() {
             {/* Industry AI adoption benchmarks */}
             <SubCollapsible title={`Where ${result.companyProfile.companyName}'s Competitors Are Investing`} hint="View competitor investments" defaultOpen>
               <p className="text-xs text-foreground/50 mb-3">
-                At Stage {result.stageClassification.primaryStage} with an overall score of <strong className="text-navy">{result.overallScore}/100</strong>,
+                At Stage {result.stageClassification.primaryStage} with an overall score of <strong className="text-secondary">{result.overallScore}/100</strong>,
                 {" "}{result.companyProfile.companyName} is <strong className="text-secondary">{result.overallScore >= 60 ? "keeping pace with but not leading" : result.overallScore >= 40 ? "trailing the median of" : "significantly behind"}</strong> peers
                 in {industryLabel(result.companyProfile.industry)} on these investment areas. Your weakest dimension -{" "}
-                <strong className="text-navy">{dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")}</strong> at{" "}
+                <strong className="text-secondary">{dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")}</strong> at{" "}
                 {[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 - is the primary bottleneck
                 limiting {result.companyProfile.companyName}&apos;s ability to capture value from these same investments.
               </p>
@@ -1452,7 +1452,7 @@ function ReportPage() {
                     the language of your P&L - how AI investment (or the absence of it) flows through
                     <strong className="text-secondary"> revenue, margins, cost structure, talent economics, and risk exposure</strong> over the next
                     12-24 months. Every dollar figure below is derived from {result.companyProfile.companyName}&apos;s
-                    actual revenue of <strong className="text-navy">{fmtUSD(result.companyProfile.revenue)}</strong> and industry benchmarks
+                    actual revenue of <strong className="text-secondary">{fmtUSD(result.companyProfile.revenue)}</strong> and industry benchmarks
                     for {industryLabel(result.companyProfile.industry)}.
                   </p>
 
@@ -1587,10 +1587,10 @@ function ReportPage() {
                   potential business consequence if it does).
                 </p>
                 <p className="text-sm text-foreground/70 leading-relaxed">
-                  According to Gartner&apos;s 2024 AI Risk Management survey, <strong className="text-navy">62% of organizations</strong> have
+                  According to Gartner&apos;s 2024 AI Risk Management survey, <strong className="text-secondary">62% of organizations</strong> have
                   experienced at least one AI-related risk event (data leak, biased output, compliance
                   violation) in the past 18 months. Organizations with formal AI governance frameworks
-                  experienced <strong className="text-navy">73% fewer material incidents</strong>. The EU AI Act (effective August 2025) and
+                  experienced <strong className="text-secondary">73% fewer material incidents</strong>. The EU AI Act (effective August 2025) and
                   state-level US regulations (Colorado AI Act, California AI Transparency Act) are
                   increasing the <strong className="text-secondary">regulatory cost of inadequate governance</strong>.
                 </p>
@@ -1684,7 +1684,7 @@ function ReportPage() {
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                   Every vendor relationship is a bet on your AI future. We evaluate across <strong className="text-secondary">six
-                  dimensions</strong>, weighted for your maturity stage. At <strong className="text-navy">Stage{" "}
+                  dimensions</strong>, weighted for your maturity stage. At <strong className="text-secondary">Stage{" "}
                   {result.stageClassification.primaryStage}</strong>, the priorities that matter most for
                   {" "}{result.companyProfile.companyName} are{" "}
                   {result.stageClassification.primaryStage <= 2
@@ -1868,8 +1868,8 @@ function ReportPage() {
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               These findings are structured for <strong className="text-secondary">direct board presentation</strong>. Each item
               below is a <strong className="text-secondary">decision point</strong>, not an informational update. NACD&apos;s 2024
-              Board Oversight of AI report found that <strong className="text-navy">78% of boards</strong> consider AI a
-              top-three priority - but only <strong className="text-navy">23% feel equipped to oversee it</strong>. The asks
+              Board Oversight of AI report found that <strong className="text-secondary">78% of boards</strong> consider AI a
+              top-three priority - but only <strong className="text-secondary">23% feel equipped to oversee it</strong>. The asks
               below are designed to close that gap for {result.companyProfile.companyName}.
             </p>
 
