@@ -1033,24 +1033,22 @@ function ReportPage() {
               </>
             }
           >
-            {/* How to read the matrix — shown directly */}
-            <div className="bg-offwhite border border-light p-5 mb-4">
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">How to Read This Matrix</span>
+            {/* How to read the matrix — collapsed */}
+            <SubCollapsible title="How to Read This Matrix" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
+              <div className="bg-offwhite border border-light p-5">
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  The horizontal axis measures <strong className="text-secondary">AI Capability</strong> (how effectively
+                  your organization adopts and integrates AI tools into workflows). The vertical axis measures{" "}
+                  <strong className="text-secondary">Organizational Readiness</strong> (governance structures, decision
+                  velocity, and economic translation capabilities). Organizations in the upper-right quadrant have
+                  both strong AI tooling and the organizational infrastructure to scale it. Competitor positions are
+                  informed by <strong className="text-secondary">industry benchmarks, public filings, news coverage of AI
+                  investments, analyst research, and market intelligence</strong> - not just survey data. According to
+                  McKinsey&apos;s 2024 Global AI Survey, only 8% of organizations achieve &quot;AI-Native Leader&quot;
+                  status across both dimensions simultaneously.
+                </p>
               </div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                The horizontal axis measures <strong className="text-secondary">AI Capability</strong> (how effectively
-                your organization adopts and integrates AI tools into workflows). The vertical axis measures{" "}
-                <strong className="text-secondary">Organizational Readiness</strong> (governance structures, decision
-                velocity, and economic translation capabilities). Organizations in the upper-right quadrant have
-                both strong AI tooling and the organizational infrastructure to scale it. Competitor positions are
-                informed by <strong className="text-secondary">industry benchmarks, public filings, news coverage of AI
-                investments, analyst research, and market intelligence</strong> - not just survey data. According to
-                McKinsey&apos;s 2024 Global AI Survey, only 8% of organizations achieve &quot;AI-Native Leader&quot;
-                status across both dimensions simultaneously.
-              </p>
-            </div>
+            </SubCollapsible>
 
             {/* Your Quadrant Analysis — shown directly */}
             <div className="border border-light p-5 mb-4" style={{ borderLeft: "3px solid #0B1D3A" }}>
@@ -1125,19 +1123,42 @@ function ReportPage() {
               </div>
             </div>
 
-            {/* Competitive positioning narrative — shown directly */}
+            {/* Competitive positioning narrative — organized by heading */}
             <div className="border border-light p-5">
               <div className="flex items-center gap-2 mb-3">
                 <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                 <span className="text-xs font-bold text-secondary tracking-wide uppercase">Competitive Intelligence Analysis</span>
               </div>
-              <ChunkedMarkdown
-                content={
-                  report?.sections?.find(
-                    (s) => s.slug === "competitive-positioning"
-                  )?.content || ""
+              {(() => {
+                const rawContent = report?.sections?.find((s) => s.slug === "competitive-positioning")?.content || "";
+                if (!rawContent) return null;
+                // Split by headings into organized sections
+                const parts = rawContent.split(/(?=^#{1,3}\s)/m).filter((p) => p.trim());
+                if (parts.length <= 1) {
+                  // No headings found — render as formatted markdown
+                  return <MarkdownContent content={rawContent} />;
                 }
-              />
+                // First part may be intro text (no heading)
+                const intro = parts[0]?.startsWith("#") ? null : parts[0];
+                const sections = parts.filter((p) => p.startsWith("#"));
+                return (
+                  <>
+                    {intro && <MarkdownContent content={intro} />}
+                    <div className="mt-3 space-y-1">
+                      {sections.map((section, idx) => {
+                        const lines = section.split("\n");
+                        const heading = lines[0]?.replace(/^#{1,3}\s+/, "").trim() || `Finding ${idx + 1}`;
+                        const body = lines.slice(1).join("\n").trim();
+                        return (
+                          <SubCollapsible key={idx} title={heading}>
+                            <MarkdownContent content={body} />
+                          </SubCollapsible>
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </CollapsibleSection>
 
