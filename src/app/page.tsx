@@ -554,9 +554,9 @@ export default function Home() {
                 RLK Consulting
               </div>
               <p className="text-sm leading-relaxed mb-4">
-                Enterprise AI strategy advisory. Helping CIOs, CTOs, and
-                senior technology leaders translate AI investment into
-                measurable organizational value.
+                CIO Advisory. Helping CIOs, CTOs, and senior technology
+                leaders navigate digital transformation and translate
+                technology investment into measurable organizational value.
               </p>
               <p className="text-sm">
                 Founded by Ryan King. McKinsey &amp; Deloitte alum.

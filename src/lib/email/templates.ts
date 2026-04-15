@@ -251,7 +251,7 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                 </tr>
                 <tr>
                   <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${TERTIARY};text-align:center;">
-                    RLK Consulting, LLC &nbsp;|&nbsp; AI Strategy &amp; Transformation
+                    RLK Consulting, LLC &nbsp;|&nbsp; CIO Advisory
                   </td>
                 </tr>
               </table>
@@ -310,7 +310,7 @@ ryan.king@rlkconsultingco.com
 
 ${'='.repeat(52)}
 www.rlkconsultingco.com
-RLK Consulting, LLC | AI Strategy & Transformation
+RLK Consulting, LLC | CIO Advisory
 `;
 
   return { subject, html, text };

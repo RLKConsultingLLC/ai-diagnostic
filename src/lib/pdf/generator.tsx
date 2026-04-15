@@ -46,9 +46,7 @@ const C = {
   bodyMuted: '#5A5A5A',
   white: '#FFFFFF',
   offWhite: '#F7F8FA',
-  green: '#1A6B3C',
-  amber: '#B8860B',
-  red: '#B85C38',
+  // Brand-only score palette (no traffic-light colors)
   radarFill: '#E1E5ED', // Navy at ~12% on white — safe flat color for SVG fill
   gradientBar: ['#0B1D3A', '#364E6E', '#6B7F99', '#A8B5C4', '#CED5DD'],
 } as const;
@@ -144,9 +142,11 @@ const DIM_SHORT: Record<Dimension, string> = {
 };
 
 function tierColor(sc: number): string {
-  if (sc >= 70) return C.green;
-  if (sc >= 45) return C.secondary;
-  return C.red;
+  if (sc >= 80) return C.navy;
+  if (sc >= 60) return C.secondary;
+  if (sc >= 40) return C.tertiary;
+  if (sc >= 20) return C.accent;
+  return C.light;
 }
 function tierLabel(sc: number): string {
   if (sc >= 80) return 'Leading';
@@ -404,6 +404,83 @@ function StageTimeline({ stage }: { stage: StageClassification }) {
   );
 }
 
+/** Cover page stage bar — shows all 5 stages with the current stage highlighted. */
+function CoverStageBar({ stage }: { stage: StageClassification }) {
+  const nums = [1, 2, 3, 4, 5] as const;
+  const names = ['Awareness', 'Experimentation', 'Organizational', 'Strategic', 'Transformational'];
+  return (
+    <View style={{ marginBottom: 28, width: 400, alignSelf: 'center' }}>
+      {/* Stage label */}
+      <Text style={{ fontFamily: FONT_B, fontSize: 7, color: C.accent, letterSpacing: 3, textAlign: 'center', marginBottom: 10 }}>
+        YOUR MATURITY STAGE
+      </Text>
+      {/* 5-stage row */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+        {nums.map((n, i) => {
+          const cur = n === stage.primaryStage;
+          const past = n < stage.primaryStage;
+          return (
+            <React.Fragment key={n}>
+              {i > 0 && (
+                <View style={{ width: 28, height: 1.5, backgroundColor: past || cur ? C.accent : C.secondary }} />
+              )}
+              <View style={{ alignItems: 'center', width: cur ? 64 : 52 }}>
+                <View style={{
+                  width: cur ? 32 : 22, height: cur ? 32 : 22, borderRadius: 16,
+                  backgroundColor: cur ? C.white : 'transparent',
+                  borderWidth: cur ? 0 : 1, borderColor: past ? C.accent : C.secondary,
+                  justifyContent: 'center', alignItems: 'center', marginBottom: 4,
+                }}>
+                  <Text style={{
+                    fontFamily: FONT_B, fontSize: cur ? 14 : 8,
+                    color: cur ? C.navy : past ? C.accent : C.secondary,
+                  }}>{n}</Text>
+                </View>
+                <Text style={{
+                  fontSize: cur ? 7 : 5.5, textAlign: 'center',
+                  color: cur ? C.white : past ? C.accent : C.secondary,
+                  fontFamily: cur ? FONT_B : FONT,
+                }}>{names[i]}</Text>
+              </View>
+            </React.Fragment>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+/** Score legend — explains what the score tiers mean. Placed on exec dashboard. */
+function ScoreLegend() {
+  const tiers = [
+    { label: 'Leading', range: '80-100', color: C.navy },
+    { label: 'Advancing', range: '60-79', color: C.secondary },
+    { label: 'Developing', range: '40-59', color: C.tertiary },
+    { label: 'Emerging', range: '20-39', color: C.accent },
+    { label: 'Foundational', range: '0-19', color: C.light },
+  ];
+  return (
+    <View style={{
+      borderWidth: 0.75, borderColor: C.light, borderRadius: 4,
+      backgroundColor: C.white, paddingVertical: 8, paddingHorizontal: 12,
+      marginBottom: 10,
+    }}>
+      <Text style={{ fontSize: 6.5, color: C.tertiary, fontFamily: FONT_B, letterSpacing: 2, marginBottom: 6 }}>
+        SCORE GUIDE
+      </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {tiers.map(t => (
+          <View key={t.label} style={{ alignItems: 'center', width: 80 }}>
+            <View style={{ width: 36, height: 5, backgroundColor: t.color, borderRadius: 2.5, marginBottom: 3 }} />
+            <Text style={{ fontFamily: FONT_B, fontSize: 7, color: C.body }}>{t.label}</Text>
+            <Text style={{ fontSize: 6, color: C.bodyMuted }}>{t.range}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 /** Enhanced horizontal dimension score bars with tier labels. */
 function DimensionBars({ scores }: { scores: DimensionScore[] }) {
   const sorted = [...scores].sort((a, b) => b.normalizedScore - a.normalizedScore);
@@ -471,9 +548,9 @@ function EconomicDashboard({ est }: { est: EconomicEstimate }) {
         </Text>
       </View>
       <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-        <MetricCard label="Productivity Potential" value={`${est.productivityPotentialPercent}%`} sub="of workforce capacity" accent={C.green} />
-        <MetricCard label="Current Capture" value={`${est.currentCapturePercent}%`} sub="of AI potential realized" accent={C.amber} />
-        <MetricCard label="Wasted Hours" value={est.annualWastedHours.toLocaleString()} sub="hours per year" accent={C.red} />
+        <MetricCard label="Productivity Potential" value={`${est.productivityPotentialPercent}%`} sub="of workforce capacity" accent={C.navy} />
+        <MetricCard label="Current Capture" value={`${est.currentCapturePercent}%`} sub="of AI potential realized" accent={C.secondary} />
+        <MetricCard label="Wasted Hours" value={est.annualWastedHours.toLocaleString()} sub="hours per year" accent={C.tertiary} />
       </View>
       <View style={{ flexDirection: 'row' }}>
         <MetricCard label="Cost Per Employee" value={fmt$(est.costPerEmployee)} sub="annually" accent={C.secondary} />
@@ -555,12 +632,12 @@ function AtAGlance({ result }: { result: DiagnosticResult }) {
       <View style={{ borderTopWidth: 0.5, borderTopColor: C.light, paddingTop: 7, flexDirection: 'row' }}>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 6.5, color: C.tertiary }}>Primary Constraint</Text>
-          <Text style={{ fontFamily: FONT_B, fontSize: 8.5, color: C.red }}>{DIM_LABELS[weakest.dimension]}</Text>
+          <Text style={{ fontFamily: FONT_B, fontSize: 8.5, color: C.tertiary }}>{DIM_LABELS[weakest.dimension]}</Text>
           <Text style={{ fontSize: 7.5, color: C.bodyMuted }}>{weakest.normalizedScore}/100</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 6.5, color: C.tertiary }}>Organizational Strength</Text>
-          <Text style={{ fontFamily: FONT_B, fontSize: 8.5, color: C.green }}>{DIM_LABELS[strongest.dimension]}</Text>
+          <Text style={{ fontFamily: FONT_B, fontSize: 8.5, color: C.navy }}>{DIM_LABELS[strongest.dimension]}</Text>
           <Text style={{ fontSize: 7.5, color: C.bodyMuted }}>{strongest.normalizedScore}/100</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -752,10 +829,10 @@ function CoverPage({ report, result }: { report: GeneratedReport; result: Diagno
         <Text style={{ fontFamily: FONT_B, fontSize: 26, color: C.white, textAlign: 'center', marginBottom: 6 }}>
           {report.companyProfile.companyName}
         </Text>
-        {/* Score preview */}
+        {/* Overall score badge */}
         <View style={{
           flexDirection: 'row', alignItems: 'baseline',
-          marginTop: 12, marginBottom: 28, paddingHorizontal: 16, paddingVertical: 8,
+          marginTop: 12, marginBottom: 20, paddingHorizontal: 16, paddingVertical: 8,
           borderWidth: 0.5, borderColor: C.secondary, borderRadius: 4,
         }}>
           <Text style={{ fontFamily: FONT_B, fontSize: 20, color: C.white, marginRight: 4 }}>
@@ -764,9 +841,11 @@ function CoverPage({ report, result }: { report: GeneratedReport; result: Diagno
           <Text style={{ fontSize: 10, color: C.accent }}>/100</Text>
           <Text style={{ fontSize: 10, color: C.accent, marginLeft: 12 }}>|</Text>
           <Text style={{ fontSize: 10, color: C.light, marginLeft: 12 }}>
-            Stage {result.stageClassification.primaryStage}: {result.stageClassification.stageName}
+            Overall AI Readiness Score
           </Text>
         </View>
+        {/* 5-stage bar across cover */}
+        <CoverStageBar stage={result.stageClassification} />
         <View style={{ flexDirection: 'row', marginBottom: 52 }}>
           <Text style={{ fontSize: 10, color: C.light }}>{date}</Text>
           <Text style={{ fontSize: 10, color: C.accent, marginHorizontal: 10 }}>|</Text>
@@ -838,10 +917,18 @@ function ExecDashPage({ report, result }: { report: GeneratedReport; result: Dia
             backgroundColor: C.offWhite, borderWidth: 0.75, borderColor: C.light,
             borderRadius: 4, padding: 11,
           }}>
+            <Text style={{ fontFamily: FONT_B, fontSize: 6.5, color: C.tertiary, letterSpacing: 2, marginBottom: 2 }}>
+              MATURITY STAGE
+            </Text>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 3 }}>
+              <Text style={{ fontFamily: FONT_B, fontSize: 13, color: C.secondary, marginRight: 2 }}>
+                Stage
+              </Text>
               <Text style={{ fontFamily: FONT_B, fontSize: 26, color: C.navy, marginRight: 8 }}>
                 {result.stageClassification.primaryStage}
               </Text>
+              <Text style={{ fontSize: 9, color: C.tertiary, marginRight: 4 }}>of 5</Text>
+              <View style={{ width: 0.5, height: 14, backgroundColor: C.light, marginRight: 8 }} />
               <Text style={{ fontFamily: FONT_B, fontSize: 13, color: C.secondary }}>
                 {result.stageClassification.stageName}
               </Text>
@@ -855,6 +942,7 @@ function ExecDashPage({ report, result }: { report: GeneratedReport; result: Dia
       </View>
 
       <StageTimeline stage={result.stageClassification} />
+      <ScoreLegend />
       <AtAGlance result={result} />
 
       {/* Compact economic bar */}
@@ -923,17 +1011,17 @@ function SectionVis({ slug, result }: { slug: string; result: DiagnosticResult }
           <MetricCard
             label="Quarterly Cost of Inaction"
             value={fmt$(Math.round((result.economicEstimate.unrealizedValueLow + result.economicEstimate.unrealizedValueHigh) / 2 / 4))}
-            accent={C.red}
+            accent={C.tertiary}
           />
         </View>
       );
     case 'security-governance-risk':
       return (
         <View style={{
-          borderLeftWidth: 3, borderLeftColor: C.amber,
-          backgroundColor: '#FFFBF0', padding: 10, marginBottom: 10,
+          borderLeftWidth: 3, borderLeftColor: C.secondary,
+          backgroundColor: C.offWhite, padding: 10, marginBottom: 10,
         }}>
-          <Text style={{ fontFamily: FONT_B, fontSize: 8.5, color: C.amber, marginBottom: 2 }}>RISK ASSESSMENT</Text>
+          <Text style={{ fontFamily: FONT_B, fontSize: 8.5, color: C.secondary, marginBottom: 2 }}>RISK ASSESSMENT</Text>
           <Text style={{ fontSize: 7.5, color: C.body, lineHeight: 1.4 }}>
             This section identifies security vulnerabilities, governance gaps, and compliance risks
             in your current AI posture. Review with your CISO and General Counsel.
@@ -1010,10 +1098,10 @@ function AboutPage() {
       <Divider />
       <View style={{ marginBottom: 18 }}>
         <Text style={{ fontSize: 9.5, color: C.body, lineHeight: 1.6, marginBottom: 8 }}>
-          RLK Consulting is a strategic advisory firm specializing in AI
-          transformation for mid-market and enterprise organizations. We help
-          boards, C-suites, and operating leaders translate AI potential into
-          measurable business value.
+          RLK Consulting is a CIO advisory firm serving mid-market and
+          enterprise organizations. We help boards, C-suites, and operating
+          leaders navigate digital transformation and translate technology
+          investment into measurable business value.
         </Text>
         <Text style={{ fontSize: 9.5, color: C.body, lineHeight: 1.6, marginBottom: 8 }}>
           Our AI Diagnostic gives organizational leaders the same caliber of AI

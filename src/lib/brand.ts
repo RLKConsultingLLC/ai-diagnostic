@@ -8,7 +8,7 @@ export const BRAND = {
   // Company
   name: 'RLK Consulting',
   legalName: 'RLK Consulting, LLC',
-  tagline: 'AI Strategy & Transformation',
+  tagline: 'CIO Advisory',
   website: 'rlkconsultingco.com',
   productName: 'AI Diagnostic',
 

@@ -81,7 +81,11 @@ export async function generateReportSection(
     );
   }
 
-  return text;
+  // Post-processing: remove AI writing tells (em dashes, en dashes)
+  // The system prompt asks Claude not to use them, but it often ignores this.
+  return text
+    .replace(/—/g, ' - ')
+    .replace(/–/g, '-');
 }
 
 // ---------------------------------------------------------------------------
