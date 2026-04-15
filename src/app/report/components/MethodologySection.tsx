@@ -12,6 +12,7 @@ import { REFERENCE_LIBRARY } from "@/lib/data/reference-library";
 interface MethodologySectionProps {
   result: DiagnosticResult;
   sectionNumber: number;
+  bare?: boolean;
 }
 
 const COMPOSITE_INDEX_META: Record<string, { questionId: string; weight: number }[]> = {
@@ -20,32 +21,11 @@ const COMPOSITE_INDEX_META: Record<string, { questionId: string; weight: number 
   economic_translation: ECONOMIC_TRANSLATION_COMPONENTS,
 };
 
-export default function MethodologySection({ result, sectionNumber }: MethodologySectionProps) {
+export default function MethodologySection({ result, sectionNumber, bare }: MethodologySectionProps) {
   const conf = Math.min(99, Math.max(65, Math.round(result.stageClassification.confidence * 100)));
 
-  return (
-    <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-      {/* Section Header */}
-      <div className="mb-2">
-        <div className="flex items-center gap-4">
-          <div
-            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-bold tracking-wide"
-            style={{ backgroundColor: "#0B1D3A" }}
-          >
-            {sectionNumber}
-          </div>
-          <h3 className="text-xl md:text-2xl font-bold text-navy tracking-tight">
-            Methodology, Data Sources & Citations
-          </h3>
-        </div>
-        <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
-      </div>
-
-      <p className="text-sm text-foreground/60 mt-2 mb-6">
-        Transparency is a core principle of this diagnostic. Below is the complete
-        scoring methodology, every data source consulted, and the full research citation
-        list, so every number and recommendation in this report can be independently verified.
-      </p>
+  const content = (
+    <>
 
       <div className="mt-6 grid md:grid-cols-2 gap-8">
         {/* Scoring methodology */}
@@ -179,6 +159,35 @@ export default function MethodologySection({ result, sectionNumber }: Methodolog
           ))}
         </div>
       </div>
+    </>
+  );
+
+  if (bare) return content;
+
+  return (
+    <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+      {/* Section Header */}
+      <div className="mb-2">
+        <div className="flex items-center gap-4">
+          <div
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-bold tracking-wide"
+            style={{ backgroundColor: "#0B1D3A" }}
+          >
+            {sectionNumber}
+          </div>
+          <h3 className="text-xl md:text-2xl font-bold text-navy tracking-tight">
+            Methodology, Data Sources & Citations
+          </h3>
+        </div>
+        <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
+      </div>
+
+      <p className="text-sm text-foreground/60 mt-2 mb-6">
+        Transparency is a core principle of this diagnostic. Below is the complete
+        scoring methodology, every data source consulted, and the full research citation
+        list, so every number and recommendation in this report can be independently verified.
+      </p>
+      {content}
     </section>
   );
 }
