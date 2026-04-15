@@ -10,6 +10,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getResearchProfile, getResearchStatus } from '@/lib/research/engine';
 
+export const maxDuration = 60;
+
 let _client: Anthropic | null = null;
 
 function getClient(): Anthropic {

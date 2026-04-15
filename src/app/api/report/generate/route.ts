@@ -13,6 +13,9 @@ import { getResearchProfile, getResearchStatus } from '@/lib/research/engine';
 import { computeResearchAdjustments } from '@/lib/diagnostic/research-integration';
 import { sendReportEmail } from '@/lib/email/sender';
 
+// Report generation calls Claude and can take 30-90s
+export const maxDuration = 120;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
