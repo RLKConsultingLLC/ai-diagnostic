@@ -2583,7 +2583,7 @@ function FloatingTOC() {
   );
 }
 
-/** Collapsible section wrapper — shows header + summary, click to expand full content. */
+/** Collapsible section wrapper — click header to expand, shows ALL content at once. */
 function CollapsibleSection({
   number, title, summary, children, preview, sectionId, insight, badges, scorecard,
 }: {
@@ -2624,22 +2624,19 @@ function CollapsibleSection({
           {summary}
         </p>
       </button>
-      {/* Stat badges — visible even when collapsed */}
-      {badges && badges.length > 0 && <StatBadges stats={badges} />}
-      {/* Traffic-light scorecard — visible even when collapsed */}
-      {scorecard && scorecard.length > 0 && <TrafficLight items={scorecard} />}
-      {preview && <div className="mt-6">{preview}</div>}
       {expanded && (
         <div className="mt-6 animate-in fade-in duration-200 print-expand">
-          {/* Key insight card at top of expanded content */}
+          {/* Stat badges */}
+          {badges && badges.length > 0 && <StatBadges stats={badges} />}
+          {/* Traffic-light scorecard */}
+          {scorecard && scorecard.length > 0 && <TrafficLight items={scorecard} />}
+          {/* Key insight card */}
           {insight && <InsightCard text={insight} />}
-          {children}
+          {/* Preview content */}
+          {preview && <div className="mt-4">{preview}</div>}
+          {/* Children content — shown directly, no second expand */}
+          {children && <div className="mt-4">{children}</div>}
         </div>
-      )}
-      {!expanded && (
-        <p className="text-xs text-navy/50 mt-3 font-medium cursor-pointer no-print" onClick={() => setExpanded(true)}>
-          Click to expand full analysis &darr;
-        </p>
       )}
     </section>
   );
