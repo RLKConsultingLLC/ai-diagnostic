@@ -250,6 +250,9 @@ function ReportPage() {
         </div>
       )}
 
+      {/* Pre-paywall content — hidden once full report is showing */}
+      {phase !== "full" && result && (
+        <>
       {/* Overall Score Hero */}
       {result && (
         <section className="bg-white border border-light overflow-hidden mb-10 shadow-sm">
@@ -446,6 +449,9 @@ function ReportPage() {
           </section>
         );
       })()}
+
+        </>
+      )}
 
       {/* Paywall / Full Report */}
       {phase === "preview" && (
@@ -1200,6 +1206,7 @@ function ReportPage() {
                   }
                   companyName={result.companyProfile.companyName}
                   industry={result.companyProfile.industry}
+                  competitorPositions={report?.competitorPositions}
                 />
               </>
             }
@@ -3200,18 +3207,22 @@ function CompetitiveMatrix({
   readinessScore,
   companyName,
   industry,
+  competitorPositions,
 }: {
   capabilityScore: number;
   readinessScore: number;
   companyName: string;
   industry?: string;
+  competitorPositions?: { label: string; capability: number; readiness: number; rationale?: string }[];
 }) {
   // Convert 0-100 scores to position in the matrix (0-100%)
   const dotLeft = Math.max(5, Math.min(95, capabilityScore));
   const dotBottom = Math.max(5, Math.min(95, readinessScore));
 
-  // Generate competitor positions based on industry benchmarks
-  const competitors = industry ? getIndustryCompetitors(industry, capabilityScore, readinessScore) : [];
+  // Use AI-generated competitor positions when available, fall back to static benchmarks
+  const competitors = competitorPositions?.length
+    ? competitorPositions
+    : industry ? getIndustryCompetitors(industry, capabilityScore, readinessScore) : [];
 
   const quadrants = [
     {
@@ -3363,6 +3374,7 @@ function CompetitiveMatrix({
             {competitors.map((comp) => {
               const cx = Math.max(8, Math.min(92, comp.capability));
               const cy = Math.max(8, Math.min(92, comp.readiness));
+              const rationale = 'rationale' in comp ? (comp as { rationale?: string }).rationale : undefined;
               return (
                 <div
                   key={comp.label}
@@ -3372,6 +3384,7 @@ function CompetitiveMatrix({
                     bottom: `${cy}%`,
                     transform: "translate(-50%, 50%)",
                   }}
+                  title={rationale || undefined}
                 >
                   <div className="relative group">
                     <div

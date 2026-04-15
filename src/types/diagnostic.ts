@@ -204,6 +204,13 @@ export interface ReportSection {
   content: string; // AI-generated markdown
 }
 
+export interface CompetitorPosition {
+  label: string;
+  capability: number;
+  readiness: number;
+  rationale: string;
+}
+
 export interface GeneratedReport {
   id: string;
   diagnosticResultId: string;
@@ -212,6 +219,7 @@ export interface GeneratedReport {
   companyProfile: CompanyProfile;
   stageClassification: StageClassification;
   economicEstimate: EconomicEstimate;
+  competitorPositions?: CompetitorPosition[];
 }
 
 // Assessment session tracking

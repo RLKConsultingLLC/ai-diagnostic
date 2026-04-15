@@ -371,7 +371,7 @@ DIAGNOSTIC DATA:
 ${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
-- Markdown with a single H2 header: ## Executive Summary
+- Markdown with a single H2 header: ## Current State of AI at ${result.companyProfile.companyName}
 - 400 words maximum. Every sentence must carry weight.
 - No bullet points in this section. Flowing paragraphs only.
 - The peer gap paragraph must use specific dimension names and scores.
