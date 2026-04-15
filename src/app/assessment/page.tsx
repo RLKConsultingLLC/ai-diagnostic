@@ -160,6 +160,7 @@ export default function AssessmentPage() {
   const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
   const [ticker, setTicker] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [executiveName, setExecutiveName] = useState("");
   const [executiveEmail, setExecutiveEmail] = useState("");
 
   // -- Question responses keyed by question id
@@ -389,6 +390,7 @@ export default function AssessmentPage() {
       regulatoryIntensity:
         regulatoryIntensity as CompanyProfile["regulatoryIntensity"],
       primaryAIUseCases: selectedUseCases,
+      executiveName: executiveName.trim() || undefined,
       executiveEmail: executiveEmail.trim() || undefined,
       ticker: ticker.trim() || undefined,
       websiteUrl: websiteUrl.trim() || undefined,
@@ -915,17 +917,28 @@ export default function AssessmentPage() {
                 </div>
               </Field>
 
+              {/* Executive Name */}
+              <Field label="Your Name" optional>
+                <input
+                  type="text"
+                  value={executiveName}
+                  onChange={(e) => setExecutiveName(e.target.value)}
+                  className="form-input"
+                  placeholder="Jane Smith"
+                />
+              </Field>
+
               {/* Email */}
-              <Field label="Executive Email" optional error={validationErrors.executiveEmail}>
+              <Field label="Email Address" optional error={validationErrors.executiveEmail}>
                 <input
                   type="email"
                   value={executiveEmail}
                   onChange={(e) => setExecutiveEmail(e.target.value)}
                   className="form-input"
-                  placeholder="ceo@company.com"
+                  placeholder="jane@company.com"
                 />
                 <p className="text-xs text-tertiary mt-1.5">
-                  Optional. Used only to deliver your completed report.
+                  Your completed diagnostic report will be delivered here.
                 </p>
               </Field>
             </div>

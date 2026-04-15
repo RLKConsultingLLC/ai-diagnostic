@@ -37,6 +37,7 @@ export interface CompanyProfile {
   publicOrPrivate: 'public' | 'private';
   regulatoryIntensity: 'low' | 'moderate' | 'high' | 'very_high';
   primaryAIUseCases: string[]; // e.g., ['claims', 'underwriting', 'customer_service']
+  executiveName?: string;
   executiveTitle?: string;
   executiveEmail?: string;
 }
