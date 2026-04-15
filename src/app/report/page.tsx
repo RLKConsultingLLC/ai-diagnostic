@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type {
@@ -682,10 +682,13 @@ function ReportPage() {
             </div>
           </section>
 
+          {/* Floating Table of Contents */}
+          <FloatingTOC />
+
           {/* ================================================================= */}
           {/* SECTION 1: EXECUTIVE SUMMARY                                */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+          <section id="section-1" className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm scroll-mt-16">
             <SectionHeader number={1} title="Executive Summary" />
 
             {(() => {
@@ -749,47 +752,38 @@ function ReportPage() {
                     </div>
 
                     {/* Detailed findings */}
-                    <div className="md:col-span-2 space-y-4">
-                      <div>
-                        <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                          The Structural Reality
-                        </p>
+                    <div className="md:col-span-2 space-y-1">
+                      <SubCollapsible title="The Structural Reality" hint="View dimension analysis" defaultOpen>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           Across five behavioral dimensions, {result.companyProfile.companyName}&apos;s strongest area
-                          is <strong className="text-secondary">{dimensionLabel(strongest?.dimension || "")}</strong> ({strongest?.normalizedScore}/100),
+                          is <strong className="text-navy">{dimensionLabel(strongest?.dimension || "")}</strong> ({strongest?.normalizedScore}/100),
                           indicating {dimensionInterpretation(strongest?.dimension || "", strongest?.normalizedScore || 0).toLowerCase()} The
-                          primary constraint is <strong className="text-secondary">{dimensionLabel(weakest?.dimension || "")}</strong> ({weakest?.normalizedScore}/100):{" "}
-                          {dimensionInterpretation(weakest?.dimension || "", weakest?.normalizedScore || 0).toLowerCase()} Until
-                          this dimension improves, it will act as a ceiling on the returns from every other AI investment.
+                          primary constraint is <strong className="text-navy">{dimensionLabel(weakest?.dimension || "")}</strong> ({weakest?.normalizedScore}/100):{" "}
+                          {dimensionInterpretation(weakest?.dimension || "", weakest?.normalizedScore || 0).toLowerCase()}{" "}
+                          <strong className="text-secondary">Until this dimension improves, it will act as a ceiling on the returns from every other AI investment.</strong>{" "}
                           See Section 2 for the AI posture diagnosis and Section 3 for structural constraints that translate
                           these scores into actionable intelligence.
                         </p>
-                      </div>
+                      </SubCollapsible>
 
-                      <div>
-                        <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                          The Economic Opportunity
-                        </p>
+                      <SubCollapsible title="The Economic Opportunity" hint="View financial impact">
                         <p className="text-sm text-foreground/70 leading-relaxed">
-                          The diagnostic estimates {fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
-                          {fmtUSD(result.economicEstimate.unrealizedValueHigh)} in annual unrealized value —
-                          productivity improvement that {result.companyProfile.companyName} is not capturing while
-                          competitors in {ind} are. Current capture rate: {result.economicEstimate.currentCapturePercent}% of
-                          AI-addressable potential. That translates to approximately {fmtUSD(Math.round(unrealizedMid / 4))}{" "}
-                          forfeited per quarter. Section 5 provides the transparent methodology behind these numbers
-                          — your CFO should stress-test these before sharing with the board.
+                          The diagnostic estimates <strong className="text-navy">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
+                          {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value -
+                          productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
+                          competitors in {ind} are. Current capture rate: <strong className="text-navy">{result.economicEstimate.currentCapturePercent}%</strong> of
+                          AI-addressable potential. That translates to approximately <strong className="text-navy">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
+                          forfeited per quarter</strong>. Section 5 provides the transparent methodology behind these numbers
+                          - your CFO should stress-test these before sharing with the board.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
                           revenue growth, operating margin, cost structure, and EBITDA over 12-24 months.
                         </p>
-                      </div>
+                      </SubCollapsible>
 
-                      <div>
-                        <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                          The Competitive Context
-                        </p>
+                      <SubCollapsible title="The Competitive Context" hint="View positioning">
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           {result.companyProfile.companyName} sits in the{" "}
-                          {(() => {
+                          <strong className="text-navy">{(() => {
                             const cap = (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
                               (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5;
                             const read = (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
@@ -799,35 +793,32 @@ function ReportPage() {
                             if (cap >= 50) return "Capability Without Structure";
                             if (read >= 50) return "Structure Without Capability";
                             return "Pre-AI";
-                          })()}{" "}
-                          quadrant of the competitive positioning matrix. Section 4 details where your specific
-                          competitors are investing in AI right now — with named companies, dollar amounts, and use
+                          })()}</strong>{" "}
+                          quadrant of the competitive positioning matrix. Section 4 details <strong className="text-secondary">where your specific
+                          competitors are investing in AI right now</strong> - with named companies, dollar amounts, and use
                           cases sourced from public filings and analyst research. Section 8 provides the vendor
                           landscape assessment and contract negotiation levers to optimize your AI spend.
                         </p>
-                      </div>
+                      </SubCollapsible>
 
-                      <div>
-                        <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                          The Path Forward
-                        </p>
+                      <SubCollapsible title="The Path Forward" hint="View next steps">
                         <p className="text-sm text-foreground/70 leading-relaxed">
-                          Section 7 maps the security and governance risks your current posture creates.
-                          Section 9 provides messages for the board with specific decision items and investment asks.
+                          Section 7 maps the <strong className="text-secondary">security and governance risks</strong> your current posture creates.
+                          Section 9 provides <strong className="text-secondary">messages for the board</strong> with specific decision items and investment asks.
                           Every finding is supported by methodology and sources documented in Section 10.
-                          Contact RLK to build a tailored 90-day operationalization plan from these findings.
+                          <strong className="text-navy"> Contact RLK to build a tailored 90-day operationalization plan from these findings.</strong>
                         </p>
-                      </div>
+                      </SubCollapsible>
                     </div>
                   </div>
 
-                  {/* AI-generated narrative if available */}
+                  {/* Detailed narrative if available */}
                   {report?.sections?.find((s) => s.slug === "executive-summary")?.content && (
-                    <div className="pt-6 border-t border-light">
+                    <SubCollapsible title={`Current State of AI at ${result.companyProfile.companyName}`} hint="Read full narrative">
                       <MarkdownContent
                         content={report?.sections?.find((s) => s.slug === "executive-summary")?.content || ""}
                       />
-                    </div>
+                    </SubCollapsible>
                   )}
                 </div>
               );
@@ -838,6 +829,7 @@ function ReportPage() {
           {/* SECTION 2: AI POSTURE DIAGNOSIS                             */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-2"
             number={2}
             title="AI Posture Diagnosis"
             summary="Five behavioral dimensions measuring how your organization actually behaves around AI: who uses it, who governs it, how fast decisions move, and whether anyone can prove it is working."
@@ -969,7 +961,7 @@ function ReportPage() {
             </div>
 
             {/* AI narrative for AI Posture Diagnosis */}
-            <SubCollapsible title="AI-Generated Posture Analysis">
+            <SubCollapsible title="Detailed Posture Analysis" hint="Read full analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -984,6 +976,7 @@ function ReportPage() {
           {/* SECTION 3: STRUCTURAL CONSTRAINTS                           */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-3"
             number={3}
             title="Structural Constraints"
             summary="Three composite indices distill your 61 responses into the metrics that matter: can your organization govern AI, capture its value, and move fast enough to stay competitive?"
@@ -1028,7 +1021,7 @@ function ReportPage() {
               </div>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-3">
               {result.compositeIndices.map((ci) => {
                 const ciColor =
                   ci.score >= 70
@@ -1053,8 +1046,13 @@ function ReportPage() {
                 const weakQs = sorted.slice(-2).reverse();
 
                 return (
-                  <div
+                  <SubCollapsible
                     key={ci.slug}
+                    title={`${ci.name}: ${ci.score}/100 (${ciTier})`}
+                    hint="View detailed analysis"
+                    defaultOpen={ci.score < 50}
+                  >
+                  <div
                     className="border border-light p-4 md:p-6"
                   >
                     <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
@@ -1155,16 +1153,17 @@ function ReportPage() {
                         What This Means for {result.companyProfile.companyName}
                       </p>
                       <p className="text-sm text-foreground/70 leading-relaxed">
-                        {ci.interpretation} Contact RLK Consulting to build a tailored action plan addressing this gap.
+                        {ci.interpretation} <strong className="text-navy">Contact RLK Consulting</strong> to build a tailored action plan addressing this gap.
                       </p>
                     </div>
                   </div>
+                  </SubCollapsible>
                 );
               })}
             </div>
 
             {/* Structural constraints narrative */}
-            <SubCollapsible title="AI-Generated Structural Constraints Analysis">
+            <SubCollapsible title="Structural Constraints Deep Dive" hint="Read full analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -1179,6 +1178,7 @@ function ReportPage() {
           {/* SECTION 4: COMPETITIVE POSITIONING & INDUSTRY INTELLIGENCE  */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-4"
             number={4}
             title="Competitive Positioning & Industry Intelligence"
             summary={`Where ${result.companyProfile.companyName} stands relative to peers in ${industryLabel(result.companyProfile.industry)}. Competitor positions are estimated from industry benchmark data (McKinsey 2024 Global AI Survey, BCG AI Advantage Report, Gartner peer analytics) and anonymized for confidentiality.`}
@@ -1228,10 +1228,7 @@ function ReportPage() {
             </div>
 
             {/* What your quadrant means */}
-            <div className="border border-light p-5 mb-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Your Quadrant Analysis
-              </p>
+            <SubCollapsible title="Your Quadrant Analysis" hint="View interpretation" defaultOpen>
               <p className="text-sm text-foreground/70 leading-relaxed">
                 {getQuadrantAnalysis(
                   (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
@@ -1242,19 +1239,16 @@ function ReportPage() {
                   result.companyProfile.industry
                 )}
               </p>
-            </div>
+            </SubCollapsible>
 
             {/* Industry AI adoption benchmarks */}
-            <div className="mt-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-navy mb-3">
-                Where {result.companyProfile.companyName}&apos;s Competitors Are Investing Right Now
-              </p>
+            <SubCollapsible title={`Where ${result.companyProfile.companyName}'s Competitors Are Investing`} hint="View competitor investments" defaultOpen>
               <p className="text-xs text-foreground/50 mb-3">
-                At Stage {result.stageClassification.primaryStage} with an overall score of {result.overallScore}/100,
-                {" "}{result.companyProfile.companyName} is {result.overallScore >= 60 ? "keeping pace with but not leading" : result.overallScore >= 40 ? "trailing the median of" : "significantly behind"} peers
-                in {industryLabel(result.companyProfile.industry)} on these investment areas. Your weakest dimension —{" "}
-                {dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")} at{" "}
-                {[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 — is the primary bottleneck
+                At Stage {result.stageClassification.primaryStage} with an overall score of <strong className="text-navy">{result.overallScore}/100</strong>,
+                {" "}{result.companyProfile.companyName} is <strong className="text-secondary">{result.overallScore >= 60 ? "keeping pace with but not leading" : result.overallScore >= 40 ? "trailing the median of" : "significantly behind"}</strong> peers
+                in {industryLabel(result.companyProfile.industry)} on these investment areas. Your weakest dimension -{" "}
+                <strong className="text-navy">{dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")}</strong> at{" "}
+                {[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 - is the primary bottleneck
                 limiting {result.companyProfile.companyName}&apos;s ability to capture value from these same investments.
               </p>
               {/* Investment priority legend */}
@@ -1275,27 +1269,16 @@ function ReportPage() {
 
               <div className="grid sm:grid-cols-2 gap-3">
                 {getCompetitorInvestmentAreas(result.companyProfile.industry).map((area, idx) => (
-                  <div key={idx} className="bg-offwhite border border-light p-4">
-                    <div className="flex items-start gap-3">
-                      <div
-                        className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white text-[10px] font-bold mt-0.5"
-                        style={{ backgroundColor: ["#0B1D3A", "#364E6E", "#6B7F99", "#A8B5C4", "#CED5DD", "#0B1D3A"][idx % 6] }}
-                      >
-                        {idx + 1}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-secondary">{area.area}</p>
-                        <p className="text-xs text-foreground/60 leading-relaxed mt-1">{area.detail}</p>
-                        <p className="text-[10px] text-tertiary mt-1">{area.source}</p>
-                      </div>
-                    </div>
-                  </div>
+                  <SubCollapsible key={idx} title={area.area} hint="View details">
+                    <p className="text-xs text-foreground/60 leading-relaxed">{area.detail}</p>
+                    <p className="text-[10px] text-tertiary mt-2 italic">{area.source}</p>
+                  </SubCollapsible>
                 ))}
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* Competitive positioning narrative */}
-            <SubCollapsible title="AI-Generated Competitive Intelligence">
+            <SubCollapsible title="Competitive Intelligence Deep Dive" hint="Read full analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -1310,18 +1293,19 @@ function ReportPage() {
           {/* SECTION 5: ECONOMIC IMPACT MODEL                            */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-5"
             number={5}
             title="Economic Impact Model"
             summary={`${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with ${result.economicEstimate.currentCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
           >
             <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              Below is the transparent methodology — every assumption stated, every input sourced — so
-              your CFO should stress-test these assumptions before sharing with the board.
+              Below is the <strong className="text-secondary">transparent methodology</strong> - every assumption stated, every input sourced - so
+              your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
             </p>
 
             {/* Methodology credibility block */}
-            <SubCollapsible title="How We Calculate These Numbers">
+            <SubCollapsible title="How We Calculate These Numbers" hint="View methodology">
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
                   <p>
@@ -1390,8 +1374,8 @@ function ReportPage() {
                   </p>
                   <p className="text-xs text-foreground/50 mt-2">
                     Midpoint of unrealized annual value, divided by four. This is not
-                    &quot;money you are losing&quot; — it is productivity improvement you
-                    are not capturing while your competitors in{" "}
+                    &quot;money you are losing&quot; - it is <strong className="text-secondary">productivity improvement you
+                    are not capturing</strong> while your competitors in{" "}
                     {industryLabel(result.companyProfile.industry)} are. See Section 6
                     for P&L impact and Section 4 for what competitors are doing.
                   </p>
@@ -1405,8 +1389,8 @@ function ReportPage() {
                   </p>
                   <p className="text-xs text-foreground/50 mt-2">
                     Per-employee unrealized value. For context, the average enterprise
-                    AI software license costs $1,200-$3,600/employee/year. If your per-employee
-                    gap exceeds your per-employee AI investment by 3x+, the ROI case is clear.
+                    AI software license costs <strong className="text-secondary">$1,200-$3,600/employee/year</strong>. If your per-employee
+                    gap exceeds your per-employee AI investment by <strong className="text-secondary">3x+</strong>, the ROI case is clear.
                   </p>
                 </div>
               </div>
@@ -1424,7 +1408,7 @@ function ReportPage() {
             )}
 
             {/* Financial impact narrative */}
-            <SubCollapsible title="AI-Generated Financial Impact Analysis">
+            <SubCollapsible title="Financial Impact Narrative" hint="Read full analysis">
               <MarkdownContent
                 content={
                   report?.sections?.find(
@@ -1439,6 +1423,7 @@ function ReportPage() {
           {/* SECTION 6: P&L BUSINESS CASE                                */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-6"
             number={6}
             title="The Business Case: P&L Impact Analysis"
             summary={`Translates unrealized AI value into specific revenue growth, operating margin improvement, and cost structure changes for a ${fmtUSD(result.companyProfile.revenue)} revenue organization.`}
@@ -1463,10 +1448,10 @@ function ReportPage() {
                   {/* Intro */}
                   <p className="text-sm text-foreground/60">
                     Section 5 quantified the unrealized value. This section translates that into
-                    the language of your P&L — how AI investment (or the absence of it) flows through
-                    revenue, margins, cost structure, talent economics, and risk exposure over the next
+                    the language of your P&L - how AI investment (or the absence of it) flows through
+                    <strong className="text-secondary"> revenue, margins, cost structure, talent economics, and risk exposure</strong> over the next
                     12-24 months. Every dollar figure below is derived from {result.companyProfile.companyName}&apos;s
-                    actual revenue of {fmtUSD(result.companyProfile.revenue)} and industry benchmarks
+                    actual revenue of <strong className="text-navy">{fmtUSD(result.companyProfile.revenue)}</strong> and industry benchmarks
                     for {industryLabel(result.companyProfile.industry)}.
                   </p>
 
@@ -1563,7 +1548,7 @@ function ReportPage() {
 
                   {/* Optional AI narrative */}
                   {report?.sections?.find((s) => s.slug === "pnl-business-case")?.content && (
-                    <SubCollapsible title="AI-Generated P&L Analysis">
+                    <SubCollapsible title="P&L Narrative Analysis" hint="Read full analysis">
                       <MarkdownContent
                         content={report.sections.find((s) => s.slug === "pnl-business-case")?.content || ""}
                       />
@@ -1578,19 +1563,20 @@ function ReportPage() {
           {/* SECTION 7: SECURITY & GOVERNANCE RISK ASSESSMENT            */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-7"
             number={7}
             title="Security & Governance Risk Assessment"
             summary={`Risk exposure analysis calibrated to ${result.companyProfile.regulatoryIntensity} regulatory intensity in ${industryLabel(result.companyProfile.industry)}. Covers shadow AI, compliance, data governance, and board liability.`}
           >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
-              Risk exposure mapped across likelihood and impact, derived from
+              Risk exposure mapped across <strong className="text-secondary">likelihood and impact</strong>, derived from
               your diagnostic dimension scores and governance posture. This assessment
-              integrates your survey responses with industry-specific regulatory
-              requirements and emerging AI governance standards.
+              integrates your survey responses with <strong className="text-secondary">industry-specific regulatory
+              requirements</strong> and emerging AI governance standards.
             </p>
 
             {/* Detailed risk context */}
-            <SubCollapsible title="Understanding This Assessment">
+            <SubCollapsible title="Understanding This Assessment" hint="View methodology">
               <div className="bg-offwhite border border-light p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed mb-3">
                   Your risk profile is derived from inverting your dimension scores: low governance
@@ -1600,12 +1586,12 @@ function ReportPage() {
                   potential business consequence if it does).
                 </p>
                 <p className="text-sm text-foreground/70 leading-relaxed">
-                  According to Gartner&apos;s 2024 AI Risk Management survey, 62% of organizations have
+                  According to Gartner&apos;s 2024 AI Risk Management survey, <strong className="text-navy">62% of organizations</strong> have
                   experienced at least one AI-related risk event (data leak, biased output, compliance
                   violation) in the past 18 months. Organizations with formal AI governance frameworks
-                  experienced 73% fewer material incidents. The EU AI Act (effective August 2025) and
+                  experienced <strong className="text-navy">73% fewer material incidents</strong>. The EU AI Act (effective August 2025) and
                   state-level US regulations (Colorado AI Act, California AI Transparency Act) are
-                  increasing the regulatory cost of inadequate governance.
+                  increasing the <strong className="text-secondary">regulatory cost of inadequate governance</strong>.
                 </p>
               </div>
             </SubCollapsible>
@@ -1648,7 +1634,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Risk Matrix visualization */}
-            <SubCollapsible title="Risk Matrix (Likelihood x Impact)">
+            <SubCollapsible title="Risk Matrix (Likelihood x Impact)" hint="View matrix">
               <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
             </SubCollapsible>
 
@@ -1662,7 +1648,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Security narrative */}
-            <SubCollapsible title="AI-Generated Security & Governance Analysis">
+            <SubCollapsible title="Security & Governance Narrative" hint="Read full analysis">
               <div className="pt-2">
                 <MarkdownContent
                   content={
@@ -1679,29 +1665,30 @@ function ReportPage() {
           {/* SECTION 8: VENDOR & PARTNER LANDSCAPE ASSESSMENT            */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-8"
             number={8}
             title="Vendor & Partner Landscape Assessment"
             summary={`Independent vendor analysis with buy/build/partner recommendations for ${result.companyProfile.primaryAIUseCases?.slice(0, 2).join(", ").replace(/_/g, " ") || "your AI use cases"}. Includes negotiation intelligence and lock-in risk assessment.`}
           >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
-              Independent analysis of AI vendor positioning, buy/build/partner
-              recommendations, and stack optimization opportunities. This assessment
-              draws on Gartner Magic Quadrant positioning, Forrester Wave evaluations,
+              Independent analysis of AI vendor positioning, <strong className="text-secondary">buy/build/partner
+              recommendations</strong>, and stack optimization opportunities. This assessment
+              draws on <strong className="text-secondary">Gartner Magic Quadrant</strong> positioning, <strong className="text-secondary">Forrester Wave</strong> evaluations,
               and current market intelligence to recommend partners aligned to your
               maturity stage, industry, and strategic objectives.
             </p>
 
             {/* Vendor evaluation framework */}
-            <SubCollapsible title="Evaluation Framework">
+            <SubCollapsible title="Evaluation Framework" hint="View criteria">
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  Every vendor relationship is a bet on your AI future. We evaluate across six
-                  dimensions, weighted for your maturity stage. At Stage{" "}
-                  {result.stageClassification.primaryStage}, the priorities that matter most for
+                  Every vendor relationship is a bet on your AI future. We evaluate across <strong className="text-secondary">six
+                  dimensions</strong>, weighted for your maturity stage. At <strong className="text-navy">Stage{" "}
+                  {result.stageClassification.primaryStage}</strong>, the priorities that matter most for
                   {" "}{result.companyProfile.companyName} are{" "}
                   {result.stageClassification.primaryStage <= 2
-                    ? "Fit and Support — you need tools that work fast with teams that help you deploy."
-                    : "Scale, Risk, and Ecosystem — you need platforms that grow with you without locking you in."}
+                    ? <><strong className="text-secondary">Fit and Support</strong> - you need tools that work fast with teams that help you deploy.</>
+                    : <><strong className="text-secondary">Scale, Risk, and Ecosystem</strong> - you need platforms that grow with you without locking you in.</>}
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                   {[
@@ -1729,7 +1716,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Gartner-style quadrant reference */}
-            <SubCollapsible title="Market Positioning Context (Gartner / Forrester)">
+            <SubCollapsible title="Market Positioning Context (Gartner / Forrester)" hint="View recommendations">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 {getGartnerContext(result.companyProfile.industry, result.stageClassification.primaryStage)}
               </p>
@@ -1797,10 +1784,10 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* AI Contract Value Levers */}
-            <SubCollapsible title="Contract Value Levers: How to Negotiate Smarter AI Deals">
+            <SubCollapsible title="Contract Value Levers: How to Negotiate Smarter AI Deals" hint="View levers">
               <div className="border border-light p-4 md:p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  AI vendor contracts are not software licenses. The economics are different,
+                  <strong className="text-secondary">AI vendor contracts are not software licenses.</strong> The economics are different,
                   the risks are different, and the leverage points are different.
                   {result.stageClassification.primaryStage <= 2
                     ? ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} is likely entering its first significant AI vendor relationships — getting these contracts right from the start avoids costly renegotiations later.`
@@ -1809,7 +1796,7 @@ function ReportPage() {
                     ? ` In ${industryLabel(result.companyProfile.industry)}, data sovereignty and compliance provisions are non-negotiable and should be explicit in every AI contract.`
                     : ''}
                 </p>
-                <div className="grid sm:grid-cols-2 gap-3">
+                <div className="space-y-2">
                   {[
                     {
                       lever: "Declining Unit Economics",
@@ -1836,10 +1823,9 @@ function ReportPage() {
                       description: `Negotiate 90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName}'s AI strategy will evolve significantly — 3-year lock-ins made today will be regretted in 18 months. Insist on flexibility.` : `Even at Stage ${result.stageClassification.primaryStage}, the AI vendor landscape is volatile enough that long-term lock-ins carry material risk. If the product delivers value, ${result.companyProfile.companyName} will stay anyway.`}`,
                     },
                   ].map((item) => (
-                    <div key={item.lever} className="bg-offwhite border border-light p-3 md:p-4">
-                      <p className="text-sm font-semibold text-secondary mb-1">{item.lever}</p>
+                    <SubCollapsible key={item.lever} title={item.lever} hint="View negotiation details">
                       <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
-                    </div>
+                    </SubCollapsible>
                   ))}
                 </div>
               </div>
@@ -1847,7 +1833,7 @@ function ReportPage() {
 
             {report?.sections?.find((s) => s.slug === "vendor-landscape")
               ?.content ? (
-              <SubCollapsible title="AI-Generated Vendor Landscape Analysis">
+              <SubCollapsible title="Vendor Landscape Narrative" hint="Read full analysis">
                 <MarkdownContent
                   content={
                     report?.sections?.find(
@@ -1863,20 +1849,21 @@ function ReportPage() {
           {/* SECTION 9: MESSAGES FOR THE BOARD                          */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-9"
             number={9}
             title="Messages for the Board"
             summary={`Board-ready findings structured as decision items for ${result.companyProfile.companyName}. Includes peer board intelligence, ${getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).length} recommended asks, and governance recommendations aligned to NACD best practices.`}
           >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
-              These findings are structured for direct board presentation. Each item
-              below is a decision point, not an informational update. NACD&apos;s 2024
-              Board Oversight of AI report found that 78% of boards consider AI a
-              top-three priority — but only 23% feel equipped to oversee it. The asks
+              These findings are structured for <strong className="text-secondary">direct board presentation</strong>. Each item
+              below is a <strong className="text-secondary">decision point</strong>, not an informational update. NACD&apos;s 2024
+              Board Oversight of AI report found that <strong className="text-navy">78% of boards</strong> consider AI a
+              top-three priority - but only <strong className="text-navy">23% feel equipped to oversee it</strong>. The asks
               below are designed to close that gap for {result.companyProfile.companyName}.
             </p>
 
             {/* Peer board intelligence */}
-            <SubCollapsible title="What Peer Boards Are Doing">
+            <SubCollapsible title="What Peer Boards Are Doing" hint="View peer actions">
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3">
                   {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
@@ -1935,13 +1922,12 @@ function ReportPage() {
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 {getBoardSupportNarrative(result.stageClassification.primaryStage)}
               </p>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="space-y-2">
                 {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
-                  <div key={idx} className="bg-offwhite border border-light p-4">
-                    <p className="text-sm font-semibold text-secondary mb-1">{action.action}</p>
-                    <p className="text-xs text-foreground/60 leading-relaxed">{action.rationale}</p>
-                    <p className="text-[10px] text-navy font-medium mt-2">{action.owner}</p>
-                  </div>
+                  <SubCollapsible key={idx} title={action.action} hint="View rationale">
+                    <p className="text-xs text-foreground/60 leading-relaxed mb-2">{action.rationale}</p>
+                    <p className="text-[10px] text-navy font-medium">{action.owner}</p>
+                  </SubCollapsible>
                 ))}
               </div>
             </SubCollapsible>
@@ -1951,23 +1937,14 @@ function ReportPage() {
               <div className="bg-navy/5 border border-navy/10 p-6">
                 <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                   Based on this diagnostic, the following asks should be presented to the board
-                  for discussion and resolution. These are structured as decision items, not
+                  for <strong className="text-secondary">discussion and resolution</strong>. These are structured as <strong className="text-secondary">decision items</strong>, not
                   informational updates, per NACD guidance on effective board AI governance.
                 </p>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).map((ask, idx) => (
-                    <div key={idx} className="bg-white border border-light p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span
-                          className="text-[9px] font-bold px-2 py-0.5 text-white"
-                          style={{ backgroundColor: ask.type === "decision" ? "#0B1D3A" : ask.type === "investment" ? "#364E6E" : "#6B7F99" }}
-                        >
-                          {ask.type.toUpperCase()}
-                        </span>
-                        <p className="text-sm font-semibold text-secondary">{ask.title}</p>
-                      </div>
+                    <SubCollapsible key={idx} title={`${ask.type.toUpperCase()}: ${ask.title}`} hint="View details">
                       <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
-                    </div>
+                    </SubCollapsible>
                   ))}
                 </div>
               </div>
@@ -1978,6 +1955,7 @@ function ReportPage() {
           {/* SECTION 10: METHODOLOGY, DATA SOURCES & CITATIONS              */}
           {/* ================================================================= */}
           <CollapsibleSection
+            sectionId="section-10"
             number={10}
             title="Methodology, Data Sources & Citations"
             summary="Complete scoring methodology, every data source consulted, and full research citation list so every number in this report can be independently verified."
@@ -1998,13 +1976,12 @@ function ReportPage() {
               </h2>
               <p className="text-sm text-white/70 leading-relaxed mb-6">
                 This diagnostic identified{" "}
-                {fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
-                {fmtUSD(result.economicEstimate.unrealizedValueHigh)}{" "}
+                <strong className="text-white">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
+                {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong>{" "}
                 in unrealized AI value for {result.companyProfile.companyName}.
-                Closing that gap requires a tailored 90-day operationalization plan.
+                Closing that gap requires a <strong className="text-white">tailored 90-day operationalization plan</strong>.
                 RLK builds these with clients: translating diagnostic findings into
                 specific governance structures, vendor decisions, and organizational changes.
-                Schedule a strategy session to get started.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <a
@@ -2146,6 +2123,8 @@ function Shell({ children }: { children: React.ReactNode }) {
           body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           section, [class*="CollapsibleSection"], [class*="SubCollapsible"] { break-inside: avoid; }
         }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
       `}} />
       <div className="rlk-gradient-bar no-print" />
       <header className="bg-white border-b border-light no-print">
@@ -2571,15 +2550,144 @@ function SectionHeader({ number, title }: { number: number; title: string }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Floating Table of Contents — sticky nav stripe at top of paid report
+// ---------------------------------------------------------------------------
+
+const TOC_SECTIONS = [
+  { id: "section-1", number: 1, label: "Executive Summary" },
+  { id: "section-2", number: 2, label: "Posture Diagnosis" },
+  { id: "section-3", number: 3, label: "Constraints" },
+  { id: "section-4", number: 4, label: "Competitive Intel" },
+  { id: "section-5", number: 5, label: "Economic Impact" },
+  { id: "section-6", number: 6, label: "P&L Analysis" },
+  { id: "section-7", number: 7, label: "Risk Assessment" },
+  { id: "section-8", number: 8, label: "Vendor Landscape" },
+  { id: "section-9", number: 9, label: "Board Messages" },
+  { id: "section-10", number: 10, label: "Methodology" },
+] as const;
+
+function FloatingTOC() {
+  const [activeId, setActiveId] = useState<string>("");
+  const [isSticky, setIsSticky] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Track which section is in view
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the first section that is intersecting (from top)
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+    );
+
+    TOC_SECTIONS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Track when TOC becomes sticky
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsSticky(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // Auto-scroll the active item into view in the nav
+  useEffect(() => {
+    if (!navRef.current || !activeId) return;
+    const activeBtn = navRef.current.querySelector(`[data-section="${activeId}"]`);
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeId]);
+
+  return (
+    <>
+      {/* Sentinel element to detect when TOC reaches top */}
+      <div ref={sentinelRef} className="h-0 no-print" />
+      <nav
+        ref={navRef}
+        className={`no-print sticky top-0 z-50 transition-all duration-200 ${
+          isSticky
+            ? "bg-navy/95 backdrop-blur-md shadow-lg border-b border-white/5"
+            : "bg-navy/80 backdrop-blur-sm"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto flex items-center overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+          {/* Report title — visible when sticky */}
+          <div className={`flex-shrink-0 pl-4 pr-3 py-2.5 border-r border-white/10 transition-opacity duration-200 ${
+            isSticky ? "opacity-100" : "opacity-0 w-0 pl-0 pr-0 border-0 overflow-hidden"
+          }`}>
+            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/40 whitespace-nowrap">
+              Report
+            </span>
+          </div>
+
+          {/* Section links */}
+          <div className="flex items-center gap-0.5 px-2 py-1.5">
+            {TOC_SECTIONS.map(({ id, number, label }) => {
+              const isActive = activeId === id;
+              return (
+                <button
+                  key={id}
+                  data-section={id}
+                  type="button"
+                  onClick={() => scrollTo(id)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap transition-all duration-150 cursor-pointer group ${
+                    isActive
+                      ? "bg-white/15 text-white"
+                      : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                  }`}
+                >
+                  <span className={`flex-shrink-0 w-4.5 h-4.5 flex items-center justify-center text-[9px] font-bold transition-colors ${
+                    isActive
+                      ? "bg-white text-navy"
+                      : "bg-white/10 text-white/60 group-hover:bg-white/20"
+                  }`} style={{ width: 18, height: 18 }}>
+                    {number}
+                  </span>
+                  <span className="hidden lg:inline">{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+    </>
+  );
+}
+
 /** Collapsible section wrapper — shows header + summary, click to expand full content. */
 function CollapsibleSection({
-  number, title, summary, children, preview,
+  number, title, summary, children, preview, sectionId,
 }: {
-  number: number; title: string; summary: string; children: React.ReactNode; preview?: React.ReactNode;
+  number: number; title: string; summary: string; children: React.ReactNode; preview?: React.ReactNode; sectionId?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+    <section id={sectionId} className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm scroll-mt-16">
       <button
         type="button"
         className="w-full text-left cursor-pointer"
@@ -2629,28 +2737,34 @@ function CollapsibleSection({
 // ---------------------------------------------------------------------------
 
 function SubCollapsible({
-  title, children, defaultOpen = false,
+  title, children, defaultOpen = false, hint,
 }: {
-  title: string; children: React.ReactNode; defaultOpen?: boolean;
+  title: string; children: React.ReactNode; defaultOpen?: boolean; hint?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-light mb-3">
+    <div className={`border mb-3 transition-colors duration-150 ${open ? "border-navy/15 bg-white" : "border-light hover:border-navy/10 bg-offwhite/30"}`}>
       <button
         type="button"
-        className="w-full text-left px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-offwhite/50 transition-colors"
+        className="w-full text-left px-4 py-3.5 flex items-center gap-3 cursor-pointer group"
         onClick={() => setOpen(!open)}
       >
-        <span className="text-sm font-semibold text-secondary">{title}</span>
+        {/* Expand/collapse icon */}
         <svg
-          className={`w-4 h-4 text-tertiary transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`}
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-90 text-navy" : "text-tertiary group-hover:text-navy/60"}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
+        <span className={`text-sm font-semibold flex-1 transition-colors ${open ? "text-navy" : "text-secondary group-hover:text-navy/80"}`}>{title}</span>
+        {!open && (
+          <span className="text-[10px] text-tertiary/60 tracking-wide uppercase font-medium hidden sm:inline">
+            {hint || "Click to expand"}
+          </span>
+        )}
       </button>
       {open && (
-        <div className="px-4 pb-4 animate-in fade-in duration-150">
+        <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-150">
           {children}
         </div>
       )}
