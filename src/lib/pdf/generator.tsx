@@ -1040,27 +1040,6 @@ function SectionVis({ slug, result }: { slug: string; result: DiagnosticResult }
           </Text>
         </View>
       );
-    case '90-day-action-plan':
-      return (
-        <View style={{
-          backgroundColor: C.navy, borderRadius: 4, padding: 11,
-          marginBottom: 10, flexDirection: 'row', alignItems: 'center',
-        }}>
-          <View style={{
-            width: 34, height: 34, borderRadius: 17,
-            borderWidth: 1.5, borderColor: C.accent,
-            justifyContent: 'center', alignItems: 'center', marginRight: 11,
-          }}>
-            <Text style={{ fontFamily: FONT_B, fontSize: 13, color: C.white }}>90</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: FONT_B, fontSize: 9.5, color: C.white }}>90-Day Transformation Roadmap</Text>
-            <Text style={{ fontSize: 7.5, color: C.light }}>
-              Research-backed actions with named owners, timeframes, and measurable KPIs
-            </Text>
-          </View>
-        </View>
-      );
     default:
       return null;
   }
@@ -1086,6 +1065,70 @@ function SectionPage({
       <SectionVis slug={section.slug} result={result} />
       <Md markdown={section.content} />
       <PageFooter />
+    </Page>
+  );
+}
+
+function CTAPage({ result }: { result: DiagnosticResult }) {
+  const sorted = [...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore);
+  const weakest = sorted[0];
+  const secondWeakest = sorted[1];
+  return (
+    <Page size="LETTER" style={s.coverPage}>
+      <GradientBar tall />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 72 }}>
+        <Text style={{ fontFamily: FONT_B, fontSize: 7, color: C.accent, letterSpacing: 6, marginBottom: 36 }}>
+          NEXT STEPS
+        </Text>
+        <Text style={{ fontFamily: FONT_B, fontSize: 28, color: C.white, textAlign: 'center', marginBottom: 8, lineHeight: 1.3 }}>
+          From Diagnosis to Action
+        </Text>
+        <Text style={{ fontSize: 11, color: C.light, textAlign: 'center', marginBottom: 36, lineHeight: 1.5 }}>
+          This diagnostic identifies where {result.companyProfile.companyName} stands.{'\n'}
+          Closing the gap requires a tailored operationalization plan.
+        </Text>
+        <View style={{ width: 40, height: 0.5, backgroundColor: C.accent, marginBottom: 36 }} />
+        {/* Key gaps callout */}
+        <View style={{
+          borderWidth: 0.5, borderColor: C.secondary, borderRadius: 4,
+          padding: 18, marginBottom: 28, width: 360,
+        }}>
+          <Text style={{ fontFamily: FONT_B, fontSize: 8, color: C.accent, letterSpacing: 3, marginBottom: 10 }}>
+            YOUR CRITICAL GAPS
+          </Text>
+          <View style={{ flexDirection: 'row', marginBottom: 6 }}>
+            <Text style={{ fontFamily: FONT_B, fontSize: 10, color: C.white, width: 160 }}>
+              {DIM_LABELS[weakest.dimension]}
+            </Text>
+            <Text style={{ fontSize: 10, color: C.light }}>
+              {weakest.normalizedScore}/100
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+            <Text style={{ fontFamily: FONT_B, fontSize: 10, color: C.white, width: 160 }}>
+              {DIM_LABELS[secondWeakest.dimension]}
+            </Text>
+            <Text style={{ fontSize: 10, color: C.light }}>
+              {secondWeakest.normalizedScore}/100
+            </Text>
+          </View>
+          <Text style={{ fontSize: 8, color: C.accent, lineHeight: 1.5 }}>
+            RLK builds tailored 90-day plans that translate these findings into specific
+            governance structures, vendor decisions, and organizational changes.
+          </Text>
+        </View>
+        {/* Contact info */}
+        <Text style={{ fontFamily: FONT_B, fontSize: 14, color: C.white, marginBottom: 16 }}>
+          Schedule a Strategy Session
+        </Text>
+        <Text style={{ fontSize: 10, color: C.light, marginBottom: 4 }}>
+          ryan.king@rlkconsultingco.com
+        </Text>
+        <Text style={{ fontSize: 10, color: C.light, marginBottom: 4 }}>
+          rlkconsultingco.com
+        </Text>
+      </View>
+      <GradientBar tall />
     </Page>
   );
 }
@@ -1183,6 +1226,7 @@ function ReportDoc({ report, result }: { report: GeneratedReport; result: Diagno
       {contentSections.map((sec, i) => (
         <SectionPage key={sec.slug} section={sec} num={i + 2} result={result} />
       ))}
+      <CTAPage result={result} />
       <AboutPage />
     </Document>
   );

@@ -12,7 +12,7 @@ import type {
   CompanyProfile,
 } from "@/types/diagnostic";
 import MethodologySection from "@/app/report/components/MethodologySection";
-import SensitivitySection from "@/app/report/components/SensitivitySection";
+// SensitivitySection removed — not shown to clients
 
 // ---------------------------------------------------------------------------
 // Wrapper -- useSearchParams requires Suspense in Next.js app router
@@ -371,8 +371,8 @@ function ReportPage() {
           <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
             <p className="text-sm text-foreground/70">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              The full report provides the <strong className="text-navy">transparent step-by-step methodology</strong>,
-              sensitivity analysis, and industry benchmarks — your CFO should stress-test these assumptions before sharing with the board.
+              The full report provides the <strong className="text-navy">transparent step-by-step methodology</strong> and
+              industry benchmarks. Your CFO should stress-test these assumptions before sharing with the board.
             </p>
           </div>
         </section>
@@ -534,12 +534,11 @@ function ReportPage() {
               </div>
               <div className="bg-white/10 border border-white/10 p-4">
                 <p className="text-white text-sm font-semibold mb-1">
-                  90-Day Action Plan
+                  Board-Ready Messaging
                 </p>
                 <p className="text-white/50 text-xs leading-relaxed">
-                  15+ research-backed actions with named owners by role,
-                  specific timeframes, measurable KPIs, and supporting evidence
-                  from McKinsey, BCG, and Deloitte transformation research.
+                  Pre-built board presentation findings, peer benchmarks, and
+                  recommended asks structured as decision items per NACD guidance.
                 </p>
               </div>
               <div className="bg-white/10 border border-white/10 p-4">
@@ -806,11 +805,10 @@ function ReportPage() {
                           The Path Forward
                         </p>
                         <p className="text-sm text-foreground/70 leading-relaxed">
-                          Section 9 provides a 90-day action plan with 15 research-backed actions, named owners
-                          by role, and specific KPIs to track weekly. Section 7 maps the security and governance
-                          risks your current posture creates. Section 12 provides messages for the board with specific
-                          decision items and investment asks. Every finding is supported by methodology
-                          and sources documented in Sections 10 and 11 — review with your CFO before any board presentation.
+                          Section 7 maps the security and governance risks your current posture creates.
+                          Section 9 provides messages for the board with specific decision items and investment asks.
+                          Every finding is supported by methodology and sources documented in Section 10.
+                          Contact RLK to build a tailored 90-day operationalization plan from these findings.
                         </p>
                       </div>
                     </div>
@@ -840,22 +838,6 @@ function ReportPage() {
               around AI: who uses it, who governs it, how fast decisions move, and whether
               anyone can prove it is working.
             </p>
-
-            {/* Dimension definitions */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-              {[
-                { dim: "Adoption Behavior", desc: "How AI is actually being used versus merely purchased or discussed. Measures whether AI tools have crossed the threshold from 'available' to 'embedded in how work gets done.' A low score here means you have tools your people are not using." },
-                { dim: "Authority Structure", desc: "Who can say yes to AI — and how fast. Measures governance clarity, decision rights, and whether your approval structures enable or block AI deployment. A low score means good ideas die in committee." },
-                { dim: "Workflow Integration", desc: "Whether AI is woven into core business processes or sits alongside them as a novelty. The difference between AI as a feature and AI as infrastructure. A low score means AI is a sidebar, not a workflow." },
-                { dim: "Decision Velocity", desc: "How quickly your organization moves from AI insight to AI action. Measures the time from identifying an AI opportunity to deploying it in production. A low score means your competitors will get there first." },
-                { dim: "Economic Translation", desc: "Can your organization prove AI is creating financial value? Measures the ability to connect AI activity to revenue, margin, and productivity outcomes. A low score means you cannot defend your AI budget." },
-              ].map((d) => (
-                <div key={d.dim} className="bg-offwhite border border-light p-3 md:p-4">
-                  <p className="text-xs font-semibold text-navy mb-1">{d.dim}</p>
-                  <p className="text-[11px] text-foreground/60 leading-relaxed">{d.desc}</p>
-                </div>
-              ))}
-            </div>
 
             {/* Pentagon radar visualization */}
             <div className="mb-10 flex justify-center overflow-x-auto">
@@ -1108,7 +1090,7 @@ function ReportPage() {
                         What This Means for {result.companyProfile.companyName}
                       </p>
                       <p className="text-sm text-foreground/70 leading-relaxed">
-                        {ci.interpretation} The 90-day action plan in Section 9 provides specific steps to address this.
+                        {ci.interpretation} Contact RLK Consulting to build a tailored action plan addressing this gap.
                       </p>
                     </div>
                   </div>
@@ -1262,9 +1244,12 @@ function ReportPage() {
           {/* ================================================================= */}
           {/* SECTION 5: ECONOMIC IMPACT MODEL                            */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={5} title="Economic Impact Model" />
-            <p className="text-sm text-foreground/60 mt-2 mb-4">
+          <CollapsibleSection
+            number={5}
+            title="Economic Impact Model"
+            summary={`${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with ${result.economicEstimate.currentCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
+          >
+            <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
               Below is the transparent methodology — every assumption stated, every input sourced — so
               your CFO should stress-test these assumptions before sharing with the board.
@@ -1359,36 +1344,6 @@ function ReportPage() {
               </div>
             </div>
 
-            {/* Sensitivity analysis */}
-            <div className="mt-6 border border-light p-4 md:p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-3">
-                Sensitivity Analysis: What If Our Assumptions Are Wrong?
-              </p>
-              <div className="grid grid-cols-3 gap-2 md:gap-3 text-center">
-                <div className="bg-offwhite border border-light p-2 md:p-3">
-                  <p className="text-[10px] text-tertiary uppercase tracking-wider mb-1">Conservative</p>
-                  <p className="text-sm md:text-lg font-bold text-navy">{fmtUSD(Math.round(result.economicEstimate.unrealizedValueLow * 0.5))}</p>
-                  <p className="text-[10px] text-tertiary mt-1">Half the low estimate</p>
-                </div>
-                <div className="bg-navy/5 border border-navy/10 p-2 md:p-3">
-                  <p className="text-[10px] text-tertiary uppercase tracking-wider mb-1">Base Case</p>
-                  <p className="text-sm md:text-lg font-bold text-navy">{fmtUSD(Math.round((result.economicEstimate.unrealizedValueLow + result.economicEstimate.unrealizedValueHigh) / 2))}</p>
-                  <p className="text-[10px] text-tertiary mt-1">Midpoint estimate</p>
-                </div>
-                <div className="bg-offwhite border border-light p-2 md:p-3">
-                  <p className="text-[10px] text-tertiary uppercase tracking-wider mb-1">Aggressive</p>
-                  <p className="text-sm md:text-lg font-bold text-navy">{fmtUSD(result.economicEstimate.unrealizedValueHigh)}</p>
-                  <p className="text-[10px] text-tertiary mt-1">Full potential</p>
-                </div>
-              </div>
-              <p className="text-[11px] text-foreground/50 mt-3">
-                Even at the most conservative estimate — assuming our model overstates potential
-                by 50% — the unrealized value exceeds what most organizations invest in AI
-                annually. The question is not whether the opportunity exists but how quickly
-                you can capture it before competitors close the gap.
-              </p>
-            </div>
-
             {/* Industry benchmark bar */}
             {result.economicEstimate.industryBenchmark && (
               <div className="mt-6 bg-offwhite border border-light p-4 md:p-5">
@@ -1411,13 +1366,16 @@ function ReportPage() {
                 }
               />
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ================================================================= */}
           {/* SECTION 6: P&L BUSINESS CASE                                */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={6} title="The Business Case: P&L Impact Analysis" />
+          <CollapsibleSection
+            number={6}
+            title="The Business Case: P&L Impact Analysis"
+            summary={`Translates unrealized AI value into specific revenue growth, operating margin improvement, and cost structure changes for a ${fmtUSD(result.companyProfile.revenue)} revenue organization.`}
+          >
 
             {(() => {
               const pnl = getPnLImpact(
@@ -1566,13 +1524,16 @@ function ReportPage() {
                 </div>
               );
             })()}
-          </section>
+          </CollapsibleSection>
 
           {/* ================================================================= */}
           {/* SECTION 7: SECURITY & GOVERNANCE RISK ASSESSMENT            */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={7} title="Security & Governance Risk Assessment" />
+          <CollapsibleSection
+            number={7}
+            title="Security & Governance Risk Assessment"
+            summary={`Risk exposure analysis calibrated to ${result.companyProfile.regulatoryIntensity} regulatory intensity in ${industryLabel(result.companyProfile.industry)}. Covers shadow AI, compliance, data governance, and board liability.`}
+          >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Risk exposure mapped across likelihood and impact, derived from
               your diagnostic dimension scores and governance posture. This assessment
@@ -1662,13 +1623,16 @@ function ReportPage() {
                 }
               />
             </div>
-          </section>
+          </CollapsibleSection>
 
           {/* ================================================================= */}
           {/* SECTION 8: VENDOR & PARTNER LANDSCAPE ASSESSMENT            */}
           {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={8} title="Vendor & Partner Landscape Assessment" />
+          <CollapsibleSection
+            number={8}
+            title="Vendor & Partner Landscape Assessment"
+            summary={`Independent vendor analysis with buy/build/partner recommendations for ${result.companyProfile.primaryAIUseCases?.slice(0, 2).join(", ").replace(/_/g, " ") || "your AI use cases"}. Includes negotiation intelligence and lock-in risk assessment.`}
+          >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Independent analysis of AI vendor positioning, buy/build/partner
               recommendations, and stack optimization opportunities. This assessment
@@ -1846,174 +1810,13 @@ function ReportPage() {
                 />
               </div>
             ) : null}
-          </section>
+          </CollapsibleSection>
 
           {/* ================================================================= */}
-          {/* SECTION 9: 90-DAY TRANSFORMATION ACTION PLAN                */}
-          {/* ================================================================= */}
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={9} title="90-Day Transformation Action Plan" />
-            <p className="text-sm text-foreground/60 mt-2 mb-4">
-              A research-backed, role-specific action plan designed for immediate
-              executive mobilization. Each action is informed by your diagnostic scores,
-              industry benchmarks, competitive intelligence, and leading transformation
-              frameworks from McKinsey, BCG, and Deloitte.
-            </p>
-
-            {/* Strategic context */}
-            <div className="bg-offwhite border border-light p-5 mb-8">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                Strategic Context
-              </p>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                {get90DayContext(result.overallScore, result.stageClassification.primaryStage, result.companyProfile.industry)}
-              </p>
-            </div>
-
-            {/* Timeline visual */}
-            <ActionTimeline
-              overallScore={result.overallScore}
-              weakestDimension={
-                [...result.dimensionScores].sort(
-                  (a, b) => a.normalizedScore - b.normalizedScore
-                )[0]?.dimension || "adoption_behavior"
-              }
-              stage={result.stageClassification.primaryStage}
-              dimensionScores={result.dimensionScores}
-            />
-
-            {/* AI narrative */}
-            <div className="mt-8 pt-6 border-t border-light">
-              <MarkdownContent
-                content={
-                  report?.sections?.find(
-                    (s) => s.slug === "90-day-action-plan"
-                  )?.content || ""
-                }
-              />
-            </div>
-
-            {/* Success metrics — industry-specific KPI cards */}
-            <div className="mt-8 border border-light p-5 md:p-6">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-1">
-                90-Day Success Metrics
-              </p>
-              <p className="text-sm text-foreground/60 leading-relaxed mb-5">
-                Industry-specific KPIs for{" "}
-                {industryLabel(result.companyProfile.industry)}, calibrated to your
-                organization&apos;s scale ({result.companyProfile.employeeCount.toLocaleString()}{" "}
-                employees) and current AI maturity (Stage{" "}
-                {result.stageClassification.primaryStage}). Track weekly to measure
-                transformation momentum.
-              </p>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                {get90DayKPIs(
-                  result.overallScore,
-                  result.companyProfile.industry,
-                  result.companyProfile.employeeCount,
-                  result.companyProfile.revenue,
-                  result.dimensionScores,
-                ).map((kpi, idx) => {
-                  const dimColor = getDimensionColor(kpi.dimension);
-                  return (
-                    <div
-                      key={idx}
-                      className="bg-white border border-light p-4 md:p-5 relative overflow-hidden"
-                    >
-                      {/* Left accent bar */}
-                      <div
-                        className="absolute left-0 top-0 bottom-0 w-[3px]"
-                        style={{ backgroundColor: dimColor }}
-                      />
-
-                      <div className="flex items-start justify-between pl-3">
-                        <div className="flex-1 min-w-0">
-                          {/* Category pill */}
-                          <span
-                            className="inline-block text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 mb-2"
-                            style={{
-                              backgroundColor: dimColor + "12",
-                              color: dimColor,
-                            }}
-                          >
-                            {kpi.category}
-                          </span>
-
-                          {/* Metric name */}
-                          <p className="text-sm font-semibold text-secondary leading-snug">
-                            {kpi.metric}
-                          </p>
-
-                          {/* Target — the hero number */}
-                          <p className="text-[9px] text-tertiary font-medium tracking-wide uppercase mt-2">
-                            90-Day Target
-                          </p>
-                          <p className="text-xl md:text-2xl font-bold text-navy tracking-tight">
-                            {kpi.target}
-                          </p>
-                        </div>
-
-                        {/* Circular progress gauge */}
-                        <div className="flex-shrink-0 ml-3 text-center">
-                          <CircularGauge
-                            current={kpi.currentEstimate}
-                            target={kpi.targetValue}
-                            color={dimColor}
-                            size={56}
-                          />
-                          <p className="text-[8px] text-tertiary mt-1 leading-tight">
-                            Est. Current<br />Progress
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Detail text */}
-                      <p className="text-[11px] text-foreground/55 leading-relaxed mt-3 pl-3">
-                        {kpi.detail}
-                      </p>
-
-                      {/* Dimension badge */}
-                      <div className="flex items-center gap-1.5 mt-3 pl-3">
-                        <div
-                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: dimColor }}
-                        />
-                        <span className="text-[9px] text-tertiary font-medium tracking-wide uppercase">
-                          {dimensionLabel(kpi.dimension)}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Data sources callout */}
-            <div className="mt-6 bg-offwhite border border-light p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                Data Sources Informing This Plan
-              </p>
-              <p className="text-sm text-foreground/60 leading-relaxed">
-                This action plan is informed by: diagnostic scores across 61
-                behavioral questions, industry benchmarks for{" "}
-                {result.companyProfile.industry
-                  .replace(/_/g, " ")
-                  .replace(/\b\w/g, (c) => c.toUpperCase())}
-                , competitive intelligence, SEC EDGAR filings, Google News
-                signals, vendor intelligence, regulatory analysis, McKinsey Global
-                AI Survey (2024), BCG AI Advantage Report (2024), Gartner AI
-                Maturity Model, Deloitte State of AI in the Enterprise (2024),
-                and sector-specific digital transformation case studies.
-              </p>
-            </div>
-          </section>
-
-          {/* ================================================================= */}
-          {/* SECTION 10: MESSAGES FOR THE BOARD                          */}
+          {/* SECTION 9: MESSAGES FOR THE BOARD                          */}
           {/* ================================================================= */}
           <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <SectionHeader number={10} title="Messages for the Board" />
+            <SectionHeader number={9} title="Messages for the Board" />
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               These findings are structured for direct board presentation. Each item
               below is a decision point, not an informational update. NACD&apos;s 2024
@@ -2130,16 +1933,9 @@ function ReportPage() {
           </section>
 
           {/* ================================================================= */}
-          {/* SECTION 11: SENSITIVITY ANALYSIS                               */}
+          {/* SECTION 10: METHODOLOGY, DATA SOURCES & CITATIONS              */}
           {/* ================================================================= */}
-          {result.sensitivityAnalysis && (
-            <SensitivitySection sensitivity={result.sensitivityAnalysis} sectionNumber={11} />
-          )}
-
-          {/* ================================================================= */}
-          {/* SECTION 12: METHODOLOGY, DATA SOURCES & CITATIONS              */}
-          {/* ================================================================= */}
-          <MethodologySection result={result} sectionNumber={result.sensitivityAnalysis ? 12 : 11} />
+          <MethodologySection result={result} sectionNumber={10} />
 
           {/* ================================================================= */}
           {/* CONTACT CTA                                                    */}
@@ -2150,15 +1946,17 @@ function ReportPage() {
                 Next Steps
               </p>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Discuss These Findings
+                Ready to Operationalize?
               </h2>
               <p className="text-sm text-white/70 leading-relaxed mb-6">
                 This diagnostic identified{" "}
                 {fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
                 {fmtUSD(result.economicEstimate.unrealizedValueHigh)}{" "}
                 in unrealized AI value for {result.companyProfile.companyName}.
-                Schedule a 30-minute strategy session to walk through these findings,
-                pressure-test the assumptions, and map the first 90 days of action.
+                Closing that gap requires a tailored 90-day operationalization plan.
+                RLK builds these with clients: translating diagnostic findings into
+                specific governance structures, vendor decisions, and organizational changes.
+                Schedule a strategy session to get started.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <a
@@ -2378,38 +2176,6 @@ function StageDisplay({ stage, dimensionScores }: { stage: StageClassification; 
 
   const current = stage.primaryStage;
 
-  // Why not higher — narrative, not math
-  const whyNotHigher = current < 5
-    ? (() => {
-        if (!dimensionScores) return "Improvement across multiple dimensions is required to advance.";
-        const weakest = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0];
-        const secondWeakest = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[1];
-        const whyNotNarratives: Record<number, string> = {
-          1: `Your organization has not yet moved beyond ad hoc AI experimentation. The diagnostic reveals that ${dimensionLabel(weakest?.dimension || "")} and ${dimensionLabel(secondWeakest?.dimension || "")} are both at foundational levels — meaning there is no consistent process for how AI gets adopted, governed, or measured. Stage 2 organizations have at least begun formalizing these processes; yours has not yet crossed that threshold.`,
-          2: `You have the beginnings of AI capability, but it has not translated into managed, repeatable deployment. The gap is organizational: ${dimensionLabel(weakest?.dimension || "")} shows that your governance or process structures are not yet mature enough to move AI from isolated experiments into coordinated programs. Stage 3 organizations have established clear ownership, measurement, and governance — your responses indicate these are still forming.`,
-          3: `Your AI programs are managed but not yet scaling across the enterprise. The barrier is primarily ${dimensionLabel(weakest?.dimension || "")}: your responses indicate that while pockets of AI maturity exist, the organizational connective tissue — decision rights, value measurement, cross-team learning — is not yet strong enough to support enterprise-wide scaling. Stage 4 organizations have cracked this code; you are close but not there.`,
-          4: `You are scaling AI successfully, but it has not yet become a strategic differentiator. Stage 5 organizations have AI embedded so deeply that it shapes products, business models, and competitive strategy — not just operations. Your ${dimensionLabel(weakest?.dimension || "")} score suggests there is still a gap between AI as an operational tool and AI as a competitive weapon.`,
-        };
-        return whyNotNarratives[current] || "Further maturity across all dimensions is needed.";
-      })()
-    : "You have reached the highest maturity stage. The focus now is sustaining this position and converting maturity into competitive moats.";
-
-  // Why not lower — narrative, not math
-  const whyNotLower = current > 1
-    ? (() => {
-        if (!dimensionScores) return "Strengths in multiple dimensions elevate your classification.";
-        const strongest = [...dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[0];
-        const secondStrongest = [...dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[1];
-        const whyNotLowerNarratives: Record<number, string> = {
-          2: `You are beyond Stage 1 because your organization has moved past pure experimentation. Your ${dimensionLabel(strongest?.dimension || "")} responses show intentional effort — AI is not accidental here. You have started building the muscle, even if it is not yet coordinated.`,
-          3: `Your ${dimensionLabel(strongest?.dimension || "")} and ${dimensionLabel(secondStrongest?.dimension || "")} scores demonstrate real organizational capability. AI is producing measurable results in specific areas, governance structures exist, and there is executive awareness. Stage 2 organizations are still figuring out whether AI matters; you have moved past that question.`,
-          4: `You have clear organizational strengths that Stage 3 organizations lack. Your ${dimensionLabel(strongest?.dimension || "")} capability shows AI is not just managed — it is accelerating. Multiple business units are engaged, value is being tracked, and the organization has learned from early deployments.`,
-          5: `You have achieved what fewer than 8% of enterprises have: AI maturity across every organizational dimension. Your ${dimensionLabel(strongest?.dimension || "")} and ${dimensionLabel(secondStrongest?.dimension || "")} scores reflect an organization where AI is not a project — it is infrastructure.`,
-        };
-        return whyNotLowerNarratives[current] || "Your strengths elevate you beyond the previous stage.";
-      })()
-    : "This is the entry-level stage.";
-
   return (
     <div>
       {/* All 5 stages displayed */}
@@ -2463,24 +2229,6 @@ function StageDisplay({ stage, dimensionScores }: { stage: StageClassification; 
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-3">
-        {current < 5 && (
-          <div className="bg-offwhite border border-light p-4">
-            <p className="text-[10px] font-semibold tracking-wider uppercase text-tertiary mb-1">
-              Why Not Stage {current + 1}
-            </p>
-            <p className="text-xs text-foreground/60 leading-relaxed">{whyNotHigher}</p>
-          </div>
-        )}
-        {current > 1 && (
-          <div className="bg-offwhite border border-light p-4">
-            <p className="text-[10px] font-semibold tracking-wider uppercase text-tertiary mb-1">
-              Why Not Stage {current - 1}
-            </p>
-            <p className="text-xs text-foreground/60 leading-relaxed">{whyNotLower}</p>
-          </div>
-        )}
-      </div>
 
       {stage.confidence < 0.7 && (
         <p className="text-xs text-tertiary mt-3">
@@ -2715,6 +2463,58 @@ function SectionHeader({ number, title }: { number: number; title: string }) {
       </div>
       <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
     </div>
+  );
+}
+
+/** Collapsible section wrapper — shows header + summary, click to expand full content. */
+function CollapsibleSection({
+  number, title, summary, children,
+}: {
+  number: number; title: string; summary: string; children: React.ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+      <button
+        type="button"
+        className="w-full text-left cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="mb-2">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-bold tracking-wide"
+              style={{ backgroundColor: "#0B1D3A" }}
+            >
+              {number}
+            </div>
+            <h3 className="text-xl md:text-2xl font-bold text-navy tracking-tight flex-1">
+              {title}
+            </h3>
+            <svg
+              className={`w-5 h-5 text-tertiary transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
+        </div>
+        <p className="text-sm text-foreground/60 mt-2">
+          {summary}
+        </p>
+      </button>
+      {expanded && (
+        <div className="mt-6 animate-in fade-in duration-200">
+          {children}
+        </div>
+      )}
+      {!expanded && (
+        <p className="text-xs text-navy/50 mt-3 font-medium cursor-pointer" onClick={() => setExpanded(true)}>
+          Click to expand full analysis &darr;
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -4262,7 +4062,7 @@ function getFreeMaturityAnalysis(
   const closingHook = stage <= 2
     ? `The full report translates these findings into dollar-denominated impact specific to ${companyName}: where the value is trapped, what it costs you every quarter, and the exact sequence of interventions — with named owners, timelines, and KPIs — to begin capturing it. Organizations that wait 12 months to act pay 2-3x more to close the same gaps.`
     : stage <= 3
-    ? `The full report maps ${companyName}'s specific path from Stage ${stage} to Stage ${stage + 1}, quantifying the P&L impact of each dimension improvement, identifying the 3-5 highest-leverage interventions, and providing a 90-day action plan with named owners and measurable milestones. The difference between Stage ${stage} and Stage ${stage + 1} is not incremental — it represents a step-change in value capture.`
+    ? `The full report maps ${companyName}'s specific path from Stage ${stage} to Stage ${stage + 1}, quantifying the P&L impact of each dimension improvement and identifying the 3-5 highest-leverage interventions. RLK Consulting then works with clients to build a tailored 90-day operationalization plan. The difference between Stage ${stage} and Stage ${stage + 1} is not incremental — it represents a step-change in value capture.`
     : `The full report details how ${companyName} can protect and extend its AI advantage: where competitors are closing the gap, which capabilities are most at risk of disruption, and the specific investments required to maintain leadership. At Stage ${stage}, the risk is not falling behind — it is assuming the current position is durable without continued strategic investment.`;
 
   return {
@@ -5602,8 +5402,8 @@ function getBoardAsks(overallScore: number, stage: number, economic: EconomicEst
     },
     {
       type: "investment",
-      title: `Authorize 90-day AI transformation sprint with ring-fenced budget`,
-      description: `The 90-day action plan in Section 9 requires dedicated resources. Recommended initial investment: ${stage <= 2 ? "1-2% of annual revenue" : "2-4% of annual revenue"} allocated specifically to AI transformation, separate from business-as-usual IT budget. This investment should be evaluated against the ${fmtUSD(unrealizedMid)} annual opportunity, not against other IT projects.`,
+      title: `Authorize a dedicated AI transformation budget`,
+      description: `Recommended initial investment: ${stage <= 2 ? "1-2% of annual revenue" : "2-4% of annual revenue"} allocated specifically to AI transformation, separate from business-as-usual IT budget. This investment should be evaluated against the ${fmtUSD(unrealizedMid)} annual opportunity, not against other IT projects. Engage RLK Consulting to build a tailored 90-day operationalization plan.`,
     },
     {
       type: "governance",

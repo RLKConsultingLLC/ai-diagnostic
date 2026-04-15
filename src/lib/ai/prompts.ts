@@ -347,25 +347,35 @@ export interface PromptTemplate {
 // ---------------------------------------------------------------------------
 
 export function executiveSummaryPrompt(result: DiagnosticResult, research?: CompanyResearchProfile): PromptTemplate {
+  const sorted = [...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore);
+  const weakest = sorted[0];
+  const secondWeakest = sorted[1];
+  const strongest = sorted[sorted.length - 1];
+
   return {
     system: SYSTEM_MESSAGE,
-    user: `Write a 300-word Executive Summary for the board of ${result.companyProfile.companyName}.
+    user: `Write a 400-word Executive Summary for the board of ${result.companyProfile.companyName}.
 
-This is the opening section of an AI Maturity diagnostic report. It must accomplish three things in exactly this order:
+This is the opening section of an AI Maturity diagnostic report. It must accomplish these things in exactly this order:
 1. State the organization's AI maturity stage and what that means in plain language (one sentence).
 2. Deliver the headline financial figure — the unrealized value range (${formatCurrency(result.economicEstimate.unrealizedValueLow)} – ${formatCurrency(result.economicEstimate.unrealizedValueHigh)}) — and frame it as what the board is leaving on the table.
 3. Provide a one-sentence diagnosis: the single most important structural reason this organization is underperforming on AI.
 
-Then provide 2-3 short paragraphs of supporting context that connect the overall score to the dimension-level findings.${research ? '\n\nCRITICAL: You have access to company intelligence below. Reference at least one specific finding — a recent news item, leadership signal, or competitor move — to demonstrate that this report is built on real-world intelligence, not just survey data.' : ''}
+Then provide 2-3 short paragraphs of supporting context that connect the overall score to the dimension-level findings.
+
+CRITICAL — PEER GAP ANALYSIS: You MUST include a paragraph that explicitly identifies where this organization lags its peers. The weakest dimension is ${formatDimensionLabel(weakest.dimension)} at ${weakest.normalizedScore}/100, followed by ${formatDimensionLabel(secondWeakest.dimension)} at ${secondWeakest.normalizedScore}/100. Their strongest dimension is ${formatDimensionLabel(strongest.dimension)} at ${strongest.normalizedScore}/100. Call out the specific gap between strongest and weakest (${strongest.normalizedScore - weakest.normalizedScore} points). Explain what this imbalance means in practical terms for ${formatIndustryLabel(result.companyProfile.industry)}.
+
+CRITICAL — CLOSING CTA: End the executive summary with a closing paragraph that says: this diagnostic identifies the gaps, but closing them requires a tailored 90-day operationalization plan. RLK Consulting builds these plans with clients — translating diagnostic findings into specific governance structures, vendor decisions, and organizational changes. Contact RLK to schedule a strategy session.${research ? '\n\nCRITICAL: You have access to company intelligence below. Reference at least one specific finding — a recent news item, leadership signal, or competitor move — to demonstrate that this report is built on real-world intelligence, not just survey data.' : ''}
 
 DIAGNOSTIC DATA:
 ${buildDiagnosticDataBlock(result, research)}
 
 OUTPUT FORMAT:
 - Markdown with a single H2 header: ## Executive Summary
-- 300 words maximum. Every sentence must carry weight.
+- 400 words maximum. Every sentence must carry weight.
 - No bullet points in this section. Flowing paragraphs only.
-- End with a single forward-looking sentence that sets up the rest of the report.`,
+- The peer gap paragraph must use specific dimension names and scores.
+- The final paragraph must be the RLK CTA — natural and authoritative, not salesy.`,
   };
 }
 
@@ -665,7 +675,7 @@ OUTPUT FORMAT:
 - Use H3 subheaders for each analysis area
 - 500-700 words total
 - Name at least 5 specific vendors with concrete assessments
-- End with a summary table or ranked list of the top 3 vendor decisions the board should make in the next quarter.`,
+- Focus on actionable, specific vendor assessments rather than generic recommendations.`,
   };
 }
 
@@ -810,7 +820,6 @@ export const SECTION_TITLES: Record<string, string> = {
   'competitive-positioning': 'Competitive Positioning',
   'security-governance-risk': 'Security & Governance Risk',
   'vendor-landscape': 'Vendor Landscape Analysis',
-  '90-day-action-plan': '90-Day Action Plan',
 };
 
 export const SECTION_ORDER: string[] = [
@@ -822,5 +831,4 @@ export const SECTION_ORDER: string[] = [
   'pnl-business-case',
   'security-governance-risk',
   'vendor-landscape',
-  '90-day-action-plan',
 ];
