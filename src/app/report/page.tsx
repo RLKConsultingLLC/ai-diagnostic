@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import React, { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type {
@@ -833,6 +833,18 @@ function ReportPage() {
             number={2}
             title="AI Posture Diagnosis"
             summary="Five behavioral dimensions measuring how your organization actually behaves around AI: who uses it, who governs it, how fast decisions move, and whether anyone can prove it is working."
+            insight={`${result.companyProfile.companyName}'s weakest dimension is ${dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")} at ${[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 - this is the primary bottleneck constraining all other AI investments.`}
+            badges={[
+              { value: `${result.overallScore}/100`, label: "Composite Score" },
+              { value: `Stage ${result.stageClassification.primaryStage}`, label: result.stageClassification.stageName },
+              { value: `${[...result.dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[0]?.normalizedScore}`, label: "Strongest" },
+              { value: `${[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}`, label: "Weakest" },
+            ]}
+            scorecard={result.dimensionScores.map((d) => ({
+              label: dimensionLabel(d.dimension).split(" ").map(w => w[0]).join(""),
+              score: d.normalizedScore,
+              color: "",
+            }))}
             preview={
               <>
                 {/* Pentagon radar visualization */}
@@ -898,6 +910,12 @@ function ReportPage() {
             number={3}
             title="Structural Constraints"
             summary="Three composite indices distill your 61 responses into the metrics that matter: can your organization govern AI, capture its value, and move fast enough to stay competitive?"
+            insight={`The structural gap between your strongest and weakest composite index is ${Math.abs((result.compositeIndices[0]?.score || 0) - ([...result.compositeIndices].sort((a, b) => a.score - b.score)[0]?.score || 0))} points - this imbalance is where organizational friction compounds.`}
+            scorecard={result.compositeIndices.map((ci) => ({
+              label: ci.name.split(" ").slice(0, 2).join(" "),
+              score: ci.score,
+              color: "",
+            }))}
             preview={
               <div className="space-y-2">
                 {result.compositeIndices.map((ci) => {
@@ -951,6 +969,7 @@ function ReportPage() {
             number={4}
             title="Competitive Positioning & Industry Intelligence"
             summary={`Where ${result.companyProfile.companyName} stands relative to peers in ${industryLabel(result.companyProfile.industry)}. Competitor positions are informed by industry benchmarks, public filings, news coverage of competitor AI investments, analyst research, and market intelligence - then anonymized for confidentiality.`}
+            insight={`Based on industry intelligence, at least one competitor in ${industryLabel(result.companyProfile.industry)} is already operating at AI maturity levels significantly above ${result.companyProfile.companyName}'s current position - the competitive window to close this gap is narrowing.`}
             preview={
               <>
                 <CompetitiveMatrix
@@ -1082,6 +1101,12 @@ function ReportPage() {
             number={5}
             title="Economic Impact Model"
             summary={`${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with ${result.economicEstimate.currentCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
+            insight={`Every quarter of inaction forfeits approximately ${fmtUSD(Math.round((result.economicEstimate.unrealizedValueLow + result.economicEstimate.unrealizedValueHigh) / 2 / 4))} in unrealized value. This is not a technology problem - it is an organizational design problem with a dollar sign attached.`}
+            badges={[
+              { value: fmtUSD(result.economicEstimate.unrealizedValueLow), label: "Low Estimate" },
+              { value: fmtUSD(result.economicEstimate.unrealizedValueHigh), label: "High Estimate" },
+              { value: `${result.economicEstimate.currentCapturePercent}%`, label: "Currently Captured" },
+            ]}
           >
             <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
@@ -1212,6 +1237,7 @@ function ReportPage() {
             number={6}
             title="The Business Case: P&L Impact Analysis"
             summary={`Translates unrealized AI value into specific revenue growth, operating margin improvement, and cost structure changes for a ${fmtUSD(result.companyProfile.revenue)} revenue organization.`}
+            insight={`This is the section your CFO needs to see. Every number below is derived from ${result.companyProfile.companyName}'s actual revenue and industry-specific benchmarks - stress-test the assumptions, but do not ignore the directional signal.`}
           >
 
             {(() => {
@@ -1361,6 +1387,12 @@ function ReportPage() {
             number={7}
             title="Security & Governance Risk Assessment"
             summary={`Risk exposure analysis calibrated to ${result.companyProfile.regulatoryIntensity} regulatory intensity in ${industryLabel(result.companyProfile.industry)}. Covers shadow AI, compliance, data governance, and board liability.`}
+            insight={`${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).filter(r => r.severity === "high").length} high-severity risks identified. In ${industryLabel(result.companyProfile.industry)}, the regulatory cost of inadequate AI governance is accelerating - 62% of organizations have experienced an AI-related risk event in the past 18 months.`}
+            badges={[
+              { value: `${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).length}`, label: "Risks Identified" },
+              { value: `${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).filter(r => r.severity === "high").length}`, label: "High Severity" },
+              { value: result.companyProfile.regulatoryIntensity.charAt(0).toUpperCase() + result.companyProfile.regulatoryIntensity.slice(1), label: "Reg. Intensity" },
+            ]}
           >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Risk exposure mapped across <strong className="text-secondary">likelihood and impact</strong>, derived from
@@ -1471,6 +1503,7 @@ function ReportPage() {
             number={8}
             title="Vendor & Partner Landscape Assessment"
             summary={`Independent vendor analysis with buy/build/partner recommendations for ${result.companyProfile.primaryAIUseCases?.slice(0, 2).join(", ").replace(/_/g, " ") || "your AI use cases"}. Includes negotiation intelligence and lock-in risk assessment.`}
+            insight={`At Stage ${result.stageClassification.primaryStage}, the biggest vendor risk is not choosing the wrong tool - it is signing contracts that lock you into today's decisions when your AI strategy will evolve significantly over the next 18 months.`}
           >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               Independent analysis of AI vendor positioning, <strong className="text-secondary">buy/build/partner
@@ -1684,6 +1717,7 @@ function ReportPage() {
             number={9}
             title="Messages for the Board"
             summary={`Board-ready findings structured as decision items for ${result.companyProfile.companyName}. Includes peer board intelligence, ${getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).length} recommended asks, and governance recommendations aligned to NACD best practices.`}
+            insight={`78% of boards consider AI a top-three priority, but only 23% feel equipped to oversee it. These findings translate your diagnostic into the language of board governance - decision items, not status updates.`}
           >
             <p className="text-sm text-foreground/60 mt-2 mb-4">
               These findings are structured for <strong className="text-secondary">direct board presentation</strong>. Each item
@@ -1979,7 +2013,18 @@ function Shell({ children }: { children: React.ReactNode }) {
           .no-print { display: none !important; }
           .print-cover { display: block !important; }
           body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          /* Auto-expand ALL sections for print/PDF export */
+          .print-section .print-expand { display: block !important; }
+          .print-section { break-inside: avoid-page; }
+          .print-section button[type="button"] { pointer-events: none; }
+          /* Force all SubCollapsible content to show */
+          [data-subcollapsible-content] { display: block !important; max-height: none !important; }
+          /* Show everything as expanded */
+          .animate-in { animation: none !important; }
           section, [class*="CollapsibleSection"], [class*="SubCollapsible"] { break-inside: avoid; }
+          /* Clean page breaks */
+          .print-section { page-break-inside: avoid; margin-bottom: 20px; }
+          h3, h4, h5 { page-break-after: avoid; }
         }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -2539,13 +2584,16 @@ function FloatingTOC() {
 
 /** Collapsible section wrapper — shows header + summary, click to expand full content. */
 function CollapsibleSection({
-  number, title, summary, children, preview, sectionId,
+  number, title, summary, children, preview, sectionId, insight, badges, scorecard,
 }: {
   number: number; title: string; summary: string; children: React.ReactNode; preview?: React.ReactNode; sectionId?: string;
+  insight?: string;
+  badges?: { value: string; label: string }[];
+  scorecard?: { label: string; score: number; color: string }[];
 }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <section id={sectionId} className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm scroll-mt-16">
+    <section id={sectionId} className="print-section bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm scroll-mt-16">
       <button
         type="button"
         className="w-full text-left cursor-pointer"
@@ -2575,14 +2623,20 @@ function CollapsibleSection({
           {summary}
         </p>
       </button>
+      {/* Stat badges — visible even when collapsed */}
+      {badges && badges.length > 0 && <StatBadges stats={badges} />}
+      {/* Traffic-light scorecard — visible even when collapsed */}
+      {scorecard && scorecard.length > 0 && <TrafficLight items={scorecard} />}
       {preview && <div className="mt-6">{preview}</div>}
       {expanded && (
-        <div className="mt-6 animate-in fade-in duration-200">
+        <div className="mt-6 animate-in fade-in duration-200 print-expand">
+          {/* Key insight card at top of expanded content */}
+          {insight && <InsightCard text={insight} />}
           {children}
         </div>
       )}
       {!expanded && (
-        <p className="text-xs text-navy/50 mt-3 font-medium cursor-pointer" onClick={() => setExpanded(true)}>
+        <p className="text-xs text-navy/50 mt-3 font-medium cursor-pointer no-print" onClick={() => setExpanded(true)}>
           Click to expand full analysis &darr;
         </p>
       )}
@@ -2916,6 +2970,129 @@ function KeyMetric({
 // Markdown Content Renderer (basic markdown to JSX)
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// PullQuote — extracts largest stat from content and renders as a callout
+// ---------------------------------------------------------------------------
+
+function PullQuote({ content }: { content: string }) {
+  if (!content) return null;
+  // Find the most impactful stat: dollar amounts, large percentages, multipliers
+  const statPatterns = [
+    /\$[\d,.]+\s?(?:billion|million|trillion|B|M|T)/gi,
+    /\$[\d,.]+[BMT]?/g,
+    /\d+(?:\.\d+)?%/g,
+    /\d+(?:\.\d+)?x/g,
+  ];
+  let bestStat = "";
+  let bestContext = "";
+  for (const pattern of statPatterns) {
+    const matches = content.match(pattern);
+    if (matches && matches.length > 0) {
+      // Pick the first substantial match
+      const candidate = matches[0];
+      if (!bestStat || candidate.length > bestStat.length) {
+        bestStat = candidate;
+        // Extract surrounding sentence for context
+        const idx = content.indexOf(candidate);
+        const before = content.lastIndexOf(".", idx - 1);
+        const after = content.indexOf(".", idx + candidate.length);
+        bestContext = content.slice(
+          before >= 0 ? before + 1 : Math.max(0, idx - 80),
+          after >= 0 ? after + 1 : Math.min(content.length, idx + candidate.length + 80)
+        ).trim();
+      }
+      break; // Use first pattern that matches (highest priority)
+    }
+  }
+  if (!bestStat || !bestContext) return null;
+  return (
+    <div className="my-4 flex items-stretch gap-0">
+      <div className="w-1 bg-navy flex-shrink-0" />
+      <div className="bg-navy/[0.03] px-5 py-4 flex-1">
+        <p className="text-2xl font-bold text-navy mb-1 tracking-tight">{bestStat}</p>
+        <p className="text-xs text-foreground/60 leading-relaxed">{bestContext.replace(bestStat, "").replace(/^\s*[-,.:]\s*/, "").trim()}</p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// StatBadges — oversized stat extraction displayed as badges
+// ---------------------------------------------------------------------------
+
+function StatBadges({ stats }: { stats: { value: string; label: string }[] }) {
+  if (!stats.length) return null;
+  return (
+    <div className="flex flex-wrap gap-4 mb-4 mt-2">
+      {stats.map((stat, idx) => (
+        <div key={idx} className="flex items-center gap-2.5 bg-navy/[0.04] border border-navy/10 px-4 py-2.5">
+          <span className="text-lg font-bold text-navy tracking-tight">{stat.value}</span>
+          <span className="text-[10px] text-foreground/50 uppercase tracking-wider font-semibold leading-tight max-w-[100px]">{stat.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// TrafficLight — horizontal row of colored score dots
+// ---------------------------------------------------------------------------
+
+function TrafficLight({ items }: { items: { label: string; score: number; color: string }[] }) {
+  return (
+    <div className="flex flex-wrap gap-3 mb-4 mt-1">
+      {items.map((item, idx) => {
+        const bg = item.score >= 60 ? "#4ADE80" : item.score >= 40 ? "#FBBF24" : "#F87171";
+        return (
+          <div key={idx} className="flex items-center gap-2 bg-white border border-light px-3 py-1.5">
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: bg }} />
+            <span className="text-[10px] text-foreground/60 font-medium">{item.label}</span>
+            <span className="text-[10px] font-bold text-secondary">{item.score}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ActionSteps — numbered timeline treatment for recommendation lists
+// ---------------------------------------------------------------------------
+
+function ActionSteps({ steps }: { steps: { title: string; detail: string }[] }) {
+  if (!steps.length) return null;
+  return (
+    <div className="relative pl-8 mt-3">
+      {/* Connecting line */}
+      <div className="absolute left-[11px] top-3 bottom-3 w-px bg-navy/15" />
+      {steps.map((step, idx) => (
+        <div key={idx} className="relative mb-4 last:mb-0">
+          <div className="absolute -left-8 top-0.5 w-[22px] h-[22px] rounded-full bg-navy text-white text-[10px] font-bold flex items-center justify-center z-10">
+            {idx + 1}
+          </div>
+          <div className="bg-offwhite border border-light p-3">
+            <p className="text-xs font-semibold text-secondary mb-1">{step.title}</p>
+            <p className="text-xs text-foreground/60 leading-relaxed">{step.detail}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// InsightCard — "So What" punchline card at top of section
+// ---------------------------------------------------------------------------
+
+function InsightCard({ text }: { text: string }) {
+  return (
+    <div className="bg-navy text-white px-5 py-3.5 mb-5 flex items-start gap-3">
+      <svg className="w-4 h-4 mt-0.5 flex-shrink-0 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg>
+      <p className="text-sm text-white/90 leading-relaxed font-medium">{text}</p>
+    </div>
+  );
+}
+
 /** Chunked markdown — splits AI narrative by headings, renders each as a SubCollapsible */
 function ChunkedMarkdown({ content }: { content: string }) {
   if (!content) return null;
@@ -2944,9 +3121,14 @@ function ChunkedMarkdown({ content }: { content: string }) {
     sections.push({ title: currentTitle, body: currentBody.join("\n") });
   }
 
-  // If only one section (no headings found), fall back to regular MarkdownContent
+  // If only one section (no headings found), fall back to regular MarkdownContent with pull-quote
   if (sections.length <= 1) {
-    return <MarkdownContent content={content} />;
+    return (
+      <div>
+        <PullQuote content={content} />
+        <MarkdownContent content={content} />
+      </div>
+    );
   }
 
   return (
@@ -2959,9 +3141,13 @@ function ChunkedMarkdown({ content }: { content: string }) {
           return <MarkdownContent key={idx} content={trimmedBody} />;
         }
         return (
-          <SubCollapsible key={idx} title={section.title} hint="Read section" defaultOpen={idx === 0}>
-            <MarkdownContent content={trimmedBody} />
-          </SubCollapsible>
+          <React.Fragment key={idx}>
+            {/* Pull-quote after the first titled section for visual impact */}
+            {idx === 1 && <PullQuote content={content} />}
+            <SubCollapsible title={section.title} hint="Read section" defaultOpen={idx === 0}>
+              <MarkdownContent content={trimmedBody} />
+            </SubCollapsible>
+          </React.Fragment>
         );
       })}
     </div>
@@ -2973,25 +3159,67 @@ function MarkdownContent({ content }: { content: string }) {
 
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
-  let listItems: string[] = [];
+  let bulletItems: string[] = [];
+  let numberedItems: string[] = [];
   let listKey = 0;
 
-  const flushList = () => {
-    if (listItems.length > 0) {
+  const flushBullets = () => {
+    if (bulletItems.length > 0) {
       elements.push(
         <ul
           key={`list-${listKey++}`}
           className="list-disc list-outside pl-5 space-y-1 text-sm text-foreground/70 leading-relaxed mb-4"
         >
-          {listItems.map((item, i) => (
+          {bulletItems.map((item, i) => (
             <li key={i}>
               <InlineMarkdown text={item} />
             </li>
           ))}
         </ul>
       );
-      listItems = [];
+      bulletItems = [];
     }
+  };
+
+  const flushNumbered = () => {
+    if (numberedItems.length > 0) {
+      // 3+ numbered items with action keywords → ActionSteps timeline
+      const isActionList = numberedItems.length >= 3 && numberedItems.some((item) =>
+        /\b(implement|establish|deploy|create|develop|launch|build|design|conduct|evaluate|assess|prioritize|invest|negotiate|audit)\b/i.test(item)
+      );
+      if (isActionList) {
+        const steps = numberedItems.map((item) => {
+          // Split on first colon or period for title/detail separation
+          const colonIdx = item.indexOf(":");
+          const periodIdx = item.indexOf(".");
+          const splitIdx = colonIdx > 0 && colonIdx < 60 ? colonIdx : periodIdx > 0 && periodIdx < 60 ? periodIdx : -1;
+          if (splitIdx > 0) {
+            return { title: item.slice(0, splitIdx).trim(), detail: item.slice(splitIdx + 1).trim() };
+          }
+          return { title: item.slice(0, 50).trim() + (item.length > 50 ? "..." : ""), detail: item };
+        });
+        elements.push(<ActionSteps key={`steps-${listKey++}`} steps={steps} />);
+      } else {
+        elements.push(
+          <ol
+            key={`olist-${listKey++}`}
+            className="list-decimal list-outside pl-5 space-y-1 text-sm text-foreground/70 leading-relaxed mb-4"
+          >
+            {numberedItems.map((item, i) => (
+              <li key={i}>
+                <InlineMarkdown text={item} />
+              </li>
+            ))}
+          </ol>
+        );
+      }
+      numberedItems = [];
+    }
+  };
+
+  const flushAll = () => {
+    flushBullets();
+    flushNumbered();
   };
 
   lines.forEach((line, idx) => {
@@ -2999,7 +3227,7 @@ function MarkdownContent({ content }: { content: string }) {
 
     // Headings
     if (trimmed.startsWith("### ")) {
-      flushList();
+      flushAll();
       elements.push(
         <h5
           key={idx}
@@ -3011,7 +3239,7 @@ function MarkdownContent({ content }: { content: string }) {
       return;
     }
     if (trimmed.startsWith("## ")) {
-      flushList();
+      flushAll();
       elements.push(
         <h4
           key={idx}
@@ -3023,7 +3251,7 @@ function MarkdownContent({ content }: { content: string }) {
       return;
     }
     if (trimmed.startsWith("# ")) {
-      flushList();
+      flushAll();
       elements.push(
         <h3
           key={idx}
@@ -3035,24 +3263,27 @@ function MarkdownContent({ content }: { content: string }) {
       return;
     }
 
-    // List items
+    // Bullet list items
     if (/^[-*]\s+/.test(trimmed)) {
-      listItems.push(trimmed.replace(/^[-*]\s+/, ""));
+      flushNumbered();
+      bulletItems.push(trimmed.replace(/^[-*]\s+/, ""));
       return;
     }
+    // Numbered list items
     if (/^\d+\.\s+/.test(trimmed)) {
-      listItems.push(trimmed.replace(/^\d+\.\s+/, ""));
+      flushBullets();
+      numberedItems.push(trimmed.replace(/^\d+\.\s+/, ""));
       return;
     }
 
     // Empty line
     if (!trimmed) {
-      flushList();
+      flushAll();
       return;
     }
 
     // Paragraph
-    flushList();
+    flushAll();
     elements.push(
       <p
         key={idx}
@@ -3063,7 +3294,7 @@ function MarkdownContent({ content }: { content: string }) {
     );
   });
 
-  flushList();
+  flushAll();
 
   return <div>{elements}</div>;
 }
