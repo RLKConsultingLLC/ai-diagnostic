@@ -834,72 +834,97 @@ function ReportPage() {
             title="AI Posture Diagnosis"
             summary="Five behavioral dimensions measuring how your organization actually behaves around AI: who uses it, who governs it, how fast decisions move, and whether anyone can prove it is working."
             insight={`${result.companyProfile.companyName}'s weakest dimension is ${dimensionLabel([...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.dimension || "")} at ${[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 - this is the primary bottleneck constraining all other AI investments.`}
-            badges={[
-              { value: `${result.overallScore}/100`, label: "Composite Score" },
-              { value: `Stage ${result.stageClassification.primaryStage}`, label: result.stageClassification.stageName },
-              { value: `${[...result.dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[0]?.normalizedScore}`, label: "Strongest" },
-              { value: `${[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}`, label: "Weakest" },
-            ]}
-            scorecard={result.dimensionScores.map((d) => ({
-              label: dimensionLabel(d.dimension).split(" ").map(w => w[0]).join(""),
-              score: d.normalizedScore,
-              color: "",
-            }))}
             preview={
-              <>
-                {/* Pentagon radar visualization */}
-                <div className="mb-6 flex justify-center overflow-x-auto">
-                  <PentagonRadar dimensions={result.dimensionScores} />
-                </div>
+              (() => {
+                // Parse the AI narrative and split by dimension headings
+                const narrativeContent = report?.sections?.find((s) => s.slug === "ai-posture-diagnosis")?.content || "";
+                const dimensionKeywords: Record<string, string[]> = {
+                  adoption_behavior: ["adoption", "adoption behavior"],
+                  authority_structure: ["authority", "authority structure", "governance"],
+                  workflow_integration: ["workflow", "workflow integration", "integration"],
+                  decision_velocity: ["decision", "decision velocity", "velocity"],
+                  economic_translation: ["economic", "economic translation", "translation", "value"],
+                };
+                // Split narrative into sections by headings
+                const narrativeSections: { heading: string; body: string }[] = [];
+                if (narrativeContent) {
+                  const nLines = narrativeContent.split("\n");
+                  let curHeading = "";
+                  let curBody: string[] = [];
+                  nLines.forEach((nLine) => {
+                    const hMatch = nLine.match(/^#{1,3}\s+(.+)/);
+                    if (hMatch) {
+                      if (curHeading || curBody.length > 0) {
+                        narrativeSections.push({ heading: curHeading, body: curBody.join("\n") });
+                      }
+                      curHeading = hMatch[1].trim();
+                      curBody = [];
+                    } else {
+                      curBody.push(nLine);
+                    }
+                  });
+                  if (curHeading || curBody.length > 0) {
+                    narrativeSections.push({ heading: curHeading, body: curBody.join("\n") });
+                  }
+                }
+                // Match narrative sections to dimensions
+                const findNarrative = (dim: string): string => {
+                  const keywords = dimensionKeywords[dim] || [];
+                  const match = narrativeSections.find((ns) =>
+                    keywords.some((kw) => ns.heading.toLowerCase().includes(kw))
+                  );
+                  return match ? match.body.trim() : "";
+                };
 
-                {/* Each dimension bar is its own expand/collapse */}
-                <div className="space-y-2">
-                  {result.dimensionScores.map((ds) => {
-                    const stage = result.stageClassification.dimensionStages[ds.dimension];
-                    const barColor =
-                      ds.normalizedScore >= 80
-                        ? "#0B1D3A"
-                        : ds.normalizedScore >= 60
-                        ? "#364E6E"
-                        : ds.normalizedScore >= 40
-                        ? "#6B7F99"
-                        : ds.normalizedScore >= 20
-                        ? "#A8B5C4"
-                        : "#CED5DD";
-                    const dimDesc: Record<string, string> = {
-                      adoption_behavior: "Are your people actually using AI, or just talking about it?",
-                      authority_structure: "Who can say yes to AI - and how fast can they do it?",
-                      workflow_integration: "Is AI embedded in how work gets done, or sitting on the side?",
-                      decision_velocity: "How quickly does your organization move from AI insight to action?",
-                      economic_translation: "Can you prove AI is creating financial value?",
-                    };
-                    return (
-                      <DimensionExpander
-                        key={ds.dimension}
-                        dimension={ds.dimension}
-                        label={dimensionLabel(ds.dimension)}
-                        score={ds.normalizedScore}
-                        stage={stage}
-                        barColor={barColor}
-                        subtitle={dimDesc[ds.dimension] || ""}
-                        interpretation={dimensionInterpretation(ds.dimension, ds.normalizedScore)}
-                      />
-                    );
-                  })}
-                </div>
-              </>
+                return (
+                  <>
+                    {/* Pentagon radar visualization */}
+                    <div className="mb-6 flex justify-center overflow-x-auto">
+                      <PentagonRadar dimensions={result.dimensionScores} />
+                    </div>
+
+                    {/* Each dimension bar — one click shows ALL detail including AI narrative */}
+                    <div className="space-y-2">
+                      {result.dimensionScores.map((ds) => {
+                        const stage = result.stageClassification.dimensionStages[ds.dimension];
+                        const barColor =
+                          ds.normalizedScore >= 80
+                            ? "#0B1D3A"
+                            : ds.normalizedScore >= 60
+                            ? "#364E6E"
+                            : ds.normalizedScore >= 40
+                            ? "#6B7F99"
+                            : ds.normalizedScore >= 20
+                            ? "#A8B5C4"
+                            : "#CED5DD";
+                        const dimDesc: Record<string, string> = {
+                          adoption_behavior: "Are your people actually using AI, or just talking about it?",
+                          authority_structure: "Who can say yes to AI - and how fast can they do it?",
+                          workflow_integration: "Is AI embedded in how work gets done, or sitting on the side?",
+                          decision_velocity: "How quickly does your organization move from AI insight to action?",
+                          economic_translation: "Can you prove AI is creating financial value?",
+                        };
+                        return (
+                          <DimensionExpander
+                            key={ds.dimension}
+                            dimension={ds.dimension}
+                            label={dimensionLabel(ds.dimension)}
+                            score={ds.normalizedScore}
+                            stage={stage}
+                            barColor={barColor}
+                            subtitle={dimDesc[ds.dimension] || ""}
+                            interpretation={dimensionInterpretation(ds.dimension, ds.normalizedScore)}
+                            narrative={findNarrative(ds.dimension)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()
             }
           >
-            {/* AI narrative for AI Posture Diagnosis */}
-            <SubCollapsible title="Detailed Posture Analysis" hint="Read full analysis" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>}>
-              <ChunkedMarkdown
-                content={
-                  report?.sections?.find(
-                    (s) => s.slug === "ai-posture-diagnosis"
-                  )?.content || ""
-                }
-              />
-            </SubCollapsible>
+            {/* No separate narrative section — everything is inside each dimension bar */}
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -911,54 +936,63 @@ function ReportPage() {
             title="Structural Constraints"
             summary="Three composite indices distill your 61 responses into the metrics that matter: can your organization govern AI, capture its value, and move fast enough to stay competitive?"
             insight={`The structural gap between your strongest and weakest composite index is ${Math.abs((result.compositeIndices[0]?.score || 0) - ([...result.compositeIndices].sort((a, b) => a.score - b.score)[0]?.score || 0))} points - this imbalance is where organizational friction compounds.`}
-            scorecard={result.compositeIndices.map((ci) => ({
-              label: ci.name.split(" ").slice(0, 2).join(" "),
-              score: ci.score,
-              color: "",
-            }))}
             preview={
-              <div className="space-y-2">
-                {result.compositeIndices.map((ci) => {
-                  const ciColor =
-                    ci.score >= 70 ? "#0B1D3A" : ci.score >= 40 ? "#6B7F99" : "#A8B5C4";
-                  const ciTier =
-                    ci.score >= 80 ? "Leading" : ci.score >= 60 ? "Advancing" : ci.score >= 40 ? "Developing" : ci.score >= 20 ? "Emerging" : "Foundational";
-                  const sorted = [...ci.components].sort((a, b) => b.score - a.score);
-                  const strongQs = sorted.slice(0, 2);
-                  const weakQs = sorted.slice(-2).reverse();
+              (() => {
+                const narrativeContent = report?.sections?.find((s) => s.slug === "structural-constraints")?.content || "";
+                const constraintKeywords: Record<string, string[]> = {
+                  authority_friction: ["authority", "friction", "governance", "approval", "oversight"],
+                  decision_velocity: ["decision", "velocity", "speed", "agility", "pace"],
+                  economic_translation: ["economic", "translation", "value", "roi", "financial", "monetiz"],
+                };
+                // Split narrative by headings and match to constraints
+                const findNarrative = (slug: string): string => {
+                  const keywords = constraintKeywords[slug] || [];
+                  if (!narrativeContent || !keywords.length) return "";
+                  const sections = narrativeContent.split(/(?=^#{1,3}\s)/m);
+                  const matched = sections.filter((section) => {
+                    const heading = section.split("\n")[0]?.toLowerCase() || "";
+                    return keywords.some((kw) => heading.includes(kw));
+                  });
+                  return matched.join("\n\n").trim();
+                };
 
-                  return (
-                    <ConstraintExpander
-                      key={ci.slug}
-                      slug={ci.slug}
-                      name={ci.name}
-                      score={ci.score}
-                      tier={ciTier}
-                      barColor={ciColor}
-                      description={compositeIndexDescription(ci.slug, ci.score, result.companyProfile.industry)}
-                      strongQs={strongQs}
-                      weakQs={weakQs}
-                      industry={result.companyProfile.industry}
-                      benchmark={compositeIndexBenchmark(ci.slug, ci.score, result.companyProfile.industry)}
-                      risks={compositeIndexRisks(ci.slug, ci.score)}
-                      interpretation={ci.interpretation}
-                      companyName={result.companyProfile.companyName}
-                    />
-                  );
-                })}
-              </div>
+                return (
+                  <div className="space-y-2">
+                    {result.compositeIndices.map((ci) => {
+                      const ciColor =
+                        ci.score >= 70 ? "#0B1D3A" : ci.score >= 40 ? "#6B7F99" : "#A8B5C4";
+                      const ciTier =
+                        ci.score >= 80 ? "Leading" : ci.score >= 60 ? "Advancing" : ci.score >= 40 ? "Developing" : ci.score >= 20 ? "Emerging" : "Foundational";
+                      const sorted = [...ci.components].sort((a, b) => b.score - a.score);
+                      const strongQs = sorted.slice(0, 2);
+                      const weakQs = sorted.slice(-2).reverse();
+
+                      return (
+                        <ConstraintExpander
+                          key={ci.slug}
+                          slug={ci.slug}
+                          name={ci.name}
+                          score={ci.score}
+                          tier={ciTier}
+                          barColor={ciColor}
+                          description={compositeIndexDescription(ci.slug, ci.score, result.companyProfile.industry)}
+                          strongQs={strongQs}
+                          weakQs={weakQs}
+                          industry={result.companyProfile.industry}
+                          benchmark={compositeIndexBenchmark(ci.slug, ci.score, result.companyProfile.industry)}
+                          risks={compositeIndexRisks(ci.slug, ci.score)}
+                          interpretation={ci.interpretation}
+                          companyName={result.companyProfile.companyName}
+                          narrative={findNarrative(ci.slug)}
+                        />
+                      );
+                    })}
+                  </div>
+                );
+              })()
             }
           >
-            {/* Structural constraints narrative */}
-            <SubCollapsible title="Structural Constraints Deep Dive" hint="Read full analysis" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>}>
-              <ChunkedMarkdown
-                content={
-                  report?.sections?.find(
-                    (s) => s.slug === "structural-constraints"
-                  )?.content || ""
-                }
-              />
-            </SubCollapsible>
+            {/* No separate deep dive — narrative is merged into each constraint bar */}
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -999,25 +1033,31 @@ function ReportPage() {
               </>
             }
           >
-            {/* How to read the matrix */}
-            <SubCollapsible title="How to Read This Matrix" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
-              <div className="bg-offwhite border border-light p-5">
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  The horizontal axis measures <strong className="text-secondary">AI Capability</strong> (how effectively
-                  your organization adopts and integrates AI tools into workflows). The vertical axis measures{" "}
-                  <strong className="text-secondary">Organizational Readiness</strong> (governance structures, decision
-                  velocity, and economic translation capabilities). Organizations in the upper-right quadrant have
-                  both strong AI tooling and the organizational infrastructure to scale it. Competitor positions are
-                  informed by <strong className="text-secondary">industry benchmarks, public filings, news coverage of AI
-                  investments, analyst research, and market intelligence</strong> - not just survey data. According to
-                  McKinsey&apos;s 2024 Global AI Survey, only 8% of organizations achieve &quot;AI-Native Leader&quot;
-                  status across both dimensions simultaneously.
-                </p>
+            {/* How to read the matrix — shown directly */}
+            <div className="bg-offwhite border border-light p-5 mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">How to Read This Matrix</span>
               </div>
-            </SubCollapsible>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                The horizontal axis measures <strong className="text-secondary">AI Capability</strong> (how effectively
+                your organization adopts and integrates AI tools into workflows). The vertical axis measures{" "}
+                <strong className="text-secondary">Organizational Readiness</strong> (governance structures, decision
+                velocity, and economic translation capabilities). Organizations in the upper-right quadrant have
+                both strong AI tooling and the organizational infrastructure to scale it. Competitor positions are
+                informed by <strong className="text-secondary">industry benchmarks, public filings, news coverage of AI
+                investments, analyst research, and market intelligence</strong> - not just survey data. According to
+                McKinsey&apos;s 2024 Global AI Survey, only 8% of organizations achieve &quot;AI-Native Leader&quot;
+                status across both dimensions simultaneously.
+              </p>
+            </div>
 
-            {/* What your quadrant means */}
-            <SubCollapsible title="Your Quadrant Analysis" hint="View interpretation" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>}>
+            {/* Your Quadrant Analysis — shown directly */}
+            <div className="border border-light p-5 mb-4" style={{ borderLeft: "3px solid #0B1D3A" }}>
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Your Quadrant Analysis</span>
+              </div>
               <p className="text-sm text-foreground/70 leading-relaxed">
                 {getQuadrantAnalysis(
                   (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
@@ -1028,10 +1068,14 @@ function ReportPage() {
                   result.companyProfile.industry
                 )}
               </p>
-            </SubCollapsible>
+            </div>
 
-            {/* Industry AI adoption benchmarks */}
-            <SubCollapsible title={`Where ${result.companyProfile.companyName}'s Competitors Are Investing`} hint="View competitor investments" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
+            {/* Competitor investments — shown directly with expandable details */}
+            <div className="border border-light p-5 mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Where {result.companyProfile.companyName}&apos;s Competitors Are Investing</span>
+              </div>
               <p className="text-xs text-foreground/50 mb-3">
                 At Stage {result.stageClassification.primaryStage} with an overall score of <strong className="text-secondary">{result.overallScore}/100</strong>,
                 {" "}{result.companyProfile.companyName} is <strong className="text-secondary">{result.overallScore >= 60 ? "keeping pace with but not leading" : result.overallScore >= 40 ? "trailing the median of" : "significantly behind"}</strong> peers
@@ -1079,10 +1123,14 @@ function ReportPage() {
                   );
                 })}
               </div>
-            </SubCollapsible>
+            </div>
 
-            {/* Competitive positioning narrative */}
-            <SubCollapsible title="Competitive Intelligence Deep Dive" hint="Read full analysis">
+            {/* Competitive positioning narrative — shown directly */}
+            <div className="border border-light p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Competitive Intelligence Analysis</span>
+              </div>
               <ChunkedMarkdown
                 content={
                   report?.sections?.find(
@@ -1090,7 +1138,7 @@ function ReportPage() {
                   )?.content || ""
                 }
               />
-            </SubCollapsible>
+            </div>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1108,18 +1156,93 @@ function ReportPage() {
               { value: `${result.economicEstimate.currentCapturePercent}%`, label: "Currently Captured" },
             ]}
           >
+            {/* Cost of Inaction — shown directly first, the headline number */}
+            <div className="grid sm:grid-cols-3 gap-4 md:gap-6 mb-4">
+              <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
+                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
+                  Quarterly Cost of Inaction
+                </p>
+                <p className="text-xl md:text-2xl font-bold text-navy">
+                  {fmtUSD(
+                    Math.round(
+                      (result.economicEstimate.unrealizedValueLow +
+                        result.economicEstimate.unrealizedValueHigh) /
+                        2 /
+                        4
+                    )
+                  )}
+                </p>
+                <p className="text-xs text-foreground/50 mt-2">
+                  Midpoint of unrealized annual value, divided by four. This is not
+                  &quot;money you are losing&quot; - it is <strong className="text-secondary">productivity improvement you
+                  are not capturing</strong> while competitors act.
+                </p>
+              </div>
+              <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
+                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
+                  Annual Cost per Employee
+                </p>
+                <p className="text-xl md:text-2xl font-bold text-navy">
+                  {fmtUSD(result.economicEstimate.costPerEmployee)}
+                </p>
+                <p className="text-xs text-foreground/50 mt-2">
+                  If your per-employee gap exceeds your per-employee AI investment by <strong className="text-secondary">3x+</strong>, the ROI case is clear.
+                  Average enterprise AI license: <strong className="text-secondary">$1,200-$3,600/yr</strong>.
+                </p>
+              </div>
+              <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
+                <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
+                  3-Year Cumulative Cost
+                </p>
+                <p className="text-xl md:text-2xl font-bold text-red-700">
+                  {fmtUSD(
+                    Math.round(
+                      ((result.economicEstimate.unrealizedValueLow +
+                        result.economicEstimate.unrealizedValueHigh) /
+                        2) * 3 * 1.15
+                    )
+                  )}
+                </p>
+                <p className="text-xs text-foreground/50 mt-2">
+                  Unrealized value compounds as competitors advance and the gap widens.
+                  Includes <strong className="text-secondary">15% compounding factor</strong> for widening competitive gap.
+                </p>
+              </div>
+            </div>
+
             <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              Below is the <strong className="text-secondary">transparent methodology</strong> - every assumption stated, every input sourced - so
-              your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
+              Every assumption is stated and every input sourced - your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
             </p>
 
-            {/* Waterfall / Funnel visualization — the visual story first */}
-            <SubCollapsible title="Value Waterfall" defaultOpen icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>}>
+            {/* Value Waterfall */}
+            <SubCollapsible title="Value Waterfall" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>}>
               <EconomicWaterfall estimate={result.economicEstimate} profile={result.companyProfile} />
             </SubCollapsible>
 
-            {/* Methodology credibility block */}
+            {/* Industry benchmark bar */}
+            {result.economicEstimate.industryBenchmark && (
+              <SubCollapsible title="Industry Benchmark Context">
+                <div className="bg-offwhite border border-light p-4 md:p-5">
+                  <p className="text-sm text-foreground/70 leading-relaxed">
+                    {result.economicEstimate.industryBenchmark}
+                  </p>
+                </div>
+              </SubCollapsible>
+            )}
+
+            {/* Financial impact narrative */}
+            <SubCollapsible title="Financial Impact Narrative" hint="Read full analysis">
+              <ChunkedMarkdown
+                content={
+                  report?.sections?.find(
+                    (s) => s.slug === "financial-impact"
+                  )?.content || ""
+                }
+              />
+            </SubCollapsible>
+
+            {/* How we got these numbers — methodology at the bottom */}
             <SubCollapsible title="How We Calculate These Numbers" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" /></svg>}>
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
@@ -1163,69 +1286,6 @@ function ReportPage() {
                   your internal data.
                 </p>
               </div>
-            </SubCollapsible>
-
-            {/* Cost of delay */}
-            <SubCollapsible title="Cost of Inaction" defaultOpen icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
-              <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
-                <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
-                  <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                    Quarterly Cost of Inaction
-                  </p>
-                  <p className="text-xl md:text-2xl font-bold text-navy">
-                    {fmtUSD(
-                      Math.round(
-                        (result.economicEstimate.unrealizedValueLow +
-                          result.economicEstimate.unrealizedValueHigh) /
-                          2 /
-                          4
-                      )
-                    )}
-                  </p>
-                  <p className="text-xs text-foreground/50 mt-2">
-                    Midpoint of unrealized annual value, divided by four. This is not
-                    &quot;money you are losing&quot; - it is <strong className="text-secondary">productivity improvement you
-                    are not capturing</strong> while your competitors in{" "}
-                    {industryLabel(result.companyProfile.industry)} are. See Section 6
-                    for P&L impact and Section 4 for what competitors are doing.
-                  </p>
-                </div>
-                <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
-                  <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                    Annual Cost per Employee
-                  </p>
-                  <p className="text-xl md:text-2xl font-bold text-navy">
-                    {fmtUSD(result.economicEstimate.costPerEmployee)}
-                  </p>
-                  <p className="text-xs text-foreground/50 mt-2">
-                    Per-employee unrealized value. For context, the average enterprise
-                    AI software license costs <strong className="text-secondary">$1,200-$3,600/employee/year</strong>. If your per-employee
-                    gap exceeds your per-employee AI investment by <strong className="text-secondary">3x+</strong>, the ROI case is clear.
-                  </p>
-                </div>
-              </div>
-            </SubCollapsible>
-
-            {/* Industry benchmark bar */}
-            {result.economicEstimate.industryBenchmark && (
-              <SubCollapsible title="Industry Benchmark Context">
-                <div className="bg-offwhite border border-light p-4 md:p-5">
-                  <p className="text-sm text-foreground/70 leading-relaxed">
-                    {result.economicEstimate.industryBenchmark}
-                  </p>
-                </div>
-              </SubCollapsible>
-            )}
-
-            {/* Financial impact narrative */}
-            <SubCollapsible title="Financial Impact Narrative" hint="Read full analysis">
-              <ChunkedMarkdown
-                content={
-                  report?.sections?.find(
-                    (s) => s.slug === "financial-impact"
-                  )?.content || ""
-                }
-              />
             </SubCollapsible>
           </CollapsibleSection>
 
@@ -1310,28 +1370,32 @@ function ReportPage() {
                     </div>
                   </div>
 
-                  {/* EBITDA Impact Summary */}
-                  <SubCollapsible title={`Projected EBITDA Impact: ${pnl.ebitda.currentLabel} current vs. ${pnl.ebitda.investLabel} with investment`}>
-                    <div className="bg-offwhite border border-light p-5">
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                          <p className="text-xs text-foreground/50 mb-1">Current Estimate</p>
-                          <p className="text-sm font-bold text-navy">{pnl.ebitda.currentLabel}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-foreground/50 mb-1">Invest Scenario</p>
-                          <p className="text-sm font-bold text-green-700">{pnl.ebitda.investLabel}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-foreground/50 mb-1">Stand-Still Scenario</p>
-                          <p className="text-sm font-bold text-red-700">{pnl.ebitda.coastLabel}</p>
-                        </div>
+                  {/* EBITDA Impact Summary — shown directly */}
+                  <div className="bg-offwhite border border-light p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-bold text-secondary tracking-wide uppercase">Projected EBITDA Impact</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-xs text-foreground/50 mb-1">Current Estimate</p>
+                        <p className="text-sm font-bold text-navy">{pnl.ebitda.currentLabel}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-foreground/50 mb-1">Invest Scenario</p>
+                        <p className="text-sm font-bold text-green-700">{pnl.ebitda.investLabel}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-foreground/50 mb-1">Stand-Still Scenario</p>
+                        <p className="text-sm font-bold text-red-700">{pnl.ebitda.coastLabel}</p>
                       </div>
                     </div>
-                  </SubCollapsible>
+                  </div>
 
-                  {/* Industry Proof Points */}
-                  <SubCollapsible title={`Industry Data: What the Numbers Show in ${industryLabel(result.companyProfile.industry)}`}>
+                  {/* Industry Proof Points — shown directly */}
+                  <div className="border border-light p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-bold text-secondary tracking-wide uppercase">Industry Data: What the Numbers Show in {industryLabel(result.companyProfile.industry)}</span>
+                    </div>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {pnl.proofPoints.map((pp, i) => (
                         <div key={i} className="bg-offwhite border border-light p-4">
@@ -1343,36 +1407,18 @@ function ReportPage() {
                         </div>
                       ))}
                     </div>
-                  </SubCollapsible>
+                  </div>
 
-                  {/* Compound Cost of Inaction */}
-                  <SubCollapsible title={`Compounding Cost of Inaction: ${fmtUSD(pnl.compoundCost.year3)} over 3 years`}>
-                    <div className="bg-navy/5 border border-navy/10 p-5">
-                      <div className="grid grid-cols-3 gap-4 text-center mb-4">
-                        <div>
-                          <p className="text-xs text-foreground/50 mb-1">Per Quarter</p>
-                          <p className="text-lg font-bold text-red-700">{fmtUSD(pnl.compoundCost.quarterly)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-foreground/50 mb-1">Year 1 Total</p>
-                          <p className="text-lg font-bold text-red-700">{fmtUSD(pnl.compoundCost.year1)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-foreground/50 mb-1">3-Year Cumulative</p>
-                          <p className="text-lg font-bold text-red-700">{fmtUSD(pnl.compoundCost.year3)}</p>
-                        </div>
-                      </div>
-                      <p className="text-xs text-foreground/70 leading-relaxed">{pnl.compoundCost.narrative}</p>
-                    </div>
-                  </SubCollapsible>
-
-                  {/* Optional AI narrative */}
+                  {/* Optional AI narrative — shown directly */}
                   {report?.sections?.find((s) => s.slug === "pnl-business-case")?.content && (
-                    <SubCollapsible title="P&L Narrative Analysis" hint="Read full analysis">
+                    <div className="border border-light p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-bold text-secondary tracking-wide uppercase">P&L Narrative Analysis</span>
+                      </div>
                       <ChunkedMarkdown
                         content={report.sections.find((s) => s.slug === "pnl-business-case")?.content || ""}
                       />
-                    </SubCollapsible>
+                    </div>
                   )}
                 </div>
               );
@@ -1388,85 +1434,83 @@ function ReportPage() {
             title="Security & Governance Risk Assessment"
             summary={`Risk exposure analysis calibrated to ${result.companyProfile.regulatoryIntensity} regulatory intensity in ${industryLabel(result.companyProfile.industry)}. Covers shadow AI, compliance, data governance, and board liability.`}
             insight={`${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).filter(r => r.severity === "high").length} high-severity risks identified. In ${industryLabel(result.companyProfile.industry)}, the regulatory cost of inadequate AI governance is accelerating - 62% of organizations have experienced an AI-related risk event in the past 18 months.`}
-            badges={[
-              { value: `${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).length}`, label: "Risks Identified" },
-              { value: `${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).filter(r => r.severity === "high").length}`, label: "High Severity" },
-              { value: result.companyProfile.regulatoryIntensity.charAt(0).toUpperCase() + result.companyProfile.regulatoryIntensity.slice(1), label: "Reg. Intensity" },
-            ]}
-          >
-            <p className="text-sm text-foreground/60 mt-2 mb-4">
-              Risk exposure mapped across <strong className="text-secondary">likelihood and impact</strong>, derived from
-              your diagnostic dimension scores and governance posture. This assessment
-              integrates your survey responses with <strong className="text-secondary">industry-specific regulatory
-              requirements</strong> and emerging AI governance standards.
-            </p>
-
-            {/* Detailed risk context */}
-            <SubCollapsible title="Understanding This Assessment" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
-              <div className="bg-offwhite border border-light p-5">
-                <p className="text-sm text-foreground/70 leading-relaxed mb-3">
-                  Your risk profile is derived from inverting your dimension scores: low governance
-                  maturity translates to high governance risk, low adoption structure translates to high
-                  shadow AI risk, and so on. Each risk is mapped on a 4x4 matrix of <strong className="text-secondary">Likelihood</strong> (how
-                  probable the risk materializes based on your current posture) versus <strong className="text-secondary">Impact</strong> (the
-                  potential business consequence if it does).
+            preview={
+              <>
+                <p className="text-sm text-foreground/60 mb-4">
+                  Risk exposure mapped across <strong className="text-secondary">likelihood and impact</strong>, derived from
+                  your diagnostic dimension scores and governance posture. This assessment
+                  integrates your survey responses with <strong className="text-secondary">industry-specific regulatory
+                  requirements</strong> and emerging AI governance standards.
                 </p>
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  According to Gartner&apos;s 2024 AI Risk Management survey, <strong className="text-secondary">62% of organizations</strong> have
-                  experienced at least one AI-related risk event (data leak, biased output, compliance
-                  violation) in the past 18 months. Organizations with formal AI governance frameworks
-                  experienced <strong className="text-secondary">73% fewer material incidents</strong>. The EU AI Act (effective August 2025) and
-                  state-level US regulations (Colorado AI Act, California AI Transparency Act) are
-                  increasing the <strong className="text-secondary">regulatory cost of inadequate governance</strong>.
-                </p>
-              </div>
-            </SubCollapsible>
 
-            {/* Risk breakdown — collapsed color-coded grid */}
-            <SubCollapsible title={`Risk Breakdown (${getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).length} risks identified)`} defaultOpen>
-              <div className="flex items-center gap-5 mb-4">
-                <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Severity:</p>
-                {[
-                  { label: "High", color: "#FCA5A5", border: "#F87171" },
-                  { label: "Medium", color: "#FCD34D", border: "#FBBF24" },
-                  { label: "Low", color: "#86EFAC", border: "#4ADE80" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className="text-[10px] text-foreground/50">{item.label}</span>
+                {/* Understanding This Assessment */}
+                <SubCollapsible title="Understanding This Assessment" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
+                  <div className="bg-offwhite border border-light p-5">
+                    <p className="text-sm text-foreground/70 leading-relaxed mb-3">
+                      Your risk profile is derived from inverting your dimension scores: low governance
+                      maturity translates to high governance risk, low adoption structure translates to high
+                      shadow AI risk, and so on. Each risk is mapped on a 4x4 matrix of <strong className="text-secondary">Likelihood</strong> (how
+                      probable the risk materializes based on your current posture) versus <strong className="text-secondary">Impact</strong> (the
+                      potential business consequence if it does).
+                    </p>
+                    <p className="text-sm text-foreground/70 leading-relaxed">
+                      According to Gartner&apos;s 2024 AI Risk Management survey, <strong className="text-secondary">62% of organizations</strong> have
+                      experienced at least one AI-related risk event (data leak, biased output, compliance
+                      violation) in the past 18 months. Organizations with formal AI governance frameworks
+                      experienced <strong className="text-secondary">73% fewer material incidents</strong>. The EU AI Act (effective August 2025) and
+                      state-level US regulations (Colorado AI Act, California AI Transparency Act) are
+                      increasing the <strong className="text-secondary">regulatory cost of inadequate governance</strong>.
+                    </p>
                   </div>
-                ))}
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).map((risk, idx) => {
-                  const bgColor = risk.severity === "high" ? "rgba(252,165,165,0.15)" : risk.severity === "medium" ? "rgba(252,211,77,0.15)" : "rgba(134,239,172,0.15)";
-                  const borderColor = risk.severity === "high" ? "#F87171" : risk.severity === "medium" ? "#FBBF24" : "#4ADE80";
-                  const severityLabel = risk.severity === "high" ? "HIGH" : risk.severity === "medium" ? "MEDIUM" : "LOW";
-                  return (
-                    <SubCollapsible
-                      key={idx}
-                      title={risk.label}
-                      hint={`${severityLabel} severity`}
-                      icon={
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-2.5 h-2.5 flex-shrink-0" style={{ backgroundColor: borderColor }} />
-                          <span className="text-[9px] font-bold tracking-wider" style={{ color: borderColor }}>{severityLabel}</span>
-                        </div>
-                      }
-                    >
-                      <div className="p-3" style={{ backgroundColor: bgColor, borderLeft: `3px solid ${borderColor}` }}>
-                        <p className="text-xs text-foreground/70 leading-relaxed mb-3">{risk.description}</p>
-                        <div className="bg-white/80 border border-light p-2.5">
-                          <p className="text-[10px] font-semibold text-tertiary uppercase tracking-wider mb-1">Mitigation</p>
-                          <p className="text-xs text-foreground/60 leading-relaxed">{risk.mitigation}</p>
-                        </div>
-                      </div>
-                    </SubCollapsible>
-                  );
-                })}
-              </div>
-            </SubCollapsible>
+                </SubCollapsible>
 
+                {/* Risk breakdown — color-coded grid shown in preview */}
+                <div className="mt-2">
+                  <div className="flex items-center gap-5 mb-4">
+                    <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Severity:</p>
+                    {[
+                      { label: "High", color: "#FCA5A5", border: "#F87171" },
+                      { label: "Medium", color: "#FCD34D", border: "#FBBF24" },
+                      { label: "Low", color: "#86EFAC", border: "#4ADE80" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-[10px] text-foreground/50">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).map((risk, idx) => {
+                      const bgColor = risk.severity === "high" ? "rgba(252,165,165,0.15)" : risk.severity === "medium" ? "rgba(252,211,77,0.15)" : "rgba(134,239,172,0.15)";
+                      const borderColor = risk.severity === "high" ? "#F87171" : risk.severity === "medium" ? "#FBBF24" : "#4ADE80";
+                      const severityLabel = risk.severity === "high" ? "HIGH" : risk.severity === "medium" ? "MEDIUM" : "LOW";
+                      return (
+                        <SubCollapsible
+                          key={idx}
+                          title={risk.label}
+                          hint={`${severityLabel} severity`}
+                          icon={
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2.5 h-2.5 flex-shrink-0" style={{ backgroundColor: borderColor }} />
+                              <span className="text-[9px] font-bold tracking-wider" style={{ color: borderColor }}>{severityLabel}</span>
+                            </div>
+                          }
+                        >
+                          <div className="p-3" style={{ backgroundColor: bgColor, borderLeft: `3px solid ${borderColor}` }}>
+                            <p className="text-xs text-foreground/70 leading-relaxed mb-3">{risk.description}</p>
+                            <div className="bg-white/80 border border-light p-2.5">
+                              <p className="text-[10px] font-semibold text-tertiary uppercase tracking-wider mb-1">Mitigation</p>
+                              <p className="text-xs text-foreground/60 leading-relaxed">{risk.mitigation}</p>
+                            </div>
+                          </div>
+                        </SubCollapsible>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            }
+          >
             {/* Risk Matrix visualization */}
             <SubCollapsible title="Risk Matrix (Likelihood x Impact)" hint="View matrix" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>}>
               <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
@@ -1505,54 +1549,42 @@ function ReportPage() {
             summary={`Independent vendor analysis with buy/build/partner recommendations for ${result.companyProfile.primaryAIUseCases?.slice(0, 2).join(", ").replace(/_/g, " ") || "your AI use cases"}. Includes negotiation intelligence and lock-in risk assessment.`}
             insight={`At Stage ${result.stageClassification.primaryStage}, the biggest vendor risk is not choosing the wrong tool - it is signing contracts that lock you into today's decisions when your AI strategy will evolve significantly over the next 18 months.`}
           >
-            <p className="text-sm text-foreground/60 mt-2 mb-4">
-              Independent analysis of AI vendor positioning, <strong className="text-secondary">buy/build/partner
-              recommendations</strong>, and stack optimization opportunities. This assessment
-              draws on <strong className="text-secondary">Gartner Magic Quadrant</strong> positioning, <strong className="text-secondary">Forrester Wave</strong> evaluations,
-              and current market intelligence to recommend partners aligned to your
-              maturity stage, industry, and strategic objectives.
-            </p>
-
-            {/* Vendor evaluation framework */}
-            <SubCollapsible title="Evaluation Framework" hint="View criteria">
-              <div className="bg-offwhite border border-light p-4 md:p-5">
-                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  Every vendor relationship is a bet on your AI future. We evaluate across <strong className="text-secondary">six
-                  dimensions</strong>, weighted for your maturity stage. At <strong className="text-secondary">Stage{" "}
-                  {result.stageClassification.primaryStage}</strong>, the priorities that matter most for
-                  {" "}{result.companyProfile.companyName} are{" "}
-                  {result.stageClassification.primaryStage <= 2
-                    ? <><strong className="text-secondary">Fit and Support</strong> - you need tools that work fast with teams that help you deploy.</>
-                    : <><strong className="text-secondary">Scale, Risk, and Ecosystem</strong> - you need platforms that grow with you without locking you in.</>}
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-                  {[
-                    { label: "Fit", desc: "Use case alignment", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg> },
-                    { label: "Scale", desc: "Enterprise readiness", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg> },
-                    { label: "Cost", desc: "TCO & pricing", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg> },
-                    { label: "Risk", desc: "Lock-in & continuity", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg> },
-                    { label: "Support", desc: "Implementation depth", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.712 4.33a9.027 9.027 0 011.652 1.306c.51.51.944 1.064 1.306 1.652M16.712 4.33l-3.448 4.138m3.448-4.138a9.014 9.014 0 00-9.424 0M19.67 7.288l-4.138 3.448m4.138-3.448a9.014 9.014 0 010 9.424m-4.138-5.976a3.736 3.736 0 00-.88-1.388 3.737 3.737 0 00-1.388-.88m2.268 2.268a3.765 3.765 0 010 2.528m-2.268-4.796a3.765 3.765 0 00-2.528 0m4.796 4.796c-.181.506-.475.982-.88 1.388a3.736 3.736 0 01-1.388.88m2.268-2.268l4.138 3.448m0 0a9.027 9.027 0 01-1.306 1.652 9.027 9.027 0 01-1.652 1.306m0 0l-3.448-4.138m3.448 4.138a9.014 9.014 0 01-9.424 0m5.976-4.138a3.765 3.765 0 01-2.528 0m0 0a3.736 3.736 0 01-1.388-.88 3.737 3.737 0 01-.88-1.388m0 0l-4.138-3.448m0 0a9.027 9.027 0 01-1.306-1.652A9.014 9.014 0 014.33 7.288m5.976 4.138l-4.138 3.448m0 0a9.014 9.014 0 000-9.424m4.138 5.976a3.765 3.765 0 010-2.528m0 0c.181-.506.475-.982.88-1.388a3.736 3.736 0 011.388-.88" /></svg> },
-                    { label: "Ecosystem", desc: "Integration breadth", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.193-5.615a4.5 4.5 0 00-6.364-6.364L4.5 5.7a4.5 4.5 0 001.242 7.244" /></svg> },
-                  ].map((crit) => (
-                    <div
-                      key={crit.label}
-                      className="bg-white border border-light p-3 text-center"
-                    >
-                      <div className="flex justify-center text-navy/50 mb-1.5">{crit.icon}</div>
-                      <p className="text-xs font-semibold text-secondary">
-                        {crit.label}
-                      </p>
-                      <p className="text-[10px] text-tertiary mt-1">
-                        {crit.desc}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+            {/* --- 1. HOW WE EVALUATE VENDORS --- */}
+            <div className="border border-light p-5 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">How We Evaluate Vendors</span>
               </div>
-            </SubCollapsible>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                Every vendor relationship is a bet on your AI future. We evaluate across <strong className="text-secondary">six
+                dimensions</strong>, weighted for your maturity stage. At <strong className="text-secondary">Stage{" "}
+                {result.stageClassification.primaryStage}</strong>, the priorities that matter most for
+                {" "}{result.companyProfile.companyName} are{" "}
+                {result.stageClassification.primaryStage <= 2
+                  ? <><strong className="text-secondary">Fit and Support</strong> - you need tools that work fast with teams that help you deploy.</>
+                  : <><strong className="text-secondary">Scale, Risk, and Ecosystem</strong> - you need platforms that grow with you without locking you in.</>}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {[
+                  { label: "Fit", desc: "Use case alignment" },
+                  { label: "Scale", desc: "Enterprise readiness" },
+                  { label: "Cost", desc: "TCO & pricing" },
+                  { label: "Risk", desc: "Lock-in & continuity" },
+                  { label: "Support", desc: "Implementation depth" },
+                  { label: "Ecosystem", desc: "Integration breadth" },
+                ].map((crit) => (
+                  <div key={crit.label} className="bg-offwhite border border-light p-3 text-center">
+                    <p className="text-xs font-semibold text-secondary">{crit.label}</p>
+                    <p className="text-[10px] text-tertiary mt-1">{crit.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            {/* Gartner-style quadrant reference */}
-            <SubCollapsible title="Market Positioning Context (Gartner / Forrester)" hint="View recommendations">
+            {/* --- 2. RECOMMENDED PARTNERS --- */}
+            <div className="border border-light p-5 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Recommended Partner Categories</span>
+              </div>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 {getGartnerContext(result.companyProfile.industry, result.stageClassification.primaryStage)}
               </p>
@@ -1566,147 +1598,111 @@ function ReportPage() {
                   </div>
                 ))}
               </div>
-            </SubCollapsible>
+            </div>
 
-            {/* Buy/Build/Partner Decision Framework — tile row */}
-            <div className="mt-4 mb-2">
-              <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-1">Technology Decision Framework</p>
-              <p className="text-sm text-foreground/60 leading-relaxed mb-3">
+            {/* --- 3. BUY / BUILD / PARTNER DECISION FRAMEWORK --- */}
+            <div className="border border-light p-5 mb-6">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Technology Decision Framework</span>
+              </div>
+              <p className="text-sm text-foreground/60 leading-relaxed mb-4">
                 Based on Stage {result.stageClassification.primaryStage} maturity and {result.companyProfile.regulatoryIntensity} regulatory intensity.
               </p>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {([
-                {
-                  strategy: "Buy",
-                  icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>,
-                  color: "#0B1D3A",
-                  when: result.companyProfile.regulatoryIntensity === 'high'
-                    ? `Compliance-ready commodity capabilities where ${industryLabel(result.companyProfile.industry)} regulatory requirements are well-served by established vendors`
-                    : `Commodity capabilities where differentiation is not a priority for ${result.companyProfile.companyName}`,
-                  guidance: result.stageClassification.primaryStage <= 2
-                    ? `Recommended for most use cases at your maturity stage. Prioritize tools requiring minimal governance overhead that deliver value in weeks.`
-                    : `Appropriate for non-differentiating capabilities at scale. Require enterprise SLAs and data portability guarantees.`,
-                },
-                {
-                  strategy: "Build",
-                  icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.384 3.073A1.5 1.5 0 014.5 16.97V7.03a1.5 1.5 0 011.536-1.273L11.42 8.83a1.5 1.5 0 010 6.34zm0 0a1.5 1.5 0 001.536-1.273l5.384-3.073a1.5 1.5 0 000-6.34L13.956 8.83A1.5 1.5 0 0011.42 15.17z" /></svg>,
-                  color: "#364E6E",
-                  when: result.companyProfile.regulatoryIntensity === 'high'
-                    ? `Proprietary models where off-the-shelf solutions cannot meet ${industryLabel(result.companyProfile.industry)} regulatory or accuracy requirements`
-                    : `Core differentiators where proprietary data or workflows create competitive advantage`,
-                  guidance: result.stageClassification.primaryStage <= 2
-                    ? `Exercise caution. Workflow Integration score of ${result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0}/100 suggests custom AI infrastructure is premature.`
-                    : `${(result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) >= 60 ? 'Sufficient infrastructure maturity for selective custom development.' : 'Build MLOps and data platform capability before scaling custom AI.'}`,
-                },
-                {
-                  strategy: "Partner",
-                  icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>,
-                  color: "#6B7F99",
-                  when: `Complex transformations requiring ${result.companyProfile.regulatoryIntensity === 'high' ? `regulatory expertise, ` : ''}domain knowledge, change management, or accelerated timelines`,
-                  guidance: result.stageClassification.primaryStage <= 2
-                    ? `Strongly recommended. A strategic partner can compress the learning curve by 12-18 months and avoid governance pitfalls.`
-                    : `Selective use for specialized domains. Internal capabilities should lead, with partners filling expertise gaps.`,
-                },
-              ] as const).map((s) => (
-                <SubCollapsible
-                  key={s.strategy}
-                  title={s.strategy}
-                  hint="View recommendation"
-                  icon={<span style={{ color: s.color }}>{s.icon}</span>}
-                >
-                  <div className="border-l-3 pl-3" style={{ borderLeftColor: s.color, borderLeftWidth: 3 }}>
-                    <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-1.5">When to {s.strategy.toLowerCase()}</p>
+              <div className="grid grid-cols-3 gap-3">
+                {([
+                  {
+                    strategy: "Buy",
+                    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>,
+                    color: "#0B1D3A",
+                    when: result.companyProfile.regulatoryIntensity === 'high'
+                      ? `Compliance-ready commodity capabilities where ${industryLabel(result.companyProfile.industry)} regulatory requirements are well-served by established vendors`
+                      : `Commodity capabilities where differentiation is not a priority for ${result.companyProfile.companyName}`,
+                    guidance: result.stageClassification.primaryStage <= 2
+                      ? `Recommended for most use cases at your maturity stage. Prioritize tools requiring minimal governance overhead that deliver value in weeks.`
+                      : `Appropriate for non-differentiating capabilities at scale. Require enterprise SLAs and data portability guarantees.`,
+                  },
+                  {
+                    strategy: "Build",
+                    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.384 3.073A1.5 1.5 0 014.5 16.97V7.03a1.5 1.5 0 011.536-1.273L11.42 8.83a1.5 1.5 0 010 6.34zm0 0a1.5 1.5 0 001.536-1.273l5.384-3.073a1.5 1.5 0 000-6.34L13.956 8.83A1.5 1.5 0 0011.42 15.17z" /></svg>,
+                    color: "#364E6E",
+                    when: result.companyProfile.regulatoryIntensity === 'high'
+                      ? `Proprietary models where off-the-shelf solutions cannot meet ${industryLabel(result.companyProfile.industry)} regulatory or accuracy requirements`
+                      : `Core differentiators where proprietary data or workflows create competitive advantage`,
+                    guidance: result.stageClassification.primaryStage <= 2
+                      ? `Exercise caution. Workflow Integration score of ${result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0}/100 suggests custom AI infrastructure is premature.`
+                      : `${(result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) >= 60 ? 'Sufficient infrastructure maturity for selective custom development.' : 'Build MLOps and data platform capability before scaling custom AI.'}`,
+                  },
+                  {
+                    strategy: "Partner",
+                    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>,
+                    color: "#6B7F99",
+                    when: `Complex transformations requiring ${result.companyProfile.regulatoryIntensity === 'high' ? `regulatory expertise, ` : ''}domain knowledge, change management, or accelerated timelines`,
+                    guidance: result.stageClassification.primaryStage <= 2
+                      ? `Strongly recommended. A strategic partner can compress the learning curve by 12-18 months and avoid governance pitfalls.`
+                      : `Selective use for specialized domains. Internal capabilities should lead, with partners filling expertise gaps.`,
+                  },
+                ] as const).map((s) => (
+                  <div key={s.strategy} className="border border-light p-4" style={{ borderTop: `3px solid ${s.color}` }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span style={{ color: s.color }}>{s.icon}</span>
+                      <span className="text-sm font-bold text-secondary">{s.strategy}</span>
+                    </div>
+                    <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-1">When to {s.strategy.toLowerCase()}</p>
                     <p className="text-xs text-foreground/60 leading-relaxed mb-3">{s.when}</p>
                     <div className="bg-offwhite border border-light p-2.5">
                       <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-1">Guidance</p>
                       <p className="text-xs text-secondary font-medium leading-relaxed">{s.guidance}</p>
                     </div>
                   </div>
-                </SubCollapsible>
-              ))}
+                ))}
+              </div>
             </div>
 
-            {/* AI Contract Value Levers */}
-            <SubCollapsible title="Contract Value Levers: How to Negotiate Smarter AI Deals" hint="View levers">
-              <div className="border border-light p-4 md:p-5">
-                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  <strong className="text-secondary">AI vendor contracts are not software licenses.</strong> The economics are different,
-                  the risks are different, and the leverage points are different.
-                  {result.stageClassification.primaryStage <= 2
-                    ? ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} is likely entering its first significant AI vendor relationships — getting these contracts right from the start avoids costly renegotiations later.`
-                    : ` At Stage ${result.stageClassification.primaryStage}, ${result.companyProfile.companyName} likely has existing AI vendor relationships that should be audited against these levers — renegotiation windows are leverage points.`}
-                  {result.companyProfile.regulatoryIntensity === 'high'
-                    ? ` In ${industryLabel(result.companyProfile.industry)}, data sovereignty and compliance provisions are non-negotiable and should be explicit in every AI contract.`
-                    : ''}
-                </p>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {[
-                    {
-                      lever: "Declining Unit Economics",
-                      icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" /></svg>,
-                      group: "Pricing",
-                      description: `AI inference costs drop 30-50% annually. Build automatic price reductions - 15-20% annual step-downs are reasonable. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying by 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.`,
-                    },
-                    {
-                      lever: "Usage-Based Pricing with Caps",
-                      icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                      group: "Pricing",
-                      description: `Negotiate consumption-based pricing with hard budget caps. ${result.stageClassification.primaryStage <= 2 ? `Avoid flat enterprise licenses until usage patterns stabilize - organizations at this stage typically overpay by 40-60% in year one.` : `Push for 25-40% volume discounts at your scale. Match tiers to actual consumption data.`}`,
-                    },
-                    {
-                      lever: "Data Portability Guarantees",
-                      icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>,
-                      group: "Risk",
-                      description: `Full data export in standard formats with ≤30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, data portability is a regulatory requirement.` : `Training data and fine-tuned models are proprietary IP - lock-in happens when you cannot take them with you.`}`,
-                    },
-                    {
-                      lever: "Model-Agnostic Architecture",
-                      icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>,
-                      group: "Risk",
-                      description: `Allow model swaps without renegotiation. The LLM landscape shifts quarterly. Require API-compatible alternatives so you are never locked to a single provider.`,
-                    },
-                    {
-                      lever: "Performance SLAs with Teeth",
-                      icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>,
-                      group: "Protection",
-                      description: `Tie payments to measurable outcomes: latency, accuracy, uptime. ${result.companyProfile.regulatoryIntensity === 'high' ? `Model accuracy degradation creates compliance liability. Include drift monitoring and penalty clauses.` : `Include penalty clauses for model degradation below agreed accuracy thresholds.`}`,
-                    },
-                    {
-                      lever: "Termination Without Penalty",
-                      icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>,
-                      group: "Protection",
-                      description: `90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `AI strategy will evolve significantly - 3-year lock-ins made today will be regretted in 18 months.` : `Even at higher maturity, the vendor landscape is volatile enough that long-term lock-ins carry material risk.`}`,
-                    },
-                  ].map((item) => (
-                    <SubCollapsible
-                      key={item.lever}
-                      title={item.lever}
-                      hint={`${item.group} lever`}
-                      icon={<span className="text-navy/50">{item.icon}</span>}
-                    >
-                      <div className="border-l-2 border-navy/15 pl-3">
-                        <span className="text-[9px] font-bold tracking-wider uppercase text-tertiary">{item.group}</span>
-                        <p className="text-xs text-foreground/60 leading-relaxed mt-1">{item.description}</p>
-                      </div>
-                    </SubCollapsible>
-                  ))}
-                </div>
+            {/* --- 4. CONTRACT NEGOTIATION LEVERS --- */}
+            <div className="border border-light p-5 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Contract Negotiation Levers</span>
               </div>
-            </SubCollapsible>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                <strong className="text-secondary">AI vendor contracts are not software licenses.</strong>{" "}
+                {result.stageClassification.primaryStage <= 2
+                  ? `At Stage ${result.stageClassification.primaryStage}, getting these contracts right from the start avoids costly renegotiations later.`
+                  : `At Stage ${result.stageClassification.primaryStage}, existing vendor relationships should be audited against these levers.`}
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  { lever: "Declining Unit Economics", group: "Pricing", description: `AI inference costs drop 30-50% annually. Build automatic 15-20% annual step-downs. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying by 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.` },
+                  { lever: "Usage-Based Pricing with Caps", group: "Pricing", description: `Negotiate consumption-based pricing with hard budget caps. ${result.stageClassification.primaryStage <= 2 ? `Organizations at this stage typically overpay by 40-60% in year one.` : `Push for 25-40% volume discounts at your scale.`}` },
+                  { lever: "Data Portability Guarantees", group: "Risk", description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement.` : `Training data and fine-tuned models are proprietary IP.`}` },
+                  { lever: "Model-Agnostic Architecture", group: "Risk", description: `Allow model swaps without renegotiation. The LLM landscape shifts quarterly. Require API-compatible alternatives.` },
+                  { lever: "Performance SLAs with Teeth", group: "Protection", description: `Tie payments to measurable outcomes: latency, accuracy, uptime. Include penalty clauses for model degradation.` },
+                  { lever: "Termination Without Penalty", group: "Protection", description: `90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `3-year lock-ins made today will be regretted in 18 months.` : `The vendor landscape is volatile enough that long-term lock-ins carry material risk.`}` },
+                ].map((item) => {
+                  const groupColor = item.group === "Pricing" ? "#0B1D3A" : item.group === "Risk" ? "#364E6E" : "#6B7F99";
+                  return (
+                    <div key={item.lever} className="bg-offwhite border border-light p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 text-white" style={{ backgroundColor: groupColor }}>{item.group.toUpperCase()}</span>
+                        <span className="text-xs font-semibold text-secondary">{item.lever}</span>
+                      </div>
+                      <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-            {report?.sections?.find((s) => s.slug === "vendor-landscape")
-              ?.content ? (
-              <SubCollapsible title="Vendor Landscape Narrative" hint="Read full analysis">
+            {/* --- 5. AI NARRATIVE --- */}
+            {report?.sections?.find((s) => s.slug === "vendor-landscape")?.content && (
+              <div className="border border-light p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-bold text-secondary tracking-wide uppercase">Vendor Landscape Analysis</span>
+                </div>
                 <ChunkedMarkdown
-                  content={
-                    report?.sections?.find(
-                      (s) => s.slug === "vendor-landscape"
-                    )?.content || ""
-                  }
+                  content={report?.sections?.find((s) => s.slug === "vendor-landscape")?.content || ""}
                 />
-              </SubCollapsible>
-            ) : null}
+              </div>
+            )}
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1718,17 +1714,18 @@ function ReportPage() {
             title="Messages for the Board"
             summary={`Board-ready findings structured as decision items for ${result.companyProfile.companyName}. Includes peer board intelligence, ${getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).length} recommended asks, and governance recommendations aligned to NACD best practices.`}
             insight={`78% of boards consider AI a top-three priority, but only 23% feel equipped to oversee it. These findings translate your diagnostic into the language of board governance - decision items, not status updates.`}
-          >
-            <p className="text-sm text-foreground/60 mt-2 mb-4">
-              These findings are structured for <strong className="text-secondary">direct board presentation</strong>. Each item
-              below is a <strong className="text-secondary">decision point</strong>, not an informational update. NACD&apos;s 2024
-              Board Oversight of AI report found that <strong className="text-secondary">78% of boards</strong> consider AI a
-              top-three priority - but only <strong className="text-secondary">23% feel equipped to oversee it</strong>. The asks
-              below are designed to close that gap for {result.companyProfile.companyName}.
-            </p>
+            preview={
+              <>
+                <p className="text-sm text-foreground/60 mb-4">
+                  These findings are structured for <strong className="text-secondary">direct board presentation</strong>. Each item
+                  below is a <strong className="text-secondary">decision point</strong>, not an informational update. NACD&apos;s 2024
+                  Board Oversight of AI report found that <strong className="text-secondary">78% of boards</strong> consider AI a
+                  top-three priority - but only <strong className="text-secondary">23% feel equipped to oversee it</strong>. The asks
+                  below are designed to close that gap for {result.companyProfile.companyName}.
+                </p>
 
-            {/* Board-ready headline findings — FIRST for impact */}
-            <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).length} items)`} defaultOpen>
+                {/* Board-ready headline findings */}
+                <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).length} items)`} defaultOpen>
               <div className="border-2 border-navy p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1.5">
@@ -1841,6 +1838,10 @@ function ReportPage() {
                 </div>
               </div>
             </SubCollapsible>
+              </>
+            }
+          >
+            {/* No separate children — all board content is in preview for immediate visibility */}
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -2586,7 +2587,7 @@ function FloatingTOC() {
 function CollapsibleSection({
   number, title, summary, children, preview, sectionId, insight, badges, scorecard,
 }: {
-  number: number; title: string; summary: string; children: React.ReactNode; preview?: React.ReactNode; sectionId?: string;
+  number: number; title: string; summary: string; children?: React.ReactNode; preview?: React.ReactNode; sectionId?: string;
   insight?: string;
   badges?: { value: string; label: string }[];
   scorecard?: { label: string; score: number; color: string }[];
@@ -2649,10 +2650,10 @@ function CollapsibleSection({
 // ---------------------------------------------------------------------------
 
 function DimensionExpander({
-  dimension, label, score, stage, barColor, subtitle, interpretation,
+  dimension, label, score, stage, barColor, subtitle, interpretation, narrative,
 }: {
   dimension: string; label: string; score: number; stage: number;
-  barColor: string; subtitle: string; interpretation: string;
+  barColor: string; subtitle: string; interpretation: string; narrative?: string;
 }) {
   const [open, setOpen] = useState(false);
   const dimIcons: Record<string, React.ReactNode> = {
@@ -2716,6 +2717,12 @@ function DimensionExpander({
             <p className="text-sm text-foreground/70 leading-relaxed">
               <strong className="text-secondary">{score}/100</strong> - {interpretation}
             </p>
+            {/* AI narrative for this dimension — merged in from detailed analysis */}
+            {narrative && (
+              <div className="mt-4 pt-3 border-t border-light">
+                <MarkdownContent content={narrative} />
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -2729,14 +2736,14 @@ function DimensionExpander({
 
 function ConstraintExpander({
   slug, name, score, tier, barColor, description,
-  strongQs, weakQs, industry, benchmark, risks, interpretation, companyName,
+  strongQs, weakQs, industry, benchmark, risks, interpretation, companyName, narrative,
 }: {
   slug: string; name: string; score: number; tier: string; barColor: string;
   description: string;
   strongQs: { questionId: string; score: number }[];
   weakQs: { questionId: string; score: number }[];
   industry: string; benchmark: string; risks: string;
-  interpretation: string; companyName: string;
+  interpretation: string; companyName: string; narrative?: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -2765,7 +2772,7 @@ function ConstraintExpander({
           <div className="w-10 text-right">
             <span className="text-base font-bold" style={{ color: barColor }}>{score}</span>
           </div>
-          <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: barColor }}>
+          <span className="hidden sm:inline-block text-[10px] font-bold tracking-wide uppercase" style={{ color: barColor }}>
             {tier}
           </span>
         </div>
@@ -2779,27 +2786,33 @@ function ConstraintExpander({
             {description}
           </p>
 
+          {/* Strongest Signals + Critical Gaps — side by side */}
+          <div className="grid md:grid-cols-2 gap-3 ml-4 mb-3">
+            <div className="bg-green-50/60 border border-green-200/50 p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <svg className="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span className="text-xs font-bold text-green-700 tracking-wide uppercase">Strongest Signals</span>
+              </div>
+              {strongQs.map((q, qi) => (
+                <p key={q.questionId} className="text-xs text-green-700 leading-relaxed mb-1">
+                  <span className="font-semibold">{qi + 1}.</span> {getQuestionInsight(q.questionId, q.score, industry, true, slug)}
+                </p>
+              ))}
+            </div>
+            <div className="bg-red-50/60 border border-red-200/50 p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <svg className="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                <span className="text-xs font-bold text-red-600 tracking-wide uppercase">Critical Gaps</span>
+              </div>
+              {weakQs.map((q, qi) => (
+                <p key={q.questionId} className="text-xs text-red-700 leading-relaxed mb-1">
+                  <span className="font-semibold">{qi + 1}.</span> {getQuestionInsight(q.questionId, q.score, industry, false, slug)}
+                </p>
+              ))}
+            </div>
+          </div>
+
           <div className="ml-4 space-y-1">
-            <SubCollapsible title="Strongest Signals" hint="View assets to leverage" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
-              <div className="bg-green-50 border border-green-200 p-3">
-                {strongQs.map((q, qi) => (
-                  <p key={q.questionId} className="text-xs text-green-700 leading-relaxed mb-1">
-                    <span className="font-semibold">{qi + 1}.</span> {getQuestionInsight(q.questionId, q.score, industry, true, slug)}
-                  </p>
-                ))}
-              </div>
-            </SubCollapsible>
-
-            <SubCollapsible title="Critical Gaps" hint="View areas to address" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>}>
-              <div className="bg-red-50 border border-red-200 p-3">
-                {weakQs.map((q, qi) => (
-                  <p key={q.questionId} className="text-xs text-red-700 leading-relaxed mb-1">
-                    <span className="font-semibold">{qi + 1}.</span> {getQuestionInsight(q.questionId, q.score, industry, false, slug)}
-                  </p>
-                ))}
-              </div>
-            </SubCollapsible>
-
             <SubCollapsible title="Industry Context" hint="View benchmarks" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>}>
               <div className="bg-offwhite border border-light p-3">
                 <p className="text-sm text-foreground/60 leading-relaxed">{benchmark}</p>
@@ -2822,6 +2835,13 @@ function ConstraintExpander({
               </div>
             </SubCollapsible>
           </div>
+
+          {/* AI narrative for this constraint — merged from deep dive */}
+          {narrative && (
+            <div className="mt-4 pt-3 border-t border-light ml-4">
+              <MarkdownContent content={narrative} />
+            </div>
+          )}
         </div>
       )}
     </div>
