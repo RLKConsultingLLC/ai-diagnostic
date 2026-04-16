@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { DiagnosticResult, CompositeIndex } from "@/types/diagnostic";
 import {
   AUTHORITY_FRICTION_COMPONENTS,
@@ -28,6 +29,43 @@ const COMPOSITE_INDEX_META: Record<string, { questionId: string; weight: number 
   economic_translation: ECONOMIC_TRANSLATION_COMPONENTS,
 };
 
+// ---------------------------------------------------------------------------
+// Local collapsible for methodology sub-sections
+// ---------------------------------------------------------------------------
+function MethodCollapsible({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border-b border-light pb-4 mb-4">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 w-full text-left py-2 group"
+      >
+        <svg
+          className={`w-3.5 h-3.5 text-navy/50 transition-transform ${open ? "rotate-90" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <h4 className="text-sm font-bold text-navy tracking-wide uppercase group-hover:text-navy/70 transition-colors">
+          {title}
+        </h4>
+      </button>
+      {open && <div className="mt-3">{children}</div>}
+    </div>
+  );
+}
+
 export default function MethodologySection({ result, sectionNumber, bare }: MethodologySectionProps) {
   const conf = Math.min(99, Math.max(65, Math.round(result.stageClassification.confidence * 100)));
 
@@ -35,17 +73,15 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
   const modifierResult = computeDiagnosticModifier(result.dimensionScores);
   const userGroup = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
   const baseRate = CAPTURE_RATES_BY_GROUP[userGroup]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
-  const adjustedRate = Math.max(0.01, Math.min(0.95, baseRate * modifierResult.modifier));
+  // Use the same number as the economic estimate for consistency
+  const adjustedRatePercent = result.economicEstimate.currentCapturePercent;
 
   const content = (
     <>
       {/* ================================================================= */}
-      {/* SUB-HEADER: SCORING METHODOLOGY                                   */}
+      {/* COLLAPSIBLE: SCORING METHODOLOGY                                  */}
       {/* ================================================================= */}
-      <div className="mt-6 border-b border-light pb-6 mb-6">
-        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-4">
-          Scoring Methodology
-        </h4>
+      <MethodCollapsible title="Scoring Methodology">
         <div className="grid md:grid-cols-2 gap-8">
           <div>
           <div className="space-y-3">
@@ -121,20 +157,17 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             </div>
           </div>
         </div>
-      </div>
+      </MethodCollapsible>
 
       {/* ================================================================= */}
-      {/* SUB-HEADER: ESTIMATING AI VALUE CAPTURE PERCENTAGES              */}
+      {/* COLLAPSIBLE: ESTIMATING AI VALUE CAPTURE PERCENTAGES              */}
       {/* ================================================================= */}
-      <div className="border-b border-light pb-6 mb-6">
-        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-2">
-          Estimating AI Value Capture Percentages
-        </h4>
+      <MethodCollapsible title="Estimating AI Value Capture Percentages">
         <p className="text-xs text-foreground/50 leading-relaxed mb-4">
           The capture rate is the single most consequential assumption in this report. It determines how much
           of the theoretical AI productivity potential an organization is <em>actually realizing</em> today, and therefore
           drives the entire unrealized value calculation. Because of its importance, the methodology and every
-          source informing it are documented in full below. <strong className="text-secondary">These are estimates</strong> - they should be
+          source informing it are documented in full below. <strong className="text-secondary">These are estimates</strong> — they should be
           stress-tested against your internal data before being presented as fact.
         </p>
 
@@ -178,7 +211,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                 <strong className="text-secondary">2. BCG &quot;AI Advantage&quot; Report (2024).</strong>{" "}
                 BCG&apos;s research distinguishes &quot;AI leaders&quot; (top 10% by revenue impact) from mainstream adopters.
                 Leaders report 2.5x the economic return from AI investments. BCG finds that AI leaders in tech capture
-                60-80% of addressable value vs. 15-25% for the average enterprise - a spread that informs the Stage 4-5
+                60-80% of addressable value vs. 15-25% for the average enterprise — a spread that informs the Stage 4-5
                 column. Critically, BCG attributes the gap primarily to organizational factors (governance, talent,
                 change management) rather than technology choices, validating the stage-based approach.
               </p>
@@ -208,11 +241,11 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
         {/* The actual matrix */}
         <div className="mb-4">
           <p className="text-xs font-semibold text-secondary mb-3">
-            Estimated Capture Rate Matrix: Industry Group x Maturity Stage
+            Estimated Capture Rate Matrix: Industry Group × Maturity Stage
           </p>
           <p className="text-[10px] text-foreground/40 mb-2 italic">
             Values represent the estimated percentage of theoretical AI productivity potential currently being captured.
-            Your organization&apos;s position is highlighted.
+            Your organization&apos;s position is highlighted. Every industry selectable in this diagnostic maps to one of the 8 groups below.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-[11px] border-collapse">
@@ -238,7 +271,6 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                     infrastructure_heavy: "Infrastructure & Energy",
                     public_sector: "Public Sector & Nonprofit",
                   };
-                  const userGroup = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
                   const isUserGroup = group === userGroup;
                   const userStage = result.stageClassification.primaryStage;
                   return (
@@ -331,18 +363,18 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             </table>
           </div>
 
-          {/* The actual calculation for this user */}
+          {/* The actual calculation for this user — uses economicEstimate for consistency */}
           <div className="bg-offwhite border border-light p-4">
             <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-2">Your Capture Rate Derivation</p>
             <div className="space-y-1.5 text-xs text-foreground/60 leading-relaxed font-mono">
               <p>Base Rate (from matrix)  = <strong className="text-secondary">{Math.round(baseRate * 100)}%</strong> ({userGroup?.replace(/_/g, " ")} × Stage {result.stageClassification.primaryStage})</p>
               <p>Diagnostic Modifier      = <strong className="text-secondary">{modifierResult.modifier.toFixed(3)}×</strong> (weighted from 5 dimension scores above)</p>
               <p className="border-t border-light pt-1.5">
-                Adjusted Capture Rate    = {Math.round(baseRate * 100)}% × {modifierResult.modifier.toFixed(3)} = <strong className="text-navy font-bold">{Math.round(adjustedRate * 100)}%</strong>
+                Adjusted Capture Rate    = {Math.round(baseRate * 100)}% × {modifierResult.modifier.toFixed(3)} = <strong className="text-navy font-bold">{adjustedRatePercent}%</strong>
               </p>
             </div>
             <p className="text-[10px] text-foreground/40 mt-2 italic">
-              This is the estimated capture rate used throughout the economic calculations in Sections 5 and 6.
+              This {adjustedRatePercent}% is the estimated capture rate used throughout Sections 5 and 6.
               {modifierResult.modifier > 1.02 && ` Your behavioral scores push the rate above the industry-stage baseline, suggesting above-average organizational capability for AI value capture.`}
               {modifierResult.modifier < 0.98 && ` Your behavioral scores pull the rate below the industry-stage baseline, suggesting organizational constraints are limiting value capture beyond what industry and stage alone would predict.`}
               {modifierResult.modifier >= 0.98 && modifierResult.modifier <= 1.02 && ` Your behavioral scores are near the industry-stage baseline, suggesting typical organizational capability for your peer group.`}
@@ -353,6 +385,9 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
         {/* Industry group classification */}
         <div className="mb-4">
           <p className="text-xs font-semibold text-secondary mb-2">Industry Group Classification Rationale</p>
+          <p className="text-[10px] text-foreground/40 mb-2 italic">
+            All {Object.keys(INDUSTRY_CAPTURE_GROUP).length} industries selectable in this diagnostic are mapped to one of 8 capture rate groups.
+          </p>
           <div className="grid md:grid-cols-2 gap-2">
             {([
               { group: "Technology & Digital", rationale: "Deep technical talent pools, mature data infrastructure, cultural affinity for experimentation, and high software-to-headcount ratios create the conditions for highest AI value capture at every maturity stage." },
@@ -384,7 +419,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             <p>
               <strong className="text-foreground/70">Sensitivity:</strong> A &plusmn;5 percentage point shift in capture rate changes
               the unrealized value estimate by approximately {(() => {
-                const laborCost = result.companyProfile.employeeCount * 85000;
+                const laborCost = result.companyProfile.employeeCount * result.economicEstimate.costPerEmployee;
                 const aiPct = result.economicEstimate.productivityPotentialPercent / 100;
                 const fivePointShift = laborCost * aiPct * 0.05;
                 return fivePointShift >= 1_000_000
@@ -421,21 +456,18 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             ))}
           </div>
         </div>
-      </div>
+      </MethodCollapsible>
 
       {/* ================================================================= */}
-      {/* SUB-HEADER: CONFIDENCE & QUALITY METRICS                        */}
+      {/* COLLAPSIBLE: CONFIDENCE & QUALITY METRICS                         */}
       {/* ================================================================= */}
-      <div className="border-b border-light pb-6 mb-6">
-        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-4">
-          Confidence & Quality Metrics
-        </h4>
+      <MethodCollapsible title="Confidence & Quality Metrics">
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <MethodologyItem label="Overall Confidence" value={`${conf}% — ${conf >= 85 ? "high" : conf >= 75 ? "moderate" : "low"} confidence classification`} />
             <MethodologyItem label="Questions Answered" value={`${result.responses.length} of 61 questions (${Math.round((result.responses.length / 61) * 100)}% completion)`} />
             <MethodologyItem label="Stage Classification" value={`Stage ${result.stageClassification.primaryStage}: ${result.stageClassification.stageName}`} />
-            <MethodologyItem label="Capture Rate Model" value={`7-input model (industry group × stage × 5 dimension scores) — see "Estimating AI Value Capture Percentages" above`} />
+            <MethodologyItem label="Capture Rate Model" value={`7-input model → ${adjustedRatePercent}% estimated capture (see "Estimating AI Value Capture Percentages" above)`} />
           </div>
           <div className="space-y-2">
             <MethodologyItem label="Economic Model Inputs" value="Employee count, revenue, industry, stage, dimension scores, composite indices" />
@@ -444,15 +476,12 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             <MethodologyItem label="Recency" value="All research citations are 2024 vintage. Annual recalibration recommended as new benchmarking data is published." />
           </div>
         </div>
-      </div>
+      </MethodCollapsible>
 
       {/* ================================================================= */}
-      {/* SUB-HEADER: INDUSTRY REFERENCE LIBRARY                           */}
+      {/* COLLAPSIBLE: INDUSTRY REFERENCE LIBRARY                           */}
       {/* ================================================================= */}
-      <div>
-        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-4">
-          Industry Reference Library
-        </h4>
+      <MethodCollapsible title="Industry Reference Library">
         <div className="grid md:grid-cols-2 gap-x-8 gap-y-1">
           {REFERENCE_LIBRARY.map((group) => (
             <div key={group.category} className="mb-4">
@@ -467,7 +496,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             </div>
           ))}
         </div>
-      </div>
+      </MethodCollapsible>
     </>
   );
 
