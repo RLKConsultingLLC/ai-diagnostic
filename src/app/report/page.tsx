@@ -1501,17 +1501,12 @@ function ReportPage() {
                     {getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).map((risk, idx) => {
                       const bgColor = risk.severity === "high" ? "rgba(252,165,165,0.15)" : risk.severity === "medium" ? "rgba(252,211,77,0.15)" : "rgba(134,239,172,0.15)";
                       const borderColor = risk.severity === "high" ? "#F87171" : risk.severity === "medium" ? "#FBBF24" : "#4ADE80";
-                      const severityLabel = risk.severity === "high" ? "HIGH" : risk.severity === "medium" ? "MEDIUM" : "LOW";
                       return (
                         <SubCollapsible
                           key={idx}
                           title={risk.label}
-                          hint={`${severityLabel} severity`}
                           icon={
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-2.5 h-2.5 flex-shrink-0" style={{ backgroundColor: borderColor }} />
-                              <span className="text-[9px] font-bold tracking-wider" style={{ color: borderColor }}>{severityLabel}</span>
-                            </div>
+                            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: borderColor }} />
                           }
                         >
                           <div className="p-3" style={{ backgroundColor: bgColor, borderLeft: `3px solid ${borderColor}` }}>
