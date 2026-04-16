@@ -6348,6 +6348,21 @@ function getPeerBoardActions(industry: string): { company: string; action: strin
       { company: "Google (Alphabet)", action: "Board-level AI Principles governance framework with public accountability. CEO Sundar Pichai declared Google an 'AI-first company.' Board oversees Gemini deployment serving 2B+ users. DeepMind reports directly to the board on frontier AI safety.", source: "Alphabet 2024 Annual Report; Google I/O 2024 Keynote" },
       { company: "Salesforce", action: "Board oversees Einstein AI platform generating 1T+ predictions/week. CEO Marc Benioff mandated AI-first product development. Board Technology Committee reviews AI trust metrics including bias, toxicity, and accuracy quarterly.", source: "Salesforce 2024 Annual Report; Dreamforce 2024" },
     ],
+    consulting_services: [
+      { company: "Accenture", action: "Board approved $3B AI investment over 3 years — the largest in professional services history. CEO Julie Sweet mandated AI training for all 733K+ employees. Board receives quarterly updates on AI-generated revenue and internal productivity metrics. Accenture's AI practice now generates $2B+ annually.", source: "Accenture 2024 Annual Report; Q4 2024 Earnings Call" },
+      { company: "McKinsey & Company", action: "Senior Partners voted to embed generative AI across all client engagements. McKinsey's proprietary Lilli platform (AI knowledge assistant) is used by 30,000+ consultants daily. The firm invested $2B+ in AI capabilities and acquired QuantumBlack as its AI-native division. Board governance tracks AI utilization rates and quality impact.", source: "McKinsey 2024 Annual Review; QuantumBlack Public Disclosures" },
+      { company: "Deloitte", action: "Board approved enterprise-wide AI strategy with $2B+ commitment. CEO Joe Ucuzoglu positioned AI as 'the defining technology of our era.' Deloitte's AI practice serves 75% of Fortune 500 clients. Board-level AI Ethics Committee governs responsible deployment across audit, tax, consulting, and advisory practices.", source: "Deloitte 2024 Global Report; State of Generative AI in the Enterprise, Q4 2024" },
+    ],
+    legal_services: [
+      { company: "Allen & Overy", action: "Board approved firm-wide deployment of Harvey AI (GPT-4-powered legal assistant) across all practice groups — the first Magic Circle firm to do so. Managing Partner mandated AI literacy training for all 5,500+ lawyers. Board tracks AI-augmented billable hours and client satisfaction.", source: "Allen & Overy 2024 Annual Review; Financial Times Legal AI Report 2024" },
+      { company: "Clifford Chance", action: "Board governs AI deployment through dedicated Innovation Committee. Invested in proprietary AI tools for contract analysis and due diligence. The firm's Applied Solutions division builds AI products for both internal use and client-facing services.", source: "Clifford Chance 2024 Annual Review; Legal Technology Survey 2024" },
+      { company: "Latham & Watkins", action: "Management Committee approved AI-first knowledge management strategy. The firm deploys multiple AI tools across litigation, M&A, and regulatory practices. Partners report 25-40% faster document review and due diligence through AI augmentation.", source: "Latham & Watkins Innovation Report 2024; American Lawyer Technology Survey" },
+    ],
+    accounting_audit: [
+      { company: "PwC", action: "Board approved $1B AI investment over 3 years. CEO Bob Moritz mandated AI training for all 328K+ employees globally. PwC's AI-powered audit platform now covers 100% of transactions versus historical 5-10% sampling. Board receives quarterly AI adoption and quality metrics.", source: "PwC 2024 Global Annual Review; Audit Innovation Report 2024" },
+      { company: "EY", action: "Board oversees EY.ai platform — a $1.4B investment positioning AI as central to all service lines. CEO Carmine Di Sibio mandated that every engagement evaluate AI applicability. EY's AI-driven tax automation processes 60% of routine compliance work.", source: "EY 2024 Global Review; EY.ai Platform Public Disclosures" },
+      { company: "KPMG", action: "Board approved enterprise AI transformation with dedicated AI governance framework. KPMG's AI-powered audit tools analyze 100% of journal entries and flag anomalies automatically. The firm invested $2B+ in technology including AI across audit, tax, and advisory.", source: "KPMG 2024 Global Annual Review; Transparency Report 2024" },
+    ],
   };
   const defaults = [
     { company: "Industry Leaders (Cross-Sector)", action: "According to NACD's 2024 survey, 62% of S&P 500 boards have added AI as a standing agenda item, up from 28% in 2022. Leading boards are moving from 'awareness' to 'accountability' — requiring measurable AI ROI, not just activity updates.", source: "NACD 2024 Board Oversight of AI Report" },
@@ -6393,9 +6408,9 @@ function getPeerBoardActions(industry: string): { company: string; action: strin
     defense_contractors: "manufacturing",
     government_federal: "technology",
     government_state_local: "technology",
-    consulting_services: "technology",
-    legal_services: "financial_services",
-    accounting_audit: "financial_services",
+    consulting_services: "consulting_services",
+    legal_services: "legal_services",
+    accounting_audit: "accounting_audit",
     nonprofit_ngo: "healthcare",
   };
   const aliased = peerAliases[industry];
