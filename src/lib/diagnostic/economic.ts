@@ -256,6 +256,33 @@ export function computeEconomicEstimate(
 // HELPERS
 // ---------------------------------------------------------------------------
 
+function formatIndustryName(industry: Industry): string {
+  const labels: Partial<Record<Industry, string>> = {
+    insurance: 'Insurance', banking: 'Banking', capital_markets: 'Capital Markets',
+    asset_wealth_management: 'Asset & Wealth Management', investment_banking: 'Investment Banking',
+    private_equity: 'Private Equity', venture_capital: 'Venture Capital', hedge_funds: 'Hedge Funds',
+    healthcare_providers: 'Healthcare', healthcare_payers: 'Healthcare Payer',
+    healthcare_services: 'Healthcare Services', life_sciences_pharma: 'Life Sciences & Pharma',
+    retail: 'Retail', ecommerce_digital: 'E-Commerce', cpg: 'Consumer Packaged Goods',
+    dtc: 'Direct-to-Consumer', food_beverage: 'Food & Beverage',
+    manufacturing_discrete: 'Manufacturing', manufacturing_process: 'Process Manufacturing',
+    automotive: 'Automotive', aerospace_defense: 'Aerospace & Defense',
+    energy_oil_gas: 'Energy', utilities: 'Utilities',
+    chemicals_materials: 'Chemicals & Materials', industrial_services: 'Industrial Services',
+    software_saas: 'Software & SaaS', it_services: 'IT Services',
+    hardware_electronics: 'Technology Hardware', transportation: 'Transportation',
+    shipping_logistics: 'Shipping & Logistics', infrastructure_transport: 'Infrastructure & Transport',
+    construction_engineering: 'Construction & Engineering',
+    real_estate_commercial: 'Commercial Real Estate', real_estate_residential: 'Residential Real Estate',
+    telecommunications: 'Telecommunications', media_entertainment: 'Media & Entertainment',
+    government_federal: 'Federal Government', government_state_local: 'State & Local Government',
+    defense_contractors: 'Defense Contracting', nonprofit_ngo: 'Non-Profit',
+    consulting_services: 'Consulting & Professional Services',
+    legal_services: 'Legal Services', accounting_audit: 'Accounting & Audit',
+  };
+  return labels[industry] || industry.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function roundToSignificantFigures(num: number, figures: number): number {
   if (num === 0) return 0;
   const d = Math.ceil(Math.log10(Math.abs(num)));
@@ -298,10 +325,12 @@ function buildBenchmarkNarrative(
 
   const capturePercent = STAGE_CAPTURE_RATES[stage] * 100;
 
+  const label = formatIndustryName(industry);
+
   return (
-    `Organizations at the "${stageLabel}" stage in your industry typically capture ` +
-    `approximately ${capturePercent}% of their potential AI value. ` +
-    `For an organization of your size and industry, this represents an estimated ` +
+    `${label} organizations at the "${stageLabel}" stage typically capture ` +
+    `approximately ${capturePercent}% of their potential AI value, based on McKinsey and BCG industry benchmarks. ` +
+    `For a ${label.toLowerCase()} organization of your size, this represents an estimated ` +
     `${formatCurrency(unrealizedLow)} to ${formatCurrency(unrealizedHigh)} in unrealized annual value, ` +
     `equivalent to approximately ${unrealizedPercent.toFixed(1)}% of revenue. ` +
     `Advancing one stage would roughly double your capture rate.`

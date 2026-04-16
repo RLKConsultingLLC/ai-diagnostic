@@ -369,14 +369,20 @@ function ReportPage() {
       {/* Economic Impact */}
       {result && (
         <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Economic Impact Summary</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">
+            Economic Impact Summary
+          </h2>
+          <p className="text-sm text-foreground/50 mb-1">
+            {industryLabel(result.companyProfile.industry, result.companyProfile.industryDisplayLabel)} industry benchmarks applied to {result.companyProfile.companyName}
+          </p>
           <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-6" />
           <EconomicSummary estimate={result.economicEstimate} />
           <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
             <p className="text-sm text-foreground/70">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              The full report provides the <strong className="text-secondary">transparent step-by-step methodology</strong> and
-              industry benchmarks. Your CFO should stress-test these assumptions before sharing with the board.
+              The full report provides the <strong className="text-secondary">transparent step-by-step methodology</strong>,{" "}
+              {industryLabel(result.companyProfile.industry)} peer benchmarks, and five P&L scenarios modeled to your revenue and employee base.
+              Your CFO should stress-test these assumptions before sharing with the board.
             </p>
           </div>
         </section>
@@ -2561,7 +2567,7 @@ function FloatingTOC() {
             : "bg-navy/80 backdrop-blur-sm"
         }`}
       >
-        <div className="max-w-7xl mx-auto flex items-center overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+        <div className="max-w-7xl mx-auto flex items-center overflow-x-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch", msOverflowStyle: "none" }}>
           {/* Report title — visible when sticky */}
           <div className={`flex-shrink-0 pl-4 pr-3 py-2.5 border-r border-white/10 transition-opacity duration-200 ${
             isSticky ? "opacity-100" : "opacity-0 w-0 pl-0 pr-0 border-0 overflow-hidden"
@@ -2571,8 +2577,8 @@ function FloatingTOC() {
             </span>
           </div>
 
-          {/* Section links */}
-          <div className="flex items-center gap-0.5 px-2 py-1.5">
+          {/* Section links — min-w-max ensures they scroll instead of shrink */}
+          <div className="flex items-center gap-0.5 px-2 py-1.5 min-w-max">
             {TOC_SECTIONS.map(({ id, number, label }) => {
               const isActive = activeId === id;
               return (
@@ -2594,11 +2600,13 @@ function FloatingTOC() {
                   }`} style={{ width: 18, height: 18 }}>
                     {number}
                   </span>
-                  <span className="hidden lg:inline">{label}</span>
+                  <span className="hidden md:inline">{label}</span>
                 </button>
               );
             })}
           </div>
+          {/* Right fade indicator to show more items exist */}
+          <div className="sticky right-0 flex-shrink-0 w-8 h-full bg-gradient-to-l from-navy/95 to-transparent pointer-events-none" />
         </div>
       </nav>
     </>
@@ -5647,10 +5655,21 @@ function getIndustryCompetitors(
     cpg: { capMed: 48, readMed: 42, spread: 22 },
     construction_engineering: { capMed: 32, readMed: 35, spread: 24 },
     real_estate_commercial: { capMed: 35, readMed: 38, spread: 24 },
+    real_estate_residential: { capMed: 32, readMed: 35, spread: 24 },
     government_federal: { capMed: 40, readMed: 48, spread: 22 },
+    government_state_local: { capMed: 35, readMed: 42, spread: 24 },
     education_higher: { capMed: 42, readMed: 40, spread: 24 },
     legal_services: { capMed: 45, readMed: 50, spread: 22 },
     accounting_audit: { capMed: 50, readMed: 55, spread: 18 },
+    asset_wealth_management: { capMed: 60, readMed: 56, spread: 18 },
+    healthcare_services: { capMed: 42, readMed: 40, spread: 22 },
+    dtc: { capMed: 58, readMed: 48, spread: 20 },
+    food_beverage: { capMed: 42, readMed: 38, spread: 22 },
+    industrial_services: { capMed: 38, readMed: 40, spread: 24 },
+    hardware_electronics: { capMed: 68, readMed: 58, spread: 18 },
+    infrastructure_transport: { capMed: 38, readMed: 42, spread: 24 },
+    nonprofit_ngo: { capMed: 30, readMed: 35, spread: 24 },
+    defense_contractors: { capMed: 52, readMed: 55, spread: 20 },
   };
 
   const b = benchmarks[industry] || { capMed: 50, readMed: 48, spread: 20 };
