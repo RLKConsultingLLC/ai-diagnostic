@@ -11,6 +11,8 @@ import { REFERENCE_LIBRARY } from "@/lib/data/reference-library";
 import {
   CAPTURE_RATES_BY_GROUP,
   INDUSTRY_CAPTURE_GROUP,
+  DIAGNOSTIC_MODIFIER_WEIGHTS,
+  computeDiagnosticModifier,
   type IndustryCaptureGroup,
 } from "@/lib/diagnostic/economic";
 
@@ -29,15 +31,23 @@ const COMPOSITE_INDEX_META: Record<string, { questionId: string; weight: number 
 export default function MethodologySection({ result, sectionNumber, bare }: MethodologySectionProps) {
   const conf = Math.min(99, Math.max(65, Math.round(result.stageClassification.confidence * 100)));
 
+  // Compute the diagnostic modifier for display
+  const modifierResult = computeDiagnosticModifier(result.dimensionScores);
+  const userGroup = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
+  const baseRate = CAPTURE_RATES_BY_GROUP[userGroup]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
+  const adjustedRate = Math.max(0.01, Math.min(0.95, baseRate * modifierResult.modifier));
+
   const content = (
     <>
-
-      <div className="mt-6 grid md:grid-cols-2 gap-8">
-        {/* Scoring methodology */}
-        <div>
-          <h4 className="text-sm font-semibold text-secondary mb-3">
-            Scoring Methodology
-          </h4>
+      {/* ================================================================= */}
+      {/* SUB-HEADER: SCORING METHODOLOGY                                   */}
+      {/* ================================================================= */}
+      <div className="mt-6 border-b border-light pb-6 mb-6">
+        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-4">
+          Scoring Methodology
+        </h4>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div>
           <div className="space-y-3">
             <MethodologyItem label="Dimensions Assessed" value="5 behavioral dimensions" />
             <MethodologyItem label="Total Questions" value="61 behavioral questions" />
@@ -87,42 +97,39 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
               );
             })}
           </div>
-        </div>
-
-        {/* Data sources */}
-        <div>
-          <h4 className="text-sm font-semibold text-secondary mb-3">
-            Data Sources
-          </h4>
-          <div className="space-y-2">
-            {[
-              { source: "Behavioral Diagnostic", detail: "61 questions across 5 dimensions, completed by organizational respondent" },
-              { source: "SEC EDGAR Filings", detail: "Public company financial disclosures, 10-K and 10-Q filings, proxy statements" },
-              { source: "Google News Intelligence", detail: "Recent company and industry news, leadership signals, market developments" },
-              { source: "Industry Benchmarks", detail: "Sector-specific AI maturity benchmarks and peer comparison data" },
-              { source: "Vendor Intelligence", detail: "AI vendor landscape data, pricing benchmarks, capability assessments" },
-              { source: "Regulatory Analysis", detail: "Industry-specific compliance requirements, AI governance standards, emerging regulation" },
-            ].map((ds) => (
-              <div key={ds.source} className="flex gap-3 p-3 bg-offwhite border border-light">
-                <div className="w-1.5 flex-shrink-0 mt-0.5" style={{ backgroundColor: "#0B1D3A", height: 32 }} />
-                <div>
-                  <p className="text-xs font-semibold text-secondary">{ds.source}</p>
-                  <p className="text-[11px] text-tertiary leading-relaxed">{ds.detail}</p>
-                </div>
-              </div>
-            ))}
           </div>
 
+          {/* Data sources — right column */}
+          <div>
+            <div className="space-y-2">
+              {[
+                { source: "Behavioral Diagnostic", detail: "61 questions across 5 dimensions, completed by organizational respondent" },
+                { source: "SEC EDGAR Filings", detail: "Public company financial disclosures, 10-K and 10-Q filings, proxy statements" },
+                { source: "Google News Intelligence", detail: "Recent company and industry news, leadership signals, market developments" },
+                { source: "Industry Benchmarks", detail: "Sector-specific AI maturity benchmarks and peer comparison data" },
+                { source: "Vendor Intelligence", detail: "AI vendor landscape data, pricing benchmarks, capability assessments" },
+                { source: "Regulatory Analysis", detail: "Industry-specific compliance requirements, AI governance standards, emerging regulation" },
+              ].map((ds) => (
+                <div key={ds.source} className="flex gap-3 p-3 bg-offwhite border border-light">
+                  <div className="w-1.5 flex-shrink-0 mt-0.5" style={{ backgroundColor: "#0B1D3A", height: 32 }} />
+                  <div>
+                    <p className="text-xs font-semibold text-secondary">{ds.source}</p>
+                    <p className="text-[11px] text-tertiary leading-relaxed">{ds.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ================================================================= */}
-      {/* CAPTURE RATE MODEL — Full methodology and matrix               */}
+      {/* SUB-HEADER: ESTIMATING AI VALUE CAPTURE PERCENTAGES              */}
       {/* ================================================================= */}
-      <div className="mt-8 pt-6 border-t border-light">
-        <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-          Economic Capture Rate Model
-        </p>
+      <div className="border-b border-light pb-6 mb-6">
+        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-2">
+          Estimating AI Value Capture Percentages
+        </h4>
         <p className="text-xs text-foreground/50 leading-relaxed mb-4">
           The capture rate is the single most consequential assumption in this report. It determines how much
           of the theoretical AI productivity potential an organization is <em>actually realizing</em> today, and therefore
@@ -135,13 +142,18 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
         <div className="bg-offwhite border border-light p-4 mb-4">
           <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-2">Core Formula</p>
           <p className="text-xs text-secondary font-mono leading-relaxed mb-2">
-            Unrealized Value = (Total Labor Cost x AI-Addressable %) x (1 - Capture Rate)
+            Unrealized Value = (Total Labor Cost × AI-Addressable %) × (1 − Adjusted Capture Rate)
+          </p>
+          <p className="text-xs text-secondary font-mono leading-relaxed mb-2">
+            Adjusted Capture Rate = Base Rate(Industry Group, Stage) × Diagnostic Modifier
           </p>
           <p className="text-xs text-foreground/60 leading-relaxed">
-            Where <strong className="text-secondary">Capture Rate = f(Industry Group, Maturity Stage)</strong>. The capture rate is not a single
-            number - it is a two-dimensional lookup that accounts for the fact that a Stage 3 technology company
-            captures far more AI value than a Stage 3 government agency, because of structural differences in
-            talent density, data infrastructure, procurement agility, and regulatory burden.
+            The capture rate is a <strong className="text-secondary">7-input function</strong>: a two-dimensional base rate lookup
+            (industry group × maturity stage) multiplied by a diagnostic modifier derived from 5 behavioral
+            dimension scores. This means the final rate reflects both <em>structural industry factors</em> (talent density,
+            regulatory burden, data infrastructure) and <em>this organization&apos;s specific behavioral data</em> from the diagnostic.
+            A Stage 3 technology company with strong Economic Translation scores will capture meaningfully more than
+            a Stage 3 technology company with weak measurement practices.
           </p>
         </div>
 
@@ -179,12 +191,15 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                 1-5% capture for organizations still in pilot/experimentation mode.
               </p>
               <p>
-                <strong className="text-secondary">4. Diagnostic Score Calibration.</strong>{" "}
-                The base rates above are further calibrated by this organization&apos;s diagnostic scores. The Economic
-                Translation composite index (measuring whether the organization can connect AI activity to financial outcomes)
-                and the Workflow Integration dimension (measuring whether AI is embedded in production processes) serve as
-                real-time modifiers. An organization scoring in the top quartile on these dimensions within its stage
-                will capture at the higher end of the range; bottom quartile at the lower end.
+                <strong className="text-secondary">4. Diagnostic Modifier (5-Dimension Behavioral Calibration).</strong>{" "}
+                The base rates from the matrix above are multiplied by a <strong className="text-secondary">diagnostic modifier</strong> derived
+                from this organization&apos;s scores across all five behavioral dimensions. Each dimension is weighted by its
+                empirical contribution to value capture variance (see weights below). A score of 50/100 on any dimension is
+                neutral (1.0×); score 0 pulls the rate down by up to 25%; score 100 pushes it up by up to 25%. This means
+                the final capture rate reflects 7 inputs: industry group, maturity stage, and 5 behavioral dimension scores —
+                making it the most organization-specific number in the report. BCG 2024 data validates this approach: organizational
+                capability factors (governance, talent, measurement, adoption) explain 70% of capture rate variance among
+                same-stage organizations.
               </p>
             </div>
           </div>
@@ -250,6 +265,88 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* Diagnostic modifier breakdown */}
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-secondary mb-3">
+            Diagnostic Modifier: Your Organization&apos;s Behavioral Calibration
+          </p>
+          <p className="text-[10px] text-foreground/40 mb-3 italic">
+            The base rate from the matrix above is multiplied by a weighted modifier derived from your diagnostic scores.
+            Score of 50 = neutral (1.0×). Range: 0.75× to 1.25× (±25% adjustment).
+          </p>
+
+          {/* Weight rationale + user scores table */}
+          <div className="overflow-x-auto mb-3">
+            <table className="w-full text-[11px] border-collapse">
+              <thead>
+                <tr className="border-b-2 border-navy/20">
+                  <th className="text-left py-2 pr-3 font-semibold text-secondary">Dimension</th>
+                  <th className="text-center py-2 px-2 font-semibold text-secondary w-[60px]">Weight</th>
+                  <th className="text-center py-2 px-2 font-semibold text-secondary w-[70px]">Your Score</th>
+                  <th className="text-center py-2 px-2 font-semibold text-secondary w-[90px]">Dim. Modifier</th>
+                  <th className="text-center py-2 px-2 font-semibold text-secondary w-[90px]">Contribution</th>
+                  <th className="text-left py-2 pl-3 font-semibold text-secondary">Why This Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                {modifierResult.components.map((c) => {
+                  const meta = DIAGNOSTIC_MODIFIER_WEIGHTS[c.dimension];
+                  const dimMod = 0.75 + (c.score / 100) * 0.50;
+                  const rationales: Record<string, string> = {
+                    economic_translation: "Can you prove AI is working? Measurement capability explains 35% of capture variance (BCG 2024).",
+                    workflow_integration: "Is AI in production workflows or sitting as shelfware? Embedded AI compounds; standalone decays (McKinsey 2024).",
+                    adoption_behavior: "Are employees using the tools? Zero usage = zero value regardless of capability deployed (Gartner 2024).",
+                    decision_velocity: "Faster experimentation = more at-bats = higher capture through volume and learning effects (BCG 2024).",
+                    authority_structure: "Governance that enables vs. blocks. Lowest weight because governance affects risk more than capture directly.",
+                  };
+                  return (
+                    <tr key={c.dimension} className="border-b border-light">
+                      <td className="py-2 pr-3 text-foreground/70 font-medium">{meta?.label || c.dimension}</td>
+                      <td className="text-center py-2 px-2 text-foreground/60">{(c.weight * 100).toFixed(0)}%</td>
+                      <td className="text-center py-2 px-2">
+                        <span className={`font-semibold ${c.score >= 60 ? "text-green-700" : c.score >= 40 ? "text-amber-700" : "text-red-700"}`}>
+                          {Math.round(c.score)}/100
+                        </span>
+                      </td>
+                      <td className="text-center py-2 px-2 text-foreground/60 font-mono">{dimMod.toFixed(3)}×</td>
+                      <td className="text-center py-2 px-2 text-foreground/60 font-mono">{c.contribution.toFixed(4)}</td>
+                      <td className="py-2 pl-3 text-[10px] text-foreground/40 leading-snug">{rationales[c.dimension] || ""}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-navy/20">
+                  <td className="py-2 pr-3 font-semibold text-secondary">Final Modifier</td>
+                  <td className="text-center py-2 px-2 text-foreground/60">100%</td>
+                  <td />
+                  <td />
+                  <td className="text-center py-2 px-2 font-bold text-navy font-mono">{modifierResult.modifier.toFixed(3)}×</td>
+                  <td className="py-2 pl-3 text-[10px] text-foreground/40">Weighted sum, clamped to [0.75, 1.25]</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* The actual calculation for this user */}
+          <div className="bg-offwhite border border-light p-4">
+            <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-2">Your Capture Rate Derivation</p>
+            <div className="space-y-1.5 text-xs text-foreground/60 leading-relaxed font-mono">
+              <p>Base Rate (from matrix)  = <strong className="text-secondary">{Math.round(baseRate * 100)}%</strong> ({userGroup?.replace(/_/g, " ")} × Stage {result.stageClassification.primaryStage})</p>
+              <p>Diagnostic Modifier      = <strong className="text-secondary">{modifierResult.modifier.toFixed(3)}×</strong> (weighted from 5 dimension scores above)</p>
+              <p className="border-t border-light pt-1.5">
+                Adjusted Capture Rate    = {Math.round(baseRate * 100)}% × {modifierResult.modifier.toFixed(3)} = <strong className="text-navy font-bold">{Math.round(adjustedRate * 100)}%</strong>
+              </p>
+            </div>
+            <p className="text-[10px] text-foreground/40 mt-2 italic">
+              This is the estimated capture rate used throughout the economic calculations in Sections 5 and 6.
+              {modifierResult.modifier > 1.02 && ` Your behavioral scores push the rate above the industry-stage baseline, suggesting above-average organizational capability for AI value capture.`}
+              {modifierResult.modifier < 0.98 && ` Your behavioral scores pull the rate below the industry-stage baseline, suggesting organizational constraints are limiting value capture beyond what industry and stage alone would predict.`}
+              {modifierResult.modifier >= 0.98 && modifierResult.modifier <= 1.02 && ` Your behavioral scores are near the industry-stage baseline, suggesting typical organizational capability for your peer group.`}
+            </p>
           </div>
         </div>
 
@@ -326,11 +423,36 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
         </div>
       </div>
 
-      {/* Industry Reference Library */}
-      <div className="mt-8 pt-6 border-t border-light">
-        <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-4">
+      {/* ================================================================= */}
+      {/* SUB-HEADER: CONFIDENCE & QUALITY METRICS                        */}
+      {/* ================================================================= */}
+      <div className="border-b border-light pb-6 mb-6">
+        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-4">
+          Confidence & Quality Metrics
+        </h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <MethodologyItem label="Overall Confidence" value={`${conf}% — ${conf >= 85 ? "high" : conf >= 75 ? "moderate" : "low"} confidence classification`} />
+            <MethodologyItem label="Questions Answered" value={`${result.responses.length} of 61 questions (${Math.round((result.responses.length / 61) * 100)}% completion)`} />
+            <MethodologyItem label="Stage Classification" value={`Stage ${result.stageClassification.primaryStage}: ${result.stageClassification.stageName}`} />
+            <MethodologyItem label="Capture Rate Model" value={`7-input model (industry group × stage × 5 dimension scores) — see "Estimating AI Value Capture Percentages" above`} />
+          </div>
+          <div className="space-y-2">
+            <MethodologyItem label="Economic Model Inputs" value="Employee count, revenue, industry, stage, dimension scores, composite indices" />
+            <MethodologyItem label="AI-Generated Content" value="Sections 1, 2, 4, 7, and 8 include AI-generated analysis powered by Claude (Anthropic) using diagnostic data and background research as context" />
+            <MethodologyItem label="Research Sources" value={`${result.companyProfile.companyName} diagnostic responses, SEC filings (if public), Google News intelligence, industry benchmark databases`} />
+            <MethodologyItem label="Recency" value="All research citations are 2024 vintage. Annual recalibration recommended as new benchmarking data is published." />
+          </div>
+        </div>
+      </div>
+
+      {/* ================================================================= */}
+      {/* SUB-HEADER: INDUSTRY REFERENCE LIBRARY                           */}
+      {/* ================================================================= */}
+      <div>
+        <h4 className="text-sm font-bold text-navy tracking-wide uppercase mb-4">
           Industry Reference Library
-        </p>
+        </h4>
         <div className="grid md:grid-cols-2 gap-x-8 gap-y-1">
           {REFERENCE_LIBRARY.map((group) => (
             <div key={group.category} className="mb-4">

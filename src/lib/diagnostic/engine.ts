@@ -42,7 +42,7 @@ export function runDiagnostic(
   });
 
   // Step 5: Compute economic estimate
-  const economicEstimate = computeEconomicEstimate(profile, stageClassification);
+  const economicEstimate = computeEconomicEstimate(profile, stageClassification, dimensionScores);
 
   // Step 6: Compute overall score
   const overallScore = computeOverallScore(dimensionScores);

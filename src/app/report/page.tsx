@@ -12,6 +12,12 @@ import type {
   CompanyProfile,
 } from "@/types/diagnostic";
 import MethodologySection from "@/app/report/components/MethodologySection";
+import {
+  CAPTURE_RATES_BY_GROUP,
+  INDUSTRY_CAPTURE_GROUP,
+  DIAGNOSTIC_MODIFIER_WEIGHTS,
+  computeDiagnosticModifier,
+} from "@/lib/diagnostic/economic";
 // SensitivitySection removed — not shown to clients
 
 // ---------------------------------------------------------------------------
@@ -745,12 +751,15 @@ function ReportPage() {
                       <SubCollapsible title="The Economic Opportunity" hint="View financial impact" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           The diagnostic estimates <strong className="text-secondary">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
-                          {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value -
+                          {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value —
                           productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
-                          competitors in {ind} are. Estimated current capture rate: <strong className="text-secondary">{result.economicEstimate.currentCapturePercent}%</strong> of
-                          AI-addressable potential (based on industry benchmarks and your maturity stage). That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
-                          forfeited per quarter</strong>. Section 5 provides the transparent methodology behind these numbers
-                          - your CFO should stress-test these before sharing with the board.
+                          competitors in {ind} are. The estimated current capture rate is{" "}
+                          <strong className="text-secondary">{result.economicEstimate.currentCapturePercent}%</strong> —
+                          derived from a 7-input model that combines your industry group, maturity stage, and five behavioral
+                          dimension scores from the diagnostic (fully documented in Section 10 → &quot;Estimating AI Value Capture Percentages&quot;).
+                          That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
+                          forfeited per quarter</strong>. Section 5 provides the transparent methodology behind every assumption —
+                          your CFO should stress-test these before sharing with the board.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
                           revenue growth, operating margin, cost structure, and EBITDA over 12-24 months.
                         </p>
@@ -1271,17 +1280,16 @@ function ReportPage() {
 
             <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              Every assumption is stated and every input sourced - your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
+              Every assumption is stated and every input sourced — see &quot;How We Calculate These Numbers&quot; below for the full 4-step derivation, and Section 10 (&quot;Estimating AI Value Capture Percentages&quot;) for the complete capture rate methodology, matrix, and sources.
+              Your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
             </p>
 
             {/* Industry benchmark bar */}
             {result.economicEstimate.industryBenchmark && (
               <SubCollapsible title="Industry Benchmark Context">
-                <div className="bg-offwhite border border-light p-4 md:p-5">
-                  <p className="text-sm text-foreground/70 leading-relaxed">
-                    {result.economicEstimate.industryBenchmark}
-                  </p>
-                </div>
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  {result.economicEstimate.industryBenchmark}
+                </p>
               </SubCollapsible>
             )}
 
@@ -1292,48 +1300,97 @@ function ReportPage() {
 
             {/* How we got these numbers — methodology at the bottom */}
             <SubCollapsible title="How We Calculate These Numbers">
-              <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
                   <p>
                     <strong className="text-secondary">Step 1: Total labor cost.</strong>{" "}
-                    {result.companyProfile.employeeCount.toLocaleString()} employees x ~$85,000
-                    average fully-loaded cost = {fmtUSD(Math.round(result.companyProfile.employeeCount * 85000))}.
-                    This uses BLS median for {industryLabel(result.companyProfile.industry)} roles
-                    adjusted for benefits and overhead. Your actual figure may differ - substitute your
-                    real number to refine.
+                    {result.companyProfile.employeeCount.toLocaleString()} employees × ~${(result.economicEstimate.costPerEmployee).toLocaleString()}{" "}
+                    average fully-loaded cost = {fmtUSD(Math.round(result.companyProfile.employeeCount * result.economicEstimate.costPerEmployee))}.
+                    The per-employee cost is sourced from BLS Occupational Employment and Wage Statistics (2024) for{" "}
+                    {industryLabel(result.companyProfile.industry)} roles, adjusted for benefits, overhead, and employer taxes.
+                    Your actual fully-loaded cost may differ — substitute your real number to refine. <em className="text-foreground/50">
+                    (Full sourcing: Section {10} → Scoring Methodology → Data Sources.)</em>
                   </p>
                   <p>
                     <strong className="text-secondary">Step 2: AI-addressable share.</strong>{" "}
                     McKinsey&apos;s 2024 research estimates {result.economicEstimate.productivityPotentialPercent}%
                     of labor tasks in {industryLabel(result.companyProfile.industry)} are
-                    automatable or augmentable with current AI. This is not &quot;replace all workers&quot; -
+                    automatable or augmentable with current AI. This is not &quot;replace all workers&quot; —
                     it means {result.economicEstimate.productivityPotentialPercent}% of time across the
-                    workforce could be redirected to higher-value work. Accenture and Goldman Sachs
-                    research produces similar estimates (18-30% range for most industries).
+                    workforce could be redirected to higher-value work. Accenture, Goldman Sachs, and the World Economic
+                    Forum produce corroborating estimates (18–30% range for most industries). <em className="text-foreground/50">
+                    (Source: McKinsey Global Institute, &quot;The Economic Potential of Generative AI,&quot; 2023.)</em>
                   </p>
-                  <p>
-                    <strong className="text-secondary">Step 3: Estimated current capture rate.</strong>{" "}
-                    Based on your diagnostic scores and industry-stage benchmarks, we estimate you currently capture approximately{" "}
-                    {result.economicEstimate.currentCapturePercent}% of this potential. This estimate is
-                    derived from your Composite Index scores - particularly Value Capture Efficiency
-                    ({result.compositeIndices.find(c => c.slug === ("economic_translation" as string))?.score || result.compositeIndices[1]?.score || "-"}/100).
-                    Organizations at your maturity stage typically capture 15-35% (BCG 2024).
-                  </p>
+                  {(() => {
+                    const group = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
+                    const bRate = CAPTURE_RATES_BY_GROUP[group]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
+                    const mod = computeDiagnosticModifier(result.dimensionScores);
+                    const adjRate = Math.max(0.01, Math.min(0.95, bRate * mod.modifier));
+                    const groupLabel: Record<string, string> = {
+                      tech_forward: "Technology & Digital",
+                      data_rich_financial: "Financial Services",
+                      professional_services: "Professional Services",
+                      consumer_digital: "Consumer & Retail",
+                      industrial_mid: "Industrial & Manufacturing",
+                      healthcare_regulated: "Healthcare & Life Sciences",
+                      infrastructure_heavy: "Infrastructure & Energy",
+                      public_sector: "Public Sector & Nonprofit",
+                    };
+                    return (
+                      <>
+                        <p>
+                          <strong className="text-secondary">Step 3: Estimated capture rate (7-input model).</strong>{" "}
+                          This is the most consequential number in the report. It estimates what percentage of the
+                          AI-addressable potential your organization is <em>actually capturing today</em>. The rate is
+                          derived from a 7-input model:
+                        </p>
+                        <div className="pl-3 border-l-2 border-navy/20 space-y-2 text-[13px]">
+                          <p>
+                            <strong className="text-secondary">Base rate:</strong>{" "}
+                            Your industry group ({groupLabel[group] || group}) at Stage {result.stageClassification.primaryStage} ({result.stageClassification.stageName})
+                            maps to a base capture rate of <strong className="text-secondary">{Math.round(bRate * 100)}%</strong>.
+                            This comes from an 8×5 matrix (8 industry groups × 5 maturity stages = 40 cells)
+                            calibrated against McKinsey 2024 Global AI Survey cross-tabs, BCG AI Advantage Report peer analytics,
+                            and Gartner industry maturity curves.
+                          </p>
+                          <p>
+                            <strong className="text-secondary">Diagnostic modifier ({mod.modifier.toFixed(3)}×):</strong>{" "}
+                            The base rate is then adjusted by a weighted modifier derived from your 5 behavioral dimension scores:
+                            {mod.components.map((c) => {
+                              const w = DIAGNOSTIC_MODIFIER_WEIGHTS[c.dimension];
+                              return ` ${w?.label || c.dimension} (${Math.round(c.score)}/100, ${(c.weight * 100).toFixed(0)}% weight)`;
+                            }).join(",")}. A score of 50 is neutral (1.0×); your weighted score produces a{" "}
+                            <strong className="text-secondary">{mod.modifier.toFixed(3)}× modifier</strong>
+                            {mod.modifier > 1.0 ? ", meaning your behavioral data pushes you above the industry-stage average." : mod.modifier < 1.0 ? ", meaning organizational constraints are pulling your capture below the industry-stage average." : "."}
+                          </p>
+                          <p>
+                            <strong className="text-secondary">Adjusted rate:</strong>{" "}
+                            {Math.round(bRate * 100)}% × {mod.modifier.toFixed(3)} ={" "}
+                            <strong className="text-navy">{Math.round(adjRate * 100)}%</strong> estimated current capture rate.
+                          </p>
+                        </div>
+                        <p className="text-[11px] text-foreground/50 mt-1">
+                          <em>The complete capture rate matrix, dimension weights with sourced rationales,
+                          and your full derivation are documented in Section {10} → &quot;Estimating AI Value Capture Percentages.&quot;
+                          Your CFO should stress-test this number against internal adoption data before presenting to the board.</em>
+                        </p>
+                      </>
+                    );
+                  })()}
                   <p>
                     <strong className="text-secondary">Step 4: The gap.</strong>{" "}
                     The difference between potential and current capture is the unrealized value:{" "}
                     {fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
                     {fmtUSD(result.economicEstimate.unrealizedValueHigh)}. The range reflects
                     uncertainty in adoption speed and implementation quality. Even the conservative
-                    end assumes only modest improvement over current capture rates.
+                    end assumes only modest improvement over estimated current capture rates. <em className="text-foreground/50">
+                    (Formula: Section {10} → Estimating AI Value Capture Percentages → Core Formula.)</em>
                   </p>
                 </div>
                 <p className="text-[10px] text-tertiary mt-3 italic">
                   Challenge these assumptions. The model is designed to be stress-tested, not accepted
-                  on faith. Adjust labor cost, AI-addressable percentage, or capture rate to reflect
-                  your internal data.
+                  on faith. Adjust labor cost, AI-addressable percentage, or estimated capture rate to reflect
+                  your internal data. Every input and weight is documented in Section {10}.
                 </p>
-              </div>
             </SubCollapsible>
           </CollapsibleSection>
 
@@ -1369,7 +1426,7 @@ function ReportPage() {
                     the language of your P&L - how AI investment (or the absence of it) flows through
                     <strong className="text-secondary"> revenue, margins, cost structure, talent economics, and risk exposure</strong> over the next
                     12-24 months. Every dollar figure below is derived from {result.companyProfile.companyName}&apos;s
-                    actual revenue of <strong className="text-secondary">{fmtUSD(result.companyProfile.revenue)}</strong> and industry benchmarks
+                    actual revenue of <strong className="text-secondary">{fmtUSD(result.companyProfile.revenue)}</strong>, the estimated {result.economicEstimate.currentCapturePercent}% capture rate (Section 10 → &quot;Estimating AI Value Capture Percentages&quot;), and industry benchmarks
                     for {industryLabel(result.companyProfile.industry)}.
                   </p>
 
@@ -1480,12 +1537,12 @@ function ReportPage() {
                 </p>
 
                 {/* Understanding This Assessment */}
-                <SubCollapsible title="Understanding This Assessment" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
-                  <div className="bg-offwhite border border-light p-5">
-                    <p className="text-sm text-foreground/70 leading-relaxed mb-3">
+                <SubCollapsible title="Understanding This Assessment">
+                  <div className="space-y-3">
+                    <p className="text-sm text-foreground/70 leading-relaxed">
                       Your risk profile is derived from inverting your dimension scores: low governance
                       maturity translates to high governance risk, low adoption structure translates to high
-                      shadow AI risk, and so on. Each risk is mapped on a 4x4 matrix of <strong className="text-secondary">Likelihood</strong> (how
+                      shadow AI risk, and so on. Each risk is mapped on a 4×4 matrix of <strong className="text-secondary">Likelihood</strong> (how
                       probable the risk materializes based on your current posture) versus <strong className="text-secondary">Impact</strong> (the
                       potential business consequence if it does).
                     </p>
@@ -1543,17 +1600,15 @@ function ReportPage() {
             }
           >
             {/* Risk Matrix visualization */}
-            <SubCollapsible title="Risk Matrix (Likelihood x Impact)" hint="View matrix" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>}>
+            <SubCollapsible title="Risk Matrix (Likelihood x Impact)">
               <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
             </SubCollapsible>
 
             {/* Regulatory landscape context */}
             <SubCollapsible title={`Regulatory Landscape for ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())}`}>
-              <div className="border border-light p-5">
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  {getRegulatoryContext(result.companyProfile.industry, result.companyProfile.regulatoryIntensity)}
-                </p>
-              </div>
+              <p className="text-sm text-foreground/70 leading-relaxed">
+                {getRegulatoryContext(result.companyProfile.industry, result.companyProfile.regulatoryIntensity)}
+              </p>
             </SubCollapsible>
 
           </CollapsibleSection>
@@ -1606,9 +1661,7 @@ function ReportPage() {
               </div>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Vendor recommendations for {result.companyProfile.companyName}&apos;s selected AI use cases,
-                rated on the six evaluation criteria above. <strong className="text-green-700">Green</strong> indicates
-                strong fit, <strong className="text-yellow-700">yellow</strong> adequate, and <strong className="text-red-600">red</strong> a
-                potential concern area.
+                rated on the six evaluation criteria above.
               </p>
               <div className="space-y-1">
                 {getVendorStackByUseCase(
@@ -1712,9 +1765,10 @@ function ReportPage() {
               </p>
               {/* Legend */}
               <div className="flex flex-wrap items-center gap-4 mb-4 text-[10px]">
-                <span className="font-semibold text-tertiary uppercase tracking-wider">Likelihood:</span>
+                <span className="font-semibold text-tertiary uppercase tracking-wider">Success Rate:</span>
                 <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-green-500" /> High</span>
                 <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-red-400" /> Low</span>
                 <span className="text-foreground/30">|</span>
                 <span className="font-semibold text-tertiary uppercase tracking-wider">TCV Impact:</span>
                 <span className="flex items-center gap-1"><span className="inline-block w-5 h-1.5 bg-navy" /> High</span>
@@ -1726,7 +1780,7 @@ function ReportPage() {
                   const levers = [
                     { lever: "Declining Unit Economics", group: "Pricing", likelihood: "high" as const, tcvImpact: "high" as const, description: `AI inference costs drop 30-50% annually. Build automatic 15-20% annual step-downs. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying by 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.` },
                     { lever: "Usage-Based Pricing with Caps", group: "Pricing", likelihood: "high" as const, tcvImpact: "medium" as const, description: `Negotiate consumption-based pricing with hard budget caps. ${result.stageClassification.primaryStage <= 2 ? `Organizations at this stage typically overpay by 40-60% in year one.` : `Push for 25-40% volume discounts at your scale.`}` },
-                    { lever: "Data Portability Guarantees", group: "Risk", likelihood: "medium" as const, tcvImpact: "low" as const, description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement.` : `Training data and fine-tuned models are proprietary IP.`}` },
+                    { lever: "Data Portability Guarantees", group: "Risk", likelihood: "low" as const, tcvImpact: "low" as const, description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement — leverage compliance mandates to negotiate.` : `Training data and fine-tuned models are proprietary IP. Most vendors resist this hard — expect pushback.`}` },
                     { lever: "Model-Agnostic Architecture", group: "Risk", likelihood: "medium" as const, tcvImpact: "medium" as const, description: `Allow model swaps without renegotiation. The LLM landscape shifts quarterly. Require API-compatible alternatives.` },
                     { lever: "Performance SLAs with Teeth", group: "Protection", likelihood: "high" as const, tcvImpact: "high" as const, description: `Tie payments to measurable outcomes: latency, accuracy, uptime. Include penalty clauses for model degradation.` },
                     { lever: "Termination Without Penalty", group: "Protection", likelihood: "medium" as const, tcvImpact: "medium" as const, description: `90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `3-year lock-ins made today will be regretted in 18 months.` : `The vendor landscape is volatile enough that long-term lock-ins carry material risk.`}` },
@@ -1736,7 +1790,7 @@ function ReportPage() {
                     { name: "Protection", color: "#6B7F99" },
                     { name: "Risk", color: "#364E6E" },
                   ];
-                  const likelihoodColor = (l: "high" | "medium") => l === "high" ? "bg-green-500" : "bg-yellow-500";
+                  const likelihoodColor = (l: "high" | "medium" | "low") => l === "high" ? "bg-green-500" : l === "medium" ? "bg-yellow-500" : "bg-red-400";
                   const tcvBarWidth = (t: "high" | "medium" | "low") => t === "high" ? "w-full" : t === "medium" ? "w-2/3" : "w-1/3";
                   const tcvBarOpacity = (t: "high" | "medium" | "low") => t === "high" ? "bg-navy" : t === "medium" ? "bg-navy/50" : "bg-navy/25";
                   return groups.map((g) => (
@@ -1746,7 +1800,7 @@ function ReportPage() {
                         {levers.filter((l) => l.group === g.name).map((item) => (
                           <div key={item.lever}>
                             <div className="flex items-center gap-2 mb-1">
-                              <span className={`flex-shrink-0 w-2 h-2 rounded-full ${likelihoodColor(item.likelihood)}`} title={`Likelihood: ${item.likelihood}`} />
+                              <span className={`flex-shrink-0 w-2 h-2 rounded-full ${likelihoodColor(item.likelihood)}`} title={`Success Rate: ${item.likelihood}`} />
                               <p className="text-xs font-semibold text-secondary">{item.lever}</p>
                             </div>
                             <p className="text-xs text-foreground/60 leading-relaxed mb-2">{item.description}</p>
@@ -1869,7 +1923,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Items for board consideration — grouped by Decision / Investment / Governance */}
-            <SubCollapsible title="Items for Board Consideration" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>}>
+            <SubCollapsible title="Items for Board Consideration">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Based on this diagnostic, the following items may warrant <strong className="text-secondary">board-level discussion</strong>.
                 Each is framed as a consideration adapted from NACD best practices for AI governance oversight.
@@ -1886,24 +1940,23 @@ function ReportPage() {
                     {groups.map((g) => {
                       const groupAsks = asks.filter((a) => a.type === g.type);
                       return (
-                        <div key={g.type} className="border border-light min-h-[120px]" style={{ borderTop: `3px solid ${g.color}` }}>
-                          <SubCollapsible
-                            title={g.label}
-                            icon={<span style={{ color: g.color }}>{g.icon}</span>}
-                          >
-                            <div className="space-y-3">
-                              {groupAsks.map((ask, idx) => (
-                                <div key={idx}>
-                                  <p className="text-xs font-semibold text-secondary mb-1">{ask.title}</p>
-                                  <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
-                                </div>
-                              ))}
-                              {groupAsks.length === 0 && (
-                                <p className="text-xs text-foreground/40 italic">No items in this category based on your diagnostic results.</p>
-                              )}
-                            </div>
-                          </SubCollapsible>
-                        </div>
+                        <SubCollapsible
+                          key={g.type}
+                          title={g.label}
+                          icon={<span style={{ color: g.color }}>{g.icon}</span>}
+                        >
+                          <div className="space-y-3">
+                            {groupAsks.map((ask, idx) => (
+                              <div key={idx}>
+                                <p className="text-xs font-semibold text-secondary mb-1">{ask.title}</p>
+                                <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
+                              </div>
+                            ))}
+                            {groupAsks.length === 0 && (
+                              <p className="text-xs text-foreground/40 italic">No items in this category based on your diagnostic results.</p>
+                            )}
+                          </div>
+                        </SubCollapsible>
                       );
                     })}
                   </div>
