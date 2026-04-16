@@ -83,9 +83,9 @@ const INDUSTRY_PRODUCTIVITY_POTENTIAL: Record<Industry, { low: number; high: num
 // capture less. Based on McKinsey 2024 Global AI Survey cross-tabs,
 // BCG AI Advantage Report peer analytics, and Gartner industry maturity curves.
 
-type IndustryCaptureGroup = 'tech_forward' | 'data_rich_financial' | 'professional_services' | 'consumer_digital' | 'industrial_mid' | 'healthcare_regulated' | 'infrastructure_heavy' | 'public_sector';
+export type IndustryCaptureGroup = 'tech_forward' | 'data_rich_financial' | 'professional_services' | 'consumer_digital' | 'industrial_mid' | 'healthcare_regulated' | 'infrastructure_heavy' | 'public_sector';
 
-const INDUSTRY_CAPTURE_GROUP: Record<Industry, IndustryCaptureGroup> = {
+export const INDUSTRY_CAPTURE_GROUP: Record<Industry, IndustryCaptureGroup> = {
   // Tech-forward: deep technical talent, data infrastructure, cultural readiness
   software_saas: 'tech_forward',
   it_services: 'tech_forward',
@@ -139,7 +139,7 @@ const INDUSTRY_CAPTURE_GROUP: Record<Industry, IndustryCaptureGroup> = {
   nonprofit_ngo: 'public_sector',
 };
 
-const CAPTURE_RATES_BY_GROUP: Record<IndustryCaptureGroup, Record<StageNumber, number>> = {
+export const CAPTURE_RATES_BY_GROUP: Record<IndustryCaptureGroup, Record<StageNumber, number>> = {
   // Tech companies capture more at every stage — talent, infra, and culture already exist
   tech_forward:          { 1: 0.05, 2: 0.15, 3: 0.32, 4: 0.62, 5: 0.85 },
   // Financial services: massive data and investment capacity, but compliance slows deployment
