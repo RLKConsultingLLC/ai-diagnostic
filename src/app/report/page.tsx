@@ -777,7 +777,7 @@ function ReportPage() {
                           forfeited per quarter</strong>. Section 5 provides the transparent methodology behind every assumption —
                           your CFO should stress-test these before making investment decisions.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
-                          revenue growth, operating margin, cost structure, and EBITDA over 12-24 months.
+                          revenue growth, operating margin, and cost structure over 12-24 months.
                         </p>
                       </SubCollapsible>
 
@@ -855,7 +855,7 @@ function ReportPage() {
                   {report?.sections?.find((s) => s.slug === "executive-summary")?.content && (
                     <SubCollapsible title={`Overarching Narrative`}>
                       <MarkdownContent
-                        content={(report?.sections?.find((s) => s.slug === "executive-summary")?.content || "").replace(/^#{1,3}\s+.*\n+/, "")}
+                        content={scrubEBITDAFromText((report?.sections?.find((s) => s.slug === "executive-summary")?.content || "").replace(/^#{1,3}\s+.*\n+/, ""))}
                       />
                     </SubCollapsible>
                   )}
@@ -1179,7 +1179,7 @@ function ReportPage() {
                             {priorityLabel.toUpperCase()}
                           </span>
                         </div>
-                        <p className="text-xs text-foreground/60 leading-relaxed">{area.detail}</p>
+                        <p className="text-xs text-foreground/60 leading-relaxed">{scrubUserCompanyFromText(area.detail, result.companyProfile.companyName)}</p>
                         <p className="text-[10px] text-tertiary mt-2 italic">{area.source}</p>
                       </SubCollapsible>
                     </div>
@@ -1618,7 +1618,6 @@ function ReportPage() {
                     </div>
                     <p className="text-[10px] text-tertiary mt-2 italic">
                       Scores: 5 = Excellent, 4 = Strong, 3 = Adequate, 2 = Below Average, 1 = Concern.
-                      Based on Gartner, Forrester, and G2 enterprise reviews (2024).
                     </p>
                   </SubCollapsible>
                 ))}
@@ -1751,35 +1750,64 @@ function ReportPage() {
                   below are designed to close that gap for {result.companyProfile.companyName}.
                 </p>
 
-                {/* Board-ready headline findings */}
+                {/* Board-ready headline findings — sorted by severity, with color legend */}
                 <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, {...result.economicEstimate, currentCapturePercent: correctedCapturePercent}, result.companyProfile).length} items)`}>
-                <div className="space-y-4">
-                  {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, {...result.economicEstimate, currentCapturePercent: correctedCapturePercent}, result.companyProfile).map((finding, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <div
-                        className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
-                        style={{ backgroundColor: finding.severity === "critical" ? "#0B1D3A" : finding.severity === "high" ? "#364E6E" : "#A8B5C4" }}
-                      >
-                        {idx + 1}
+                {(() => {
+                  const severityOrder: Record<string, number> = { critical: 0, high: 1, info: 2 };
+                  const severityColor = (s: string) => s === "critical" ? "#0B1D3A" : s === "high" ? "#364E6E" : "#A8B5C4";
+                  const rawFindings = getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, {...result.economicEstimate, currentCapturePercent: correctedCapturePercent}, result.companyProfile);
+                  const sortedFindings = [...rawFindings].sort((a, b) => (severityOrder[a.severity] ?? 99) - (severityOrder[b.severity] ?? 99));
+                  const legendItems = [
+                    { label: "Critical", detail: "Immediate board attention", color: "#0B1D3A" },
+                    { label: "High", detail: "Significant risk or opportunity", color: "#364E6E" },
+                    { label: "Informational", detail: "Context or trend to monitor", color: "#A8B5C4" },
+                  ];
+                  return (
+                    <>
+                      {/* Severity legend */}
+                      <div className="mb-4 pb-4 border-b border-light">
+                        <p className="text-[10px] uppercase tracking-wider text-tertiary font-semibold mb-2">Severity Key</p>
+                        <div className="flex flex-wrap gap-x-5 gap-y-2">
+                          {legendItems.map((l) => (
+                            <div key={l.label} className="flex items-center gap-2">
+                              <span className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: l.color }} />
+                              <span className="text-[11px] text-secondary font-medium">{l.label}</span>
+                              <span className="text-[11px] text-foreground/50">— {l.detail}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-secondary">{finding.headline}</p>
-                        <p className="text-xs text-foreground/60 leading-relaxed mt-1">{finding.detail}</p>
+                      <div className="space-y-4">
+                        {sortedFindings.map((finding, idx) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <div
+                              className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
+                              style={{ backgroundColor: severityColor(finding.severity) }}
+                              title={finding.severity === "critical" ? "Critical" : finding.severity === "high" ? "High" : "Informational"}
+                            >
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-secondary">{finding.headline}</p>
+                              <p className="text-xs text-foreground/60 leading-relaxed mt-1">{finding.detail}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    </>
+                  );
+                })()}
             </SubCollapsible>
 
             {/* Peer board intelligence — industry-specific context */}
             <SubCollapsible title={`What Peer Boards in ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())} Are Doing`}>
               <div className="space-y-3">
-                {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
+                {getPeerBoardActions(result.companyProfile.industry, result.companyProfile.companyName).map((peer, idx) => (
                   <div key={idx} className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
                     <div>
                       <p className="text-sm text-foreground/70 leading-relaxed">
-                        <strong className="text-secondary">{peer.company}:</strong> {peer.action}
+                        <strong className="text-secondary">{peer.company}:</strong> {scrubUserCompanyFromText(peer.action, result.companyProfile.companyName)}
                       </p>
                       <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
                     </div>
@@ -1795,6 +1823,7 @@ function ReportPage() {
                   <SubCollapsible
                     key={idx}
                     title={action.action}
+                    icon={action.icon}
                   >
                     <p className="text-xs text-foreground/60 leading-relaxed mb-2">{action.rationale}</p>
                     <p className="text-[10px] text-navy font-medium">{action.owner}</p>
@@ -6361,7 +6390,111 @@ function get90DayKPIs(
 // Section 12: Board Findings Helpers
 // ---------------------------------------------------------------------------
 
-function getPeerBoardActions(industry: string): { company: string; action: string; source: string }[] {
+/**
+ * Normalizes a company name for matching: lowercases, strips punctuation/suffixes.
+ * Used to detect whether a peer example IS the user's own company.
+ */
+function normalizeCompanyName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^\w\s&]/g, " ")
+    .replace(/\s+(inc|llc|llp|ltd|limited|corp|corporation|group|holdings|company|co|plc|sa|ag|gmbh)\.?(\s|$)/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Detects whether a peer company name matches the user's own company.
+ * Guards against the user seeing their own company listed as a peer.
+ * Handles exact matches, substring matches, and first-token matches (e.g.
+ * "Deloitte Consulting" vs "Deloitte", "Google" vs "Google (Alphabet)").
+ */
+function isSameCompany(peerCompany: string, userCompany: string | undefined): boolean {
+  if (!userCompany) return false;
+  const peer = normalizeCompanyName(peerCompany);
+  const user = normalizeCompanyName(userCompany);
+  if (!peer || !user) return false;
+  if (peer === user) return true;
+  // Bidirectional substring check — catches "Deloitte" ⊂ "Deloitte Consulting"
+  if (peer.includes(user) || user.includes(peer)) return true;
+  // First-token match for brand-prefixed names (require >=3 chars to avoid
+  // false positives on short tokens like "AI" or "US").
+  const peerFirst = peer.split(/\s|&/)[0];
+  const userFirst = user.split(/\s|&/)[0];
+  if (peerFirst.length >= 3 && userFirst.length >= 3 && peerFirst === userFirst) return true;
+  // Common abbreviation-to-longname pairs we can't catch with simple substring
+  const aliasPairs: [string, string][] = [
+    ["pwc", "pricewaterhousecoopers"],
+    ["ey", "ernst young"],
+    ["kpmg", "klynveld peat marwick goerdeler"],
+    ["bcg", "boston consulting"],
+    ["dhl", "deutsche post"],
+    ["jpm", "jpmorgan"],
+    ["bofa", "bank of america"],
+    ["ge", "general electric"],
+    ["ibm", "international business machines"],
+    ["hp", "hewlett packard"],
+  ];
+  for (const [a, b] of aliasPairs) {
+    if ((peer.includes(a) && user.includes(b)) || (peer.includes(b) && user.includes(a))) return true;
+    // Google/Alphabet special case
+  }
+  if ((peer.includes("google") && user.includes("alphabet")) || (peer.includes("alphabet") && user.includes("google"))) return true;
+  return false;
+}
+
+/**
+ * Removes sentences and phrases mentioning EBITDA from AI-generated
+ * markdown content. Used on executive-summary narrative text so EBITDA
+ * references never appear in that section.
+ *
+ * Strategy: drop entire sentences that mention EBITDA; if EBITDA appears
+ * mid-sentence as part of a short comma-separated list, strip just that
+ * item (e.g., "revenue, margin, and EBITDA" → "revenue and margin").
+ */
+function scrubEBITDAFromText(text: string): string {
+  if (!text) return text;
+  // First, strip comma-separated list items mentioning EBITDA without
+  // destroying the surrounding sentence. Handles ", and EBITDA" / ", EBITDA" /
+  // "and EBITDA " at end of a list.
+  let out = text
+    .replace(/,\s*and\s+EBITDA\b/gi, "")
+    .replace(/,\s*EBITDA\b/gi, "")
+    .replace(/\band\s+EBITDA\b/gi, "")
+    .replace(/\bEBITDA\s+margin[s]?\b/gi, "operating margin");
+  // Then drop any remaining sentences that still mention EBITDA.
+  const parts = out.split(/(?<=[.!?])\s+/);
+  out = parts.filter((s) => !/\bEBITDA\b/i.test(s)).join(" ");
+  return out;
+}
+
+/**
+ * Replaces occurrences of the user's own company name in narrative text
+ * (peer/competitor illustrative text) with a generic phrase so the user
+ * never sees their own company listed as a peer or competitor.
+ *
+ * Matches the full name and, where distinctive, the first token
+ * (e.g. "Accenture" from "Accenture plc"). Case-insensitive, word-boundary.
+ */
+function scrubUserCompanyFromText(text: string, userCompany: string | undefined): string {
+  if (!userCompany || !text) return text;
+  const candidates = new Set<string>();
+  const raw = userCompany.trim();
+  if (raw.length >= 3) candidates.add(raw);
+  const firstToken = raw.split(/[\s&,(]/)[0];
+  if (firstToken.length >= 4) candidates.add(firstToken);
+  // Also try the normalized form (suffixes stripped)
+  const normalized = normalizeCompanyName(raw);
+  if (normalized.length >= 4 && normalized !== raw.toLowerCase()) candidates.add(normalized);
+  let out = text;
+  for (const needle of candidates) {
+    const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    out = out.replace(new RegExp(`\\b${escaped}\\b`, "gi"), "a leading peer");
+  }
+  return out;
+}
+
+function getPeerBoardActions(industry: string, userCompanyName?: string): { company: string; action: string; source: string }[] {
   const peers: Record<string, { company: string; action: string; source: string }[]> = {
     shipping_logistics: [
       { company: "UPS", action: "Board established a dedicated Technology Committee in 2023 to oversee AI and automation investments. CEO Carol Tomé committed $1B+ annually to smart logistics technology. UPS's ORION AI platform now makes 20M+ routing decisions daily — a board-mandated priority.", source: "UPS 2024 Proxy Statement; 2024 10-K Filing" },
@@ -6464,7 +6597,18 @@ function getPeerBoardActions(industry: string): { company: string; action: strin
     nonprofit_ngo: "healthcare",
   };
   const aliased = peerAliases[industry];
-  return peers[industry] || (aliased ? peers[aliased] : null) || defaults;
+  const selected = peers[industry] || (aliased ? peers[aliased] : null) || defaults;
+
+  // SAFEGUARD: Never list the user's own company as a peer. Filter any matches
+  // out. If filtering would leave us with too few peers, top up from the
+  // cross-sector defaults (also filtered against the user's name).
+  const filtered = selected.filter((p) => !isSameCompany(p.company, userCompanyName));
+  if (filtered.length >= 2) return filtered;
+  const filteredDefaults = defaults.filter((p) => !isSameCompany(p.company, userCompanyName));
+  // De-dup by company string before topping up
+  const existing = new Set(filtered.map((p) => p.company));
+  const topUp = filteredDefaults.filter((p) => !existing.has(p.company));
+  return [...filtered, ...topUp].slice(0, 3);
 }
 
 function getBoardFindings(
@@ -6518,28 +6662,94 @@ function getBoardSupportNarrative(stage: number): string {
   return `At Stage ${stage}, the board's role evolves to strategic partnership on AI-driven competitive positioning. NACD recommends boards at advanced stages: (1) integrate AI into strategic planning and capital allocation discussions (not as a separate agenda item), (2) evaluate whether AI investments are creating defensible competitive moats, (3) assess management's AI talent and leadership pipeline, and (4) ensure ethical AI governance keeps pace with capability deployment. The board should also consider whether AI capabilities should inform M&A strategy and new market entry decisions.`;
 }
 
-function getBoardActions(stage: number, _industry: string): { action: string; rationale: string; owner: string }[] {
+// Shared icon library for board-action tiles. Each icon is paired 1:1 with an
+// action title below. If a title is renamed, pick the icon from this library
+// whose meaning best matches the new title so the visual stays logical.
+const BoardActionIcons = {
+  target: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    </svg>
+  ),
+  userCheck: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+    </svg>
+  ),
+  dollar: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  userPlus: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+    </svg>
+  ),
+  chartBar: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+    </svg>
+  ),
+  calendar: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+    </svg>
+  ),
+  shield: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+    </svg>
+  ),
+  users: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+    </svg>
+  ),
+  scale: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" />
+    </svg>
+  ),
+  castle: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+    </svg>
+  ),
+  ethics: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+    </svg>
+  ),
+  trending: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.306a11.95 11.95 0 015.814-5.518l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+    </svg>
+  ),
+} as const;
+
+function getBoardActions(stage: number, _industry: string): { action: string; rationale: string; owner: string; icon: React.ReactNode }[] {
   if (stage <= 2) {
     return [
-      { action: "Set AI Maturity Targets", rationale: "Establish accountability for measurable progress, not just activity. Metrics should include adoption rates, value captured, and governance maturity. Request a baseline and 12-month improvement targets.", owner: "Board request to CEO/CIO" },
-      { action: "Assess C-Suite AI Fluency", rationale: "AI transformation requires active C-suite sponsorship. Boards should assess whether leadership has the knowledge and conviction to drive change.", owner: "Board assessment" },
-      { action: "Ring-Fence AI Budget", rationale: "Dedicated funding prevents AI initiatives from competing with operational priorities. Best practice: 1-3% of revenue for organizations at this stage.", owner: "Board approval to CFO" },
-      { action: "Add AI Expertise to Board", rationale: "78% of boards lack members with deep AI expertise (NACD 2024). Consider adding a director with AI/technology leadership experience.", owner: "Nominating Committee" },
+      { action: "Set AI Maturity Targets", rationale: "Establish accountability for measurable progress, not just activity. Metrics should include adoption rates, value captured, and governance maturity. Request a baseline and 12-month improvement targets.", owner: "Board request to CEO/CIO", icon: BoardActionIcons.target },
+      { action: "Assess C-Suite AI Fluency", rationale: "AI transformation requires active C-suite sponsorship. Boards should assess whether leadership has the knowledge and conviction to drive change.", owner: "Board assessment", icon: BoardActionIcons.userCheck },
+      { action: "Ring-Fence AI Budget", rationale: "Dedicated funding prevents AI initiatives from competing with operational priorities. Best practice: 1-3% of revenue for organizations at this stage.", owner: "Board approval to CFO", icon: BoardActionIcons.dollar },
+      { action: "Add AI Expertise to Board", rationale: "78% of boards lack members with deep AI expertise (NACD 2024). Consider adding a director with AI/technology leadership experience.", owner: "Nominating Committee", icon: BoardActionIcons.userPlus },
     ];
   }
   if (stage <= 3) {
     return [
-      { action: "Demand AI ROI Evidence", rationale: "Shift board reporting from 'how many AI projects' to 'what measurable value has AI created.' Require financial evidence, not activity metrics.", owner: "Board request to CEO/CFO" },
-      { action: "Quarterly AI Positioning Review", rationale: "AI competitive dynamics shift rapidly. Quarterly reviews prevent strategic surprise and ensure investment is calibrated to market reality.", owner: "Board standing agenda item" },
-      { action: "Oversee AI Governance", rationale: "As AI scales, risk exposure increases. Board should review governance framework adequacy, especially in regulated areas.", owner: "Risk Committee / Audit Committee" },
-      { action: "Evaluate AI Talent Strategy", rationale: "AI talent is the scarcest resource. Board should assess management's plan for recruiting, retaining, and developing AI capabilities.", owner: "Compensation Committee / CHRO" },
+      { action: "Demand AI ROI Evidence", rationale: "Shift board reporting from 'how many AI projects' to 'what measurable value has AI created.' Require financial evidence, not activity metrics.", owner: "Board request to CEO/CFO", icon: BoardActionIcons.chartBar },
+      { action: "Quarterly AI Positioning Review", rationale: "AI competitive dynamics shift rapidly. Quarterly reviews prevent strategic surprise and ensure investment is calibrated to market reality.", owner: "Board standing agenda item", icon: BoardActionIcons.calendar },
+      { action: "Oversee AI Governance", rationale: "As AI scales, risk exposure increases. Board should review governance framework adequacy, especially in regulated areas.", owner: "Risk Committee / Audit Committee", icon: BoardActionIcons.shield },
+      { action: "Evaluate AI Talent Strategy", rationale: "AI talent is the scarcest resource. Board should assess management's plan for recruiting, retaining, and developing AI capabilities.", owner: "Compensation Committee / CHRO", icon: BoardActionIcons.users },
     ];
   }
   return [
-    { action: "AI in Capital Allocation", rationale: "At this maturity stage, AI should inform corporate strategy, not be a separate initiative. Board should expect AI implications in every major strategic decision.", owner: "Full Board" },
-    { action: "Assess Competitive Moat", rationale: "Evaluate whether proprietary AI capabilities create defensible advantages. Consider AI capabilities in acquisition targets and partnership evaluations.", owner: "Strategy Committee" },
-    { action: "Review AI Ethics Posture", rationale: "Advanced AI deployment increases reputational and regulatory risk. Board should ensure ethical AI governance keeps pace with capability.", owner: "Risk / Governance Committee" },
-    { action: "Annual AI Benchmarking", rationale: "Maintain external perspective on competitive position. Annual independent assessment prevents internal bias in self-reporting.", owner: "Board request to CIO" },
+    { action: "AI in Capital Allocation", rationale: "At this maturity stage, AI should inform corporate strategy, not be a separate initiative. Board should expect AI implications in every major strategic decision.", owner: "Full Board", icon: BoardActionIcons.scale },
+    { action: "Assess Competitive Moat", rationale: "Evaluate whether proprietary AI capabilities create defensible advantages. Consider AI capabilities in acquisition targets and partnership evaluations.", owner: "Strategy Committee", icon: BoardActionIcons.castle },
+    { action: "Review AI Ethics Posture", rationale: "Advanced AI deployment increases reputational and regulatory risk. Board should ensure ethical AI governance keeps pace with capability.", owner: "Risk / Governance Committee", icon: BoardActionIcons.ethics },
+    { action: "Annual AI Benchmarking", rationale: "Maintain external perspective on competitive position. Annual independent assessment prevents internal bias in self-reporting.", owner: "Board request to CIO", icon: BoardActionIcons.trending },
   ];
 }
 
