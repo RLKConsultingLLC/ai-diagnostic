@@ -67,14 +67,13 @@ function MethodCollapsible({
 }
 
 export default function MethodologySection({ result, sectionNumber, bare }: MethodologySectionProps) {
-  const conf = Math.min(99, Math.max(65, Math.round(result.stageClassification.confidence * 100)));
-
-  // Compute the diagnostic modifier for display
-  const modifierResult = computeDiagnosticModifier(result.dimensionScores);
-  const userGroup = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
-  const baseRate = CAPTURE_RATES_BY_GROUP[userGroup]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
-  // Use the same number as the economic estimate for consistency
+  // Use authoritative values stored by the economic engine — no recomputation
+  const baseRate = result.economicEstimate.captureRateBase;
+  const modifierValue = result.economicEstimate.captureRateModifier;
+  const userGroup = result.economicEstimate.captureRateGroup as IndustryCaptureGroup;
   const adjustedRatePercent = result.economicEstimate.currentCapturePercent;
+  // Still need component-level detail for the weights table
+  const modifierResult = computeDiagnosticModifier(result.dimensionScores);
 
   const content = (
     <>
@@ -356,28 +355,28 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                   <td className="text-center py-2 px-2 text-foreground/60">100%</td>
                   <td />
                   <td />
-                  <td className="text-center py-2 px-2 font-bold text-navy font-mono">{modifierResult.modifier.toFixed(3)}×</td>
+                  <td className="text-center py-2 px-2 font-bold text-navy font-mono">{modifierValue.toFixed(3)}×</td>
                   <td className="py-2 pl-3 text-[10px] text-foreground/40">Weighted sum, clamped to [0.75, 1.25]</td>
                 </tr>
               </tfoot>
             </table>
           </div>
 
-          {/* The actual calculation for this user — uses economicEstimate for consistency */}
+          {/* The actual calculation for this user — uses stored values from economic engine */}
           <div className="bg-offwhite border border-light p-4">
             <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-2">Your Capture Rate Derivation</p>
             <div className="space-y-1.5 text-xs text-foreground/60 leading-relaxed font-mono">
               <p>Base Rate (from matrix)  = <strong className="text-secondary">{Math.round(baseRate * 100)}%</strong> ({userGroup?.replace(/_/g, " ")} × Stage {result.stageClassification.primaryStage})</p>
-              <p>Diagnostic Modifier      = <strong className="text-secondary">{modifierResult.modifier.toFixed(3)}×</strong> (weighted from 5 dimension scores above)</p>
+              <p>Diagnostic Modifier      = <strong className="text-secondary">{modifierValue.toFixed(3)}×</strong> (weighted from 5 dimension scores above)</p>
               <p className="border-t border-light pt-1.5">
-                Adjusted Capture Rate    = {Math.round(baseRate * 100)}% × {modifierResult.modifier.toFixed(3)} = <strong className="text-navy font-bold">{adjustedRatePercent}%</strong>
+                Adjusted Capture Rate    = {Math.round(baseRate * 100)}% × {modifierValue.toFixed(3)} = <strong className="text-navy font-bold">{adjustedRatePercent}%</strong>
               </p>
             </div>
             <p className="text-[10px] text-foreground/40 mt-2 italic">
               This {adjustedRatePercent}% is the estimated capture rate used throughout Sections 5 and 6.
-              {modifierResult.modifier > 1.02 && ` Your behavioral scores push the rate above the industry-stage baseline, suggesting above-average organizational capability for AI value capture.`}
-              {modifierResult.modifier < 0.98 && ` Your behavioral scores pull the rate below the industry-stage baseline, suggesting organizational constraints are limiting value capture beyond what industry and stage alone would predict.`}
-              {modifierResult.modifier >= 0.98 && modifierResult.modifier <= 1.02 && ` Your behavioral scores are near the industry-stage baseline, suggesting typical organizational capability for your peer group.`}
+              {modifierValue > 1.02 && ` Your behavioral scores push the rate above the industry-stage baseline, suggesting above-average organizational capability for AI value capture.`}
+              {modifierValue < 0.98 && ` Your behavioral scores pull the rate below the industry-stage baseline, suggesting organizational constraints are limiting value capture beyond what industry and stage alone would predict.`}
+              {modifierValue >= 0.98 && modifierValue <= 1.02 && ` Your behavioral scores are near the industry-stage baseline, suggesting typical organizational capability for your peer group.`}
             </p>
           </div>
         </div>
@@ -464,7 +463,6 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
       <MethodCollapsible title="Confidence & Quality Metrics">
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <MethodologyItem label="Overall Confidence" value={`${conf}% — ${conf >= 85 ? "high" : conf >= 75 ? "moderate" : "low"} confidence classification`} />
             <MethodologyItem label="Questions Answered" value={`${result.responses.length} of 61 questions (${Math.round((result.responses.length / 61) * 100)}% completion)`} />
             <MethodologyItem label="Stage Classification" value={`Stage ${result.stageClassification.primaryStage}: ${result.stageClassification.stageName}`} />
             <MethodologyItem label="Capture Rate Model" value={`7-input model → ${adjustedRatePercent}% estimated capture (see "Estimating AI Value Capture Percentages" above)`} />

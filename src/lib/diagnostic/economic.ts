@@ -226,23 +226,35 @@ export function computeDiagnosticModifier(
   return { modifier, components };
 }
 
-function getCaptureRate(
+interface CaptureRateResult {
+  rate: number;
+  baseRate: number;
+  modifier: number;
+  group: string;
+}
+
+function getCaptureRateDetailed(
   industry: Industry,
   stage: StageNumber,
   dimensionScores?: { dimension: string; normalizedScore: number }[]
-): number {
+): CaptureRateResult {
   const group = INDUSTRY_CAPTURE_GROUP[industry];
   const baseRate = CAPTURE_RATES_BY_GROUP[group][stage];
 
   if (!dimensionScores || dimensionScores.length === 0) {
-    return baseRate; // Fallback to unmodified base rate
+    return { rate: baseRate, baseRate, modifier: 1.0, group };
   }
 
   const { modifier } = computeDiagnosticModifier(dimensionScores);
   const adjustedRate = baseRate * modifier;
 
   // Clamp to [0.01, 0.95] — no organization captures 0% or 100%
-  return Math.max(0.01, Math.min(0.95, adjustedRate));
+  return {
+    rate: Math.max(0.01, Math.min(0.95, adjustedRate)),
+    baseRate,
+    modifier,
+    group,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -329,7 +341,8 @@ export function computeEconomicEstimate(
   const warnings: string[] = [];
   const industry = profile.industry;
   const potential = INDUSTRY_PRODUCTIVITY_POTENTIAL[industry];
-  const captureRate = getCaptureRate(industry, stage.primaryStage, dimensionScores);
+  const captureDetail = getCaptureRateDetailed(industry, stage.primaryStage, dimensionScores);
+  const captureRate = captureDetail.rate;
   const sizeMultiplier = getSizeMultiplier(profile.employeeCount);
   let costPerEmployee = AVG_COST_PER_EMPLOYEE[industry];
 
@@ -401,6 +414,9 @@ export function computeEconomicEstimate(
   return {
     productivityPotentialPercent: Math.round(productivityPotentialPercent),
     currentCapturePercent: Math.round(currentCapturePercent),
+    captureRateBase: captureDetail.baseRate,
+    captureRateModifier: captureDetail.modifier,
+    captureRateGroup: captureDetail.group,
     unrealizedValueLow: roundToSignificantFigures(unrealizedLow, 2),
     unrealizedValueHigh: roundToSignificantFigures(unrealizedHigh, 2),
     annualWastedHours,
@@ -482,7 +498,7 @@ function buildBenchmarkNarrative(
     'AI-Native Enterprise',
   ][stage];
 
-  const capturePercent = getCaptureRate(industry, stage) * 100;
+  const capturePercent = getCaptureRateDetailed(industry, stage).rate * 100;
 
   const label = formatIndustryName(industry);
 

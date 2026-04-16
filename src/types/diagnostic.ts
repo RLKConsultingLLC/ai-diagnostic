@@ -156,6 +156,12 @@ export interface EconomicSource {
 export interface EconomicEstimate {
   productivityPotentialPercent: number; // 10–35%
   currentCapturePercent: number;
+  /** Raw base rate from the industry-group × stage matrix (e.g. 0.25 = 25%) */
+  captureRateBase: number;
+  /** Diagnostic modifier multiplier (e.g. 1.077) */
+  captureRateModifier: number;
+  /** Industry capture group key (e.g. "professional_services") */
+  captureRateGroup: string;
   unrealizedValueLow: number;
   unrealizedValueHigh: number;
   annualWastedHours: number;

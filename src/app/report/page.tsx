@@ -13,8 +13,6 @@ import type {
 } from "@/types/diagnostic";
 import MethodologySection from "@/app/report/components/MethodologySection";
 import {
-  CAPTURE_RATES_BY_GROUP,
-  INDUSTRY_CAPTURE_GROUP,
   DIAGNOSTIC_MODIFIER_WEIGHTS,
   computeDiagnosticModifier,
 } from "@/lib/diagnostic/economic";
@@ -1262,11 +1260,12 @@ function ReportPage() {
                     (Source: McKinsey Global Institute, &quot;The Economic Potential of Generative AI,&quot; 2023.)</em>
                   </p>
                   {(() => {
-                    const group = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
-                    const bRate = CAPTURE_RATES_BY_GROUP[group]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
-                    const mod = computeDiagnosticModifier(result.dimensionScores);
-                    // Use the authoritative value from the economic estimate — guarantees consistency
+                    // All values from the economic engine — single source of truth
+                    const bRate = result.economicEstimate.captureRateBase;
+                    const modValue = result.economicEstimate.captureRateModifier;
+                    const group = result.economicEstimate.captureRateGroup;
                     const finalCapturePercent = result.economicEstimate.currentCapturePercent;
+                    const mod = computeDiagnosticModifier(result.dimensionScores); // for component details only
                     const groupLabel: Record<string, string> = {
                       tech_forward: "Technology & Digital",
                       data_rich_financial: "Financial Services",
@@ -1295,18 +1294,18 @@ function ReportPage() {
                             and Gartner industry maturity curves. This is <em>not</em> the capture rate used — it is the starting point before behavioral adjustment.
                           </p>
                           <p>
-                            <strong className="text-secondary">Inputs 2–6 — Behavioral modifier ({mod.modifier.toFixed(3)}×):</strong>{" "}
+                            <strong className="text-secondary">Inputs 2–6 — Behavioral modifier ({modValue.toFixed(3)}×):</strong>{" "}
                             The base rate is then adjusted by a weighted modifier derived from your 5 behavioral dimension scores:
                             {mod.components.map((c) => {
                               const w = DIAGNOSTIC_MODIFIER_WEIGHTS[c.dimension];
                               return ` ${w?.label || c.dimension} (${Math.round(c.score)}/100, ${(c.weight * 100).toFixed(0)}% weight)`;
                             }).join(",")}. A score of 50 is neutral (1.0×); your weighted score produces a{" "}
-                            <strong className="text-secondary">{mod.modifier.toFixed(3)}× modifier</strong>
-                            {mod.modifier > 1.0 ? ", meaning your behavioral data pushes you above the industry-stage average." : mod.modifier < 1.0 ? ", meaning organizational constraints are pulling your capture below the industry-stage average." : "."}
+                            <strong className="text-secondary">{modValue.toFixed(3)}× modifier</strong>
+                            {modValue > 1.0 ? ", meaning your behavioral data pushes you above the industry-stage average." : modValue < 1.0 ? ", meaning organizational constraints are pulling your capture below the industry-stage average." : "."}
                           </p>
                           <p>
                             <strong className="text-secondary">Result:</strong>{" "}
-                            {Math.round(bRate * 100)}% × {mod.modifier.toFixed(3)} ={" "}
+                            {Math.round(bRate * 100)}% × {modValue.toFixed(3)} ={" "}
                             <strong className="text-navy">{finalCapturePercent}%</strong> — this is the capture rate used in every calculation throughout this report.
                           </p>
                         </div>
