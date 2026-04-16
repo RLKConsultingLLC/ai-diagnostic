@@ -1839,22 +1839,7 @@ function ReportPage() {
                 </p>
 
                 {/* Board-ready headline findings */}
-                <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).length} items)`} defaultOpen>
-              <div className="border-2 border-navy p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#0B1D3A" }} />
-                    <span className="text-[10px] text-foreground/50">Critical</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#364E6E" }} />
-                    <span className="text-[10px] text-foreground/50">High</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5" style={{ backgroundColor: "#A8B5C4" }} />
-                    <span className="text-[10px] text-foreground/50">Informational</span>
-                  </div>
-                </div>
+                <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).length} items)`}>
                 <div className="space-y-4">
                   {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).map((finding, idx) => (
                     <div key={idx} className="flex items-start gap-3">
@@ -1871,54 +1856,37 @@ function ReportPage() {
                     </div>
                   ))}
                 </div>
-              </div>
             </SubCollapsible>
 
             {/* Peer board intelligence — industry-specific context */}
             <SubCollapsible title={`What Peer Boards in ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())} Are Doing`}>
-              <div className="bg-offwhite border border-light p-4 md:p-5">
-                <div className="space-y-3">
-                  {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
-                      <div>
-                        <p className="text-sm text-foreground/70 leading-relaxed">
-                          <strong className="text-secondary">{peer.company}:</strong> {peer.action}
-                        </p>
-                        <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
-                      </div>
+              <div className="space-y-3">
+                {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-navy" />
+                    <div>
+                      <p className="text-sm text-foreground/70 leading-relaxed">
+                        <strong className="text-secondary">{peer.company}:</strong> {peer.action}
+                      </p>
+                      <p className="text-[10px] text-tertiary mt-0.5">{peer.source}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </SubCollapsible>
 
             {/* How boards can support — action tiles in a row */}
             <SubCollapsible title={`How Boards Can Support at Stage ${result.stageClassification.primaryStage}`}>
-              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                {getBoardSupportNarrative(result.stageClassification.primaryStage)}
-              </p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => {
-                  const actionIcons = [
-                    <svg key="i" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>,
-                    <svg key="i" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>,
-                    <svg key="i" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                    <svg key="i" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>,
-                    <svg key="i" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg>,
-                    <svg key="i" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>,
-                  ];
-                  return (
-                    <SubCollapsible
-                      key={idx}
-                      title={action.action}
-                      icon={<span className="text-navy/50">{actionIcons[idx % actionIcons.length]}</span>}
-                    >
-                      <p className="text-xs text-foreground/60 leading-relaxed mb-2">{action.rationale}</p>
-                      <p className="text-[10px] text-navy font-medium">{action.owner}</p>
-                    </SubCollapsible>
-                  );
-                })}
+                {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
+                  <SubCollapsible
+                    key={idx}
+                    title={action.action}
+                  >
+                    <p className="text-xs text-foreground/60 leading-relaxed mb-2">{action.rationale}</p>
+                    <p className="text-[10px] text-navy font-medium">{action.owner}</p>
+                  </SubCollapsible>
+                ))}
               </div>
             </SubCollapsible>
 
@@ -6623,25 +6591,25 @@ function getBoardSupportNarrative(stage: number): string {
 function getBoardActions(stage: number, _industry: string): { action: string; rationale: string; owner: string }[] {
   if (stage <= 2) {
     return [
-      { action: "Request AI maturity baseline and 12-month improvement targets", rationale: "Establish accountability for measurable progress, not just activity. Metrics should include adoption rates, value captured, and governance maturity.", owner: "Board request to CEO/CIO" },
-      { action: "Evaluate CEO/C-suite AI fluency and commitment", rationale: "AI transformation requires active C-suite sponsorship. Boards should assess whether leadership has the knowledge and conviction to drive change.", owner: "Board assessment" },
-      { action: "Approve dedicated AI transformation budget", rationale: "Ring-fenced funding prevents AI initiatives from competing with operational priorities. Best practice: 1-3% of revenue for organizations at this stage.", owner: "Board approval to CFO" },
-      { action: "Add AI expertise to the board", rationale: "78% of boards lack members with deep AI expertise (NACD 2024). Consider adding a director with AI/technology leadership experience.", owner: "Nominating Committee" },
+      { action: "Set AI Maturity Targets", rationale: "Establish accountability for measurable progress, not just activity. Metrics should include adoption rates, value captured, and governance maturity. Request a baseline and 12-month improvement targets.", owner: "Board request to CEO/CIO" },
+      { action: "Assess C-Suite AI Fluency", rationale: "AI transformation requires active C-suite sponsorship. Boards should assess whether leadership has the knowledge and conviction to drive change.", owner: "Board assessment" },
+      { action: "Ring-Fence AI Budget", rationale: "Dedicated funding prevents AI initiatives from competing with operational priorities. Best practice: 1-3% of revenue for organizations at this stage.", owner: "Board approval to CFO" },
+      { action: "Add AI Expertise to Board", rationale: "78% of boards lack members with deep AI expertise (NACD 2024). Consider adding a director with AI/technology leadership experience.", owner: "Nominating Committee" },
     ];
   }
   if (stage <= 3) {
     return [
-      { action: "Hold management accountable for AI ROI, not activity metrics", rationale: "Shift board reporting from 'how many AI projects' to 'what measurable value has AI created.' Require financial evidence.", owner: "Board request to CEO/CFO" },
-      { action: "Review AI competitive positioning quarterly", rationale: "AI competitive dynamics shift rapidly. Quarterly reviews prevent strategic surprise and ensure investment is calibrated to market reality.", owner: "Board standing agenda item" },
-      { action: "Oversee AI risk and governance framework", rationale: "As AI scales, risk exposure increases. Board should review governance framework adequacy, especially in regulated areas.", owner: "Risk Committee / Audit Committee" },
-      { action: "Evaluate AI talent strategy", rationale: "AI talent is the scarcest resource. Board should assess management's plan for recruiting, retaining, and developing AI capabilities.", owner: "Compensation Committee / CHRO" },
+      { action: "Demand AI ROI Evidence", rationale: "Shift board reporting from 'how many AI projects' to 'what measurable value has AI created.' Require financial evidence, not activity metrics.", owner: "Board request to CEO/CFO" },
+      { action: "Quarterly AI Positioning Review", rationale: "AI competitive dynamics shift rapidly. Quarterly reviews prevent strategic surprise and ensure investment is calibrated to market reality.", owner: "Board standing agenda item" },
+      { action: "Oversee AI Governance", rationale: "As AI scales, risk exposure increases. Board should review governance framework adequacy, especially in regulated areas.", owner: "Risk Committee / Audit Committee" },
+      { action: "Evaluate AI Talent Strategy", rationale: "AI talent is the scarcest resource. Board should assess management's plan for recruiting, retaining, and developing AI capabilities.", owner: "Compensation Committee / CHRO" },
     ];
   }
   return [
-    { action: "Integrate AI into strategic planning and capital allocation", rationale: "At this maturity stage, AI should inform corporate strategy, not be a separate initiative. Board should expect AI implications in every major strategic decision.", owner: "Full Board" },
-    { action: "Assess AI-driven competitive moat and M&A implications", rationale: "Evaluate whether proprietary AI capabilities create defensible advantages. Consider AI capabilities in acquisition targets and partnership evaluations.", owner: "Strategy Committee" },
-    { action: "Review AI ethics and responsible AI posture", rationale: "Advanced AI deployment increases reputational and regulatory risk. Board should ensure ethical AI governance keeps pace with capability.", owner: "Risk / Governance Committee" },
-    { action: "Benchmark AI maturity against industry leaders annually", rationale: "Maintain external perspective on competitive position. Annual independent assessment prevents internal bias in self-reporting.", owner: "Board request to CIO" },
+    { action: "AI in Capital Allocation", rationale: "At this maturity stage, AI should inform corporate strategy, not be a separate initiative. Board should expect AI implications in every major strategic decision.", owner: "Full Board" },
+    { action: "Assess Competitive Moat", rationale: "Evaluate whether proprietary AI capabilities create defensible advantages. Consider AI capabilities in acquisition targets and partnership evaluations.", owner: "Strategy Committee" },
+    { action: "Review AI Ethics Posture", rationale: "Advanced AI deployment increases reputational and regulatory risk. Board should ensure ethical AI governance keeps pace with capability.", owner: "Risk / Governance Committee" },
+    { action: "Annual AI Benchmarking", rationale: "Maintain external perspective on competitive position. Annual independent assessment prevents internal bias in self-reporting.", owner: "Board request to CIO" },
   ];
 }
 
