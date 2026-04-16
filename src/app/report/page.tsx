@@ -1174,11 +1174,22 @@ function ReportPage() {
                 // First part may be intro text (no heading)
                 const intro = parts[0]?.startsWith("#") ? null : parts[0];
                 const sections = parts.filter((p) => p.startsWith("#"));
+                // Filter out redundant "Competitive Positioning" heading (same as section title)
+                const filteredSections = sections.filter((s) => {
+                  const h = s.split("\n")[0]?.replace(/^#{1,3}\s+/, "").trim().toLowerCase() || "";
+                  return !h.includes("competitive positioning");
+                });
+                // If a "Competitive Positioning" section was removed, merge its body into intro
+                const removedSection = sections.find((s) => {
+                  const h = s.split("\n")[0]?.replace(/^#{1,3}\s+/, "").trim().toLowerCase() || "";
+                  return h.includes("competitive positioning");
+                });
+                const mergedIntro = [intro, removedSection ? removedSection.split("\n").slice(1).join("\n").trim() : null].filter(Boolean).join("\n\n");
                 return (
                   <>
-                    {intro && <MarkdownContent content={intro} />}
+                    {mergedIntro && <MarkdownContent content={mergedIntro} />}
                     <div className="mt-3 space-y-1">
-                      {sections.map((section, idx) => {
+                      {filteredSections.map((section, idx) => {
                         const lines = section.split("\n");
                         const heading = lines[0]?.replace(/^#{1,3}\s+/, "").trim() || `Finding ${idx + 1}`;
                         const body = lines.slice(1).join("\n").trim();
@@ -1275,12 +1286,12 @@ function ReportPage() {
             )}
 
             {/* Value Waterfall — right above methodology */}
-            <SubCollapsible title="Value Waterfall" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" /></svg>}>
+            <SubCollapsible title="Value Waterfall">
               <EconomicWaterfall estimate={result.economicEstimate} profile={result.companyProfile} />
             </SubCollapsible>
 
             {/* How we got these numbers — methodology at the bottom */}
-            <SubCollapsible title="How We Calculate These Numbers" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" /></svg>}>
+            <SubCollapsible title="How We Calculate These Numbers">
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
                   <p>
