@@ -821,7 +821,7 @@ function ReportPage() {
 
                   {/* Detailed narrative if available */}
                   {report?.sections?.find((s) => s.slug === "executive-summary")?.content && (
-                    <SubCollapsible title={`Current State of AI at ${result.companyProfile.companyName}`} hint="Read full narrative">
+                    <SubCollapsible title={`Overarching Narrative`} hint="Read full narrative">
                       <MarkdownContent
                         content={report?.sections?.find((s) => s.slug === "executive-summary")?.content || ""}
                       />
@@ -1669,9 +1669,11 @@ function ReportPage() {
                           {b.items.map((cat, idx) => (
                             <div key={idx}>
                               <p className="text-xs font-semibold text-secondary mb-1">{cat.category}</p>
-                              <p className="text-xs text-foreground/60 leading-relaxed">{cat.description}</p>
-                              <p className="text-xs text-navy font-medium mt-2">{cat.vendors}</p>
-                              <p className="text-[10px] text-tertiary mt-1">{cat.source}</p>
+                              <p className="text-xs text-foreground/60 leading-relaxed mb-2">{cat.description}</p>
+                              <div className="bg-offwhite border border-light p-2.5">
+                                <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-1">Rationale</p>
+                                <p className="text-xs text-secondary leading-relaxed">{cat.justification}</p>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1682,65 +1684,7 @@ function ReportPage() {
               })()}
             </SubCollapsible>
 
-            {/* --- 3. BUY / BUILD / PARTNER DECISION FRAMEWORK --- */}
-            <div className="border border-light p-5 mb-6">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Technology Decision Framework</span>
-              </div>
-              <p className="text-sm text-foreground/60 leading-relaxed mb-4">
-                Based on Stage {result.stageClassification.primaryStage} maturity and {result.companyProfile.regulatoryIntensity} regulatory intensity.
-              </p>
-              <div className="grid grid-cols-3 gap-3">
-                {([
-                  {
-                    strategy: "Buy",
-                    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>,
-                    color: "#0B1D3A",
-                    when: result.companyProfile.regulatoryIntensity === 'high'
-                      ? `Compliance-ready commodity capabilities where ${industryLabel(result.companyProfile.industry)} regulatory requirements are well-served by established vendors`
-                      : `Commodity capabilities where differentiation is not a priority for ${result.companyProfile.companyName}`,
-                    guidance: result.stageClassification.primaryStage <= 2
-                      ? `Recommended for most use cases at your maturity stage. Prioritize tools requiring minimal governance overhead that deliver value in weeks.`
-                      : `Appropriate for non-differentiating capabilities at scale. Require enterprise SLAs and data portability guarantees.`,
-                  },
-                  {
-                    strategy: "Build",
-                    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.384 3.073A1.5 1.5 0 014.5 16.97V7.03a1.5 1.5 0 011.536-1.273L11.42 8.83a1.5 1.5 0 010 6.34zm0 0a1.5 1.5 0 001.536-1.273l5.384-3.073a1.5 1.5 0 000-6.34L13.956 8.83A1.5 1.5 0 0011.42 15.17z" /></svg>,
-                    color: "#364E6E",
-                    when: result.companyProfile.regulatoryIntensity === 'high'
-                      ? `Proprietary models where off-the-shelf solutions cannot meet ${industryLabel(result.companyProfile.industry)} regulatory or accuracy requirements`
-                      : `Core differentiators where proprietary data or workflows create competitive advantage`,
-                    guidance: result.stageClassification.primaryStage <= 2
-                      ? `Exercise caution. Workflow Integration score of ${result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0}/100 suggests custom AI infrastructure is premature.`
-                      : `${(result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) >= 60 ? 'Sufficient infrastructure maturity for selective custom development.' : 'Build MLOps and data platform capability before scaling custom AI.'}`,
-                  },
-                  {
-                    strategy: "Partner",
-                    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>,
-                    color: "#6B7F99",
-                    when: `Complex transformations requiring ${result.companyProfile.regulatoryIntensity === 'high' ? `regulatory expertise, ` : ''}domain knowledge, change management, or accelerated timelines`,
-                    guidance: result.stageClassification.primaryStage <= 2
-                      ? `Strongly recommended. A strategic partner can compress the learning curve by 12-18 months and avoid governance pitfalls.`
-                      : `Selective use for specialized domains. Internal capabilities should lead, with partners filling expertise gaps.`,
-                  },
-                ] as const).map((s) => (
-                  <div key={s.strategy} className="border border-light p-4" style={{ borderTop: `3px solid ${s.color}` }}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span style={{ color: s.color }}>{s.icon}</span>
-                      <span className="text-sm font-bold text-secondary">{s.strategy}</span>
-                    </div>
-                    <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-1">When to {s.strategy.toLowerCase()}</p>
-                    <p className="text-xs text-foreground/60 leading-relaxed mb-3">{s.when}</p>
-                    <div className="bg-offwhite border border-light p-2.5">
-                      <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-1">Guidance</p>
-                      <p className="text-xs text-secondary font-medium leading-relaxed">{s.guidance}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* --- 4. CONTRACT NEGOTIATION LEVERS --- */}
+            {/* --- 3. CONTRACT NEGOTIATION LEVERS --- */}
             <SubCollapsible title="Contract Negotiation Levers" hint="View negotiation strategy" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>}>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 <strong className="text-secondary">AI vendor contracts are not software licenses.</strong>{" "}
@@ -1748,29 +1692,52 @@ function ReportPage() {
                   ? `At Stage ${result.stageClassification.primaryStage}, getting these contracts right from the start avoids costly renegotiations later.`
                   : `At Stage ${result.stageClassification.primaryStage}, existing vendor relationships should be audited against these levers.`}
               </p>
+              {/* Legend */}
+              <div className="flex flex-wrap items-center gap-4 mb-4 text-[10px]">
+                <span className="font-semibold text-tertiary uppercase tracking-wider">Likelihood:</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-green-500" /> High</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
+                <span className="text-foreground/30">|</span>
+                <span className="font-semibold text-tertiary uppercase tracking-wider">TCV Impact:</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-5 h-1.5 bg-navy" /> High</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-3.5 h-1.5 bg-navy/50" /> Medium</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-2 h-1.5 bg-navy/25" /> Low</span>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 {(() => {
                   const levers = [
-                    { lever: "Declining Unit Economics", group: "Pricing", description: `AI inference costs drop 30-50% annually. Build automatic 15-20% annual step-downs. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying by 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.` },
-                    { lever: "Usage-Based Pricing with Caps", group: "Pricing", description: `Negotiate consumption-based pricing with hard budget caps. ${result.stageClassification.primaryStage <= 2 ? `Organizations at this stage typically overpay by 40-60% in year one.` : `Push for 25-40% volume discounts at your scale.`}` },
-                    { lever: "Data Portability Guarantees", group: "Risk", description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement.` : `Training data and fine-tuned models are proprietary IP.`}` },
-                    { lever: "Model-Agnostic Architecture", group: "Risk", description: `Allow model swaps without renegotiation. The LLM landscape shifts quarterly. Require API-compatible alternatives.` },
-                    { lever: "Performance SLAs with Teeth", group: "Protection", description: `Tie payments to measurable outcomes: latency, accuracy, uptime. Include penalty clauses for model degradation.` },
-                    { lever: "Termination Without Penalty", group: "Protection", description: `90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `3-year lock-ins made today will be regretted in 18 months.` : `The vendor landscape is volatile enough that long-term lock-ins carry material risk.`}` },
+                    { lever: "Declining Unit Economics", group: "Pricing", likelihood: "high" as const, tcvImpact: "high" as const, description: `AI inference costs drop 30-50% annually. Build automatic 15-20% annual step-downs. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying by 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.` },
+                    { lever: "Usage-Based Pricing with Caps", group: "Pricing", likelihood: "high" as const, tcvImpact: "medium" as const, description: `Negotiate consumption-based pricing with hard budget caps. ${result.stageClassification.primaryStage <= 2 ? `Organizations at this stage typically overpay by 40-60% in year one.` : `Push for 25-40% volume discounts at your scale.`}` },
+                    { lever: "Data Portability Guarantees", group: "Risk", likelihood: "medium" as const, tcvImpact: "low" as const, description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement.` : `Training data and fine-tuned models are proprietary IP.`}` },
+                    { lever: "Model-Agnostic Architecture", group: "Risk", likelihood: "medium" as const, tcvImpact: "medium" as const, description: `Allow model swaps without renegotiation. The LLM landscape shifts quarterly. Require API-compatible alternatives.` },
+                    { lever: "Performance SLAs with Teeth", group: "Protection", likelihood: "high" as const, tcvImpact: "high" as const, description: `Tie payments to measurable outcomes: latency, accuracy, uptime. Include penalty clauses for model degradation.` },
+                    { lever: "Termination Without Penalty", group: "Protection", likelihood: "medium" as const, tcvImpact: "medium" as const, description: `90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `3-year lock-ins made today will be regretted in 18 months.` : `The vendor landscape is volatile enough that long-term lock-ins carry material risk.`}` },
                   ];
                   const groups = [
                     { name: "Pricing", color: "#0B1D3A" },
                     { name: "Protection", color: "#6B7F99" },
                     { name: "Risk", color: "#364E6E" },
                   ];
+                  const likelihoodColor = (l: "high" | "medium") => l === "high" ? "bg-green-500" : "bg-yellow-500";
+                  const tcvBarWidth = (t: "high" | "medium" | "low") => t === "high" ? "w-full" : t === "medium" ? "w-2/3" : "w-1/3";
+                  const tcvBarOpacity = (t: "high" | "medium" | "low") => t === "high" ? "bg-navy" : t === "medium" ? "bg-navy/50" : "bg-navy/25";
                   return groups.map((g) => (
                     <div key={g.name} className="border border-light p-4" style={{ borderTop: `3px solid ${g.color}` }}>
                       <p className="text-xs font-bold tracking-wider uppercase mb-3" style={{ color: g.color }}>{g.name}</p>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {levers.filter((l) => l.group === g.name).map((item) => (
                           <div key={item.lever}>
-                            <p className="text-xs font-semibold text-secondary mb-1">{item.lever}</p>
-                            <p className="text-xs text-foreground/60 leading-relaxed">{item.description}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`flex-shrink-0 w-2 h-2 rounded-full ${likelihoodColor(item.likelihood)}`} title={`Likelihood: ${item.likelihood}`} />
+                              <p className="text-xs font-semibold text-secondary">{item.lever}</p>
+                            </div>
+                            <p className="text-xs text-foreground/60 leading-relaxed mb-2">{item.description}</p>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] text-tertiary uppercase tracking-wider font-medium w-8 flex-shrink-0">TCV</span>
+                              <div className="flex-1 h-1.5 bg-light rounded-full overflow-hidden">
+                                <div className={`h-full rounded-full ${tcvBarWidth(item.tcvImpact)} ${tcvBarOpacity(item.tcvImpact)}`} />
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1884,10 +1851,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Items for board consideration — grouped by Decision / Investment / Governance */}
-            <div className="border border-light p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Items for Board Consideration</span>
-              </div>
+            <SubCollapsible title="Items for Board Consideration" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>}>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Based on this diagnostic, the following items may warrant <strong className="text-secondary">board-level discussion</strong>.
                 Each is framed as a consideration adapted from NACD best practices for AI governance oversight.
@@ -1904,7 +1868,7 @@ function ReportPage() {
                     {groups.map((g) => {
                       const groupAsks = asks.filter((a) => a.type === g.type);
                       return (
-                        <div key={g.type} className="border border-light" style={{ borderTop: `3px solid ${g.color}` }}>
+                        <div key={g.type} className="border border-light min-h-[120px]" style={{ borderTop: `3px solid ${g.color}` }}>
                           <SubCollapsible
                             title={g.label}
                             icon={<span style={{ color: g.color }}>{g.icon}</span>}
@@ -1927,7 +1891,7 @@ function ReportPage() {
                   </div>
                 );
               })()}
-            </div>
+            </SubCollapsible>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -2954,7 +2918,7 @@ function SubCollapsible({
         <span className={`text-sm font-semibold flex-1 transition-colors ${open ? "text-navy" : "text-secondary group-hover:text-navy/80"}`}>{title}</span>
         {!open && (
           <span className="text-[10px] text-tertiary/60 tracking-wide uppercase font-medium hidden sm:inline">
-            {hint || "Click to expand"}
+            {hint}
           </span>
         )}
       </button>
@@ -5931,37 +5895,42 @@ function getVendorStackByUseCase(useCases: string[], industry: string, stage: nu
   return selected;
 }
 
-function getRecommendedPartnerCategories(industry: string, stage: number): { category: string; description: string; vendors: string; source: string }[] {
+function getRecommendedPartnerCategories(industry: string, stage: number): { category: string; description: string; justification: string }[] {
+  const ind = industryLabel(industry);
   const categories = [
     {
       category: "AI/ML Platform",
       description: stage <= 2
         ? "Start with a comprehensive AI platform that includes pre-built models, AutoML, and managed infrastructure to reduce time-to-value."
         : "Enterprise-grade ML platform with robust MLOps, model governance, and multi-cloud deployment capabilities.",
-      vendors: "Leaders: AWS SageMaker, Google Vertex AI, Microsoft Azure AI, Databricks | Challengers: Dataiku, H2O.ai, DataRobot",
-      source: "Gartner Magic Quadrant for Cloud AI Developer Services 2024",
+      justification: stage <= 2
+        ? `Buy. Building ML infrastructure from scratch at Stage ${stage} diverts 6-12 months of engineering effort from business value. Cloud AI platforms commoditize infrastructure so your team focuses on ${ind}-specific use cases, not plumbing. The build-vs-buy calculus shifts only after you have differentiated data pipelines worth owning.`
+        : `Buy with selective customization. At Stage ${stage}, your ${ind} organization has enough ML maturity to evaluate platforms critically. Buy the commodity layer (compute, orchestration, monitoring) and build only the proprietary components where your data or domain creates defensible advantage.`,
     },
     {
       category: "Generative AI & LLM",
       description: "Large language model providers for enterprise applications including content generation, code assistance, and knowledge management.",
-      vendors: "Leaders: OpenAI (GPT-4), Anthropic (Claude), Google (Gemini) | Enterprise: Microsoft Copilot, AWS Bedrock, Cohere",
-      source: "Forrester Wave: AI Foundation Models 2024",
+      justification: stage <= 2
+        ? `Buy. Training or fine-tuning foundation models requires data engineering capabilities and GPU budgets that are premature at Stage ${stage}. Commercial LLM APIs deliver 80-90% of value at a fraction of the cost. The model landscape shifts quarterly; locking into a custom model now means maintaining something that may be obsolete in 12 months.`
+        : `Buy with fine-tuning. At Stage ${stage}, use commercial APIs as the base and invest in fine-tuning for ${ind}-specific tasks where accuracy and domain terminology matter. Building a foundation model from scratch is only justified if you have proprietary training data that creates a moat no vendor can replicate.`,
     },
     {
       category: "AI Governance & Risk",
       description: stage <= 2
         ? "Essential for establishing AI oversight without building custom governance tooling. Start with monitoring and basic policy enforcement."
         : "Comprehensive AI governance covering model risk management, bias detection, explainability, and regulatory compliance.",
-      vendors: "Leaders: IBM OpenPages, SAS Model Risk Management | Emerging: Credo AI, Arthur AI, Weights & Biases",
-      source: "Gartner Market Guide for AI Trust, Risk and Security Management 2024",
+      justification: stage <= 2
+        ? `Build internally with lightweight tooling. Governance frameworks must reflect your ${ind}-specific risk appetite, regulatory requirements, and organizational structure. Off-the-shelf governance platforms add complexity before you have enough AI deployments to govern. Start with documented policies, approval workflows, and a risk register - these cost nothing and establish the muscle memory for scaling later.`
+        : `Build the framework, buy the tooling. Your governance policies and risk taxonomy should be proprietary to your ${ind} context. But the monitoring, auditing, and compliance automation underneath should be purchased: model monitoring, bias detection, and explainability tooling are commodity capabilities where vendor R&D outpaces what any single organization can build.`,
     },
     {
       category: "Implementation & Strategy Partner",
       description: stage <= 2
         ? "A strategic implementation partner can compress your learning curve by 12-18 months and avoid common early-stage pitfalls."
         : "Domain-specific expertise for complex AI transformations, change management, and operating model redesign.",
-      vendors: "Strategy: McKinsey, BCG, Deloitte, Accenture | CIO Advisory: RLK Consulting | Implementation: Thoughtworks, Slalom, Cognizant, Infosys",
-      source: "Forrester Wave: AI Strategy Consulting 2024",
+      justification: stage <= 2
+        ? `Partner. At Stage ${stage}, the highest-risk failure mode is not technology selection - it is organizational: wrong governance model, misaligned incentives, AI projects that solve interesting problems instead of business problems. A strategy partner with ${ind} experience has pattern-matched across dozens of transformations and can compress the learning curve by 12-18 months, avoiding the governance pitfalls and change management failures that stall most early-stage AI programs.`
+        : `Partner selectively. At Stage ${stage}, your internal capabilities should lead. Partner only for specialized domains where you lack expertise (e.g., advanced MLOps, regulatory AI compliance) or where an outside perspective can challenge internal assumptions. The risk at this stage is over-reliance on partners for capabilities you should be building in-house.`,
     },
   ];
   return categories;
