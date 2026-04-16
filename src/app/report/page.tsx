@@ -335,37 +335,6 @@ function ReportPage() {
         </section>
       )}
 
-      {/* Competitive Positioning Teaser */}
-      {result && (
-        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Competitive Positioning</h2>
-          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
-          <p className="text-sm text-foreground/50 mb-5">
-            Where {result.companyProfile.companyName} sits relative to peers in{" "}
-            {industryLabel(result.companyProfile.industry)}.
-          </p>
-          <CompetitiveMatrix
-            capabilityScore={
-              (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
-              (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5
-            }
-            readinessScore={
-              (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
-              (result.dimensionScores.find((d) => d.dimension === "decision_velocity")?.normalizedScore || 0) * 0.3 +
-              (result.dimensionScores.find((d) => d.dimension === "economic_translation")?.normalizedScore || 0) * 0.3
-            }
-            companyName={result.companyProfile.companyName}
-          />
-          <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
-            <p className="text-sm text-foreground/70">
-              The full report reveals <strong className="text-secondary">exactly where your competitors are investing</strong> in AI,
-              with named companies, dollar amounts, and specific use cases.{" "}
-              <span className="text-tertiary">See Sections 4-5 in the full report.</span>
-            </p>
-          </div>
-        </section>
-      )}
-
       {/* Economic Impact */}
       {result && (
         <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
@@ -788,33 +757,71 @@ function ReportPage() {
                       </SubCollapsible>
 
                       <SubCollapsible title="The Competitive Context" hint="View positioning" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>}>
-                        <p className="text-sm text-foreground/70 leading-relaxed">
-                          {result.companyProfile.companyName} sits in the{" "}
-                          <strong className="text-secondary">{(() => {
-                            const cap = (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
-                              (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5;
-                            const read = (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
-                              (result.dimensionScores.find((d) => d.dimension === "decision_velocity")?.normalizedScore || 0) * 0.3 +
-                              (result.dimensionScores.find((d) => d.dimension === "economic_translation")?.normalizedScore || 0) * 0.3;
-                            if (cap >= 50 && read >= 50) return "AI-Native Leaders";
-                            if (cap >= 50) return "Capability Without Structure";
-                            if (read >= 50) return "Structure Without Capability";
-                            return "Pre-AI";
-                          })()}</strong>{" "}
-                          quadrant of the competitive positioning matrix. Section 4 details <strong className="text-secondary">where your specific
-                          competitors are investing in AI right now</strong> - with named companies, dollar amounts, and use
-                          cases sourced from public filings and analyst research. Section 8 provides the vendor
-                          landscape assessment and contract negotiation levers to optimize your AI spend.
-                        </p>
+                        {(() => {
+                          const cap = (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
+                            (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5;
+                          const read = (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
+                            (result.dimensionScores.find((d) => d.dimension === "decision_velocity")?.normalizedScore || 0) * 0.3 +
+                            (result.dimensionScores.find((d) => d.dimension === "economic_translation")?.normalizedScore || 0) * 0.3;
+                          const quadrant = cap >= 50 && read >= 50 ? "AI-Native Leaders" : cap >= 50 ? "Capability Without Structure" : read >= 50 ? "Structure Without Capability" : "Pre-AI";
+                          const strongest = [...result.dimensionScores].sort((a, b) => b.normalizedScore - a.normalizedScore)[0];
+                          const weakest = [...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0];
+                          return (
+                            <div className="text-sm text-foreground/70 leading-relaxed space-y-2">
+                              <p>
+                                {result.companyProfile.companyName} sits in the <strong className="text-secondary">{quadrant}</strong> quadrant
+                                with an AI Capability score of <strong className="text-secondary">{Math.round(cap)}/100</strong> and
+                                Organizational Readiness of <strong className="text-secondary">{Math.round(read)}/100</strong>.
+                                {cap >= 50 && read < 50 && ` Your teams are adopting AI tools faster than your governance structures can support them. This creates shadow AI risk and makes every dollar of AI investment harder to defend to the board.`}
+                                {cap < 50 && read >= 50 && ` You have the governance scaffolding for AI but the actual adoption and workflow integration lag behind. The risk is bureaucratic overhead protecting an asset that does not yet exist at scale.`}
+                                {cap >= 50 && read >= 50 && ` Both capability and governance are in healthy territory, but the gap between your strongest dimension (${dimensionLabel(strongest?.dimension || "")} at ${strongest?.normalizedScore}/100) and weakest (${dimensionLabel(weakest?.dimension || "")} at ${weakest?.normalizedScore}/100) reveals where friction compounds.`}
+                                {cap < 50 && read < 50 && ` Both adoption and governance are below the industry median. The opportunity cost is compounding: competitors in ${ind} operating at Stage 3+ are capturing 2-4x more AI value while your organization is still building the foundation.`}
+                              </p>
+                              <p>
+                                Industry intelligence suggests <strong className="text-secondary">at least one competitor in {ind} is operating
+                                at AI maturity levels significantly above</strong> {result.companyProfile.companyName}&apos;s current position.
+                                The competitive window to close this gap narrows as AI capabilities compound: organizations that reach Stage 3+
+                                accelerate away from peers because their governance infrastructure enables faster, cheaper experimentation.
+                              </p>
+                            </div>
+                          );
+                        })()}
                       </SubCollapsible>
 
                       <SubCollapsible title="The Path Forward" hint="View next steps" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>}>
-                        <p className="text-sm text-foreground/70 leading-relaxed">
-                          Section 7 maps the <strong className="text-secondary">security and governance risks</strong> your current posture creates.
-                          Section 9 provides <strong className="text-secondary">messages for the board</strong> with specific decision items and investment asks.
-                          Every finding is supported by methodology and sources documented in Section 10.
-                          The gap between diagnosis and impact is <strong className="text-secondary">a concrete operationalization plan</strong> - translating these findings into governance structures, vendor decisions, and organizational changes within 90 days.
-                        </p>
+                        {(() => {
+                          const weakest = [...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0];
+                          const highRisks = result.dimensionScores.filter(d => d.normalizedScore < 40).length;
+                          const maxIdx = [...result.compositeIndices].sort((a, b) => b.score - a.score)[0];
+                          const minIdx = [...result.compositeIndices].sort((a, b) => a.score - b.score)[0];
+                          return (
+                            <div className="text-sm text-foreground/70 leading-relaxed space-y-2">
+                              <p>
+                                <strong className="text-secondary">Priority #1: {dimensionLabel(weakest?.dimension || "")}</strong> at {weakest?.normalizedScore}/100 is the
+                                binding constraint on all other AI investments. Improving this dimension from Stage {result.stageClassification.primaryStage} levels
+                                to Stage {Math.min(5, result.stageClassification.primaryStage + 1)} unlocks disproportionate value because every
+                                other dimension is throttled by this bottleneck.
+                              </p>
+                              {highRisks > 0 && (
+                                <p>
+                                  <strong className="text-secondary">{highRisks} high-severity governance risk{highRisks > 1 ? "s" : ""}</strong> {highRisks > 1 ? "require" : "requires"} immediate
+                                  attention. These are not theoretical: they represent active exposure in areas where your diagnostic
+                                  responses indicate control gaps that AI adoption is likely exploiting today.
+                                </p>
+                              )}
+                              <p>
+                                The structural imbalance between <strong className="text-secondary">{maxIdx?.name}</strong> ({maxIdx?.score}/100)
+                                and <strong className="text-secondary">{minIdx?.name}</strong> ({minIdx?.score}/100) means
+                                targeted investment in {minIdx?.name?.toLowerCase()} will produce outsized returns: you are not starting
+                                from zero, you are closing a gap between what your organization can do and what it can govern and prove.
+                              </p>
+                              <p>
+                                The gap between diagnosis and impact is <strong className="text-secondary">a concrete 90-day operationalization
+                                plan</strong> - translating these findings into governance structures, vendor decisions, and organizational changes.
+                              </p>
+                            </div>
+                          );
+                        })()}
                       </SubCollapsible>
                     </div>
                   </div>
@@ -942,7 +949,7 @@ function ReportPage() {
             number={3}
             title="Structural Constraints"
             summary="Three composite indices distill your 61 responses into the metrics that matter: can your organization govern AI, capture its value, and move fast enough to stay competitive?"
-            insight={`The structural gap between your strongest and weakest composite index is ${Math.abs((result.compositeIndices[0]?.score || 0) - ([...result.compositeIndices].sort((a, b) => a.score - b.score)[0]?.score || 0))} points - this imbalance is where organizational friction compounds.`}
+            insight={`The structural gap between your strongest and weakest composite index is ${Math.max(...result.compositeIndices.map(ci => ci.score)) - Math.min(...result.compositeIndices.map(ci => ci.score))} points - this imbalance is where organizational friction compounds.`}
             preview={
               (() => {
                 const narrativeContent = report?.sections?.find((s) => s.slug === "structural-constraints")?.content || "";
@@ -2862,26 +2869,22 @@ function ConstraintExpander({
           </div>
 
           <div className="ml-4 space-y-1">
-            <SubCollapsible title="Industry Context" hint="View benchmarks" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>}>
-              <div className="bg-offwhite border border-light p-3">
-                <p className="text-sm text-foreground/60 leading-relaxed">{benchmark}</p>
-              </div>
+            <SubCollapsible title="Industry Context" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>}>
+              <p className="text-sm text-foreground/60 leading-relaxed">{benchmark}</p>
             </SubCollapsible>
 
-            <SubCollapsible title="What This Score Puts at Risk" hint="View risk exposure" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
-              <div className="p-3 border border-light">
-                <p className="text-sm text-foreground/60 leading-relaxed">
-                  {risks} See Section 7 for the full risk assessment.
-                </p>
-              </div>
+            <SubCollapsible title="What This Score Puts at Risk" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
+              <p className="text-sm text-foreground/60 leading-relaxed">{risks}</p>
             </SubCollapsible>
 
           </div>
 
-          {/* AI narrative for this constraint — merged from deep dive */}
+          {/* AI narrative for this constraint — collapsed under Deeper Insights */}
           {narrative && (
-            <div className="mt-4 pt-3 border-t border-light ml-4">
-              <MarkdownContent content={narrative} />
+            <div className="ml-4 mt-1">
+              <SubCollapsible title="Deeper Insights" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.456 4.186a3.001 3.001 0 00-4.412 0M12 18.75v-2.25m0 0a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /></svg>}>
+                <MarkdownContent content={narrative} />
+              </SubCollapsible>
             </div>
           )}
         </div>
