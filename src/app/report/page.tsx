@@ -367,7 +367,7 @@ function ReportPage() {
             {industryLabel(result.companyProfile.industry, result.companyProfile.industryDisplayLabel)} industry benchmarks applied to {result.companyProfile.companyName}
           </p>
           <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-6" />
-          <EconomicSummary estimate={result.economicEstimate} />
+          <EconomicSummary estimate={{...result.economicEstimate, currentCapturePercent: correctedCapturePercent}} />
           <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
             <p className="text-sm text-foreground/70">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
@@ -800,13 +800,25 @@ function ReportPage() {
                                 {cap >= 50 && read < 50 && ` Your teams are adopting AI tools faster than your governance structures can support them. This creates shadow AI risk and makes every dollar of AI investment harder to justify.`}
                                 {cap < 50 && read >= 50 && ` You have the governance scaffolding for AI but the actual adoption and workflow integration lag behind. The risk is bureaucratic overhead protecting an asset that does not yet exist at scale.`}
                                 {cap >= 50 && read >= 50 && ` Both capability and governance are in healthy territory, but the gap between your strongest dimension (${dimensionLabel(strongest?.dimension || "")} at ${strongest?.normalizedScore}/100) and weakest (${dimensionLabel(weakest?.dimension || "")} at ${weakest?.normalizedScore}/100) reveals where friction compounds.`}
-                                {cap < 50 && read < 50 && ` Both adoption and governance are below the industry median. The opportunity cost is compounding: competitors in ${ind} operating at Stage 3+ are capturing 2-4x more AI value while your organization is still building the foundation.`}
+                                {cap < 50 && read < 50 && ` Both adoption and governance are below the industry median. The opportunity cost is compounding: competitors in ${ind} operating at Stage ${Math.min(5, result.stageClassification.primaryStage + 1)}+ are capturing 2-4x more AI value while your organization is still building the foundation.`}
                               </p>
                               <p>
-                                Industry intelligence suggests <strong className="text-secondary">at least one competitor in {ind} is operating
-                                at AI maturity levels significantly above</strong> {result.companyProfile.companyName}&apos;s current position.
-                                The competitive window to close this gap narrows as AI capabilities compound: organizations that reach Stage 3+
-                                accelerate away from peers because their governance infrastructure enables faster, cheaper experimentation.
+                                {result.stageClassification.primaryStage >= 4 ? (
+                                  <>
+                                    Industry intelligence suggests <strong className="text-secondary">fast-following competitors in {ind} are
+                                    investing to close the gap</strong> with {result.companyProfile.companyName}&apos;s current Stage {result.stageClassification.primaryStage} position.
+                                    At this stage the competitive question shifts from &quot;are we behind?&quot; to &quot;is our pace of reinvestment sufficient
+                                    to stay ahead?&quot; Leaders who pause typically regress to Stage {Math.max(1, result.stageClassification.primaryStage - 1)} behavioral
+                                    patterns within 12-18 months (BCG 2024).
+                                  </>
+                                ) : (
+                                  <>
+                                    Industry intelligence suggests <strong className="text-secondary">at least one competitor in {ind} is operating
+                                    at AI maturity levels significantly above</strong> {result.companyProfile.companyName}&apos;s current position.
+                                    The competitive window to close this gap narrows as AI capabilities compound: organizations that reach Stage {Math.min(5, result.stageClassification.primaryStage + 1)}+
+                                    accelerate away from peers because their governance infrastructure enables faster, cheaper experimentation.
+                                  </>
+                                )}
                               </p>
                             </div>
                           );
@@ -4829,9 +4841,17 @@ function getFreeMaturityAnalysis(
     consulting_services: `Professional services and consulting firms face an AI inflection point: McKinsey's own internal data shows AI-augmented consultants deliver analyses 40% faster with broader evidence bases. Deloitte reports that AI-assisted audit teams cover 100% of transactions versus the 5-10% sample historically possible. EY's AI-driven tax automation handles routine compliance 60% faster. For ${companyName} at ${rev}, the leverage model amplifies AI's impact: BCG estimates that consulting and professional services firms at Stage ${stage} achieve 15-25% lower utilization rates because their people spend disproportionate time on tasks AI could accelerate or automate.`,
     aerospace_defense: `Aerospace and defense is among the most AI-intensive industries by R&D spend. Lockheed Martin's AI-driven predictive maintenance for the F-35 program reduced unscheduled downtime by 40%. Boeing's digital twin simulations powered by machine learning cut design iteration cycles from months to days. The DoD's 2024 AI strategy requires all major contractors to demonstrate AI integration capabilities for future contract eligibility. For ${companyName}, Deloitte's defense sector analysis shows that contractors below Stage 3 AI maturity are increasingly disadvantaged in competitive bids, as the DoD explicitly weights AI capability in source selection criteria.`,
     telecommunications: `Telecom operators are using AI to manage network complexity, reduce churn, and create new revenue streams. T-Mobile's AI-driven customer retention system reduced churn by 30%, worth an estimated $1.2B annually. AT&T's network AI detects and resolves issues 50% faster than manual NOC operations. Ericsson's 2024 industry report found AI-mature operators achieve 15-20% better network efficiency. For ${companyName} at ${rev}, McKinsey estimates that telecom operators at Stage ${stage} spend 25-40% more on network operations and customer retention than AI-optimized peers, a gap that compounds as 5G and edge computing increase network complexity.`,
+    government_federal: `Federal agencies are under mandate to deploy AI responsibly at scale. Executive Order 14110 (October 2023) and OMB Memorandum M-24-10 (March 2024) require every major agency to appoint a Chief AI Officer, publish an AI use-case inventory, and complete impact assessments for safety- or rights-impacting AI. DoD's Chief Digital and AI Office (CDAO) operates Task Force Lima for generative AI across the department. GSA's AI Center of Excellence supports agency adoption. For ${companyName}, GAO's 2024 assessments found that agencies at Stage ${stage} maturity face the greatest compliance exposure under M-24-10 because governance artifacts — inventories, impact assessments, and red-team results — lag behind technology deployment.`,
+    government_state_local: `State and local governments are accelerating AI adoption under a patchwork of state executive orders (CA EO N-12-23, NY, NJ) and sector-specific legislation (Colorado AI Act, Texas HB 2060). The fastest movers — California CDT, NYC Office of Technology and Innovation, Texas DIR — operate formal GenAI sandboxes, procurement guardrails, and bias-assessment toolkits. For ${companyName}, the primary risk at Stage ${stage} is not under-adoption but unmanaged adoption: public-records exposure, civil-rights litigation, and procurement audit findings compound quickly when AI is deployed without documented governance, impact assessments, and public-facing disclosure.`,
+    nonprofit_ngo: `Nonprofits and NGOs are deploying AI for mission acceleration under tight resource and ethics constraints. The Gates Foundation has committed $30M+ to AI for global development. The American Red Cross and World Food Programme deploy AI for disaster response and anticipatory action. Partnership on AI's 2024 guidance emphasizes that mission-driven organizations must balance donor expectations, beneficiary rights, and operational efficiency. For ${companyName}, Bridgespan Group's 2024 analysis finds that nonprofits at Stage ${stage} face a distinctive risk: donor and grantmaker scrutiny of AI governance is rising faster than operational AI adoption, creating reputational exposure ahead of operational benefit.`,
+    real_estate_commercial: `Commercial real estate is adopting AI across leasing, valuation, property operations, and capital markets. CBRE, JLL, and Cushman & Wakefield deploy proprietary AI platforms for deal-pipeline analytics and lease abstraction. JLL's JLL GPT was one of the first large-language models built for the CRE vertical. Prologis uses AI for energy optimization across 1.2B+ sq ft of logistics space. For ${companyName} at ${rev}, Altus Group's 2024 CRE technology benchmark finds that firms at Stage ${stage} spend 20-35% more per asset on property operations than AI-optimized peers, with the gap widening as AI-enabled tenant experience becomes a leasing differentiator.`,
+    real_estate_residential: `Residential real estate is being reshaped by AI in pricing, search, underwriting, and property management. Zillow's AI-powered Zestimate covers 100M+ homes. Opendoor's AI pricing models underwrite iBuyer offers at scale. Rocket Mortgage deploys AI across loan origination. For ${companyName} at ${rev}, STRATMOR's 2024 benchmark finds that residential real-estate operators at Stage ${stage} carry 25-40% higher origination and servicing costs per unit than AI-enabled peers, with AI-driven tenant-screening, pricing, and fraud-detection becoming competitive necessities rather than differentiators.`,
+    media_entertainment: `Media and entertainment companies are deploying AI across content personalization, production workflow, and rights management. Netflix attributes 80%+ of watched content to AI recommendations. Disney operates an enterprise AI task force with board oversight. Comcast and NBCUniversal integrate AI across Xfinity operations and Peacock personalization. For ${companyName} at ${rev}, PwC's 2024 Global Entertainment & Media Outlook finds that firms at Stage ${stage} are most exposed to the AI-driven disruption of content discovery and advertising pricing, with AI-optimized competitors capturing disproportionate share of shifting attention and ad budgets.`,
   };
 
-  // Map new industry slugs to existing context entries
+  // Map sub-industry slugs to the parent industryContextMap entry above. Only
+  // legitimate same-peer-group mappings — anything with a distinct operating
+  // model has its own entry and is NOT aliased here.
   const contextAliases: Record<string, string> = {
     healthcare_providers: 'healthcare',
     healthcare_payers: 'healthcare',
@@ -4857,6 +4877,7 @@ function getFreeMaturityAnalysis(
     automotive: 'manufacturing',
     chemicals_materials: 'manufacturing',
     industrial_services: 'manufacturing',
+    construction_engineering: 'manufacturing',
     energy_oil_gas: 'energy_utilities',
     utilities: 'energy_utilities',
     transportation: 'shipping_logistics',
@@ -4864,15 +4885,6 @@ function getFreeMaturityAnalysis(
     defense_contractors: 'aerospace_defense',
     legal_services: 'consulting_services',
     accounting_audit: 'consulting_services',
-    construction_engineering: 'manufacturing',
-    real_estate_commercial: 'consulting_services',
-    real_estate_residential: 'retail_ecommerce',
-    media_entertainment: 'technology',
-    government_federal: 'consulting_services',
-    government_state_local: 'consulting_services',
-    nonprofit_ngo: 'consulting_services',
-    education_higher: 'consulting_services',
-    education_k12: 'consulting_services',
   };
 
   const industryContext = industryContextMap[industry] || industryContextMap[contextAliases[industry] || ''] ||
@@ -5108,7 +5120,9 @@ function getPnLImpact(
 
   if (stage >= 4) {
     headline = "Protecting Your AI Edge — Why Leaders Can't Coast";
-    stageNarrative = `At Stage ${stage}, ${companyName} has built real AI capability. But competitive advantages in AI erode faster than they were built. BCG's 2024 research found that organizations pausing AI investment after reaching Stage 4 regress to Stage 3 behavioral patterns within 12-18 months — the organizational muscle atrophies quickly. Your ${capturePercent}% capture rate means you are converting real value, but competitors investing aggressively can close your lead in 2-3 quarters. The question is not whether to invest more, but whether your current pace is sufficient to maintain separation. In ${ind}, the cost of losing your AI edge is measured in market share points, not basis points.`;
+    const regressFromStage = stage; // you regress from where you are
+    const regressToStage = Math.max(1, stage - 1);
+    stageNarrative = `At Stage ${stage}, ${companyName} has built real AI capability. But competitive advantages in AI erode faster than they were built. BCG's 2024 research found that organizations pausing AI investment after reaching Stage ${regressFromStage} regress to Stage ${regressToStage} behavioral patterns within 12-18 months — the organizational muscle atrophies quickly. Your ${capturePercent}% capture rate means you are converting real value, but competitors investing aggressively can close your lead in 2-3 quarters. The question is not whether to invest more, but whether your current pace is sufficient to maintain separation. In ${ind}, the cost of losing your AI edge is measured in market share points, not basis points.`;
   } else if (stage === 3) {
     headline = "The Inflection Point — Where AI Investment Pays Off or Doesn't";
     // Compute an industry-specific Stage 4 capture estimate so the "asymmetric
@@ -5222,7 +5236,9 @@ function getPnLImpact(
       label: "Revenue Growth",
       investUpside: revGrowthInvest[industry] || `AI-driven ${ind.toLowerCase()}-specific optimization — including demand forecasting, customer personalization, and pricing intelligence — drives ${(revUp * 100).toFixed(1)}% incremental revenue growth. With an Adoption Behavior score of ${getScore('adoption_behavior')}/100, ${companyName} has meaningful room to embed AI into revenue-generating workflows.`,
       investDollar: fmtUSD(Math.round(revenue * revUp)),
-      coastDownside: revGrowthCoast[industry] || `Revenue growth stagnates as AI-enabled ${ind.toLowerCase()} competitors capture market share through faster innovation, better personalization, and lower customer acquisition costs. At Stage ${stage}, ${companyName} is falling ${stage <= 2 ? '18-24 months' : '12-18 months'} behind peers who are already scaling AI-driven revenue initiatives.`,
+      coastDownside: revGrowthCoast[industry] || (stage >= 4
+        ? `Revenue growth decelerates as fast-following ${ind.toLowerCase()} competitors close your AI lead through targeted investment in the same workflows that drive your current advantage. At Stage ${stage}, ${companyName}'s market-share premium erodes 2-4 quarters after aggressive peers match your AI operating model — the advantage is durable only if it keeps moving.`
+        : `Revenue growth stagnates as AI-enabled ${ind.toLowerCase()} competitors capture market share through faster innovation, better personalization, and lower customer acquisition costs. At Stage ${stage}, ${companyName} is falling ${stage <= 2 ? '18-24 months' : '12-18 months'} behind peers who are already scaling AI-driven revenue initiatives.`),
       coastDollar: `-${fmtUSD(Math.round(revenue * erosionRate))}`,
     },
     {
@@ -6080,9 +6096,17 @@ function resolveIndustryGroup(industry: string): string {
     transportation: "shipping_logistics", shipping_logistics: "shipping_logistics", infrastructure_transport: "shipping_logistics",
     aerospace_defense: "aerospace_defense", defense_contractors: "aerospace_defense",
     telecommunications: "telecommunications", media_entertainment: "telecommunications",
+    // Pure advisory / knowledge-work firms use the consulting_services KPI set
+    // (billable utilization, engagement-level AI, partner governance).
     consulting_services: "consulting_services", legal_services: "consulting_services", accounting_audit: "consulting_services",
-    government_federal: "consulting_services", government_state_local: "consulting_services", nonprofit_ngo: "consulting_services",
-    real_estate_commercial: "consulting_services", real_estate_residential: "consulting_services",
+    // Government, nonprofit, and real estate each have distinct operating
+    // models that do not match the billable-hour consulting KPI template.
+    // Route them to the generic defaults set until bespoke templates are
+    // authored. Peer examples, vendor benchmarks, and narratives still use
+    // industry-specific content via their own resolvers.
+    government_federal: "defaults", government_state_local: "defaults",
+    nonprofit_ngo: "defaults",
+    real_estate_commercial: "defaults", real_estate_residential: "defaults",
   };
   return groupMap[industry] || "defaults";
 }
@@ -6554,13 +6578,66 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
       { company: "EY", action: "Board oversees EY.ai platform — a $1.4B investment positioning AI as central to all service lines. CEO Carmine Di Sibio mandated that every engagement evaluate AI applicability. EY's AI-driven tax automation processes 60% of routine compliance work.", source: "EY 2024 Global Review; EY.ai Platform Public Disclosures" },
       { company: "KPMG", action: "Board approved enterprise AI transformation with dedicated AI governance framework. KPMG's AI-powered audit tools analyze 100% of journal entries and flag anomalies automatically. The firm invested $2B+ in technology including AI across audit, tax, and advisory.", source: "KPMG 2024 Global Annual Review; Transparency Report 2024" },
     ],
+    aerospace_defense: [
+      { company: "Lockheed Martin", action: "Board's Classified Business and Security Committee governs AI deployment across defense programs. Lockheed's AI Factory initiative processes petabytes of sensor data for autonomous platforms. CEO Jim Taiclet positioned '21st Century Security' around AI-enabled connected battlespace. Board receives quarterly AI risk and export-control reviews.", source: "Lockheed Martin 2024 Annual Report; 2024 Proxy Statement" },
+      { company: "Boeing", action: "Board oversees AI integration across commercial and defense programs. Boeing's AI-powered predictive maintenance covers 13,000+ aircraft. Board's Aerospace Safety Committee reviews AI quality and certification risk ahead of every model deployment.", source: "Boeing 2024 Annual Report; Aerospace Safety Committee Charter 2024" },
+      { company: "RTX (Raytheon Technologies)", action: "Board approved enterprise AI strategy anchored in Pratt & Whitney's EngineWise predictive analytics and Raytheon's mission-systems AI. CEO Chris Calio mandated AI-native product roadmaps. Board Technology Committee tracks AI export-compliance and classified-program governance quarterly.", source: "RTX 2024 Annual Report; Investor Day 2024" },
+    ],
+    defense_contractors: [
+      { company: "Northrop Grumman", action: "Board's Governance Committee oversees responsible AI deployment across autonomous systems, cyber, and space programs. Northrop's AI investments align with DoD's Joint All-Domain Command and Control (JADC2) framework. Board receives annual AI ethics and mission-assurance briefings.", source: "Northrop Grumman 2024 Annual Report; DoD JADC2 Strategy Public Summary" },
+      { company: "General Dynamics", action: "Board approved AI modernization across Mission Systems and Information Technology segments. GDIT's AI platform supports 30+ federal agencies with secure classified AI deployments. Board Technology Committee reviews AI risk and clearance governance quarterly.", source: "General Dynamics 2024 Annual Report; GDIT Public Capabilities Brief 2024" },
+      { company: "BAE Systems", action: "Board governs AI deployment through dedicated Responsible AI framework aligned with UK MoD and US DoD guidance. BAE's FalconWorks advanced-programs unit applies AI to electronic warfare and autonomous platforms. Board receives quarterly AI assurance and safety-case reviews.", source: "BAE Systems 2024 Annual Report; Responsible AI Framework Public Disclosure" },
+    ],
+    energy_oil_gas: [
+      { company: "Shell", action: "Board's Safety, Environment and Sustainability Committee oversees AI deployment across upstream and downstream operations. Shell.ai platform runs 100+ production AI models covering subsurface imaging, predictive maintenance, and trading. Board reviews AI safety-case assurance quarterly.", source: "Shell 2024 Annual Report and Accounts; Shell.ai Public Disclosures 2024" },
+      { company: "ExxonMobil", action: "Board approved AI integration across upstream exploration, refining optimization, and carbon-capture operations. ExxonMobil's AI partnership with Microsoft enables real-time optimization of Permian Basin operations. Board's Environment, Safety & Public Policy Committee reviews AI assurance.", source: "ExxonMobil 2024 Annual Report; Upstream Digital Strategy Brief" },
+      { company: "BP", action: "Board governs AI deployment through dedicated Digital Leadership Team reporting to the CEO. BP's Azure-based AI platform covers 1,200+ wells with predictive maintenance and reservoir optimization. Board receives AI safety and ESG-linked metrics alongside financial performance.", source: "BP 2024 Annual Report; Digital Strategy Public Brief 2024" },
+    ],
+    utilities: [
+      { company: "NextEra Energy", action: "Board's Risk and Strategy Committee oversees AI across grid optimization, renewable forecasting, and wildfire risk management. NextEra deploys AI for 30+ GW of renewable generation forecasting. Board receives quarterly AI reliability and regulator-facing performance metrics.", source: "NextEra Energy 2024 Annual Report; FERC Reliability Filings 2024" },
+      { company: "Duke Energy", action: "Board approved enterprise AI program covering grid modernization, outage prediction, and customer service. Duke's AI platform processes 100M+ smart-meter readings daily. Board Technology Committee reviews AI cybersecurity and NERC CIP compliance quarterly.", source: "Duke Energy 2024 Annual Report; NERC CIP Compliance Summary" },
+      { company: "Southern Company", action: "Board oversees AI deployment across generation fleet, transmission, and retail operations. Southern's AI-enabled predictive maintenance extended unit availability 2–4% across the fleet. Board receives annual AI governance and rate-case-facing reliability assurance reports.", source: "Southern Company 2024 Annual Report; Investor Day 2024" },
+    ],
+    telecommunications: [
+      { company: "AT&T", action: "Board's Corporate Governance and Nominating Committee oversees AI investments across network operations and customer care. AT&T's Ask AT&T generative-AI assistant is used by 80,000+ employees. Board receives quarterly AI risk, network-reliability, and customer-experience metrics.", source: "AT&T 2024 Annual Report; 2024 Proxy Statement" },
+      { company: "Verizon", action: "Board approved AI strategy anchored in a proprietary large-language model for customer service and a network-AI platform that reduced field dispatches materially. Board Technology Committee reviews AI risk alongside network-reliability KPIs.", source: "Verizon 2024 Annual Report; Q4 2024 Earnings Call" },
+      { company: "T-Mobile", action: "Board oversees AI deployment through the Technology Committee. T-Mobile's AI-powered 5G network optimization and generative-AI customer-care tools handle tens of millions of interactions. CEO Mike Sievert has positioned AI as a core productivity and experience lever.", source: "T-Mobile 2024 Annual Report; Q3 2024 Earnings Call" },
+    ],
+    media_entertainment: [
+      { company: "Disney", action: "Board established an AI task force in 2023 reporting to the CEO with oversight by the Governance and Nominating Committee. Disney applies AI across content recommendation, production workflow, and streaming personalization while maintaining human-creator primacy in creative decisions.", source: "Disney 2024 Annual Report; 2024 Proxy Statement" },
+      { company: "Netflix", action: "Board oversees one of the most mature AI personalization platforms in media: recommendation models drive 80%+ of watched content. Board Technology Committee reviews AI model governance, content-safety, and localization quality quarterly.", source: "Netflix 2024 Annual Report; Q4 2024 Shareholder Letter" },
+      { company: "Comcast / NBCUniversal", action: "Board approved enterprise AI program spanning Xfinity customer care, Peacock personalization, and Sky operations. Comcast's AI-driven network and customer-service automation handles tens of millions of interactions monthly. Board receives quarterly AI risk and privacy briefings.", source: "Comcast 2024 Annual Report; Investor Day 2024" },
+    ],
+    government_federal: [
+      { company: "U.S. Department of Defense (CDAO)", action: "The Chief Digital and AI Office (CDAO) governs enterprise AI adoption across the DoD under OMB M-24-10 and the DoD Responsible AI Strategy. CDAO operates the DoD AI Inventory, Task Force Lima for generative AI, and joint exercises to field AI at mission speed with human oversight.", source: "DoD Responsible AI Strategy and Implementation Pathway; OMB Memorandum M-24-10 (2024)" },
+      { company: "U.S. General Services Administration (GSA)", action: "GSA's AI Center of Excellence partners with federal agencies to implement AI use cases under OMB M-24-10. GSA maintains the federal AI use-case inventory and governs acquisition vehicles for responsible AI services across the executive branch.", source: "GSA AI Center of Excellence Public Brief; federal AI Use Case Inventory 2024" },
+      { company: "U.S. Digital Service / 18F", action: "USDS and 18F support agency AI adoption with engineering and design embed teams, AI readiness assessments, and procurement guidance. Programs align with Executive Order 14110 and OMB M-24-10 requirements for Chief AI Officers and impact assessments.", source: "Executive Order 14110 (October 30, 2023); OMB Memorandum M-24-10 (March 2024)" },
+    ],
+    government_state_local: [
+      { company: "State of California (CDT)", action: "California's Department of Technology governs generative-AI deployment under Governor Newsom's Executive Order N-12-23. CDT operates a GenAI sandbox, procurement guidance, and risk-assessment toolkit used across 200+ state entities.", source: "California EO N-12-23 (September 2023); CDT GenAI Guidelines 2024" },
+      { company: "City of New York", action: "NYC's AI Action Plan and MyCity AI chatbot program govern responsible AI deployment across city agencies. The NYC Chief Privacy Officer and Chief Technology Officer jointly oversee AI risk assessment and public-facing disclosure.", source: "NYC AI Action Plan 2023; NYC Office of Technology and Innovation Public Brief 2024" },
+      { company: "State of Texas (DIR)", action: "Texas Department of Information Resources launched the Texas AI Advisory Council under HB 2060 (2023) to evaluate agency AI deployments, bias risks, and automated decision-making across state government.", source: "Texas HB 2060 (2023); DIR AI Advisory Council Public Charter" },
+    ],
+    real_estate_commercial: [
+      { company: "CBRE", action: "Board oversees AI deployment through dedicated Technology and Innovation governance. CBRE's AI-powered deal-pipeline analytics, lease abstraction, and valuation tools serve 130,000+ professionals globally. Board receives quarterly AI adoption and data-governance metrics.", source: "CBRE 2024 Annual Report; Technology and Innovation Public Brief 2024" },
+      { company: "JLL", action: "Board approved JLL GPT — one of the first proprietary large-language models built for commercial real estate. JLL's Azimuth AI platform covers leasing, capital markets, and property management. Board Technology Committee governs AI data privacy and client-facing risk.", source: "JLL 2024 Annual Report; JLL GPT Public Announcement 2023" },
+      { company: "Prologis", action: "Board's Innovation Committee governs AI deployment across the world's largest logistics real-estate portfolio. Prologis deploys AI for energy optimization, predictive maintenance, and customer-demand forecasting across 1.2B+ sq ft of industrial space.", source: "Prologis 2024 Annual Report; Investor Day 2024" },
+    ],
+    nonprofit_ngo: [
+      { company: "American Red Cross", action: "Board oversees AI pilots across disaster response, blood-supply optimization, and donor engagement. The organization partners with federal agencies and technology donors to deploy responsible AI aligned with Red Cross / Red Crescent humanitarian principles.", source: "American Red Cross 2024 Annual Report; IFRC AI Ethics Framework 2024" },
+      { company: "Bill & Melinda Gates Foundation", action: "Foundation governance includes a dedicated AI and Global Development initiative with $30M+ committed to AI for health, agriculture, and education in low- and middle-income countries. Board receives annual responsible-AI grantmaking reviews.", source: "Gates Foundation 2024 Annual Letter; AI and Global Development Grand Challenges Public Disclosures" },
+      { company: "World Food Programme", action: "WFP's Executive Board oversees AI deployment for hunger forecasting (HungerMap LIVE), anticipatory-action triggers, and supply-chain optimization across 120+ countries. Partnerships with Palantir, Alibaba Cloud, and academic institutions operate under a public AI ethics framework.", source: "WFP 2024 Annual Performance Report; HungerMap LIVE Public Portal" },
+    ],
   };
   const defaults = [
     { company: "Industry Leaders (Cross-Sector)", action: "According to NACD's 2024 survey, 62% of S&P 500 boards have added AI as a standing agenda item, up from 28% in 2022. Leading boards are moving from 'awareness' to 'accountability' — requiring measurable AI ROI, not just activity updates.", source: "NACD 2024 Board Oversight of AI Report" },
     { company: "McKinsey Top-Quartile AI Companies", action: "Boards of the highest-performing AI organizations share three traits: (1) at least one director with deep AI expertise, (2) quarterly AI maturity reporting tied to strategy, and (3) ring-fenced AI transformation budgets separate from IT.", source: "McKinsey 2024 Global AI Survey" },
     { company: "Deloitte AI Leaders Benchmark", action: "Organizations where the board actively governs AI transformation are 2.6x more likely to scale AI beyond pilots. Board engagement is the single strongest predictor of AI transformation success, ahead of budget, talent, or technology choices.", source: "Deloitte 2024 State of AI in the Enterprise, 6th Edition" },
   ];
-  // Map specific sub-industries to their peer group
+  // Map specific sub-industries to their peer group. Only legitimate mappings —
+  // industries whose peer set is genuinely the same (e.g. retail sub-segments).
+  // Industries with materially different peer sets (aerospace, telecom, energy,
+  // utilities, gov, nonprofit, real estate) have direct entries above.
   const peerAliases: Record<string, string> = {
     banking: "financial_services",
     capital_markets: "financial_services",
@@ -6581,28 +6658,18 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
     manufacturing_discrete: "manufacturing",
     manufacturing_process: "manufacturing",
     automotive: "manufacturing",
-    aerospace_defense: "manufacturing",
     chemicals_materials: "manufacturing",
     industrial_services: "manufacturing",
+    construction_engineering: "manufacturing",
     software_saas: "technology",
     it_services: "technology",
     hardware_electronics: "technology",
-    energy_oil_gas: "manufacturing",
-    utilities: "manufacturing",
-    telecommunications: "technology",
-    media_entertainment: "technology",
     transportation: "shipping_logistics",
     infrastructure_transport: "shipping_logistics",
-    construction_engineering: "manufacturing",
-    real_estate_commercial: "financial_services",
-    real_estate_residential: "financial_services",
-    defense_contractors: "manufacturing",
-    government_federal: "technology",
-    government_state_local: "technology",
+    real_estate_residential: "real_estate_commercial",
     consulting_services: "consulting_services",
     legal_services: "legal_services",
     accounting_audit: "accounting_audit",
-    nonprofit_ngo: "healthcare",
   };
   const aliased = peerAliases[industry];
   const selected = peers[industry] || (aliased ? peers[aliased] : null) || defaults;
