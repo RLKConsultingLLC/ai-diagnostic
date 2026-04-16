@@ -2727,7 +2727,7 @@ function DimensionExpander({
       {/* Expanded detail */}
       {open && (
         <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-150">
-          <div className="ml-7 pl-3 border-l-2" style={{ borderColor: `${barColor}30` }}>
+          <div className="ml-7 pl-3">
             {/* Subtitle question */}
             <p className="text-xs text-tertiary italic mb-3">{subtitle}</p>
             {/* Stage badge on mobile */}
