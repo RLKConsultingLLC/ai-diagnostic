@@ -1073,30 +1073,50 @@ function ReportPage() {
               </div>
             </SubCollapsible>
 
-            {/* Your Quadrant Analysis — shown directly */}
-            <div className="border border-light p-5 mb-4" style={{ borderLeft: "3px solid #0B1D3A" }}>
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Your Quadrant Analysis</span>
-              </div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                {getQuadrantAnalysis(
-                  (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
-                  (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5,
-                  (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
+            {/* Your Quadrant Analysis — collapsed by default */}
+            <SubCollapsible title="Your Quadrant Analysis" hint="Expand for positioning details">
+              {(() => {
+                const capScore = (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
+                  (result.dimensionScores.find((d) => d.dimension === "workflow_integration")?.normalizedScore || 0) * 0.5;
+                const readScore = (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
                   (result.dimensionScores.find((d) => d.dimension === "decision_velocity")?.normalizedScore || 0) * 0.3 +
-                  (result.dimensionScores.find((d) => d.dimension === "economic_translation")?.normalizedScore || 0) * 0.3,
-                  result.companyProfile.industry
-                )}
-              </p>
-            </div>
+                  (result.dimensionScores.find((d) => d.dimension === "economic_translation")?.normalizedScore || 0) * 0.3;
+                const positions = report?.competitorPositions;
+                const ind = industryLabel(result.companyProfile.industry);
+                return (
+                  <div className="space-y-3">
+                    <p className="text-sm text-foreground/70 leading-relaxed">
+                      {getQuadrantAnalysis(capScore, readScore, result.companyProfile.industry)}
+                    </p>
+                    {positions && positions.length > 0 && (
+                      <div>
+                        <p className="text-xs text-foreground/50 mb-2">
+                          Based on industry benchmarks and public market data for {ind}, estimated competitor
+                          positions on the matrix above are:
+                        </p>
+                        <div className="space-y-1.5">
+                          {positions.map((pos, idx) => (
+                            <div key={idx} className="flex items-baseline gap-2 text-xs text-foreground/60">
+                              <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-navy/40 mt-1" />
+                              <p>
+                                <strong className="text-secondary">{pos.label}:</strong>{" "}
+                                Capability {pos.capability}/100, Readiness {pos.readiness}/100{pos.rationale ? ` — ${pos.rationale}` : ""}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-tertiary italic mt-2">
+                          Competitor positions informed by McKinsey 2024 Global AI Survey benchmarks, BCG AI Advantage Report peer analytics, Gartner industry maturity curves, and public filings.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </SubCollapsible>
 
-            {/* Competitor investments — shown directly with expandable details */}
-            <div className="border border-light p-5 mb-4">
-              <div className="flex items-center gap-2 mb-3">
-                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Where {result.companyProfile.companyName}&apos;s Competitors Are Investing</span>
-              </div>
+            {/* Competitor investments — collapsed by default */}
+            <SubCollapsible title={`Where ${result.companyProfile.companyName}'s Competitors Are Investing`} hint="Expand for priority-ranked investment areas">
               <p className="text-xs text-foreground/50 mb-3">
                 At Stage {result.stageClassification.primaryStage} with an overall score of <strong className="text-secondary">{result.overallScore}/100</strong>,
                 {" "}{result.companyProfile.companyName} is <strong className="text-secondary">{result.overallScore >= 60 ? "keeping pace with but not leading" : result.overallScore >= 40 ? "trailing the median of" : "significantly behind"}</strong> peers
@@ -1140,79 +1160,8 @@ function ReportPage() {
                   );
                 })}
               </div>
-            </div>
+            </SubCollapsible>
 
-            {/* Competitive positioning narrative — organized by heading */}
-            <div className="border border-light p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Competitive Intelligence Analysis</span>
-              </div>
-              {(() => {
-                const rawContent = report?.sections?.find((s) => s.slug === "competitive-positioning")?.content || "";
-                if (!rawContent) {
-                  // Fallback: use competitor positions data + industry context
-                  const positions = report?.competitorPositions;
-                  const ind = industryLabel(result.companyProfile.industry);
-                  return (
-                    <div className="space-y-3">
-                      <p className="text-sm text-foreground/70 leading-relaxed">
-                        Based on industry benchmarks and public market data for {ind}, competitive AI adoption varies significantly. The quadrant analysis above maps {result.companyProfile.companyName}&apos;s position relative to estimated competitor postures across AI capability and organizational readiness.
-                      </p>
-                      {positions && positions.length > 0 && (
-                        <div className="space-y-1">
-                          {positions.map((pos, idx) => (
-                            <SubCollapsible key={idx} title={`${pos.label}: Capability ${pos.capability}, Readiness ${pos.readiness}`}>
-                              <p className="text-sm text-foreground/60 leading-relaxed">{pos.rationale}</p>
-                            </SubCollapsible>
-                          ))}
-                        </div>
-                      )}
-                      <p className="text-xs text-tertiary italic">
-                        Competitor positions are informed by McKinsey 2024 Global AI Survey benchmarks, BCG AI Advantage Report peer analytics, and Gartner industry maturity curves.
-                      </p>
-                    </div>
-                  );
-                }
-                // Split by headings into organized sections
-                const parts = rawContent.split(/(?=^#{1,3}\s)/m).filter((p) => p.trim());
-                if (parts.length <= 1) {
-                  // No headings found — render as formatted markdown
-                  return <MarkdownContent content={rawContent} />;
-                }
-                // First part may be intro text (no heading)
-                const intro = parts[0]?.startsWith("#") ? null : parts[0];
-                const sections = parts.filter((p) => p.startsWith("#"));
-                // Filter out redundant "Competitive Positioning" heading (same as section title)
-                const filteredSections = sections.filter((s) => {
-                  const h = s.split("\n")[0]?.replace(/^#{1,3}\s+/, "").trim().toLowerCase() || "";
-                  return !h.includes("competitive positioning");
-                });
-                // If a "Competitive Positioning" section was removed, merge its body into intro
-                const removedSection = sections.find((s) => {
-                  const h = s.split("\n")[0]?.replace(/^#{1,3}\s+/, "").trim().toLowerCase() || "";
-                  return h.includes("competitive positioning");
-                });
-                const mergedIntro = [intro, removedSection ? removedSection.split("\n").slice(1).join("\n").trim() : null].filter(Boolean).join("\n\n");
-                return (
-                  <>
-                    {mergedIntro && <MarkdownContent content={mergedIntro} />}
-                    <div className="mt-3 space-y-1">
-                      {filteredSections.map((section, idx) => {
-                        const lines = section.split("\n");
-                        const heading = lines[0]?.replace(/^#{1,3}\s+/, "").trim() || `Finding ${idx + 1}`;
-                        const body = lines.slice(1).join("\n").trim();
-                        return (
-                          <SubCollapsible key={idx} title={heading}>
-                            <MarkdownContent content={body} />
-                          </SubCollapsible>
-                        );
-                      })}
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1284,14 +1233,6 @@ function ReportPage() {
               Your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
             </p>
 
-            {/* Industry benchmark bar */}
-            {result.economicEstimate.industryBenchmark && (
-              <SubCollapsible title="Industry Benchmark Context">
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  {result.economicEstimate.industryBenchmark}
-                </p>
-              </SubCollapsible>
-            )}
 
             {/* Value Waterfall — right above methodology */}
             <SubCollapsible title="Value Waterfall">
@@ -1324,7 +1265,8 @@ function ReportPage() {
                     const group = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP];
                     const bRate = CAPTURE_RATES_BY_GROUP[group]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
                     const mod = computeDiagnosticModifier(result.dimensionScores);
-                    const adjRate = Math.max(0.01, Math.min(0.95, bRate * mod.modifier));
+                    // Use the authoritative value from the economic estimate — guarantees consistency
+                    const finalCapturePercent = result.economicEstimate.currentCapturePercent;
                     const groupLabel: Record<string, string> = {
                       tech_forward: "Technology & Digital",
                       data_rich_financial: "Financial Services",
@@ -1339,21 +1281,21 @@ function ReportPage() {
                       <>
                         <p>
                           <strong className="text-secondary">Step 3: Estimated capture rate (7-input model).</strong>{" "}
-                          This is the most consequential number in the report. It estimates what percentage of the
-                          AI-addressable potential your organization is <em>actually capturing today</em>. The rate is
-                          derived from a 7-input model:
+                          This is the most consequential number in the report: <strong className="text-navy">{finalCapturePercent}%</strong>.
+                          It estimates what percentage of the AI-addressable potential your organization is{" "}
+                          <em>actually capturing today</em>. Here is how the {finalCapturePercent}% is derived:
                         </p>
                         <div className="pl-3 border-l-2 border-navy/20 space-y-2 text-[13px]">
                           <p>
-                            <strong className="text-secondary">Base rate:</strong>{" "}
+                            <strong className="text-secondary">Input 1 — Industry group baseline:</strong>{" "}
                             Your industry group ({groupLabel[group] || group}) at Stage {result.stageClassification.primaryStage} ({result.stageClassification.stageName})
-                            maps to a base capture rate of <strong className="text-secondary">{Math.round(bRate * 100)}%</strong>.
+                            starts at a base rate of {Math.round(bRate * 100)}%.
                             This comes from an 8×5 matrix (8 industry groups × 5 maturity stages = 40 cells)
                             calibrated against McKinsey 2024 Global AI Survey cross-tabs, BCG AI Advantage Report peer analytics,
-                            and Gartner industry maturity curves.
+                            and Gartner industry maturity curves. This is <em>not</em> the capture rate used — it is the starting point before behavioral adjustment.
                           </p>
                           <p>
-                            <strong className="text-secondary">Diagnostic modifier ({mod.modifier.toFixed(3)}×):</strong>{" "}
+                            <strong className="text-secondary">Inputs 2–6 — Behavioral modifier ({mod.modifier.toFixed(3)}×):</strong>{" "}
                             The base rate is then adjusted by a weighted modifier derived from your 5 behavioral dimension scores:
                             {mod.components.map((c) => {
                               const w = DIAGNOSTIC_MODIFIER_WEIGHTS[c.dimension];
@@ -1363,15 +1305,15 @@ function ReportPage() {
                             {mod.modifier > 1.0 ? ", meaning your behavioral data pushes you above the industry-stage average." : mod.modifier < 1.0 ? ", meaning organizational constraints are pulling your capture below the industry-stage average." : "."}
                           </p>
                           <p>
-                            <strong className="text-secondary">Adjusted rate:</strong>{" "}
+                            <strong className="text-secondary">Result:</strong>{" "}
                             {Math.round(bRate * 100)}% × {mod.modifier.toFixed(3)} ={" "}
-                            <strong className="text-navy">{Math.round(adjRate * 100)}%</strong> estimated current capture rate.
+                            <strong className="text-navy">{finalCapturePercent}%</strong> — this is the capture rate used in every calculation throughout this report.
                           </p>
                         </div>
                         <p className="text-[11px] text-foreground/50 mt-1">
                           <em>The complete capture rate matrix, dimension weights with sourced rationales,
                           and your full derivation are documented in Section {10} → &quot;Estimating AI Value Capture Percentages.&quot;
-                          Your CFO should stress-test this number against internal adoption data before presenting to the board.</em>
+                          Your CFO should stress-test this number against internal adoption data before presenting.</em>
                         </p>
                       </>
                     );
@@ -1572,7 +1514,7 @@ function ReportPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
                     {getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).map((risk, idx) => {
                       const bgColor = risk.severity === "high" ? "rgba(252,165,165,0.15)" : risk.severity === "medium" ? "rgba(252,211,77,0.15)" : "rgba(134,239,172,0.15)";
                       const borderColor = risk.severity === "high" ? "#F87171" : risk.severity === "medium" ? "#FBBF24" : "#4ADE80";
@@ -1602,13 +1544,6 @@ function ReportPage() {
             {/* Risk Matrix visualization */}
             <SubCollapsible title="Risk Matrix (Likelihood x Impact)">
               <RiskMatrix dimensionScores={result.dimensionScores} industry={result.companyProfile.industry} regulatoryIntensity={result.companyProfile.regulatoryIntensity} />
-            </SubCollapsible>
-
-            {/* Regulatory landscape context */}
-            <SubCollapsible title={`Regulatory Landscape for ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())}`}>
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                {getRegulatoryContext(result.companyProfile.industry, result.companyProfile.regulatoryIntensity)}
-              </p>
             </SubCollapsible>
 
           </CollapsibleSection>
@@ -1794,9 +1729,9 @@ function ReportPage() {
                   const tcvBarWidth = (t: "high" | "medium" | "low") => t === "high" ? "w-full" : t === "medium" ? "w-2/3" : "w-1/3";
                   const tcvBarOpacity = (t: "high" | "medium" | "low") => t === "high" ? "bg-navy" : t === "medium" ? "bg-navy/50" : "bg-navy/25";
                   return groups.map((g) => (
-                    <div key={g.name} className="border border-light p-4" style={{ borderTop: `3px solid ${g.color}` }}>
+                    <div key={g.name} className="border border-light p-4 flex flex-col" style={{ borderTop: `3px solid ${g.color}` }}>
                       <p className="text-xs font-bold tracking-wider uppercase mb-3" style={{ color: g.color }}>{g.name}</p>
-                      <div className="space-y-4">
+                      <div className="space-y-4 flex-1 flex flex-col justify-between">
                         {levers.filter((l) => l.group === g.name).map((item) => (
                           <div key={item.lever}>
                             <div className="flex items-center gap-2 mb-1">
@@ -1877,7 +1812,7 @@ function ReportPage() {
 
             {/* How boards can support — action tiles in a row */}
             <SubCollapsible title={`How Boards Can Support at Stage ${result.stageClassification.primaryStage}`}>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
                 {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
                   <SubCollapsible
                     key={idx}
@@ -1904,7 +1839,7 @@ function ReportPage() {
                   { type: "governance", label: "Governance", color: "#6B7F99", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg> },
                 ];
                 return (
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-3 items-start">
                     {groups.map((g) => {
                       const groupAsks = asks.filter((a) => a.type === g.type);
                       return (
