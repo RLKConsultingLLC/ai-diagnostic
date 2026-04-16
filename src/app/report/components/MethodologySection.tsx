@@ -68,9 +68,9 @@ function MethodCollapsible({
 
 export default function MethodologySection({ result, sectionNumber, bare }: MethodologySectionProps) {
   // Use authoritative values stored by the economic engine — no recomputation
-  const baseRate = result.economicEstimate.captureRateBase;
-  const modifierValue = result.economicEstimate.captureRateModifier;
-  const userGroup = result.economicEstimate.captureRateGroup as IndustryCaptureGroup;
+  const baseRate = result.economicEstimate.captureRateBase ?? 0;
+  const modifierValue = result.economicEstimate.captureRateModifier ?? 1;
+  const userGroup = (result.economicEstimate.captureRateGroup ?? "") as IndustryCaptureGroup;
   const adjustedRatePercent = result.economicEstimate.currentCapturePercent;
   // Still need component-level detail for the weights table
   const modifierResult = computeDiagnosticModifier(result.dimensionScores);

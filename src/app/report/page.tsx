@@ -1261,9 +1261,9 @@ function ReportPage() {
                   </p>
                   {(() => {
                     // All values from the economic engine — single source of truth
-                    const bRate = result.economicEstimate.captureRateBase;
-                    const modValue = result.economicEstimate.captureRateModifier;
-                    const group = result.economicEstimate.captureRateGroup;
+                    const bRate = result.economicEstimate.captureRateBase ?? 0;
+                    const modValue = result.economicEstimate.captureRateModifier ?? 1;
+                    const group = result.economicEstimate.captureRateGroup ?? "";
                     const finalCapturePercent = result.economicEstimate.currentCapturePercent;
                     const mod = computeDiagnosticModifier(result.dimensionScores); // for component details only
                     const groupLabel: Record<string, string> = {
