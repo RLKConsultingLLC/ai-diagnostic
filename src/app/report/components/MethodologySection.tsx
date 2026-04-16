@@ -75,7 +75,11 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
   const baseRate = result.economicEstimate.captureRateBase ?? fallbackBase;
   const modifierValue = result.economicEstimate.captureRateModifier ?? modifierResult.modifier;
   const userGroup = (result.economicEstimate.captureRateGroup ?? fallbackGroup) as IndustryCaptureGroup;
-  const adjustedRatePercent = result.economicEstimate.currentCapturePercent;
+  // If old session lacks stored intermediates, derive capture % from the same math shown
+  const isOldSession = !result.economicEstimate.captureRateBase;
+  const adjustedRatePercent = isOldSession
+    ? Math.round(Math.max(0.01, Math.min(0.95, baseRate * modifierValue)) * 100)
+    : result.economicEstimate.currentCapturePercent;
 
   const content = (
     <>

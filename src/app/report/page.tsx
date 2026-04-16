@@ -899,6 +899,23 @@ function ReportPage() {
                   return match ? match.body.trim() : "";
                 };
 
+                // Extract synthesis from narratives — look for "**Synthesis:**" prefix
+                const extractSynthesis = (): string => {
+                  for (const ns of narrativeSections) {
+                    const body = ns.body || "";
+                    const synthMatch = body.match(/\n?\*?\*?Synthesis:?\*?\*?\s*([\s\S]+)$/i);
+                    if (synthMatch) return synthMatch[1].trim();
+                  }
+                  return "";
+                };
+                const synthesisText = extractSynthesis();
+
+                // Strip synthesis from individual dimension narratives so it doesn't appear twice
+                const findNarrativeClean = (dim: string): string => {
+                  const raw = findNarrative(dim);
+                  return raw.replace(/\n?\*?\*?Synthesis:?\*?\*?\s*[\s\S]+$/i, "").trim();
+                };
+
                 return (
                   <>
                     {/* Pentagon radar visualization */}
@@ -937,11 +954,28 @@ function ReportPage() {
                             barColor={barColor}
                             subtitle={dimDesc[ds.dimension] || ""}
                             interpretation={dimensionInterpretation(ds.dimension, ds.normalizedScore)}
-                            narrative={findNarrative(ds.dimension)}
+                            narrative={findNarrativeClean(ds.dimension)}
                           />
                         );
                       })}
                     </div>
+
+                    {/* Synthesis — cross-dimensional analysis, collapsed by default */}
+                    {synthesisText && (
+                      <div className="mt-4">
+                        <SubCollapsible
+                          title="Cross-Dimensional Synthesis"
+                          icon={
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                            </svg>
+                          }
+                          hint="View pattern analysis"
+                        >
+                          <MarkdownContent content={synthesisText} />
+                        </SubCollapsible>
+                      </div>
+                    )}
                   </>
                 );
               })()
@@ -1246,7 +1280,11 @@ function ReportPage() {
                     const bRate = result.economicEstimate.captureRateBase ?? fallbackBase;
                     const modValue = result.economicEstimate.captureRateModifier ?? fallbackMod.modifier;
                     const group = result.economicEstimate.captureRateGroup ?? fallbackGroup;
-                    const finalCapturePercent = result.economicEstimate.currentCapturePercent;
+                    // If old session lacks stored intermediates, derive capture % from the same math shown
+                    const isOldSession = !result.economicEstimate.captureRateBase;
+                    const finalCapturePercent = isOldSession
+                      ? Math.round(Math.max(0.01, Math.min(0.95, bRate * modValue)) * 100)
+                      : result.economicEstimate.currentCapturePercent;
                     const mod = computeDiagnosticModifier(result.dimensionScores); // for component details only
                     const groupLabel: Record<string, string> = {
                       tech_forward: "Technology & Digital",
@@ -1493,7 +1531,7 @@ function ReportPage() {
             summary={`Independent vendor analysis with buy/build/partner recommendations for ${result.companyProfile.primaryAIUseCases?.slice(0, 2).join(", ").replace(/_/g, " ") || "your AI use cases"}. Includes negotiation intelligence and lock-in risk assessment.`}
           >
             {/* --- 1. HOW WE EVALUATE VENDORS --- */}
-            <SubCollapsible title="How We Evaluate Vendors">
+            <SubCollapsible title="How We Evaluate Vendors" hint="View evaluation framework" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>}>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Every vendor relationship is a bet on your AI future. We evaluate across <strong className="text-secondary">six
                 dimensions</strong>, weighted for your maturity stage. At <strong className="text-secondary">Stage{" "}
@@ -1521,7 +1559,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* --- VENDOR STACK ASSESSMENT by use case --- */}
-            <SubCollapsible title="Vendor Stack Assessment">
+            <SubCollapsible title="Vendor Stack Assessment" hint="View vendor ratings" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75l-5.571-3m11.142 0l4.179 2.25L12 17.25l-9.75-5.25 4.179-2.25m11.142 0l4.179 2.25L12 21.75l-9.75-5.25 4.179-2.25" /></svg>}>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Vendor recommendations for {result.companyProfile.companyName}&apos;s selected AI use cases,
                 rated on the six evaluation criteria above.
