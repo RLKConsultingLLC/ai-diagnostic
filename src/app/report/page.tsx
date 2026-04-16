@@ -13,6 +13,8 @@ import type {
 } from "@/types/diagnostic";
 import MethodologySection from "@/app/report/components/MethodologySection";
 import {
+  CAPTURE_RATES_BY_GROUP,
+  INDUSTRY_CAPTURE_GROUP,
   DIAGNOSTIC_MODIFIER_WEIGHTS,
   computeDiagnosticModifier,
 } from "@/lib/diagnostic/economic";
@@ -355,7 +357,7 @@ function ReportPage() {
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
               The full report provides the <strong className="text-secondary">transparent step-by-step methodology</strong>,{" "}
               {industryLabel(result.companyProfile.industry)} peer benchmarks, and five P&L scenarios modeled to your revenue and employee base.
-              Your CFO should stress-test these assumptions before sharing with the board.
+              Your CFO should stress-test these assumptions before acting on them.
             </p>
           </div>
         </section>
@@ -486,7 +488,7 @@ function ReportPage() {
                 </p>
                 <p className="text-white/50 text-xs leading-relaxed">
                   Dollar-denominated cost of inaction, capture gap analysis, and
-                  ROI framing your CFO can present to the board.
+                  ROI framing your CFO can use for investment decisions.
                 </p>
               </div>
               <div className="bg-white/10 border border-white/10 p-4">
@@ -504,8 +506,8 @@ function ReportPage() {
                   Security & Governance Risks
                 </p>
                 <p className="text-white/50 text-xs leading-relaxed">
-                  Shadow AI exposure, compliance gaps, and the board-level
-                  governance questions you should be asking but likely are not.
+                  Shadow AI exposure, compliance gaps, and the governance
+                  questions your leadership team should be asking but likely is not.
                 </p>
               </div>
               <div className="bg-white/10 border border-white/10 p-4">
@@ -757,7 +759,7 @@ function ReportPage() {
                           dimension scores from the diagnostic (fully documented in Section 10 → &quot;Estimating AI Value Capture Percentages&quot;).
                           That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
                           forfeited per quarter</strong>. Section 5 provides the transparent methodology behind every assumption —
-                          your CFO should stress-test these before sharing with the board.
+                          your CFO should stress-test these before making investment decisions.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
                           revenue growth, operating margin, cost structure, and EBITDA over 12-24 months.
                         </p>
@@ -779,7 +781,7 @@ function ReportPage() {
                                 {result.companyProfile.companyName} sits in the <strong className="text-secondary">{quadrant}</strong> quadrant
                                 with an AI Capability score of <strong className="text-secondary">{Math.round(cap)}/100</strong> and
                                 Organizational Readiness of <strong className="text-secondary">{Math.round(read)}/100</strong>.
-                                {cap >= 50 && read < 50 && ` Your teams are adopting AI tools faster than your governance structures can support them. This creates shadow AI risk and makes every dollar of AI investment harder to defend to the board.`}
+                                {cap >= 50 && read < 50 && ` Your teams are adopting AI tools faster than your governance structures can support them. This creates shadow AI risk and makes every dollar of AI investment harder to justify.`}
                                 {cap < 50 && read >= 50 && ` You have the governance scaffolding for AI but the actual adoption and workflow integration lag behind. The risk is bureaucratic overhead protecting an asset that does not yet exist at scale.`}
                                 {cap >= 50 && read >= 50 && ` Both capability and governance are in healthy territory, but the gap between your strongest dimension (${dimensionLabel(strongest?.dimension || "")} at ${strongest?.normalizedScore}/100) and weakest (${dimensionLabel(weakest?.dimension || "")} at ${weakest?.normalizedScore}/100) reveals where friction compounds.`}
                                 {cap < 50 && read < 50 && ` Both adoption and governance are below the industry median. The opportunity cost is compounding: competitors in ${ind} operating at Stage 3+ are capturing 2-4x more AI value while your organization is still building the foundation.`}
@@ -1055,7 +1057,7 @@ function ReportPage() {
             }
           >
             {/* How to read the matrix — collapsed */}
-            <SubCollapsible title="How to Read This Matrix" hint="View methodology" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>}>
+            <SubCollapsible title="How to Read This Matrix" hint="View methodology">
               <div className="bg-offwhite border border-light p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed">
                   The horizontal axis measures <strong className="text-secondary">AI Capability</strong> (how effectively
@@ -1079,35 +1081,11 @@ function ReportPage() {
                 const readScore = (result.dimensionScores.find((d) => d.dimension === "authority_structure")?.normalizedScore || 0) * 0.4 +
                   (result.dimensionScores.find((d) => d.dimension === "decision_velocity")?.normalizedScore || 0) * 0.3 +
                   (result.dimensionScores.find((d) => d.dimension === "economic_translation")?.normalizedScore || 0) * 0.3;
-                const positions = report?.competitorPositions;
-                const ind = industryLabel(result.companyProfile.industry);
                 return (
                   <div className="space-y-3">
                     <p className="text-sm text-foreground/70 leading-relaxed">
                       {getQuadrantAnalysis(capScore, readScore, result.companyProfile.industry)}
                     </p>
-                    {positions && positions.length > 0 && (
-                      <div>
-                        <p className="text-xs text-foreground/50 mb-2">
-                          Based on industry benchmarks and public market data for {ind}, estimated competitor
-                          positions on the matrix above are:
-                        </p>
-                        <div className="space-y-1.5">
-                          {positions.map((pos, idx) => (
-                            <div key={idx} className="flex items-baseline gap-2 text-xs text-foreground/60">
-                              <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-navy/40 mt-1" />
-                              <p>
-                                <strong className="text-secondary">{pos.label}:</strong>{" "}
-                                Capability {pos.capability}/100, Readiness {pos.readiness}/100{pos.rationale ? ` — ${pos.rationale}` : ""}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="text-[10px] text-tertiary italic mt-2">
-                          Competitor positions informed by McKinsey 2024 Global AI Survey benchmarks, BCG AI Advantage Report peer analytics, Gartner industry maturity curves, and public filings.
-                        </p>
-                      </div>
-                    )}
                   </div>
                 );
               })()}
@@ -1228,7 +1206,7 @@ function ReportPage() {
             <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
               Every assumption is stated and every input sourced — see &quot;How We Calculate These Numbers&quot; below for the full 4-step derivation, and Section 10 (&quot;Estimating AI Value Capture Percentages&quot;) for the complete capture rate methodology, matrix, and sources.
-              Your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before sharing with the board.
+              Your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before making investment decisions.
             </p>
 
 
@@ -1261,9 +1239,13 @@ function ReportPage() {
                   </p>
                   {(() => {
                     // All values from the economic engine — single source of truth
-                    const bRate = result.economicEstimate.captureRateBase ?? 0;
-                    const modValue = result.economicEstimate.captureRateModifier ?? 1;
-                    const group = result.economicEstimate.captureRateGroup ?? "";
+                    // Use stored values; fall back to recomputation for old sessions
+                    const fallbackGroup = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP] ?? "";
+                    const fallbackBase = CAPTURE_RATES_BY_GROUP[fallbackGroup]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
+                    const fallbackMod = computeDiagnosticModifier(result.dimensionScores);
+                    const bRate = result.economicEstimate.captureRateBase ?? fallbackBase;
+                    const modValue = result.economicEstimate.captureRateModifier ?? fallbackMod.modifier;
+                    const group = result.economicEstimate.captureRateGroup ?? fallbackGroup;
                     const finalCapturePercent = result.economicEstimate.currentCapturePercent;
                     const mod = computeDiagnosticModifier(result.dimensionScores); // for component details only
                     const groupLabel: Record<string, string> = {
@@ -1371,76 +1353,50 @@ function ReportPage() {
                     for {industryLabel(result.companyProfile.industry)}.
                   </p>
 
-                  {/* Stage narrative callout */}
-                  <div className="border-l-4 border-navy pl-5">
-                    <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-                      {pnl.headline}
-                    </p>
-                    <p className="text-sm text-foreground/80 leading-relaxed">
+                  {/* Stage narrative callout — collapsed by default */}
+                  <SubCollapsible title={pnl.headline}>
+                    <p className="text-sm text-foreground/80 leading-relaxed mb-6">
                       {pnl.stageNarrative}
                     </p>
-                  </div>
 
-                  {/* Two-column: Invest vs. Stand Still — side by side */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* INVEST column */}
-                    <div className="bg-green-50/60 border border-green-200/50 p-4">
-                      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-green-200/40">
-                        <svg className="w-5 h-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
-                        <h4 className="text-sm font-bold text-green-800">If You Invest Over 12-24 Months</h4>
-                        <span className="ml-auto text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5">+{pnl.scenarios[0]?.investDollar || ""}</span>
+                    {/* Two-column: Invest vs. Stand Still — side by side */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* INVEST column */}
+                      <div className="bg-green-50/60 border border-green-200/50 p-4">
+                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-green-200/40">
+                          <svg className="w-5 h-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
+                          <h4 className="text-sm font-bold text-green-800">If You Invest Over 12-24 Months</h4>
+                          <span className="ml-auto text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5">+{pnl.scenarios[0]?.investDollar || ""}</span>
+                        </div>
+                        <div className="space-y-2">
+                          {pnl.scenarios.map((s, i) => (
+                            <SubCollapsible key={i} title={`${s.label}: ${s.investDollar}`}>
+                              <p className="text-xs text-foreground/60 leading-relaxed">{s.investUpside}</p>
+                            </SubCollapsible>
+                          ))}
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        {pnl.scenarios.map((s, i) => (
-                          <SubCollapsible key={i} title={`${s.label}: ${s.investDollar}`}>
-                            <p className="text-xs text-foreground/60 leading-relaxed">{s.investUpside}</p>
-                          </SubCollapsible>
-                        ))}
+                      {/* STAND STILL column */}
+                      <div className="bg-red-50/60 border border-red-200/50 p-4">
+                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-red-200/40">
+                          <svg className="w-5 h-5 text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" /></svg>
+                          <h4 className="text-sm font-bold text-red-800">If You Stand Still</h4>
+                          <span className="ml-auto text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5">{pnl.scenarios[0]?.coastDollar || ""} at risk</span>
+                        </div>
+                        <div className="space-y-2">
+                          {pnl.scenarios.map((s, i) => (
+                            <SubCollapsible key={i} title={`${s.label}: ${s.coastDollar}`}>
+                              <p className="text-xs text-foreground/60 leading-relaxed">{s.coastDownside}</p>
+                            </SubCollapsible>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    {/* STAND STILL column */}
-                    <div className="bg-red-50/60 border border-red-200/50 p-4">
-                      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-red-200/40">
-                        <svg className="w-5 h-5 text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" /></svg>
-                        <h4 className="text-sm font-bold text-red-800">If You Stand Still</h4>
-                        <span className="ml-auto text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5">{pnl.scenarios[0]?.coastDollar || ""} at risk</span>
-                      </div>
-                      <div className="space-y-2">
-                        {pnl.scenarios.map((s, i) => (
-                          <SubCollapsible key={i} title={`${s.label}: ${s.coastDollar}`}>
-                            <p className="text-xs text-foreground/60 leading-relaxed">{s.coastDownside}</p>
-                          </SubCollapsible>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  </SubCollapsible>
 
-                  {/* EBITDA Impact Summary — shown directly */}
-                  <div className="bg-offwhite border border-light p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs font-bold text-secondary tracking-wide uppercase">Projected EBITDA Impact</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <p className="text-xs text-foreground/50 mb-1">Current Estimate</p>
-                        <p className="text-sm font-bold text-navy">{pnl.ebitda.currentLabel}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-foreground/50 mb-1">Invest Scenario</p>
-                        <p className="text-sm font-bold text-green-700">{pnl.ebitda.investLabel}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-foreground/50 mb-1">Stand-Still Scenario</p>
-                        <p className="text-sm font-bold text-red-700">{pnl.ebitda.coastLabel}</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Industry Proof Points — shown directly */}
-                  <div className="border border-light p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs font-bold text-secondary tracking-wide uppercase">Industry Data: What the Numbers Show in {industryLabel(result.companyProfile.industry)}</span>
-                    </div>
+                  {/* Industry Proof Points — collapsed by default */}
+                  <SubCollapsible title={`Industry Data: What the Numbers Show in ${industryLabel(result.companyProfile.industry)}`}>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {pnl.proofPoints.map((pp, i) => (
                         <div key={i} className="bg-offwhite border border-light p-4">
@@ -1452,7 +1408,7 @@ function ReportPage() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </SubCollapsible>
 
                 </div>
               );
@@ -1466,7 +1422,7 @@ function ReportPage() {
             sectionId="section-7"
             number={7}
             title="Security & Governance Risk Assessment"
-            summary={`Risk exposure analysis calibrated to ${result.companyProfile.regulatoryIntensity} regulatory intensity in ${industryLabel(result.companyProfile.industry)}. Covers shadow AI, compliance, data governance, and board liability.`}
+            summary={`Risk exposure analysis calibrated to ${result.companyProfile.regulatoryIntensity} regulatory intensity in ${industryLabel(result.companyProfile.industry)}. Covers shadow AI, compliance, data governance, and organizational liability.`}
             insight={(() => { const count = getRiskDetails(result.dimensionScores, result.companyProfile.industry, result.companyProfile.regulatoryIntensity).filter(r => r.severity === "high").length; return `${count} high-severity ${count === 1 ? "risk" : "risks"} identified. In ${industryLabel(result.companyProfile.industry)}, the regulatory cost of inadequate AI governance is accelerating - 62% of organizations have experienced an AI-related risk event in the past 18 months.`; })()}
             preview={
               <>
@@ -1477,26 +1433,6 @@ function ReportPage() {
                   requirements</strong> and emerging AI governance standards.
                 </p>
 
-                {/* Understanding This Assessment */}
-                <SubCollapsible title="Understanding This Assessment">
-                  <div className="space-y-3">
-                    <p className="text-sm text-foreground/70 leading-relaxed">
-                      Your risk profile is derived from inverting your dimension scores: low governance
-                      maturity translates to high governance risk, low adoption structure translates to high
-                      shadow AI risk, and so on. Each risk is mapped on a 4×4 matrix of <strong className="text-secondary">Likelihood</strong> (how
-                      probable the risk materializes based on your current posture) versus <strong className="text-secondary">Impact</strong> (the
-                      potential business consequence if it does).
-                    </p>
-                    <p className="text-sm text-foreground/70 leading-relaxed">
-                      According to Gartner&apos;s 2024 AI Risk Management survey, <strong className="text-secondary">62% of organizations</strong> have
-                      experienced at least one AI-related risk event (data leak, biased output, compliance
-                      violation) in the past 18 months. Organizations with formal AI governance frameworks
-                      experienced <strong className="text-secondary">73% fewer material incidents</strong>. The EU AI Act (effective August 2025) and
-                      state-level US regulations (Colorado AI Act, California AI Transparency Act) are
-                      increasing the <strong className="text-secondary">regulatory cost of inadequate governance</strong>.
-                    </p>
-                  </div>
-                </SubCollapsible>
 
                 {/* Risk breakdown — color-coded grid shown in preview */}
                 <div className="mt-2">
@@ -1557,10 +1493,7 @@ function ReportPage() {
             summary={`Independent vendor analysis with buy/build/partner recommendations for ${result.companyProfile.primaryAIUseCases?.slice(0, 2).join(", ").replace(/_/g, " ") || "your AI use cases"}. Includes negotiation intelligence and lock-in risk assessment.`}
           >
             {/* --- 1. HOW WE EVALUATE VENDORS --- */}
-            <div className="border border-light p-5 mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">How We Evaluate Vendors</span>
-              </div>
+            <SubCollapsible title="How We Evaluate Vendors">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Every vendor relationship is a bet on your AI future. We evaluate across <strong className="text-secondary">six
                 dimensions</strong>, weighted for your maturity stage. At <strong className="text-secondary">Stage{" "}
@@ -1585,14 +1518,10 @@ function ReportPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* --- VENDOR STACK ASSESSMENT by use case --- */}
-            <div className="border border-light p-5 mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75l-5.571-3m11.142 0l4.179 2.25L12 17.25l-9.75-5.25 4.179-2.25m11.142 0l4.179 2.25L12 21.75l-9.75-5.25 4.179-2.25" /></svg>
-                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Vendor Stack Assessment</span>
-              </div>
+            <SubCollapsible title="Vendor Stack Assessment">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Vendor recommendations for {result.companyProfile.companyName}&apos;s selected AI use cases,
                 rated on the six evaluation criteria above.
@@ -1644,7 +1573,7 @@ function ReportPage() {
                   </SubCollapsible>
                 ))}
               </div>
-            </div>
+            </SubCollapsible>
 
             {/* --- 2. RECOMMENDED PARTNERS (Buy / Build / Partner layout) --- */}
             <SubCollapsible title="Recommended Partner Categories" hint="View recommendations" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>}>
@@ -1810,8 +1739,8 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* How boards can support — action tiles in a row */}
-            <SubCollapsible title={`How Boards Can Support at Stage ${result.stageClassification.primaryStage}`}>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
+            <SubCollapsible title={`Stage ${result.stageClassification.primaryStage} Board Actions`}>
+              <div className="grid sm:grid-cols-2 gap-3 items-start">
                 {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
                   <SubCollapsible
                     key={idx}
@@ -1825,7 +1754,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Items for board consideration — grouped by Decision / Investment / Governance */}
-            <SubCollapsible title="Items for Board Consideration">
+            <SubCollapsible title="Board Agenda: Decisions, Investments & Governance">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Based on this diagnostic, the following items may warrant <strong className="text-secondary">board-level discussion</strong>.
                 Each is framed as a consideration adapted from NACD best practices for AI governance oversight.
@@ -4238,14 +4167,14 @@ function ActionTimeline({
     {
       period: "Days 61 to 90",
       title: "Scale & Sustain",
-      subtitle: "Institutionalize, report to board, set 12-month roadmap",
+      subtitle: "Institutionalize, report to leadership, set 12-month roadmap",
       color: "#6B7F99",
       actions: [
         {
-          action: "Compile and present board-ready AI maturity progress report with quantified value capture and risk posture update",
+          action: "Compile and present executive AI maturity progress report with quantified value capture and risk posture update",
           owner: "CEO / CIO",
           priority: "Critical",
-          detail: "Board engagement is critical for sustained investment. Include: value captured, risks mitigated, competitive positioning, and resource asks.",
+          detail: "Leadership engagement is critical for sustained investment. Include: value captured, risks mitigated, competitive positioning, and resource asks.",
         },
         {
           action: `Leverage ${dimensionLabel(strongest)} (strongest dimension) to accelerate lagging areas through internal best-practice transfer`,
@@ -4412,14 +4341,14 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
     economic_translation: {
       'ET-01': {
         strong: `Financial measurement infrastructure for AI is in place — you can track, attribute, and report AI-driven value creation. Only 10% of companies have mastered this capability (BCG 2024).`,
-        weak: `No financial measurement infrastructure for AI means every dollar spent is invisible to the P&L. Without measurement, you cannot optimize, justify, or defend AI investment at the board level.`,
+        weak: `No financial measurement infrastructure for AI means every dollar spent is invisible to the P&L. Without measurement, you cannot optimize, justify, or defend AI investment to leadership.`,
       },
       'ET-02': {
         strong: `AI-freed capacity is being systematically redeployed to higher-value work — converting productivity gains into measurable financial returns rather than letting them absorb invisibly.`,
         weak: `When AI saves time, that time disappears — absorbed into existing work rather than redeployed to measurable value creation. This is the most common "value leak" in enterprise AI: productivity gains that no one captures.`,
       },
       'ET-03': {
-        strong: `AI investment can be justified to the board with quantified evidence — a capability that unlocks continued funding and strategic confidence from leadership.`,
+        strong: `AI investment can be justified to leadership with quantified evidence — a capability that unlocks continued funding and strategic confidence.`,
         weak: `The inability to justify AI investment to leadership creates a credibility deficit that compounds with each budget cycle. In ${ind}, CFOs report that unquantified AI spending faces 2x the scrutiny of other technology investments.`,
       },
       'ET-04': {
@@ -4427,7 +4356,7 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
         weak: `No AI outcomes are measurably connected to financial results. Without this linkage, AI remains an act of faith rather than a managed investment — and faith-based spending rarely survives leadership transitions or downturns.`,
       },
       'ET-05': {
-        strong: `Finance actively engages with AI economics — a partnership that transforms AI from a technology cost center into a quantified strategic investment with board-level visibility.`,
+        strong: `Finance actively engages with AI economics — a partnership that transforms AI from a technology cost center into a quantified strategic investment with executive-level visibility.`,
         weak: `Finance has no perspective on AI value — it appears as an undifferentiated line item in the technology budget. Until finance is a partner in AI measurement, the economic case will remain invisible to the people who control capital allocation.`,
       },
       'ET-07': {
@@ -4466,9 +4395,9 @@ function compositeIndexDescription(slug: string, score: number, industry: string
       low: `A Decision Velocity score of ${score} means your organization takes 6-12+ months to move from AI use case identification to pilot deployment. This pace is structurally incompatible with the current rate of AI market evolution. In ${ind}, competitive positioning now shifts quarterly — by the time your organization deploys, the opportunity landscape has already moved. Gartner's 2024 research shows organizations in the bottom quartile of AI velocity are 4x more likely to face disruption from AI-native competitors.`,
     },
     economic_translation: {
-      high: `An Economic Translation score of ${score} means your organization has built what most lack: the ability to connect AI activity to P&L outcomes. Finance and operations are aligned on AI measurement, value flows into financial reporting, and the board sees AI as a quantified investment, not an act of faith. In ${ind}, this capability positions you to allocate capital to AI with the same rigor and confidence applied to any major investment — and to defend that allocation against competing priorities.`,
-      mid: `An Economic Translation score of ${score} indicates emerging but incomplete financial measurement. Some AI investments are tracked, but significant value leaks through untracked productivity gains, unmeasured quality improvements, and unrealized capacity that no one redeployed. In ${ind}, this is the most common pattern: organizations that have invested in AI but cannot yet present a credible, quantified narrative to the board. The CFO's question — "What are we getting for this?" — does not yet have a satisfying answer.`,
-      low: `An Economic Translation score of ${score} signals that AI spending is generating no measurable financial return. Your organization is investing without a value capture mechanism — productivity gains happen but are absorbed rather than measured, and no one can connect AI activity to margin improvement, revenue growth, or cost reduction. In ${ind}, this pattern typically leads to AI budget cuts within 12-18 months as board patience for unquantified technology spending expires (Deloitte 2024). Section 5 quantifies the value at risk.`,
+      high: `An Economic Translation score of ${score} means your organization has built what most lack: the ability to connect AI activity to P&L outcomes. Finance and operations are aligned on AI measurement, value flows into financial reporting, and leadership sees AI as a quantified investment, not an act of faith. In ${ind}, this capability positions you to allocate capital to AI with the same rigor and confidence applied to any major investment — and to defend that allocation against competing priorities.`,
+      mid: `An Economic Translation score of ${score} indicates emerging but incomplete financial measurement. Some AI investments are tracked, but significant value leaks through untracked productivity gains, unmeasured quality improvements, and unrealized capacity that no one redeployed. In ${ind}, this is the most common pattern: organizations that have invested in AI but cannot yet present a credible, quantified narrative to leadership. The CFO's question — "What are we getting for this?" — does not yet have a satisfying answer.`,
+      low: `An Economic Translation score of ${score} signals that AI spending is generating no measurable financial return. Your organization is investing without a value capture mechanism — productivity gains happen but are absorbed rather than measured, and no one can connect AI activity to margin improvement, revenue growth, or cost reduction. In ${ind}, this pattern typically leads to AI budget cuts within 12-18 months as leadership patience for unquantified technology spending expires (Deloitte 2024). Section 5 quantifies the value at risk.`,
     },
   };
   const tier = score >= 70 ? "high" : score >= 40 ? "mid" : "low";
@@ -4480,7 +4409,7 @@ function compositeIndexBenchmark(slug: string, score: number, industry: string):
   const benchmarks: Record<string, string> = {
     authority_friction: `In ${ind}, the median Authority Friction score is approximately 38/100 (McKinsey Global AI Survey 2024). Organizations scoring above 65 are classified as "governance-ready" for enterprise-scale deployment — they have formal AI decision rights, streamlined approval pathways, and compliance embedded into the deployment process rather than imposed as an afterthought. Your score of ${score} places you ${score >= 65 ? "in the top quartile — a structural advantage that enables deployment speed your competitors cannot match" : score >= 38 ? "near the industry median. You have some governance foundations but lack the structural clarity that separates fast-deploying organizations from those stuck in approval cycles" : "below the industry median, indicating governance structures that will bottleneck every AI initiative regardless of its strategic merit"}. Gartner projects that by 2027, 75% of large enterprises will have formalized AI governance frameworks, up from 35% today — the window to build governance as a competitive advantage is narrowing.`,
     decision_velocity: `The average time from AI use case identification to production deployment is 8.4 months across industries (Deloitte 2024). In ${ind}, this ranges from 6 to 14 months depending on regulatory intensity and organizational complexity. Top-quartile organizations deploy in under 10 weeks — a 4-5x velocity advantage that compounds with every deployment cycle. Your score of ${score} suggests your typical deployment cycle is ${score >= 70 ? "competitive with industry leaders, giving you a meaningful speed-to-value advantage that compounds over time" : score >= 40 ? "near the industry average of 6-9 months. This pace is workable today but will become a liability as AI-native competitors accelerate — closing the velocity gap should be a 90-day priority" : "significantly longer than peers, placing you at material competitive risk. While you are still in approval cycles, faster organizations are already measuring results and iterating"}. BCG's 2024 research found that AI deployment velocity — not AI spending — is the strongest predictor of enterprise AI ROI.`,
-    economic_translation: `Only 10% of companies generate significant, measurable financial returns from AI; 70% report minimal or no quantifiable impact (BCG AI Advantage Report 2024). In ${ind}, the median economic translation score is approximately 35/100 — most organizations cannot answer the CFO's question: "What are we getting for this?" Your score of ${score} positions you ${score >= 60 ? "among the rare organizations that can credibly demonstrate AI ROI to the board, investors, and analysts — a capability that unlocks continued investment and strategic confidence" : score >= 35 ? "near the industry median. You have pockets of measurable value but lack the systematic measurement infrastructure that would make AI investment defensible at the board level" : "below the industry median, meaning your organization is investing in AI without capturing proportionate financial evidence of return. Deloitte's 2024 State of AI report found that 58% of organizations with low translation scores eventually cut AI budgets — creating a negative spiral of underinvestment and underperformance"}.`,
+    economic_translation: `Only 10% of companies generate significant, measurable financial returns from AI; 70% report minimal or no quantifiable impact (BCG AI Advantage Report 2024). In ${ind}, the median economic translation score is approximately 35/100 — most organizations cannot answer the CFO's question: "What are we getting for this?" Your score of ${score} positions you ${score >= 60 ? "among the rare organizations that can credibly demonstrate AI ROI to leadership, investors, and analysts — a capability that unlocks continued investment and strategic confidence" : score >= 35 ? "near the industry median. You have pockets of measurable value but lack the systematic measurement infrastructure that would make AI investment defensible at the executive level" : "below the industry median, meaning your organization is investing in AI without capturing proportionate financial evidence of return. Deloitte's 2024 State of AI report found that 58% of organizations with low translation scores eventually cut AI budgets — creating a negative spiral of underinvestment and underperformance"}.`,
   };
   return benchmarks[slug] || `Industry benchmark data for ${ind} suggests organizations at your score level have specific improvement opportunities relative to top-quartile performers in AI maturity.`;
 }
@@ -4490,7 +4419,7 @@ function compositeIndexRisks(slug: string, score: number): string {
     authority_friction: {
       high: "Over-governance risk: mature governance structures can calcify into bureaucracy if not actively managed. Monitor for approval processes that outlive their purpose, governance committees that slow rather than enable, and compliance requirements that expand beyond regulatory necessity. The goal is governance that scales with AI ambition, not governance that constrains it.",
       mid: "Shadow AI proliferation is your primary exposure. Inconsistent governance across business units means employees in under-governed areas are using AI tools without oversight — creating data leakage, compliance gaps, and model risk that accumulate invisibly. Gartner estimates 75% of enterprise AI usage in mid-governance organizations is untracked. Additionally, governance inconsistency erodes trust: business units that face heavy approval burdens see AI-mature peers moving faster and begin circumventing controls.",
-      low: "Critical structural exposure on multiple fronts: ungoverned AI usage creates immediate compliance and data security risk; the absence of clear decision authority means no one can approve, fund, or kill AI initiatives with conviction; and the resulting organizational ambiguity guarantees that AI investment will be diffuse, uncoordinated, and ultimately indefensible to the board. This score means the governance problem must be solved before any AI scaling investment can yield returns.",
+      low: "Critical structural exposure on multiple fronts: ungoverned AI usage creates immediate compliance and data security risk; the absence of clear decision authority means no one can approve, fund, or kill AI initiatives with conviction; and the resulting organizational ambiguity guarantees that AI investment will be diffuse, uncoordinated, and ultimately indefensible to leadership. This score means the governance problem must be solved before any AI scaling investment can yield returns.",
     },
     decision_velocity: {
       high: "Speed-quality tradeoff requires active management. Rapid deployment can introduce technical debt, skip adequate model validation, or outpace the organization's ability to absorb change. The risk is not moving too fast — it is moving fast without the monitoring and feedback loops to catch problems early. Ensure velocity is paired with automated testing, staged rollouts, and clear rollback protocols.",
@@ -4499,8 +4428,8 @@ function compositeIndexRisks(slug: string, score: number): string {
     },
     economic_translation: {
       high: "Optimization plateau risk: as the easy-to-measure value is captured, incremental gains become harder to quantify. The risk is over-indexing on measurable outcomes at the expense of transformative but harder-to-quantify initiatives (culture change, capability building, strategic positioning). Ensure your measurement framework can accommodate longer-horizon value creation, not just quarterly efficiency gains.",
-      mid: "AI investment is entering the credibility danger zone. Without systematic value measurement, CFO and board confidence erodes predictably: initial enthusiasm lasts 2-3 quarters, then scrutiny intensifies. If you cannot present a defensible financial narrative within the next 12 months, expect AI budgets to face the same fate as most enterprise technology spending — cut during the next downturn and reallocated to initiatives with clearer ROI.",
-      low: "AI funding is at existential risk. Without any measurable financial return, the organization's AI investment is defensible only on faith — and board patience for faith-based technology spending typically expires within 12-18 months. Beyond the budget risk, inability to measure value means inability to optimize: you cannot direct investment toward high-performing AI use cases or away from underperforming ones. Every dollar of AI spend is equally unaccountable, which guarantees waste.",
+      mid: "AI investment is entering the credibility danger zone. Without systematic value measurement, CFO and leadership confidence erodes predictably: initial enthusiasm lasts 2-3 quarters, then scrutiny intensifies. If you cannot present a defensible financial narrative within the next 12 months, expect AI budgets to face the same fate as most enterprise technology spending — cut during the next downturn and reallocated to initiatives with clearer ROI.",
+      low: "AI funding is at existential risk. Without any measurable financial return, the organization's AI investment is defensible only on faith — and leadership patience for faith-based technology spending typically expires within 12-18 months. Beyond the budget risk, inability to measure value means inability to optimize: you cannot direct investment toward high-performing AI use cases or away from underperforming ones. Every dollar of AI spend is equally unaccountable, which guarantees waste.",
     },
   };
   const tier = score >= 70 ? "high" : score >= 40 ? "mid" : "low";
