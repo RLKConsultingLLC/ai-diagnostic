@@ -1588,8 +1588,8 @@ function ReportPage() {
               </div>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Vendor recommendations for {result.companyProfile.companyName}&apos;s selected AI use cases,
-                rated on the six evaluation criteria above. <strong className="text-secondary">Green</strong> indicates
-                strong fit, <strong className="text-tertiary">yellow</strong> adequate, and <span className="text-red-600 font-semibold">red</span> a
+                rated on the six evaluation criteria above. <strong className="text-green-700">Green</strong> indicates
+                strong fit, <strong className="text-yellow-700">yellow</strong> adequate, and <strong className="text-red-600">red</strong> a
                 potential concern area.
               </p>
               <div className="space-y-1">

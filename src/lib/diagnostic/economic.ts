@@ -75,17 +75,93 @@ const INDUSTRY_PRODUCTIVITY_POTENTIAL: Record<Industry, { low: number; high: num
 };
 
 // ---------------------------------------------------------------------------
-// STAGE-BASED CAPTURE RATES
+// INDUSTRY x STAGE CAPTURE RATES (2D lookup)
 // ---------------------------------------------------------------------------
-// What % of theoretical AI productivity potential the org is actually capturing
+// What % of theoretical AI productivity potential the org is actually capturing.
+// Varies by BOTH maturity stage AND industry — tech-forward industries capture
+// more at every stage; heavily regulated / resource-constrained industries
+// capture less. Based on McKinsey 2024 Global AI Survey cross-tabs,
+// BCG AI Advantage Report peer analytics, and Gartner industry maturity curves.
 
-const STAGE_CAPTURE_RATES: Record<StageNumber, number> = {
-  1: 0.02, // 2% — almost nothing captured
-  2: 0.10, // 10% — some pilot value
-  3: 0.25, // 25% — pockets of real value
-  4: 0.55, // 55% — significant capture
-  5: 0.80, // 80% — near-full capture
+type IndustryCaptureGroup = 'tech_forward' | 'data_rich_financial' | 'professional_services' | 'consumer_digital' | 'industrial_mid' | 'healthcare_regulated' | 'infrastructure_heavy' | 'public_sector';
+
+const INDUSTRY_CAPTURE_GROUP: Record<Industry, IndustryCaptureGroup> = {
+  // Tech-forward: deep technical talent, data infrastructure, cultural readiness
+  software_saas: 'tech_forward',
+  it_services: 'tech_forward',
+  hardware_electronics: 'tech_forward',
+  ecommerce_digital: 'tech_forward',
+  media_entertainment: 'tech_forward',
+  dtc: 'tech_forward',
+  // Data-rich financial: massive data assets, high investment capacity, moderate regulation
+  banking: 'data_rich_financial',
+  capital_markets: 'data_rich_financial',
+  asset_wealth_management: 'data_rich_financial',
+  insurance: 'data_rich_financial',
+  investment_banking: 'data_rich_financial',
+  private_equity: 'data_rich_financial',
+  venture_capital: 'data_rich_financial',
+  hedge_funds: 'data_rich_financial',
+  // Professional services: high knowledge-worker ratio, strong ROI from AI augmentation
+  consulting_services: 'professional_services',
+  legal_services: 'professional_services',
+  accounting_audit: 'professional_services',
+  // Consumer / retail: moderate technical maturity, high volume data
+  retail: 'consumer_digital',
+  cpg: 'consumer_digital',
+  food_beverage: 'consumer_digital',
+  telecommunications: 'consumer_digital',
+  // Industrial mid-tier: operational technology, growing AI adoption
+  manufacturing_discrete: 'industrial_mid',
+  manufacturing_process: 'industrial_mid',
+  automotive: 'industrial_mid',
+  aerospace_defense: 'industrial_mid',
+  defense_contractors: 'industrial_mid',
+  chemicals_materials: 'industrial_mid',
+  industrial_services: 'industrial_mid',
+  construction_engineering: 'industrial_mid',
+  shipping_logistics: 'industrial_mid',
+  transportation: 'industrial_mid',
+  // Healthcare regulated: high compliance burden, complex data governance
+  healthcare_providers: 'healthcare_regulated',
+  healthcare_payers: 'healthcare_regulated',
+  healthcare_services: 'healthcare_regulated',
+  life_sciences_pharma: 'healthcare_regulated',
+  // Infrastructure heavy: legacy systems, capital-intensive, slow procurement
+  energy_oil_gas: 'infrastructure_heavy',
+  utilities: 'infrastructure_heavy',
+  infrastructure_transport: 'infrastructure_heavy',
+  real_estate_commercial: 'infrastructure_heavy',
+  real_estate_residential: 'infrastructure_heavy',
+  // Public sector: procurement constraints, limited budgets, risk aversion
+  government_federal: 'public_sector',
+  government_state_local: 'public_sector',
+  nonprofit_ngo: 'public_sector',
 };
+
+const CAPTURE_RATES_BY_GROUP: Record<IndustryCaptureGroup, Record<StageNumber, number>> = {
+  // Tech companies capture more at every stage — talent, infra, and culture already exist
+  tech_forward:          { 1: 0.05, 2: 0.15, 3: 0.32, 4: 0.62, 5: 0.85 },
+  // Financial services: massive data and investment capacity, but compliance slows deployment
+  data_rich_financial:   { 1: 0.03, 2: 0.12, 3: 0.28, 4: 0.58, 5: 0.82 },
+  // Professional services: knowledge workers see immediate ROI from AI augmentation
+  professional_services: { 1: 0.04, 2: 0.14, 3: 0.30, 4: 0.60, 5: 0.84 },
+  // Consumer: decent data infrastructure, moderate tech maturity
+  consumer_digital:      { 1: 0.03, 2: 0.11, 3: 0.26, 4: 0.54, 5: 0.80 },
+  // Industrial: operational AI growing, but integration complexity is higher
+  industrial_mid:        { 1: 0.02, 2: 0.08, 3: 0.22, 4: 0.48, 5: 0.75 },
+  // Healthcare: regulatory burden and data privacy constraints slow capture
+  healthcare_regulated:  { 1: 0.02, 2: 0.07, 3: 0.20, 4: 0.45, 5: 0.72 },
+  // Infrastructure: legacy systems and capital intensity limit AI velocity
+  infrastructure_heavy:  { 1: 0.01, 2: 0.06, 3: 0.18, 4: 0.42, 5: 0.70 },
+  // Public sector: procurement, budget, and risk aversion create the widest capture gap
+  public_sector:         { 1: 0.01, 2: 0.05, 3: 0.15, 4: 0.38, 5: 0.65 },
+};
+
+function getCaptureRate(industry: Industry, stage: StageNumber): number {
+  const group = INDUSTRY_CAPTURE_GROUP[industry];
+  return CAPTURE_RATES_BY_GROUP[group][stage];
+}
 
 // ---------------------------------------------------------------------------
 // COMPANY SIZE ADJUSTMENTS
@@ -170,7 +246,7 @@ export function computeEconomicEstimate(
   const warnings: string[] = [];
   const industry = profile.industry;
   const potential = INDUSTRY_PRODUCTIVITY_POTENTIAL[industry];
-  const captureRate = STAGE_CAPTURE_RATES[stage.primaryStage];
+  const captureRate = getCaptureRate(industry, stage.primaryStage);
   const sizeMultiplier = getSizeMultiplier(profile.employeeCount);
   let costPerEmployee = AVG_COST_PER_EMPLOYEE[industry];
 
@@ -323,7 +399,7 @@ function buildBenchmarkNarrative(
     'AI-Native Enterprise',
   ][stage];
 
-  const capturePercent = STAGE_CAPTURE_RATES[stage] * 100;
+  const capturePercent = getCaptureRate(industry, stage) * 100;
 
   const label = formatIndustryName(industry);
 
