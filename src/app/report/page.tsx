@@ -3352,6 +3352,12 @@ function MarkdownContent({ content }: { content: string }) {
       return;
     }
 
+    // Horizontal rules (---, ***, ___) — skip entirely
+    if (/^[-*_]{3,}$/.test(trimmed)) {
+      flushAll();
+      return;
+    }
+
     // Empty line
     if (!trimmed) {
       flushAll();
