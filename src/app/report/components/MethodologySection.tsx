@@ -108,34 +108,6 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             ))}
           </div>
 
-          {/* Confidence indicator */}
-          <div className="mt-6 p-4 border border-light">
-            <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
-              Report Confidence Level
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-3 bg-offwhite border border-light overflow-hidden">
-                <div className="h-full" style={{ width: `${conf}%`, backgroundColor: "#0B1D3A" }} />
-              </div>
-              <span className="text-sm font-bold text-secondary">{conf}%</span>
-            </div>
-            <p className="text-[11px] text-tertiary mt-2">
-              {conf >= 90
-                ? "High confidence. Dimension scores are highly consistent, indicating coherent organizational AI posture across all five behavioral dimensions."
-                : conf >= 75
-                ? "Strong confidence. Dimension scores show some variance across organizational areas, which is typical in organizations where AI maturity has progressed unevenly across departments."
-                : "Moderate confidence. Notable variance across dimensions or response quality factors. Findings are triangulated against industry benchmarks and research data."}
-            </p>
-            {result.stageClassification.confidenceFactors && (
-              <div className="mt-3 space-y-1">
-                {Object.entries(result.stageClassification.confidenceFactors).map(([factor, value]) => (
-                  <p key={factor} className="text-[10px] text-foreground/35 font-mono">
-                    {factor}: {(value as number) > 0 ? '+' : ''}{((value as number) * 100).toFixed(1)}%
-                  </p>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
 

@@ -1585,6 +1585,67 @@ function ReportPage() {
               </div>
             </div>
 
+            {/* --- VENDOR STACK ASSESSMENT by use case --- */}
+            <div className="border border-light p-5 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-4 h-4 text-navy/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75l-5.571-3m11.142 0l4.179 2.25L12 17.25l-9.75-5.25 4.179-2.25m11.142 0l4.179 2.25L12 21.75l-9.75-5.25 4.179-2.25" /></svg>
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Vendor Stack Assessment</span>
+              </div>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                Vendor recommendations for {result.companyProfile.companyName}&apos;s selected AI use cases,
+                rated on the six evaluation criteria above. <strong className="text-secondary">Green</strong> indicates
+                strong fit, <strong className="text-tertiary">yellow</strong> adequate, and <span className="text-red-600 font-semibold">red</span> a
+                potential concern area.
+              </p>
+              <div className="space-y-1">
+                {getVendorStackByUseCase(
+                  result.companyProfile.primaryAIUseCases || [],
+                  result.companyProfile.industry,
+                  result.stageClassification.primaryStage,
+                ).map((stack) => (
+                  <SubCollapsible key={stack.useCase} title={stack.useCase}>
+                    <p className="text-xs text-foreground/60 mb-3">{stack.summary}</p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-light">
+                            <th className="text-left py-2 pr-3 font-semibold text-secondary min-w-[140px]">Vendor</th>
+                            {["Fit", "Scale", "Cost", "Risk", "Support", "Ecosystem"].map((h) => (
+                              <th key={h} className="text-center py-2 px-1.5 font-semibold text-tertiary w-[60px]">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {stack.vendors.map((v) => (
+                            <tr key={v.vendor} className="border-b border-light/50 group">
+                              <td className="py-2.5 pr-3">
+                                <p className="font-semibold text-secondary">{v.vendor}</p>
+                                <p className="text-[10px] text-foreground/40 mt-0.5 leading-snug">{v.note}</p>
+                              </td>
+                              {[v.fit, v.scale, v.cost, v.risk, v.support, v.ecosystem].map((score, i) => {
+                                const bg = score >= 4 ? "bg-green-100 text-green-800" : score >= 3 ? "bg-yellow-50 text-yellow-800" : "bg-red-50 text-red-700";
+                                return (
+                                  <td key={i} className="text-center py-2.5 px-1.5">
+                                    <span className={`inline-block w-7 h-7 leading-7 text-[10px] font-bold ${bg}`}>
+                                      {score}
+                                    </span>
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-[10px] text-tertiary mt-2 italic">
+                      Scores: 5 = Excellent, 4 = Strong, 3 = Adequate, 2 = Below Average, 1 = Concern.
+                      Based on Gartner, Forrester, and G2 enterprise reviews (2024).
+                    </p>
+                  </SubCollapsible>
+                ))}
+              </div>
+            </div>
+
             {/* --- 2. RECOMMENDED PARTNERS (Buy / Build / Partner layout) --- */}
             <SubCollapsible title="Recommended Partner Categories" hint="View recommendations" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>}>
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
@@ -1734,9 +1795,7 @@ function ReportPage() {
             number={9}
             title="Messages for the Board"
             summary={`Board-ready findings structured as decision items for ${result.companyProfile.companyName}. Includes peer board intelligence, ${getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).length} recommended asks, and governance recommendations aligned to NACD best practices.`}
-            insight={`78% of boards consider AI a top-three priority, but only 23% feel equipped to oversee it. These findings translate your diagnostic into the language of board governance - decision items, not status updates.`}
-            preview={
-              <>
+          >
                 <p className="text-sm text-foreground/60 mb-4">
                   These findings are structured for <strong className="text-secondary">direct board presentation</strong>. Each item
                   below is a <strong className="text-secondary">decision point</strong>, not an informational update. NACD&apos;s 2024
@@ -1782,7 +1841,7 @@ function ReportPage() {
             </SubCollapsible>
 
             {/* Peer board intelligence — industry-specific context */}
-            <SubCollapsible title={`What Peer Boards in ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())} Are Doing`} hint="View peer actions" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" /></svg>}>
+            <SubCollapsible title={`What Peer Boards in ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())} Are Doing`}>
               <div className="bg-offwhite border border-light p-4 md:p-5">
                 <div className="space-y-3">
                   {getPeerBoardActions(result.companyProfile.industry).map((peer, idx) => (
@@ -1819,7 +1878,6 @@ function ReportPage() {
                     <SubCollapsible
                       key={idx}
                       title={action.action}
-                      hint="View rationale"
                       icon={<span className="text-navy/50">{actionIcons[idx % actionIcons.length]}</span>}
                     >
                       <p className="text-xs text-foreground/60 leading-relaxed mb-2">{action.rationale}</p>
@@ -1830,39 +1888,51 @@ function ReportPage() {
               </div>
             </SubCollapsible>
 
-            {/* Items for board consideration — softened language */}
-            <SubCollapsible title={`Items for Board Consideration (${getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).length} topics)`}>
-              <div className="bg-navy/5 border border-navy/10 p-6">
-                <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-                  Based on this diagnostic, the following items may warrant <strong className="text-secondary">board-level discussion</strong>.
-                  Each is framed as a consideration for the board to evaluate, adapted from
-                  NACD best practices for AI governance oversight.
-                </p>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate).map((ask, idx) => {
-                    const askColors = ["#0B1D3A", "#364E6E", "#6B7F99", "#A8B5C4"];
-                    return (
-                      <SubCollapsible
-                        key={idx}
-                        title={ask.title}
-                        hint={`${ask.type.charAt(0).toUpperCase() + ask.type.slice(1)} consideration`}
-                        icon={
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 text-white" style={{ backgroundColor: askColors[idx % askColors.length] }}>
-                            {ask.type.toUpperCase()}
-                          </span>
-                        }
-                      >
-                        <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
-                      </SubCollapsible>
-                    );
-                  })}
-                </div>
+            {/* Items for board consideration — grouped by Decision / Investment / Governance */}
+            <div className="border border-light p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-bold text-secondary tracking-wide uppercase">Items for Board Consideration</span>
               </div>
-            </SubCollapsible>
-              </>
-            }
-          >
-            {/* No separate children — all board content is in preview for immediate visibility */}
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+                Based on this diagnostic, the following items may warrant <strong className="text-secondary">board-level discussion</strong>.
+                Each is framed as a consideration adapted from NACD best practices for AI governance oversight.
+              </p>
+              {(() => {
+                const asks = getBoardAsks(result.overallScore, result.stageClassification.primaryStage, result.economicEstimate);
+                const groups = [
+                  { type: "decision", label: "Decision", color: "#0B1D3A", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+                  { type: "investment", label: "Investment", color: "#364E6E", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+                  { type: "governance", label: "Governance", color: "#6B7F99", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg> },
+                ];
+                return (
+                  <div className="grid grid-cols-3 gap-3">
+                    {groups.map((g) => {
+                      const groupAsks = asks.filter((a) => a.type === g.type);
+                      return (
+                        <div key={g.type} className="border border-light" style={{ borderTop: `3px solid ${g.color}` }}>
+                          <SubCollapsible
+                            title={g.label}
+                            icon={<span style={{ color: g.color }}>{g.icon}</span>}
+                          >
+                            <div className="space-y-3">
+                              {groupAsks.map((ask, idx) => (
+                                <div key={idx}>
+                                  <p className="text-xs font-semibold text-secondary mb-1">{ask.title}</p>
+                                  <p className="text-xs text-foreground/60 leading-relaxed">{ask.description}</p>
+                                </div>
+                              ))}
+                              {groupAsks.length === 0 && (
+                                <p className="text-xs text-foreground/40 italic">No items in this category based on your diagnostic results.</p>
+                              )}
+                            </div>
+                          </SubCollapsible>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -5724,6 +5794,146 @@ function getGartnerContext(industry: string, stage: number): string {
     return `At Stage ${stage} in ${ind}, your organization is ready for a broader vendor portfolio. Gartner recommends a mix of established "Leaders" for core infrastructure and selectively engaging "Challengers" and "Visionaries" for innovative capabilities in specific domains. The key evaluation criteria at this stage shift from ease-of-adoption to platform extensibility, integration depth, and total cost of ownership. Forrester's 2024 Wave analyses suggest mid-maturity organizations should also invest in MLOps/AI platform vendors to build internal deployment capabilities.`;
   }
   return `At Stage ${stage} in ${ind}, your organization should leverage the full Gartner Magic Quadrant landscape strategically. "Leaders" for enterprise backbone, "Visionaries" for emerging capabilities, and "Niche Players" for domain-specific advantages. At this maturity level, the build-vs-buy decision becomes more nuanced: proprietary AI capabilities that create competitive moats should be built internally, while commodity capabilities should be sourced from best-in-class vendors. Forrester recommends advanced organizations invest in AI platform engineering to reduce vendor dependency.`;
+}
+
+// ---------------------------------------------------------------------------
+// Vendor Stack Assessment — grouped by use case with heat-map ratings
+// ---------------------------------------------------------------------------
+
+interface VendorRating {
+  vendor: string;
+  fit: number;      // 1-5
+  scale: number;
+  cost: number;
+  risk: number;
+  support: number;
+  ecosystem: number;
+  note: string;
+}
+
+interface UseCaseVendorStack {
+  useCase: string;
+  summary: string;
+  vendors: VendorRating[];
+}
+
+function getVendorStackByUseCase(useCases: string[], industry: string, stage: number): UseCaseVendorStack[] {
+  const stacks: Record<string, UseCaseVendorStack> = {
+    "Customer Service / Chatbots": {
+      useCase: "Customer Service / Chatbots",
+      summary: "Conversational AI for customer-facing interactions, support automation, and intelligent routing.",
+      vendors: [
+        { vendor: "Intercom Fin", fit: 5, scale: 4, cost: 3, risk: 3, support: 5, ecosystem: 4, note: "Best for mid-market; strong out-of-box NLU and handoff" },
+        { vendor: "Zendesk AI", fit: 4, scale: 5, cost: 3, risk: 4, support: 4, ecosystem: 5, note: "Enterprise-grade; deep CRM integration" },
+        { vendor: "Ada", fit: 4, scale: 4, cost: 4, risk: 3, support: 4, ecosystem: 3, note: "Strong automation rates; good for high-volume" },
+        { vendor: "Amazon Connect + Bedrock", fit: 3, scale: 5, cost: 4, risk: 4, support: 3, ecosystem: 5, note: "AWS-native; best for existing AWS shops" },
+      ],
+    },
+    "Data Analytics / BI": {
+      useCase: "Data Analytics / BI",
+      summary: "AI-augmented analytics, natural language querying, and automated insight generation.",
+      vendors: [
+        { vendor: "Databricks", fit: 5, scale: 5, cost: 3, risk: 3, support: 4, ecosystem: 5, note: "Best for unified data + AI; lakehouse architecture" },
+        { vendor: "Snowflake Cortex", fit: 4, scale: 5, cost: 3, risk: 4, support: 4, ecosystem: 4, note: "Strong SQL AI; cloud-native data warehouse" },
+        { vendor: "ThoughtSpot", fit: 4, scale: 4, cost: 3, risk: 3, support: 4, ecosystem: 4, note: "Best NL querying; non-technical user friendly" },
+        { vendor: "Microsoft Fabric", fit: 4, scale: 5, cost: 4, risk: 4, support: 4, ecosystem: 5, note: "Microsoft ecosystem advantage; rapid adoption" },
+      ],
+    },
+    "Process Automation / RPA": {
+      useCase: "Process Automation / RPA",
+      summary: "Intelligent process automation combining RPA with AI for complex workflow orchestration.",
+      vendors: [
+        { vendor: "UiPath", fit: 5, scale: 5, cost: 3, risk: 3, support: 5, ecosystem: 5, note: "Market leader; broadest capability set" },
+        { vendor: "Microsoft Power Automate", fit: 4, scale: 5, cost: 5, risk: 4, support: 4, ecosystem: 5, note: "Best value in Microsoft environments" },
+        { vendor: "Automation Anywhere", fit: 4, scale: 4, cost: 3, risk: 3, support: 4, ecosystem: 4, note: "Strong cloud-native platform; good AI integration" },
+        { vendor: "SS&C Blue Prism", fit: 3, scale: 4, cost: 3, risk: 4, support: 4, ecosystem: 3, note: "Enterprise governance focus; compliance-ready" },
+      ],
+    },
+    "Document Processing": {
+      useCase: "Document Processing",
+      summary: "Intelligent document extraction, classification, and processing using AI/ML models.",
+      vendors: [
+        { vendor: "ABBYY Vantage", fit: 5, scale: 4, cost: 3, risk: 3, support: 5, ecosystem: 4, note: "Best accuracy for structured docs; strong OCR heritage" },
+        { vendor: "Google Document AI", fit: 4, scale: 5, cost: 4, risk: 4, support: 3, ecosystem: 5, note: "Cloud-native; pre-trained for common doc types" },
+        { vendor: "AWS Textract", fit: 4, scale: 5, cost: 4, risk: 4, support: 3, ecosystem: 5, note: "Best for AWS environments; table extraction" },
+        { vendor: "Hyperscience", fit: 4, scale: 4, cost: 2, risk: 3, support: 5, ecosystem: 3, note: "Human-in-the-loop; high accuracy for complex docs" },
+      ],
+    },
+    "Predictive Modeling": {
+      useCase: "Predictive Modeling",
+      summary: "ML platforms for building, deploying, and managing predictive models at enterprise scale.",
+      vendors: [
+        { vendor: "Databricks + MLflow", fit: 5, scale: 5, cost: 3, risk: 3, support: 4, ecosystem: 5, note: "Best for data teams; open-source foundation" },
+        { vendor: "AWS SageMaker", fit: 4, scale: 5, cost: 3, risk: 4, support: 4, ecosystem: 5, note: "Fully managed; broadest model serving options" },
+        { vendor: "Google Vertex AI", fit: 4, scale: 5, cost: 3, risk: 4, support: 4, ecosystem: 5, note: "Strong AutoML; best for TensorFlow teams" },
+        { vendor: "DataRobot", fit: 5, scale: 4, cost: 2, risk: 3, support: 5, ecosystem: 4, note: "Best for citizen data scientists; automated ML" },
+      ],
+    },
+    "Content Generation": {
+      useCase: "Content Generation",
+      summary: "Enterprise generative AI for marketing, communications, and content workflows.",
+      vendors: [
+        { vendor: "Anthropic Claude", fit: 5, scale: 5, cost: 3, risk: 4, support: 4, ecosystem: 4, note: "Best for nuanced, safe enterprise content" },
+        { vendor: "OpenAI GPT-4", fit: 5, scale: 5, cost: 3, risk: 3, support: 3, ecosystem: 5, note: "Broadest capability; largest ecosystem" },
+        { vendor: "Jasper AI", fit: 4, scale: 4, cost: 3, risk: 3, support: 5, ecosystem: 4, note: "Marketing-focused; brand voice controls" },
+        { vendor: "Writer", fit: 4, scale: 4, cost: 3, risk: 4, support: 4, ecosystem: 3, note: "Enterprise governance; style guide enforcement" },
+      ],
+    },
+    "Code Development": {
+      useCase: "Code Development",
+      summary: "AI-assisted software development, code review, and developer productivity tools.",
+      vendors: [
+        { vendor: "GitHub Copilot", fit: 5, scale: 5, cost: 4, risk: 3, support: 4, ecosystem: 5, note: "Dominant market share; deepest IDE integration" },
+        { vendor: "Cursor", fit: 5, scale: 4, cost: 4, risk: 3, support: 3, ecosystem: 3, note: "Best AI-native IDE experience; rapid iteration" },
+        { vendor: "Amazon CodeWhisperer", fit: 4, scale: 5, cost: 5, risk: 4, support: 3, ecosystem: 4, note: "Free tier; best for AWS-centric shops" },
+        { vendor: "Tabnine", fit: 3, scale: 4, cost: 4, risk: 5, support: 4, ecosystem: 3, note: "On-prem option; best for air-gapped environments" },
+      ],
+    },
+    "Risk Assessment": {
+      useCase: "Risk Assessment",
+      summary: "AI-powered risk modeling, fraud detection, and compliance monitoring.",
+      vendors: [
+        { vendor: "SAS Risk Management", fit: 5, scale: 5, cost: 2, risk: 5, support: 5, ecosystem: 4, note: "Gold standard for regulated industries" },
+        { vendor: "IBM OpenPages", fit: 4, scale: 5, cost: 2, risk: 5, support: 4, ecosystem: 4, note: "Best for GRC integration; Watson AI-powered" },
+        { vendor: "Palantir Foundry", fit: 4, scale: 5, cost: 1, risk: 4, support: 4, ecosystem: 3, note: "Best for complex data integration; government-grade" },
+        { vendor: "Moody's Analytics", fit: 4, scale: 4, cost: 2, risk: 5, support: 4, ecosystem: 3, note: "Best for financial risk; deep credit modeling" },
+      ],
+    },
+    "Supply Chain Optimization": {
+      useCase: "Supply Chain Optimization",
+      summary: "AI for demand forecasting, inventory optimization, and supply chain visibility.",
+      vendors: [
+        { vendor: "Blue Yonder", fit: 5, scale: 5, cost: 2, risk: 3, support: 4, ecosystem: 4, note: "Market leader; end-to-end supply chain AI" },
+        { vendor: "o9 Solutions", fit: 5, scale: 4, cost: 3, risk: 3, support: 4, ecosystem: 3, note: "Best planning platform; real-time scenario modeling" },
+        { vendor: "Kinaxis", fit: 4, scale: 4, cost: 3, risk: 3, support: 5, ecosystem: 4, note: "Best for concurrent planning; rapid deployment" },
+        { vendor: "SAP Integrated Business Planning", fit: 4, scale: 5, cost: 2, risk: 4, support: 4, ecosystem: 5, note: "Best for SAP environments; deep ERP integration" },
+      ],
+    },
+    "HR / Talent Management": {
+      useCase: "HR / Talent Management",
+      summary: "AI for recruiting, workforce planning, employee experience, and talent analytics.",
+      vendors: [
+        { vendor: "Eightfold AI", fit: 5, scale: 4, cost: 3, risk: 3, support: 4, ecosystem: 4, note: "Best talent intelligence; deep skills matching" },
+        { vendor: "Workday AI", fit: 4, scale: 5, cost: 3, risk: 4, support: 4, ecosystem: 5, note: "Best for existing Workday customers; broad HCM" },
+        { vendor: "Visier", fit: 4, scale: 4, cost: 3, risk: 4, support: 4, ecosystem: 4, note: "Best people analytics; strong benchmarking" },
+        { vendor: "Phenom", fit: 4, scale: 4, cost: 4, risk: 3, support: 4, ecosystem: 3, note: "Best for candidate experience; talent marketplace" },
+      ],
+    },
+  };
+
+  // Filter to company's selected use cases; fall back to top 3 by industry relevance
+  const selected = useCases
+    .filter((uc) => stacks[uc])
+    .map((uc) => stacks[uc]);
+
+  if (selected.length === 0) {
+    // Default: show Data Analytics, Process Automation, Content Generation
+    return ["Data Analytics / BI", "Process Automation / RPA", "Content Generation"]
+      .filter((uc) => stacks[uc])
+      .map((uc) => stacks[uc]);
+  }
+
+  return selected;
 }
 
 function getRecommendedPartnerCategories(industry: string, stage: number): { category: string; description: string; vendors: string; source: string }[] {
