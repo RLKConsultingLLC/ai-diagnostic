@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type {
@@ -142,6 +142,22 @@ function ReportPage() {
       cancelled = true;
     };
   }, [sessionId, isDemo, stripeSession]);
+
+  // Corrected capture percent — single source of truth for display
+  // Old sessions lack captureRateBase; derive from current engine so math is consistent
+  const correctedCapturePercent = useMemo(() => {
+    if (!result) return 0;
+    const est = result.economicEstimate;
+    if (est.captureRateBase) {
+      // New session — stored values are authoritative
+      return est.currentCapturePercent;
+    }
+    // Old session — recompute from current engine
+    const group = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP] ?? "";
+    const base = CAPTURE_RATES_BY_GROUP[group]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
+    const { modifier } = computeDiagnosticModifier(result.dimensionScores);
+    return Math.round(Math.max(0.01, Math.min(0.95, base * modifier)) * 100);
+  }, [result]);
 
   // Payment handler
   const handleCheckout = useCallback(async () => {
@@ -754,7 +770,7 @@ function ReportPage() {
                           {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value —
                           productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
                           competitors in {ind} are. The estimated current capture rate is{" "}
-                          <strong className="text-secondary">{result.economicEstimate.currentCapturePercent}%</strong> —
+                          <strong className="text-secondary">{correctedCapturePercent}%</strong> —
                           derived from a 7-input model that combines your industry group, maturity stage, and five behavioral
                           dimension scores from the diagnostic (fully documented in Section 10 → &quot;Estimating AI Value Capture Percentages&quot;).
                           That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
@@ -1135,13 +1151,13 @@ function ReportPage() {
                 {[...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0]?.normalizedScore}/100 - is the primary bottleneck
                 limiting {result.companyProfile.companyName}&apos;s ability to capture value from these same investments.
               </p>
-              {/* Investment priority legend */}
+              {/* Investment activity legend */}
               <div className="flex items-center gap-5 mb-3">
-                <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Priority:</p>
+                <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Investment Activity:</p>
                 {[
-                  { label: "Critical", color: "#0B1D3A" },
-                  { label: "High", color: "#364E6E" },
-                  { label: "Medium", color: "#6B7F99" },
+                  { label: "High", color: "#0B1D3A" },
+                  { label: "Moderate", color: "#364E6E" },
+                  { label: "Low", color: "#6B7F99" },
                   { label: "Emerging", color: "#A8B5C4" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-1.5">
@@ -1154,10 +1170,10 @@ function ReportPage() {
               <div className="space-y-2">
                 {getCompetitorInvestmentAreas(result.companyProfile.industry).map((area, idx) => {
                   const priorityColor = idx === 0 ? "#0B1D3A" : idx === 1 ? "#364E6E" : idx <= 3 ? "#6B7F99" : "#A8B5C4";
-                  const priorityLabel = idx === 0 ? "Critical" : idx === 1 ? "High" : idx <= 3 ? "Medium" : "Emerging";
+                  const priorityLabel = idx === 0 ? "High" : idx === 1 ? "Moderate" : idx <= 3 ? "Low" : "Emerging";
                   return (
                     <div key={idx} style={{ borderLeft: `3px solid ${priorityColor}` }}>
-                      <SubCollapsible title={area.area} hint={`${priorityLabel} priority - View details`}>
+                      <SubCollapsible title={area.area} hint={`${priorityLabel} activity`}>
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-[9px] font-bold px-2 py-0.5 text-white" style={{ backgroundColor: priorityColor }}>
                             {priorityLabel.toUpperCase()}
@@ -1181,7 +1197,7 @@ function ReportPage() {
             sectionId="section-5"
             number={5}
             title="Economic Impact Model"
-            summary={`An estimated ${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with an estimated ${result.economicEstimate.currentCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
+            summary={`An estimated ${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with an estimated ${correctedCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
           >
             {/* Cost of Inaction — shown directly first, the headline number */}
             <div className="grid sm:grid-cols-3 gap-4 md:gap-6 mb-4">
@@ -1246,7 +1262,7 @@ function ReportPage() {
 
             {/* Value Waterfall — right above methodology */}
             <SubCollapsible title="Value Waterfall">
-              <EconomicWaterfall estimate={result.economicEstimate} profile={result.companyProfile} />
+              <EconomicWaterfall estimate={{...result.economicEstimate, currentCapturePercent: correctedCapturePercent}} profile={result.companyProfile} />
             </SubCollapsible>
 
             {/* How we got these numbers — methodology at the bottom */}
@@ -1280,11 +1296,7 @@ function ReportPage() {
                     const bRate = result.economicEstimate.captureRateBase ?? fallbackBase;
                     const modValue = result.economicEstimate.captureRateModifier ?? fallbackMod.modifier;
                     const group = result.economicEstimate.captureRateGroup ?? fallbackGroup;
-                    // If old session lacks stored intermediates, derive capture % from the same math shown
-                    const isOldSession = !result.economicEstimate.captureRateBase;
-                    const finalCapturePercent = isOldSession
-                      ? Math.round(Math.max(0.01, Math.min(0.95, bRate * modValue)) * 100)
-                      : result.economicEstimate.currentCapturePercent;
+                    const finalCapturePercent = correctedCapturePercent;
                     const mod = computeDiagnosticModifier(result.dimensionScores); // for component details only
                     const groupLabel: Record<string, string> = {
                       tech_forward: "Technology & Digital",
@@ -1372,7 +1384,7 @@ function ReportPage() {
                 result.companyProfile.revenue,
                 result.economicEstimate.unrealizedValueLow,
                 result.economicEstimate.unrealizedValueHigh,
-                result.economicEstimate.currentCapturePercent,
+                correctedCapturePercent,
                 result.companyProfile.companyName,
                 result.companyProfile.employeeCount,
                 result.dimensionScores,
@@ -1387,7 +1399,7 @@ function ReportPage() {
                     the language of your P&L - how AI investment (or the absence of it) flows through
                     <strong className="text-secondary"> revenue, margins, cost structure, talent economics, and risk exposure</strong> over the next
                     12-24 months. Every dollar figure below is derived from {result.companyProfile.companyName}&apos;s
-                    actual revenue of <strong className="text-secondary">{fmtUSD(result.companyProfile.revenue)}</strong>, the estimated {result.economicEstimate.currentCapturePercent}% capture rate (Section 10 → &quot;Estimating AI Value Capture Percentages&quot;), and industry benchmarks
+                    actual revenue of <strong className="text-secondary">{fmtUSD(result.companyProfile.revenue)}</strong>, the estimated {correctedCapturePercent}% capture rate (Section 10 → &quot;Estimating AI Value Capture Percentages&quot;), and industry benchmarks
                     for {industryLabel(result.companyProfile.industry)}.
                   </p>
 
@@ -1740,9 +1752,9 @@ function ReportPage() {
                 </p>
 
                 {/* Board-ready headline findings */}
-                <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).length} items)`}>
+                <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, {...result.economicEstimate, currentCapturePercent: correctedCapturePercent}, result.companyProfile).length} items)`}>
                 <div className="space-y-4">
-                  {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, result.economicEstimate, result.companyProfile).map((finding, idx) => (
+                  {getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, {...result.economicEstimate, currentCapturePercent: correctedCapturePercent}, result.companyProfile).map((finding, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <div
                         className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-white text-xs font-bold mt-0.5"
