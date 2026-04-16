@@ -472,8 +472,8 @@ function ReportPage() {
                   Competitive Positioning
                 </p>
                 <p className="text-white/50 text-xs leading-relaxed">
-                  Where you stand vs. industry peers with named competitor
-                  analysis and competitive window assessment.
+                  Where you stand vs. industry peers with real company data,
+                  competitor analysis, and competitive window assessment.
                 </p>
               </div>
               <div className="bg-white/10 border border-white/10 p-4">
@@ -747,8 +747,8 @@ function ReportPage() {
                           The diagnostic estimates <strong className="text-secondary">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
                           {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value -
                           productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
-                          competitors in {ind} are. Current capture rate: <strong className="text-secondary">{result.economicEstimate.currentCapturePercent}%</strong> of
-                          AI-addressable potential. That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
+                          competitors in {ind} are. Estimated current capture rate: <strong className="text-secondary">{result.economicEstimate.currentCapturePercent}%</strong> of
+                          AI-addressable potential (based on industry benchmarks and your maturity stage). That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
                           forfeited per quarter</strong>. Section 5 provides the transparent methodology behind these numbers
                           - your CFO should stress-test these before sharing with the board.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
@@ -828,9 +828,9 @@ function ReportPage() {
 
                   {/* Detailed narrative if available */}
                   {report?.sections?.find((s) => s.slug === "executive-summary")?.content && (
-                    <SubCollapsible title={`Overarching Narrative`} hint="Read full narrative">
+                    <SubCollapsible title={`Overarching Narrative`}>
                       <MarkdownContent
-                        content={report?.sections?.find((s) => s.slug === "executive-summary")?.content || ""}
+                        content={(report?.sections?.find((s) => s.slug === "executive-summary")?.content || "").replace(/^#{1,3}\s+.*\n+/, "")}
                       />
                     </SubCollapsible>
                   )}
@@ -1213,7 +1213,7 @@ function ReportPage() {
             sectionId="section-5"
             number={5}
             title="Economic Impact Model"
-            summary={`${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with ${result.economicEstimate.currentCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
+            summary={`An estimated ${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with an estimated ${result.economicEstimate.currentCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
           >
             {/* Cost of Inaction — shown directly first, the headline number */}
             <div className="grid sm:grid-cols-3 gap-4 md:gap-6 mb-4">
@@ -1312,9 +1312,9 @@ function ReportPage() {
                     research produces similar estimates (18-30% range for most industries).
                   </p>
                   <p>
-                    <strong className="text-secondary">Step 3: Current capture rate.</strong>{" "}
-                    Your diagnostic scores indicate you currently capture approximately{" "}
-                    {result.economicEstimate.currentCapturePercent}% of this potential. This is
+                    <strong className="text-secondary">Step 3: Estimated current capture rate.</strong>{" "}
+                    Based on your diagnostic scores and industry-stage benchmarks, we estimate you currently capture approximately{" "}
+                    {result.economicEstimate.currentCapturePercent}% of this potential. This estimate is
                     derived from your Composite Index scores - particularly Value Capture Efficiency
                     ({result.compositeIndices.find(c => c.slug === ("economic_translation" as string))?.score || result.compositeIndices[1]?.score || "-"}/100).
                     Organizations at your maturity stage typically capture 15-35% (BCG 2024).
@@ -2012,7 +2012,7 @@ function ReportPage() {
             <p className="text-[11px] text-foreground/50 leading-relaxed mb-3">
               <span className="font-semibold">Third-Party Data & References.</span>{" "}
               This report references publicly available information including published financial
-              data, press releases, analyst reports, industry research, and named company examples.
+              data, press releases, analyst reports, industry research, and real company data.
               All third-party company names, trademarks, and data are the property of their
               respective owners. Their inclusion is for illustrative and benchmarking purposes only
               and does not imply endorsement, affiliation, or sponsorship by those companies. We
@@ -2365,7 +2365,7 @@ function EconomicSummary({ estimate }: { estimate: EconomicEstimate }) {
         />
         <Metric
           label="Current Capture"
-          value={`${estimate.currentCapturePercent}%`}
+          value={`~${estimate.currentCapturePercent}%`}
         />
         <Metric
           label="Annual Wasted Hours"
@@ -5618,8 +5618,8 @@ function getPnLImpact(
   const compoundNarrative = stage >= 4
     ? `Even at Stage ${stage}, standing still forfeits ${fmtUSD(quarterly)} per quarter. Over three years, competitive erosion compounds the loss to ${fmtUSD(year3)} as competitors close the capability gap and begin to match or exceed your AI-driven advantages.`
     : stage === 3
-    ? `At your current capture rate, ${companyName} forfeits ${fmtUSD(quarterly)} every quarter. But the real cost compounds: as competitors at Stage 4+ build organizational learning advantages, the cost to close the gap grows approximately 15% annually. Over three years, total forfeited value reaches ${fmtUSD(year3)}.`
-    : `At ${capturePercent}% capture, ${companyName} forfeits ${fmtUSD(quarterly)} every quarter — ${fmtUSD(Math.round(quarterly / 90))} every single day. This is not a static loss: competitors investing now are building compounding advantages in cost structure, talent, and customer experience. Over three years, the total forfeited value reaches ${fmtUSD(year3)}, and the organizational deficit grows proportionally harder to close.`;
+    ? `At your estimated capture rate, ${companyName} forfeits an estimated ${fmtUSD(quarterly)} every quarter. But the real cost compounds: as competitors at Stage 4+ build organizational learning advantages, the cost to close the gap grows approximately 15% annually. Over three years, total estimated forfeited value reaches ${fmtUSD(year3)}.`
+    : `At an estimated ${capturePercent}% capture rate, ${companyName} forfeits an estimated ${fmtUSD(quarterly)} every quarter — approximately ${fmtUSD(Math.round(quarterly / 90))} every single day. This is not a static loss: competitors investing now are building compounding advantages in cost structure, talent, and customer experience. Over three years, the total estimated forfeited value reaches ${fmtUSD(year3)}, and the organizational deficit grows proportionally harder to close.`;
 
   // ---- EBITDA Projection ----
   const investEBITDA = currentEBITDA + (revenue * marginUp) + (revenue * revUp * ebitdaMargin);
@@ -6527,7 +6527,7 @@ function getBoardFindings(
     },
     {
       headline: `Estimated ${fmtUSD(economic.unrealizedValueLow)} to ${fmtUSD(economic.unrealizedValueHigh)} in annual value remains unrealized`,
-      detail: `Current AI value capture is estimated at ${economic.currentCapturePercent}% of potential. This translates to approximately ${fmtUSD(Math.round((economic.unrealizedValueLow + economic.unrealizedValueHigh) / 2 / 4))} in unrealized value per quarter. The cost of inaction compounds: each quarter of delay not only forfeits this value but allows competitors to build advantages that become increasingly difficult to close.`,
+      detail: `Based on industry benchmarks and maturity stage, estimated current AI value capture is approximately ${economic.currentCapturePercent}% of potential. This translates to an estimated ${fmtUSD(Math.round((economic.unrealizedValueLow + economic.unrealizedValueHigh) / 2 / 4))} in unrealized value per quarter. The cost of inaction compounds: each quarter of delay not only forfeits this estimated value but allows competitors to build advantages that become increasingly difficult to close.`,
       severity: "critical",
     },
     {
