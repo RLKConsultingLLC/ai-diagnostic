@@ -93,13 +93,16 @@ export async function POST(request: NextRequest) {
     // Generate the full AI report — enriched with research if available
     const report = await generateFullReport(session.diagnosticResult, researchProfile ?? undefined);
 
+    // Preserve 'paid' status — never downgrade it to 'report_generated'
+    const statusUpdate = session.status === 'paid' ? 'paid' : 'report_generated';
     await updateSession(sessionId, {
       generatedReport: report,
-      status: 'report_generated',
+      status: statusUpdate,
     });
 
     return NextResponse.json({
       report,
+      paid: statusUpdate === 'paid',
       researchAvailable: !!researchProfile,
       researchConfidence: researchProfile?.confidenceLevel,
       sourcesConsulted: researchProfile?.sourcesConsulted || 0,

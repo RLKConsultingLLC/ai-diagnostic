@@ -120,7 +120,8 @@ function ReportPage() {
           if (data.report?.companyProfile) {
             setResult((prev) => prev ? { ...prev, companyProfile: data.report.companyProfile } : prev);
           }
-          setPhase((isDemo || data.paid) ? "full" : "preview");
+          // Never downgrade from "full" — preserve paid/demo access
+          setPhase((p) => (p === "full" || isDemo || data.paid) ? "full" : "preview");
         } else {
           // Report generation failed but we still have diagnostic data
           // Don't downgrade from "full" if already set (e.g., paid session)
