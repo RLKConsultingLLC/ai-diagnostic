@@ -308,6 +308,38 @@ export const MCC_INDUSTRY_TREE: MCCCategory[] = [
       { label: 'Renewable Energy Services', diagnosticSlug: 'energy_oil_gas' },
     ],
   },
+  {
+    name: 'Consumer Packaged Goods & Food Manufacturing',
+    defaultSlug: 'food_beverage',
+    subcategories: [
+      { label: 'Food & Beverage Manufacturing', diagnosticSlug: 'food_beverage' },
+      { label: 'Frozen Food & Ready-to-Eat Meals', diagnosticSlug: 'food_beverage' },
+      { label: 'Snacks & Confectionery', diagnosticSlug: 'food_beverage' },
+      { label: 'Packaged Food Brands', diagnosticSlug: 'food_beverage' },
+      { label: 'Beverages & Bottled Drinks', diagnosticSlug: 'food_beverage' },
+      { label: 'Dairy & Protein Products', diagnosticSlug: 'food_beverage' },
+      { label: 'Meat & Poultry Processing', diagnosticSlug: 'food_beverage' },
+      { label: 'Consumer Packaged Goods (Non-Food)', diagnosticSlug: 'cpg' },
+      { label: 'Household & Personal Care Products', diagnosticSlug: 'cpg' },
+      { label: 'Beauty & Cosmetics', diagnosticSlug: 'cpg' },
+      { label: 'Direct-to-Consumer Brands', diagnosticSlug: 'dtc' },
+      { label: 'Subscription Box & DTC Commerce', diagnosticSlug: 'dtc' },
+    ],
+  },
+  {
+    name: 'Industrial & Manufacturing',
+    defaultSlug: 'manufacturing_discrete',
+    subcategories: [
+      { label: 'Discrete Manufacturing (Machined / Assembled Goods)', diagnosticSlug: 'manufacturing_discrete' },
+      { label: 'Process Manufacturing (Continuous Production)', diagnosticSlug: 'manufacturing_process' },
+      { label: 'Electronics & Hardware Manufacturing', diagnosticSlug: 'hardware_electronics' },
+      { label: 'Industrial Equipment & Machinery', diagnosticSlug: 'industrial_services' },
+      { label: 'Chemicals & Advanced Materials', diagnosticSlug: 'chemicals_materials' },
+      { label: 'Aerospace & Defense Manufacturing', diagnosticSlug: 'aerospace_defense' },
+      { label: 'Defense Contracting', diagnosticSlug: 'defense_contractors' },
+      { label: 'Automotive Manufacturing', diagnosticSlug: 'automotive' },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
