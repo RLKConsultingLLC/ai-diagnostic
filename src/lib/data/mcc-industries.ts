@@ -298,14 +298,29 @@ export const MCC_INDUSTRY_TREE: MCCCategory[] = [
     ],
   },
   {
-    name: 'Utilities & Energy',
+    name: 'Utilities',
     defaultSlug: 'utilities',
     subcategories: [
       { label: 'Electric Utilities', diagnosticSlug: 'utilities' },
-      { label: 'Gas Utilities', diagnosticSlug: 'utilities' },
+      { label: 'Natural Gas Distribution (Consumer Utility)', diagnosticSlug: 'utilities' },
       { label: 'Water Utilities', diagnosticSlug: 'utilities' },
       { label: 'Waste Management', diagnosticSlug: 'utilities' },
-      { label: 'Renewable Energy Services', diagnosticSlug: 'energy_oil_gas' },
+    ],
+  },
+  {
+    name: 'Oil, Gas & Energy',
+    defaultSlug: 'energy_oil_gas',
+    subcategories: [
+      { label: 'Integrated Oil & Gas (Majors)', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Oil & Gas Exploration & Production (Upstream)', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Oil & Gas Refining & Marketing (Downstream)', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Pipeline & Midstream Operations', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Oilfield Services & Equipment', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Natural Gas Production & LNG', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Drilling & Well Services', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Renewable Energy Development (Solar / Wind)', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Energy Storage & Battery', diagnosticSlug: 'energy_oil_gas' },
+      { label: 'Nuclear Power Generation', diagnosticSlug: 'utilities' },
     ],
   },
   {
