@@ -52,6 +52,7 @@ export type Industry =
   | 'private_equity'
   | 'venture_capital'
   | 'hedge_funds'
+  | 'fintech_payments'
   // Healthcare & Life Sciences
   | 'healthcare_providers'
   | 'healthcare_payers'

@@ -8,7 +8,7 @@ import type { CompanyProfile, Industry } from '@/types/diagnostic';
 
 const VALID_INDUSTRIES: Industry[] = [
   'insurance', 'banking', 'capital_markets', 'asset_wealth_management',
-  'investment_banking', 'private_equity', 'venture_capital', 'hedge_funds',
+  'investment_banking', 'private_equity', 'venture_capital', 'hedge_funds', 'fintech_payments',
   'healthcare_providers', 'healthcare_payers', 'healthcare_services', 'life_sciences_pharma',
   'retail', 'ecommerce_digital', 'cpg', 'dtc', 'food_beverage',
   'manufacturing_discrete', 'manufacturing_process', 'automotive', 'aerospace_defense',

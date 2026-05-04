@@ -53,6 +53,7 @@ function formatIndustryLabel(industry: string): string {
     private_equity: 'Private Equity',
     venture_capital: 'Venture Capital',
     hedge_funds: 'Hedge Funds',
+    fintech_payments: 'Fintech & Payments',
     healthcare_providers: 'Healthcare Providers',
     healthcare_payers: 'Healthcare Payers',
     healthcare_services: 'Healthcare Services',

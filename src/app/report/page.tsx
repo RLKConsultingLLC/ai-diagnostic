@@ -2387,6 +2387,7 @@ const INDUSTRY_LABELS: Record<string, string> = {
   private_equity: "Private Equity",
   venture_capital: "Venture Capital",
   hedge_funds: "Hedge Funds",
+  fintech_payments: "Fintech & Payments",
   healthcare_providers: "Healthcare Providers",
   healthcare_payers: "Healthcare Payers",
   healthcare_services: "Healthcare Services",
@@ -3974,6 +3975,7 @@ function RiskMatrix({
   // Industry-specific impact modifiers: regulated industries face higher governance/compliance impact
   const highRegIndustries = new Set([
     'insurance', 'banking', 'capital_markets', 'asset_wealth_management', 'investment_banking',
+    'fintech_payments',
     'healthcare_providers', 'healthcare_payers', 'life_sciences_pharma',
     'government_federal', 'defense_contractors', 'aerospace_defense',
   ]);
@@ -4715,6 +4717,14 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
       { area: "Supply Chain AI & Resilience", detail: "Mars uses AI to monitor 100K+ suppliers across tiers. Nestlé's AI supply chain saved CHF 800M in 2024. AI-powered demand-supply matching reduces CPG logistics costs 8-12%.", source: "Source: Gartner Supply Chain Top 25 2024; Mars Sustainability Report 2024" },
       { area: "AI for Sustainability & ESG Compliance", detail: "Unilever's AI tracks Scope 3 emissions across 150,000+ suppliers. P&G uses AI to optimize packaging sustainability. AI-powered lifecycle assessment reduces environmental reporting time 60%.", source: "Source: CDP Corporate Environmental Disclosure 2024; Unilever Climate Action Report 2024" },
     ],
+    fintech_payments: [
+      { area: "Real-Time AI Fraud Detection & Transaction Risk Scoring", detail: "Stripe Radar processes 100B+ transactions/year using ML, blocking $5B+ in fraud annually with sub-100ms decisioning. Visa Advanced Authorization uses AI to score 100% of transactions, blocking $40B+ in attempted fraud per year. Mastercard's Decision Intelligence is now in second-generation AI, prevented an estimated $20B in fraud across 159B annual transactions in 2024.", source: "Source: Stripe Radar Public Disclosures 2024; Visa Q4 2024 Earnings; Mastercard 2024 Annual Report" },
+      { area: "AI-Driven Credit Underwriting & BNPL Risk Models", detail: "Affirm's underwriting AI evaluates 1M+ data points per applicant, approving 30% more borrowers than legacy FICO-only models with materially lower defaults. Klarna's AI-driven credit decisioning powers 150M+ active consumers globally. Upstart's AI lending models have originated $36B+ in loans with delinquency 75% lower than peer credit-score-based decisions.", source: "Source: Affirm 2024 Annual Report; Klarna 2024 Investor Day; Upstart Q3 2024 Earnings" },
+      { area: "Generative AI for Customer Service & Dispute Resolution", detail: "Klarna's AI assistant handles 2.3M conversations/month — equivalent to 700 full-time agents — with customer satisfaction matching human agents and resolution time cut from 11 to under 2 minutes. PayPal deploys generative AI across 30K+ employees. Stripe Sigma+ uses LLMs to automate merchant inquiries and chargeback evidence packets.", source: "Source: Klarna 2024 AI Update; PayPal Investor Day 2024; Stripe Sessions 2024" },
+      { area: "AI for KYC, AML & Sanctions Screening", detail: "ComplyAdvantage and Sardine AI process 100B+ entity-resolution decisions annually for fintech KYC/AML. Plaid's AI risk platform serves 8K+ fintech apps with real-time identity verification. JPMorgan reports 95% reduction in false-positive sanctions alerts via AI screening.", source: "Source: ComplyAdvantage State of Financial Crime 2024; Plaid 2024 Fintech Effect Report; JPMorgan Operations Update 2024" },
+      { area: "AI-Powered Merchant Onboarding & Risk Underwriting", detail: "Stripe's Atlas AI accelerates merchant onboarding from days to minutes. Adyen's RevenueAccelerate platform uses ML to optimize authorization rates per merchant. Square (Block) deploys AI across 4M+ sellers for risk assessment and instant funding.", source: "Source: Stripe Atlas Public Brief 2024; Adyen 2024 Annual Report; Block 2024 Investor Day" },
+      { area: "Embedded AI for Personalized Financial Products", detail: "Cash App (Block) uses AI to personalize 50M+ users' product offers, driving 30%+ engagement lift. Revolut's AI delivers contextual financial recommendations across 45M users. Robinhood deploys AI to surface personalized investment opportunities and risk warnings.", source: "Source: Block Q4 2024 Earnings; Revolut 2024 Annual Report; Robinhood Investor Day 2024" },
+    ],
     shipping_logistics: [
       { area: "AI-Optimized Route Planning & Fleet Management", detail: "UPS's ORION system processes 250,000+ routes daily using ML, saving 100M+ miles and $400M annually. DHL has deployed AI route optimization across 220 countries. Amazon's AI routing engine now powers same-day delivery in 90+ US metros.", source: "Source: UPS 2024 10-K Filing; DHL Logistics Trend Radar 2024; Amazon Q3 2024 Earnings Call" },
       { area: "Predictive Maintenance for Fleet & Facilities", detail: "Maersk uses IoT + ML to predict container ship engine failures 30 days in advance, reducing unplanned downtime by 40%. XPO Logistics deploys predictive maintenance across 750+ facilities. UPS's Automotive Predictive Analytics prevents 10,000+ breakdowns annually.", source: "Source: Maersk Technology Review 2024; XPO Investor Day 2024; UPS Sustainability Report 2024" },
@@ -4847,6 +4857,7 @@ function getFreeMaturityAnalysis(
     real_estate_commercial: `Commercial real estate is adopting AI across leasing, valuation, property operations, and capital markets. CBRE, JLL, and Cushman & Wakefield deploy proprietary AI platforms for deal-pipeline analytics and lease abstraction. JLL's JLL GPT was one of the first large-language models built for the CRE vertical. Prologis uses AI for energy optimization across 1.2B+ sq ft of logistics space. For ${companyName} at ${rev}, Altus Group's 2024 CRE technology benchmark finds that firms at Stage ${stage} spend 20-35% more per asset on property operations than AI-optimized peers, with the gap widening as AI-enabled tenant experience becomes a leasing differentiator.`,
     real_estate_residential: `Residential real estate is being reshaped by AI in pricing, search, underwriting, and property management. Zillow's AI-powered Zestimate covers 100M+ homes. Opendoor's AI pricing models underwrite iBuyer offers at scale. Rocket Mortgage deploys AI across loan origination. For ${companyName} at ${rev}, STRATMOR's 2024 benchmark finds that residential real-estate operators at Stage ${stage} carry 25-40% higher origination and servicing costs per unit than AI-enabled peers, with AI-driven tenant-screening, pricing, and fraud-detection becoming competitive necessities rather than differentiators.`,
     media_entertainment: `Media and entertainment companies are deploying AI across content personalization, production workflow, and rights management. Netflix attributes 80%+ of watched content to AI recommendations. Disney operates an enterprise AI task force with board oversight. Comcast and NBCUniversal integrate AI across Xfinity operations and Peacock personalization. For ${companyName} at ${rev}, PwC's 2024 Global Entertainment & Media Outlook finds that firms at Stage ${stage} are most exposed to the AI-driven disruption of content discovery and advertising pricing, with AI-optimized competitors capturing disproportionate share of shifting attention and ad budgets.`,
+    fintech_payments: `Fintech and payments is one of the highest-leverage AI verticals: every transaction is a real-time decision (fraud, auth, KYC, risk) and AI compresses both unit cost and loss rates simultaneously. Stripe Radar processes 100B+ transactions/year and blocks $5B+ in fraud annually with sub-100ms ML decisioning. Visa's AI-powered Advanced Authorization scores 100% of transactions and has blocked $40B+ in attempted fraud per year. Klarna's AI assistant handles 2.3M conversations/month — equivalent to 700 full-time agents — with resolution time cut from 11 to under 2 minutes. For ${companyName} at ${rev}, the cost of being a Stage ${stage} payments company is structural: fast-following AI-native fintechs (Stripe, Adyen, Block) are setting auth-rate, fraud-loss, and customer-service unit economics that legacy players struggle to match without rebuilding their data and ML stack from the ground up.`,
     food_beverage: `Food and beverage manufacturers are deploying AI across demand sensing, supply chain, product R&D, and quality control. PepsiCo's AI demand sensing cut forecast error from 40% to 20% at the store-SKU level, reducing waste $450M and improving on-shelf availability 12%. Nestlé's AI-powered R&D platform screens 10,000+ flavor combinations and reduced new product launch cycles from 18 months to 10 months. General Mills' AI supply-chain optimization saves $180M annually across 30+ plants. For ${companyName} at ${rev}, McKinsey's 2024 CPG report estimates that F&B manufacturers at Stage ${stage} forfeit 2-4% of revenue-equivalent through forecast error, trade-spend inefficiency, and SKU-rationalization lag — a gap that compounds as AI-enabled competitors adjust pricing, assortment, and promotions in real time.`,
     cpg: `Consumer packaged goods leaders are using AI to manage demand volatility, optimize trade spend, and accelerate innovation. P&G's AI demand-sensing platform improved forecast accuracy 20% and reduced waste $500M+. Unilever uses AI screening to process 1.8M annual applications (75% faster hiring) and AI-powered Scope 3 emissions tracking across 150,000+ suppliers. Kraft Heinz uses AI to optimize $5B+ in annual trade spend, improving ROI 12%. For ${companyName} at ${rev}, BCG's 2024 CPG Advantage Report finds that manufacturers at Stage ${stage} leave 3-5% of revenue unrealized through suboptimal trade-promotion ROI, demand-plan inaccuracy, and slow response to retailer-specific patterns.`,
     dtc: `Direct-to-consumer brands live and die on AI-powered personalization, attribution, and customer-lifecycle economics. Warby Parker's AI virtual try-on lifted conversion 32% and cut return rates from 15% to 6%. Glossier's AI personalization engine drove 28% repeat-purchase-rate lift and 18% higher AOV. Dollar Shave Club's AI subscription optimization cut churn 35%. For ${companyName} at ${rev}, a16z's 2024 DTC Benchmark shows that brands at Stage ${stage} typically operate with 40-60% higher customer-acquisition cost than AI-optimized peers because their paid-media, retention, and creative workflows aren't yet instrumented for real-time AI optimization.`,
@@ -4954,7 +4965,7 @@ function getPnLImpact(
   const weakest = [...dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore)[0];
   const isMid = employeeCount > 200 && employeeCount <= 2000;
   const isLarge = employeeCount > 2000;
-  const highReg = regulatoryIntensity === 'high' || ['insurance','banking','capital_markets','healthcare_providers','healthcare_payers','life_sciences_pharma','government_federal','defense_contractors'].includes(industry);
+  const highReg = regulatoryIntensity === 'high' || ['insurance','banking','capital_markets','fintech_payments','healthcare_providers','healthcare_payers','life_sciences_pharma','government_federal','defense_contractors'].includes(industry);
 
   // Industry EBITDA margin estimates (public data)
   const ebitdaMargins: Record<string, number> = {
@@ -4966,6 +4977,7 @@ function getPnLImpact(
     private_equity: 0.45,         // Preqin/McKinsey: PE management fee + carry margin
     venture_capital: 0.40,        // Cambridge Associates: VC fund-level avg margin
     hedge_funds: 0.42,            // HFR/Preqin: hedge fund management avg margin
+    fintech_payments: 0.25,       // Public fintech composite (PayPal, Block, Adyen) — payments take rate × scale efficiencies
     healthcare_providers: 0.12,   // AHA Hospital Statistics 2024: system avg operating margin
     healthcare_payers: 0.10,      // Kaiser Family Foundation: managed care avg margin
     healthcare_services: 0.12,    // Deloitte Health Services Outlook 2024: services avg margin
@@ -5015,6 +5027,7 @@ function getPnLImpact(
     private_equity: 0.03,         // Bain PE Report 2024: portfolio value creation AI
     venture_capital: 0.03,        // PitchBook 2024: AI-augmented deal sourcing & screening
     hedge_funds: 0.04,            // HFR 2024: AI-driven alpha generation & signal processing
+    fintech_payments: 0.04,       // BCG Fintech 2024: AI lift in authorization rates, fraud reduction, expansion revenue
     healthcare_providers: 0.02,   // McKinsey Healthcare 2024: revenue cycle + capacity gains
     healthcare_payers: 0.02,      // Deloitte Health Plan Benchmarks 2024
     healthcare_services: 0.02,    // Deloitte Health Services 2024: operational efficiency AI
@@ -5063,6 +5076,7 @@ function getPnLImpact(
     private_equity: 0.025,        // Bain PE 2024: portfolio monitoring + ops optimization
     venture_capital: 0.02,        // PitchBook 2024: deal flow screening + diligence AI
     hedge_funds: 0.025,           // HFR 2024: execution optimization + risk management AI
+    fintech_payments: 0.03,       // BCG Fintech 2024: fraud-loss reduction + customer-service & ops automation
     healthcare_providers: 0.015,  // McKinsey Healthcare 2024: clinical ops + denials
     healthcare_payers: 0.018,     // Deloitte Payer 2024: claims adjudication + admin AI
     healthcare_services: 0.015,   // Deloitte Health Services 2024: workflow + admin automation
@@ -5143,6 +5157,7 @@ function getPnLImpact(
   const revGrowthInvest: Record<string, string> = {
     insurance: `AI-driven dynamic pricing, personalized cross-sell, and accelerated underwriting expand premium volume and improve win rates. ${companyName}'s Adoption Behavior score of ${getScore('adoption_behavior')}/100 suggests current pricing models are leaving revenue on the table that AI-enabled competitors are already capturing.`,
     banking: `AI-powered relationship intelligence, personalized product recommendations, and automated loan origination drive fee income and interest revenue. With a Workflow Integration score of ${getScore('workflow_integration')}/100, ${companyName} has significant room to embed AI into revenue-generating processes.`,
+    fintech_payments: `AI-driven authorization-rate optimization, fraud-loss reduction, and personalized merchant/consumer experiences directly grow net revenue. Adyen's RevenueAccelerate increases authorization rates 1-2 percentage points per merchant — at ${companyName}'s scale, every 100 bps of auth rate is material take-rate uplift. With ${getScore('workflow_integration')}/100 Workflow Integration, ${companyName} has room to embed AI deeper into the transaction path.`,
     healthcare_providers: `AI-optimized patient scheduling, reduced no-shows, improved coding accuracy, and capacity utilization drive incremental revenue without adding beds. ${companyName}'s ${getScore('workflow_integration')}/100 Workflow Integration score indicates scheduling and revenue cycle workflows are ripe for AI optimization.`,
     healthcare_payers: `AI-driven member engagement, predictive risk adjustment, and claims accuracy improvement increase per-member revenue and reduce STARs rating penalties. Current Decision Velocity of ${getScore('decision_velocity')}/100 suggests ${companyName} is slower than peers to deploy revenue-protecting AI.`,
     life_sciences_pharma: `AI-accelerated drug discovery, clinical trial optimization, and commercial analytics compress time-to-revenue for pipeline assets. Each month of accelerated launch is worth millions in patent-protected revenue.`,
@@ -5161,6 +5176,7 @@ function getPnLImpact(
   const revGrowthCoast: Record<string, string> = {
     insurance: `Premium leakage accelerates as AI-native carriers (Lemonade, Root, Hippo) capture price-sensitive segments with real-time underwriting ${companyName} can't match at current Authority Structure (${getScore('authority_structure')}/100).`,
     banking: `Deposit and loan market share erodes as digital-first banks and fintechs offer AI-personalized rates and instant approvals that ${companyName}'s manual processes cannot compete with.`,
+    fintech_payments: `Authorization rates plateau, fraud loss rates remain elevated, and merchant churn accelerates as AI-native fintech competitors (Stripe, Adyen, Block) widen the gap on every transaction. In a take-rate-compressed industry, every basis point of fraud loss or unrecovered auth volume directly hits net take rate.`,
     healthcare_providers: `Patient leakage to AI-optimized health systems offering shorter wait times, better scheduling, and more coordinated care. Cleveland Clinic and Kaiser report 15-20% patient acquisition advantage from AI-driven access optimization.`,
     healthcare_payers: `STARs rating degradation and member attrition as competitors deploy AI-driven care coordination and member engagement that demonstrably improves outcomes and satisfaction scores.`,
     life_sciences_pharma: `Pipeline velocity falls behind competitors using AI-accelerated discovery. Each 6-month delay in clinical development costs $50-100M in foregone patent-protected revenue.`,
@@ -5180,6 +5196,7 @@ function getPnLImpact(
   const marginInvest: Record<string, string> = {
     insurance: `Claims automation, straight-through processing, and AI-driven fraud detection reduce loss adjustment expenses and operating costs. At ${companyName}'s scale, every 1% of combined ratio improvement is worth ${fmtUSD(Math.round(revenue * 0.01))}.`,
     banking: `AI-powered credit decisioning, compliance automation, and customer service chatbots reduce operating expense ratio. With Authority Structure at ${getScore('authority_structure')}/100, governance improvements alone could unlock faster deployment of margin-enhancing AI.`,
+    fintech_payments: `AI compresses three of the largest cost centers: customer service (Klarna replaced 700 agents with one AI assistant), fraud loss reserves (Stripe Radar, Visa Advanced Authorization cut fraud loss rates materially), and engineering productivity. At ${companyName}'s scale, even a 100bps reduction in fraud loss rate compounds to material EBITDA expansion alongside the customer-service automation savings.`,
     healthcare_providers: `AI-driven clinical documentation, prior authorization automation, denials management, and staffing optimization reduce administrative burden — the single largest cost category. ${isLarge ? 'At 13,000+ employees, even small per-FTE efficiency gains compound to material savings.' : `At ${employeeCount} employees, targeted automation of highest-volume workflows delivers outsized margin impact.`}`,
     healthcare_payers: `AI claims adjudication, medical necessity review, and provider network optimization reduce medical loss ratio and administrative costs. Anthem reports 200bps MLR improvement from AI-driven utilization management.`,
     life_sciences_pharma: `AI-accelerated clinical trial design, manufacturing quality prediction, and regulatory filing automation compress timelines and reduce development costs across the pipeline.`,
@@ -5197,6 +5214,7 @@ function getPnLImpact(
   const marginCoast: Record<string, string> = {
     insurance: `Operating expense gap widens as peers automate claims processing and underwriting. ${companyName}'s combined ratio disadvantage compounds every quarter — at ${fmtUSD(revenue)}, each basis point is ${fmtUSD(Math.round(revenue * 0.0001))}.`,
     banking: `Efficiency ratio deteriorates relative to AI-optimized peers. JPMorgan targets a sub-50% efficiency ratio through AI — banks that can't match this face structural margin compression.`,
+    fintech_payments: `Fraud loss rates, customer-service cost per ticket, and KYC/AML operational overhead remain elevated while AI-native peers continuously compress unit economics. In an industry where take rates are already compressed by competition, AI laggards face a margin squeeze that doesn't have an obvious recovery path without rebuilding the underlying ML and data stack.`,
     healthcare_providers: `Administrative cost per patient encounter rises while AI-optimized systems reduce theirs. The gap is existential for providers operating on ${(ebitdaMargin * 100).toFixed(0)}% margins — there's no room for inefficiency.`,
     healthcare_payers: `MLR creeps upward as manual utilization management falls behind AI-driven peers. Administrative cost per member grows while competitors shrink theirs.`,
     life_sciences_pharma: `R&D cost per approved drug remains at $2.6B industry average while AI-enabled competitors cut development costs 20-30%, allowing more pipeline bets per dollar.`,
@@ -5501,6 +5519,13 @@ function getPnLImpact(
       { claim: "Renaissance Technologies' Medallion Fund continued its 30-year track record of 60%+ annual returns, with AI-driven pattern recognition across 10,000+ instruments executing 100,000+ trades daily", metric: "60%+ annual returns", source: "Bloomberg Intelligence 2024" },
     ],
 
+    // ---- Fintech & Payments ----
+    fintech_payments: [
+      { claim: "Stripe Radar processed 100B+ transactions in 2024 and blocked $5B+ in fraud with sub-100ms ML decisioning, enabling Stripe merchants to authorize more legitimate transactions while losing less to fraud", metric: "$5B+ fraud blocked", source: "Stripe Radar Public Disclosures 2024" },
+      { claim: "Visa's AI-powered Advanced Authorization scored 100% of 280B+ annual transactions and blocked an estimated $40B in attempted fraud in 2024 — fraud losses on the network remain at historic lows of ~6 cents per $100 of payment volume", metric: "$40B fraud prevented", source: "Visa Q4 2024 Earnings; Visa Annual Report 2024" },
+      { claim: "Klarna's AI customer-service assistant handles 2.3M conversations/month — equivalent to 700 full-time agents — cutting average handling time from 11 minutes to under 2 minutes while maintaining customer-satisfaction parity with human agents", metric: "700 agents replaced", source: "Klarna 2024 AI Update; Q1 2024 Investor Update" },
+    ],
+
     // ---- Healthcare Services ----
     healthcare_services: [
       { claim: "Optum's AI-powered care coordination platform reduced hospital readmissions 22% across 60M+ covered lives, saving $1.8B in avoidable acute care costs", metric: "22% fewer readmissions", source: "Optum Annual Report 2024" },
@@ -5698,6 +5723,7 @@ function getIndustryCompetitors(
     legal_services: { capMed: 45, readMed: 50, spread: 22 },
     accounting_audit: { capMed: 50, readMed: 55, spread: 18 },
     asset_wealth_management: { capMed: 60, readMed: 56, spread: 18 },
+    fintech_payments: { capMed: 65, readMed: 58, spread: 18 },
     healthcare_services: { capMed: 42, readMed: 40, spread: 22 },
     dtc: { capMed: 58, readMed: 48, spread: 20 },
     food_beverage: { capMed: 42, readMed: 38, spread: 22 },
@@ -5968,6 +5994,7 @@ function getRiskDetails(dimensionScores: DimensionScore[], industry: string, reg
   // Industry-specific risk amplifiers
   const highRegIndustries = new Set([
     'insurance', 'banking', 'capital_markets', 'asset_wealth_management', 'investment_banking',
+    'fintech_payments',
     'healthcare_providers', 'healthcare_payers', 'life_sciences_pharma',
     'government_federal', 'defense_contractors', 'aerospace_defense',
   ]);
@@ -6037,6 +6064,7 @@ function getRegulatoryContext(industry: string, regulatoryIntensity: string): st
     banking: `Banking faces among the highest AI regulatory scrutiny globally. The OCC, FDIC, and Federal Reserve have issued joint guidance on AI model risk management (SR 11-7 expanded). The CFPB has signaled increased scrutiny of AI in consumer lending. The EU AI Act classifies credit scoring as "high-risk." With your regulatory intensity rated as "${regulatoryIntensity}", comprehensive model documentation, bias testing, and explainability are non-negotiable for all customer-facing AI systems.`,
     capital_markets: `Capital markets AI faces scrutiny from the SEC, FINRA, and CFTC across algorithmic trading, market surveillance, and client suitability. The SEC's proposed AI rules would require disclosure of AI use in investment advice and trading. The EU AI Act and MiFID II create additional layers. With your regulatory intensity rated as "${regulatoryIntensity}", your AI governance must address model risk, market manipulation detection, and best-execution obligations.`,
     investment_banking: `Investment banking AI faces regulatory scrutiny from the SEC and FINRA, particularly around deal analysis, fairness opinions, and client communications. AI-assisted valuation models require the same documentation and oversight as traditional models. With your regulatory intensity rated as "${regulatoryIntensity}", governance should focus on model documentation for deal work and ensuring AI-assisted analysis meets fiduciary standards.`,
+    fintech_payments: `Fintech and payments AI faces a uniquely dense regulatory matrix: BSA/AML and OFAC sanctions screening at every transaction, money-transmitter laws state-by-state in the US, CFPB consumer-protection oversight, card-network rules (Visa/Mastercard/Amex), PSD2 in Europe, and emerging AI-specific guidance on automated decision-making in financial services. Algorithmic fairness in credit underwriting (ECOA, Reg B) is an active enforcement area. With your regulatory intensity rated as "${regulatoryIntensity}", governance must demonstrate model documentation, bias testing for credit/risk decisions, real-time auditability of fraud and KYC models, and consumer-facing transparency on AI-driven adverse actions.`,
     insurance: `Insurance is subject to increasing AI regulation. The NAIC has adopted AI model governance guidelines requiring fair and non-discriminatory AI use in underwriting and claims. The EU AI Act classifies insurance pricing as "high-risk." Colorado's AI Act (SB21-169) specifically targets algorithmic discrimination. With your regulatory intensity rated as "${regulatoryIntensity}", compliance requires documented model validation, bias testing, and consumer transparency.`,
     // Healthcare cluster
     healthcare_providers: `Healthcare AI faces the most complex regulatory landscape. FDA clearance is required for AI/ML-based Software as a Medical Device (SaMD). HIPAA imposes strict requirements on AI processing PHI. CMS has proposed rules on AI in clinical decision support. The EU AI Act classifies diagnostic AI as "high-risk." With your regulatory intensity rated as "${regulatoryIntensity}", governance must address clinical validation, patient safety, PHI protection, and algorithmic transparency.`,
@@ -6100,6 +6128,9 @@ function resolveIndustryGroup(industry: string): string {
     banking: "financial_services", capital_markets: "financial_services", asset_wealth_management: "financial_services",
     investment_banking: "financial_services", private_equity: "financial_services", venture_capital: "financial_services", hedge_funds: "financial_services",
     insurance: "financial_services",
+    // Fintech & payments use the financial_services KPI template (compliance, fraud, risk
+    // KPIs apply) but get fintech-specific peers, narratives, and proof points elsewhere.
+    fintech_payments: "financial_services",
     software_saas: "technology", it_services: "technology", hardware_electronics: "technology",
     retail: "retail_ecommerce", ecommerce_digital: "retail_ecommerce", cpg: "retail_ecommerce", dtc: "retail_ecommerce", food_beverage: "retail_ecommerce",
     manufacturing_discrete: "manufacturing", manufacturing_process: "manufacturing", automotive: "manufacturing",
@@ -6549,6 +6580,12 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
       { company: "JPMorgan Chase", action: "Board-mandated AI Center of Excellence reporting directly to CEO Jamie Dimon. JPMorgan employs 2,000+ AI/ML specialists and CEO has publicly stated AI could be 'equivalent to the printing press or the internet.' Board Technology Committee oversees all AI risk.", source: "JPMorgan 2024 Annual Letter to Shareholders; 2024 Proxy Statement" },
       { company: "Goldman Sachs", action: "Board approved firm-wide generative AI deployment with dedicated governance framework. CEO David Solomon mandated that every business unit develop AI use cases. Goldman's AI assistant now handles 10,000+ internal queries daily.", source: "Goldman Sachs 2024 Investor Day Presentation; Q3 2024 Earnings Call" },
       { company: "Bank of America", action: "Board oversees Erica AI assistant serving 19M+ users with 2B+ interactions to date. CTO Aditya Bhasin reports AI metrics to the board quarterly. BofA invested $3.8B in new technology initiatives in 2024, with AI as the primary focus.", source: "Bank of America 2024 Annual Report; Technology Innovation Brief 2024" },
+    ],
+    fintech_payments: [
+      { company: "Stripe", action: "Board governs an AI-first risk and fraud platform (Stripe Radar) that processes 100B+ transactions/year and blocks $5B+ in fraud annually with sub-100ms ML decisioning. Stripe's data platform is positioned by leadership as a primary competitive moat against legacy networks.", source: "Stripe Radar Public Disclosures 2024; Stripe Sessions 2024 Keynote" },
+      { company: "Block (Square)", action: "Board oversees AI deployment across Square (4M+ sellers), Cash App (50M+ users), and Afterpay (BNPL). CEO Jack Dorsey publicly positioned the company around AI-enabled financial inclusion. Board Risk Committee reviews AI model performance for credit, fraud, and compliance.", source: "Block 2024 Annual Report; Block Investor Day 2024" },
+      { company: "Adyen", action: "Board governs RevenueAccelerate AI platform that materially improves authorization rates per merchant. Adyen's AI risk engine processes payments for 60+ of the world's largest enterprises. The supervisory board's Risk and Audit Committee reviews AI-driven payment decisions quarterly.", source: "Adyen 2024 Annual Report; Adyen Capital Markets Day 2024" },
+      { company: "Visa", action: "Board oversees Advanced Authorization AI platform that scores 100% of 280B+ annual transactions and blocks $40B+ in attempted fraud per year. Visa's AI strategy is positioned by the board as central to maintaining sub-6-cent fraud loss rates per $100 of volume.", source: "Visa 2024 Annual Report; Visa Q4 2024 Earnings Call" },
     ],
     insurance: [
       { company: "Progressive", action: "Board oversees the industry's most mature telematics-to-AI pipeline. Snapshot AI program collects 1B+ miles of driving data/month. Board's Technology Committee reviews AI model fairness and bias testing quarterly.", source: "Progressive 2024 Annual Report; Q3 2024 Earnings Call" },

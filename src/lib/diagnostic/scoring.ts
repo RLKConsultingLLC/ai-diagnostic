@@ -268,6 +268,7 @@ export const INDUSTRY_BENCHMARKS: Record<Industry, { avgScore: number; topQuarti
   private_equity: { avgScore: 46, topQuartile: 68, label: 'Private Equity' },
   venture_capital: { avgScore: 50, topQuartile: 72, label: 'Venture Capital' },
   hedge_funds: { avgScore: 48, topQuartile: 70, label: 'Hedge Funds' },
+  fintech_payments: { avgScore: 56, topQuartile: 75, label: 'Fintech & Payments' },
   // Healthcare & Life Sciences
   healthcare_providers: { avgScore: 30, topQuartile: 52, label: 'Healthcare Providers' },
   healthcare_payers: { avgScore: 30, topQuartile: 52, label: 'Healthcare Payers' },

@@ -72,6 +72,8 @@ const INDUSTRY_PRODUCTIVITY_POTENTIAL: Record<Industry, { low: number; high: num
   consulting_services: { low: 0.25, high: 0.35, avgLaborCostPercent: 0.60 },
   legal_services: { low: 0.22, high: 0.35, avgLaborCostPercent: 0.55 },
   accounting_audit: { low: 0.22, high: 0.34, avgLaborCostPercent: 0.58 },
+  // Fintech & Payments: software-economics-like margins on a financial-services data substrate
+  fintech_payments: { low: 0.20, high: 0.32, avgLaborCostPercent: 0.42 },
 };
 
 // ---------------------------------------------------------------------------
@@ -102,6 +104,7 @@ export const INDUSTRY_CAPTURE_GROUP: Record<Industry, IndustryCaptureGroup> = {
   private_equity: 'data_rich_financial',
   venture_capital: 'data_rich_financial',
   hedge_funds: 'data_rich_financial',
+  fintech_payments: 'tech_forward',
   // Professional services: high knowledge-worker ratio, strong ROI from AI augmentation
   consulting_services: 'professional_services',
   legal_services: 'professional_services',
@@ -284,6 +287,7 @@ const AVG_COST_PER_EMPLOYEE: Record<Industry, number> = {
   private_equity: 250000,
   venture_capital: 200000,
   hedge_funds: 240000,
+  fintech_payments: 165000,
   // Healthcare & Life Sciences
   healthcare_providers: 95000,
   healthcare_payers: 95000,
@@ -436,6 +440,7 @@ function formatIndustryName(industry: Industry): string {
     insurance: 'Insurance', banking: 'Banking', capital_markets: 'Capital Markets',
     asset_wealth_management: 'Asset & Wealth Management', investment_banking: 'Investment Banking',
     private_equity: 'Private Equity', venture_capital: 'Venture Capital', hedge_funds: 'Hedge Funds',
+    fintech_payments: 'Fintech & Payments',
     healthcare_providers: 'Healthcare', healthcare_payers: 'Healthcare Payer',
     healthcare_services: 'Healthcare Services', life_sciences_pharma: 'Life Sciences & Pharma',
     retail: 'Retail', ecommerce_digital: 'E-Commerce', cpg: 'Consumer Packaged Goods',

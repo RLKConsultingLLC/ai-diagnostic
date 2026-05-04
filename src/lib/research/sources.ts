@@ -227,6 +227,7 @@ export async function searchIndustryNews(industry: Industry): Promise<RawNewsRes
     cpg: 'consumer packaged goods CPG AI supply chain artificial intelligence',
     dtc: 'direct to consumer DTC AI artificial intelligence personalization',
     food_beverage: 'food beverage AI artificial intelligence supply chain',
+    fintech_payments: 'fintech payments AI artificial intelligence fraud detection risk underwriting',
     // Industrial & Energy
     manufacturing_discrete: 'discrete manufacturing AI artificial intelligence industry 4.0',
     manufacturing_process: 'process manufacturing AI artificial intelligence industrial',

@@ -40,6 +40,22 @@ export const MCC_INDUSTRY_TREE: MCCCategory[] = [
     ],
   },
   {
+    name: 'Fintech & Payments',
+    defaultSlug: 'fintech_payments',
+    subcategories: [
+      { label: 'Payments & Fintech Platforms', diagnosticSlug: 'fintech_payments' },
+      { label: 'Payment Processing & Acquiring', diagnosticSlug: 'fintech_payments' },
+      { label: 'P2P Payments & Digital Wallets', diagnosticSlug: 'fintech_payments' },
+      { label: 'Buy Now Pay Later (BNPL)', diagnosticSlug: 'fintech_payments' },
+      { label: 'Card Networks & Payment Rails', diagnosticSlug: 'fintech_payments' },
+      { label: 'Crypto & Stablecoin Infrastructure', diagnosticSlug: 'fintech_payments' },
+      { label: 'Embedded Finance & BaaS', diagnosticSlug: 'fintech_payments' },
+      { label: 'Neobanks & Digital Banking', diagnosticSlug: 'fintech_payments' },
+      { label: 'Lending & Underwriting Platforms', diagnosticSlug: 'fintech_payments' },
+      { label: 'B2B Payments & Spend Management', diagnosticSlug: 'fintech_payments' },
+    ],
+  },
+  {
     name: 'Professional & Business Services',
     defaultSlug: 'consulting_services',
     subcategories: [

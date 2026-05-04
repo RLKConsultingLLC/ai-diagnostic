@@ -55,6 +55,12 @@ const INDUSTRY_WEIGHT_MODIFIERS: Record<Industry, Partial<Record<Dimension, numb
     economic_translation: 1.3,  // Alpha generation and risk-adjusted returns
     authority_structure: 1.1,   // Risk and compliance frameworks
   },
+  fintech_payments: {
+    workflow_integration: 1.3,  // Real-time fraud, risk, KYC integration into transaction flow
+    decision_velocity: 1.3,     // Auth/decline decisions must be sub-second
+    authority_structure: 1.2,   // Money-transmitter, BSA/AML, card-network compliance
+    adoption_behavior: 1.1,     // Tech-forward workforce adopts quickly
+  },
   healthcare_providers: {
     authority_structure: 1.4,   // Regulatory burden highest
     workflow_integration: 1.1,
@@ -399,6 +405,13 @@ export const INDUSTRY_THEMES: Record<Industry, {
     regulatoryContext: 'SEC and CFTC oversight, Form PF reporting, market manipulation rules, and emerging AI-specific guidance on algorithmic trading shape deployment in hedge funds.',
     keyUseCases: ['alternative data signal extraction', 'risk factor modeling', 'trade execution optimization', 'research and thesis generation', 'portfolio construction and rebalancing'],
     lastUpdated: '2025-03-01',
+  },
+  fintech_payments: {
+    primaryValueDriver: 'Real-time fraud detection, AI-driven underwriting and risk scoring, KYC/AML automation, customer-service automation, and personalized merchant and consumer experiences across the payments value chain.',
+    competitiveThreat: 'AI-native fintechs (Stripe Radar, Adyen RevenueAccelerate, Klarna AI assistant) are setting customer expectations on instant decisions, fraud loss rates, and unit-cost-to-serve. Incumbents that cannot match real-time AI risk and personalization face merchant and consumer churn to AI-forward competitors.',
+    regulatoryContext: 'Payments AI operates under BSA/AML, OFAC sanctions screening, money-transmitter laws (state-by-state in the US), card-network rules (Visa/Mastercard/Amex), PSD2 in Europe, CFPB consumer-protection oversight, and emerging AI-specific guidance on automated decision-making in financial services.',
+    keyUseCases: ['real-time fraud detection and transaction risk scoring', 'KYC/AML and sanctions screening', 'AI-driven credit underwriting and BNPL approval', 'customer-service automation and dispute resolution', 'merchant onboarding and chargeback management'],
+    lastUpdated: '2026-04-01',
   },
   healthcare_providers: {
     primaryValueDriver: 'Clinical decision support, operational efficiency, patient experience, and population health management across hospitals and health systems.',
