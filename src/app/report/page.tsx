@@ -2076,12 +2076,20 @@ function Shell({ children }: { children: React.ReactNode }) {
       <div className="rlk-gradient-bar no-print" />
       <header className="bg-white border-b border-light no-print">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
-          >
-            RLK AI Diagnostic
-          </Link>
+          <div className="flex flex-col gap-0.5">
+            <Link
+              href="/"
+              className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
+            >
+              RLK AI Diagnostic
+            </Link>
+            <a
+              href="https://rlkconsultingco.com"
+              className="text-xs text-tertiary hover:text-navy transition-colors"
+            >
+              &larr; RLK Consulting
+            </a>
+          </div>
           <span className="text-xs text-tertiary">AI Diagnostic Report</span>
         </div>
       </header>

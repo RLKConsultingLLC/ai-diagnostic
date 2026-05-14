@@ -601,12 +601,20 @@ export default function AssessmentPage() {
       {/* Sticky Header */}
       <header className="bg-white border-b border-light sticky top-0 z-30">
         <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
-          >
-            RLK AI Diagnostic
-          </Link>
+          <div className="flex flex-col gap-0.5">
+            <Link
+              href="/"
+              className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
+            >
+              RLK AI Diagnostic
+            </Link>
+            <a
+              href="https://rlkconsultingco.com"
+              className="text-xs text-tertiary hover:text-navy transition-colors"
+            >
+              &larr; RLK Consulting
+            </a>
+          </div>
           <div className="text-xs text-tertiary">{headerLabel}</div>
         </div>
         {/* Progress bar */}

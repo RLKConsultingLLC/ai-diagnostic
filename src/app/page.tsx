@@ -10,8 +10,16 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white border-b border-light">
         <div className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
-          <div className="text-navy text-sm font-bold tracking-[0.3em] uppercase">
-            RLK AI Diagnostic
+          <div className="flex flex-col gap-0.5">
+            <div className="text-navy text-sm font-bold tracking-[0.3em] uppercase">
+              RLK AI Diagnostic
+            </div>
+            <a
+              href="https://rlkconsultingco.com"
+              className="text-xs text-tertiary hover:text-navy transition-colors"
+            >
+              &larr; RLK Consulting
+            </a>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm text-secondary">
             <a href="#why-rlk" className="hover:text-navy transition-colors">
