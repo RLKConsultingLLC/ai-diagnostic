@@ -3,8 +3,8 @@
 // =============================================================================
 // Serverless-compatible persistence via Upstash Redis REST API.
 // Each session is stored as a JSON string keyed by "session:{id}".
-// Sessions auto-expire after 2 years (TTL refreshes on every write, so any
-// session that gets touched — paid, updated — gets its 2-year clock reset).
+// Sessions auto-expire after 5 years (TTL refreshes on every write, so any
+// session that gets touched — paid, updated — gets its 5-year clock reset).
 // =============================================================================
 
 import { Redis } from '@upstash/redis';
@@ -32,7 +32,7 @@ function getRedis(): Redis {
 }
 
 const SESSION_PREFIX = 'session:';
-const SESSION_TTL_SECONDS = 730 * 24 * 60 * 60; // 2 years (sales links must persist long enough to outlive enterprise procurement cycles)
+const SESSION_TTL_SECONDS = 5 * 365 * 24 * 60 * 60; // 5 years (sales links persist long enough to outlive any enterprise procurement cycle)
 
 // ---------------------------------------------------------------------------
 // Backward compatibility: map old industry slugs to new ones
