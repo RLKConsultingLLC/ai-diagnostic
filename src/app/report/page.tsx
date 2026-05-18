@@ -635,7 +635,7 @@ function ReportPage() {
       {/* Full Report Sections (post-payment) */}
       {phase === "full" && result && (
         <div className="mb-8">
-          <SaveAsPDFButton />
+          <SaveInteractiveReportButton companyName={result.companyProfile.companyName} />
           {/* ================================================================= */}
           {/* REPORT COVER / TITLE BLOCK                                        */}
           {/* ================================================================= */}
@@ -2101,49 +2101,131 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 // ---------------------------------------------------------------------------
-// Sticky "Save as PDF" button
+// Sticky "Save Interactive Report" button
+// ---------------------------------------------------------------------------
+// Downloads a self-contained HTML file with native <details>/<summary>
+// elements. Recipient opens in any browser (no internet needed) and gets the
+// same collapse/expand behavior as the web app. All CSS inlined.
 // ---------------------------------------------------------------------------
 
-function SaveAsPDFButton() {
-  const handlePrint = useCallback(() => {
-    // Before printing, expand all collapsed sections so the PDF is complete
-    const allButtons = document.querySelectorAll('button');
-    const expandedButtons: HTMLButtonElement[] = [];
-    allButtons.forEach((btn) => {
-      // Find collapsed section buttons (they have the chevron that's not rotated)
-      const svg = btn.querySelector('svg');
-      if (svg && !svg.classList.contains('rotate-180') && btn.closest('section')) {
-        btn.click();
-        expandedButtons.push(btn);
-      }
-    });
-    // Also expand all SubCollapsible items
-    const subButtons = document.querySelectorAll('[class*="border-light"] > button');
-    subButtons.forEach((btn) => {
-      const svg = btn.querySelector('svg');
-      if (svg && !svg.classList.contains('rotate-180')) {
-        (btn as HTMLButtonElement).click();
-      }
-    });
+function SaveInteractiveReportButton({ companyName }: { companyName: string }) {
+  const [saving, setSaving] = useState(false);
 
-    // Short delay to let React re-render expanded content
-    setTimeout(() => {
-      window.print();
-    }, 300);
-  }, []);
+  const handleSave = useCallback(async () => {
+    setSaving(true);
+    try {
+      // 1. Capture all stylesheet rules into a single <style> blob.
+      //    Same-origin stylesheets (Next.js, Tailwind) expose .cssRules.
+      let inlinedCSS = '';
+      for (const sheet of Array.from(document.styleSheets)) {
+        try {
+          const rules = (sheet as CSSStyleSheet).cssRules;
+          if (!rules) continue;
+          for (const rule of Array.from(rules)) {
+            inlinedCSS += rule.cssText + '\n';
+          }
+        } catch {
+          // Cross-origin stylesheet — skip silently. Recipient still gets most styles.
+        }
+      }
+
+      // 2. Add a small print stylesheet so Cmd+P prints everything expanded.
+      const printRules = `
+        @media print {
+          details > div, details > section { display: block !important; }
+          summary { font-weight: 600; page-break-after: avoid; }
+          details { page-break-inside: avoid; }
+          .no-print { display: none !important; }
+        }
+        /* Force all details open when the file is shown in offline / archival contexts */
+        details[data-force-open] { }
+      `;
+
+      // 3. Clone the live DOM. Strip the export button itself.
+      const clone = document.documentElement.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('.no-print').forEach((el) => el.remove());
+      // Remove all <link rel="stylesheet"> and <style> — we'll inject our inlined CSS
+      clone.querySelectorAll('link[rel="stylesheet"], style').forEach((el) => el.remove());
+      // Remove scripts — the exported file is static, no JS needed for interactivity
+      clone.querySelectorAll('script').forEach((el) => el.remove());
+
+      // 4. Inject a header banner identifying this as a downloaded report
+      const headerBanner = `<div style="background:#0B1D3A;color:white;padding:8px 16px;font-family:system-ui,sans-serif;font-size:12px;text-align:center;letter-spacing:0.05em">⚡ RLK AI Diagnostic — Interactive Report for ${companyName} — generated ${new Date().toLocaleDateString()}</div>`;
+
+      // 5. Inject the inlined styles into <head>
+      const head = clone.querySelector('head');
+      if (head) {
+        const styleEl = document.createElement('style');
+        styleEl.textContent = inlinedCSS + '\n' + printRules;
+        head.appendChild(styleEl);
+
+        // Ensure base meta tags are present
+        if (!head.querySelector('meta[charset]')) {
+          const meta = document.createElement('meta');
+          meta.setAttribute('charset', 'utf-8');
+          head.insertBefore(meta, head.firstChild);
+        }
+        if (!head.querySelector('title')) {
+          const title = document.createElement('title');
+          title.textContent = `RLK AI Diagnostic — ${companyName}`;
+          head.appendChild(title);
+        } else {
+          head.querySelector('title')!.textContent = `RLK AI Diagnostic — ${companyName}`;
+        }
+      }
+
+      // 6. Prepend banner inside body
+      const body = clone.querySelector('body');
+      if (body) {
+        const bannerDiv = document.createElement('div');
+        bannerDiv.innerHTML = headerBanner;
+        body.insertBefore(bannerDiv.firstChild!, body.firstChild);
+      }
+
+      // 7. Build the final HTML document.
+      const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+
+      // 8. Trigger download.
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = companyName.replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      a.download = `RLK-AI-Diagnostic-${safeName}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('[SaveInteractiveReport]', err);
+      alert('Could not save the report. Open the browser console for details.');
+    } finally {
+      setSaving(false);
+    }
+  }, [companyName]);
 
   return (
     <button
       type="button"
-      onClick={handlePrint}
-      className="no-print fixed right-6 bottom-6 z-50 flex items-center gap-2 px-5 py-3 text-white text-sm font-semibold tracking-wide uppercase shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+      onClick={handleSave}
+      disabled={saving}
+      className="no-print fixed right-6 bottom-6 z-50 flex items-center gap-2 px-5 py-3 text-white text-sm font-semibold tracking-wide uppercase shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
       style={{ backgroundColor: '#0B1D3A' }}
-      title="Save this report as a PDF"
+      title="Download a standalone interactive HTML report you can share or open offline"
     >
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-      Save as PDF
+      {saving ? (
+        <>
+          <Spinner size="sm" />
+          Saving…
+        </>
+      ) : (
+        <>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Save Interactive Report
+        </>
+      )}
     </button>
   );
 }
@@ -2646,40 +2728,37 @@ function CollapsibleSection({
   badges?: { value: string; label: string }[];
   scorecard?: { label: string; score: number; color: string }[];
 }) {
-  const [expanded, setExpanded] = useState(false);
+  // Native <details>/<summary> so the report exports cleanly to a standalone
+  // interactive HTML file. No React state needed.
   return (
-    <section id={sectionId} className="print-section bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm scroll-mt-16">
-      <button
-        type="button"
-        className="w-full text-left cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <div className="mb-2">
-          <div className="flex items-center gap-4">
-            <div
-              className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-bold tracking-wide"
-              style={{ backgroundColor: "#0B1D3A" }}
-            >
-              {number}
+    <section id={sectionId} className="print-section scroll-mt-16">
+      <details className="group bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
+        <summary className="list-none w-full text-left cursor-pointer">
+          <div className="mb-2">
+            <div className="flex items-center gap-4">
+              <div
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white text-sm font-bold tracking-wide"
+                style={{ backgroundColor: "#0B1D3A" }}
+              >
+                {number}
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-navy tracking-tight flex-1">
+                {title}
+              </h3>
+              <svg
+                className="w-5 h-5 text-tertiary transition-transform duration-200 group-open:rotate-180"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-navy tracking-tight flex-1">
-              {title}
-            </h3>
-            <svg
-              className={`w-5 h-5 text-tertiary transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
+            <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
           </div>
-          <div className="mt-4 h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent" />
-        </div>
-        <p className="text-sm text-foreground/60 mt-2">
-          {summary}
-        </p>
-      </button>
-      {expanded && (
-        <div className="mt-6 animate-in fade-in duration-200 print-expand">
+          <p className="text-sm text-foreground/60 mt-2">
+            {summary}
+          </p>
+        </summary>
+        <div className="mt-6 print-expand">
           {/* Stat badges */}
           {badges && badges.length > 0 && <StatBadges stats={badges} />}
           {/* Traffic-light scorecard */}
@@ -2691,7 +2770,7 @@ function CollapsibleSection({
           {/* Children content — shown directly, no second expand */}
           {children && <div className="mt-4">{children}</div>}
         </div>
-      )}
+      </details>
     </section>
   );
 }
@@ -2706,7 +2785,7 @@ function DimensionExpander({
   dimension: string; label: string; score: number; stage: number;
   barColor: string; subtitle: string; interpretation: string; narrative?: string;
 }) {
-  const [open, setOpen] = useState(false);
+  // Native <details>/<summary> for clean HTML export and built-in accessibility
   const dimIcons: Record<string, React.ReactNode> = {
     adoption_behavior: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>,
     authority_structure: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>,
@@ -2716,68 +2795,49 @@ function DimensionExpander({
   };
 
   return (
-    <div className={`border transition-colors duration-150 ${open ? "border-navy/15 bg-white" : "border-light hover:border-navy/10"}`}>
-      {/* Clickable bar row */}
-      <button
-        type="button"
-        className="w-full text-left px-4 py-3 cursor-pointer group"
-        onClick={() => setOpen(!open)}
-      >
+    <details className="border transition-colors duration-150 border-light hover:border-navy/10 open:border-navy/15 open:bg-white group">
+      <summary className="list-none w-full text-left px-4 py-3 cursor-pointer">
         <div className="flex items-center gap-3">
-          {/* Chevron */}
           <svg
-            className={`w-3 h-3 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-90 text-navy" : "text-tertiary group-hover:text-navy/60"}`}
+            className="w-3 h-3 flex-shrink-0 transition-transform duration-200 text-tertiary group-hover:text-navy/60 group-open:rotate-90 group-open:text-navy"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          {/* Icon */}
           <span className="flex-shrink-0 text-navy/40">{dimIcons[dimension]}</span>
-          {/* Label */}
           <div className="w-36 md:w-44 flex-shrink-0 text-sm font-semibold text-secondary group-hover:text-navy/80 transition-colors">
             {label}
           </div>
-          {/* Progress bar */}
           <div className="flex-1 h-3.5 bg-offwhite border border-light overflow-hidden">
             <div className="h-full transition-all duration-300" style={{ width: `${score}%`, backgroundColor: barColor }} />
           </div>
-          {/* Score */}
           <div className="w-10 text-right">
             <span className="text-base font-bold" style={{ color: barColor }}>{score}</span>
           </div>
-          {/* Stage badge */}
           <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: barColor }}>
             Stage {stage}
           </span>
         </div>
-      </button>
-
-      {/* Expanded detail */}
-      {open && (
-        <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-150">
-          <div className="ml-7 pl-3">
-            {/* Subtitle question */}
-            <p className="text-xs text-tertiary italic mb-3">{subtitle}</p>
-            {/* Stage badge on mobile */}
-            <div className="sm:hidden mb-3">
-              <span className="inline-block px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: barColor }}>
-                Stage {stage}
-              </span>
-            </div>
-            {/* Interpretation */}
-            <p className="text-sm text-foreground/70 leading-relaxed">
-              <strong className="text-secondary">{score}/100</strong> - {interpretation}
-            </p>
-            {/* AI narrative for this dimension — merged in from detailed analysis */}
-            {narrative && (
-              <div className="mt-4 pt-3 border-t border-light">
-                <MarkdownContent content={narrative} />
-              </div>
-            )}
+      </summary>
+      <div className="px-4 pb-4">
+        <div className="ml-7 pl-3">
+          <p className="text-xs text-tertiary italic mb-3">{subtitle}</p>
+          <div className="sm:hidden mb-3">
+            <span className="inline-block px-2 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: barColor }}>
+              Stage {stage}
+            </span>
           </div>
+          <p className="text-sm text-foreground/70 leading-relaxed">
+            <strong className="text-secondary">{score}/100</strong> - {interpretation}
+          </p>
+          {narrative && (
+            <div className="mt-4 pt-3 border-t border-light">
+              <MarkdownContent content={narrative} />
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </details>
   );
 }
 
@@ -2796,19 +2856,14 @@ function ConstraintExpander({
   industry: string; benchmark: string; risks: string;
   interpretation: string; companyName: string; narrative?: string;
 }) {
-  const [open, setOpen] = useState(false);
+  // Native <details>/<summary> for clean HTML export
 
   return (
-    <div className={`border transition-colors duration-150 ${open ? "border-navy/15 bg-white" : "border-light hover:border-navy/10"}`}>
-      {/* Clickable bar row */}
-      <button
-        type="button"
-        className="w-full text-left px-4 py-3 cursor-pointer group"
-        onClick={() => setOpen(!open)}
-      >
+    <details className="border transition-colors duration-150 border-light hover:border-navy/10 open:border-navy/15 open:bg-white group">
+      <summary className="list-none w-full text-left px-4 py-3 cursor-pointer">
         <div className="flex items-center gap-3">
           <svg
-            className={`w-3 h-3 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-90 text-navy" : "text-tertiary group-hover:text-navy/60"}`}
+            className="w-3 h-3 flex-shrink-0 transition-transform duration-200 text-tertiary group-hover:text-navy/60 group-open:rotate-90 group-open:text-navy"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -2827,11 +2882,8 @@ function ConstraintExpander({
             {tier}
           </span>
         </div>
-      </button>
-
-      {/* Expanded detail — each section is its own SubCollapsible */}
-      {open && (
-        <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-150">
+      </summary>
+      <div className="px-4 pb-4">{/* Each nested section is its own SubCollapsible */}
           {/* Brief description always visible */}
           <p className="text-sm text-foreground/70 leading-relaxed mb-3 ml-7">
             {description}
@@ -2884,9 +2936,8 @@ function ConstraintExpander({
               </SubCollapsible>
             </div>
           )}
-        </div>
-      )}
-    </div>
+      </div>
+    </details>
   );
 }
 
@@ -2899,35 +2950,29 @@ function SubCollapsible({
 }: {
   title: string; children: React.ReactNode; defaultOpen?: boolean; hint?: string; icon?: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  // Native <details>/<summary> so the report exports cleanly to a standalone
+  // HTML file with browser-native collapse/expand. No React state needed.
   return (
-    <div className={`border mb-3 transition-colors duration-150 ${open ? "border-navy/15 bg-white" : "border-light hover:border-navy/10 bg-offwhite/30"}`}>
-      <button
-        type="button"
-        className="w-full text-left px-4 py-3.5 flex items-center gap-3 cursor-pointer group"
-        onClick={() => setOpen(!open)}
-      >
-        {/* Expand/collapse icon */}
+    <details className="border mb-3 transition-colors duration-150 border-light hover:border-navy/10 bg-offwhite/30 open:border-navy/15 open:bg-white group" open={defaultOpen}>
+      <summary className="list-none w-full text-left px-4 py-3.5 flex items-center gap-3 cursor-pointer">
         <svg
-          className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-90 text-navy" : "text-tertiary group-hover:text-navy/60"}`}
+          className="w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 text-tertiary group-hover:text-navy/60 group-open:rotate-90 group-open:text-navy"
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         {icon && <span className="flex-shrink-0 text-navy/40">{icon}</span>}
-        <span className={`text-sm font-semibold flex-1 transition-colors ${open ? "text-navy" : "text-secondary group-hover:text-navy/80"}`}>{title}</span>
-        {!open && (
-          <span className="text-[10px] text-tertiary/60 tracking-wide uppercase font-medium hidden sm:inline">
+        <span className="text-sm font-semibold flex-1 transition-colors text-secondary group-hover:text-navy/80 group-open:text-navy">{title}</span>
+        {hint && (
+          <span className="text-[10px] text-tertiary/60 tracking-wide uppercase font-medium hidden sm:inline group-open:hidden">
             {hint}
           </span>
         )}
-      </button>
-      {open && (
-        <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-150">
-          {children}
-        </div>
-      )}
-    </div>
+      </summary>
+      <div className="px-4 pb-4">
+        {children}
+      </div>
+    </details>
   );
 }
 
