@@ -3,8 +3,14 @@
 // =============================================================================
 // Serverless-compatible persistence via Upstash Redis REST API.
 // Each session is stored as a JSON string keyed by "session:{id}".
-// Sessions auto-expire after 5 years (TTL refreshes on every write, so any
-// session that gets touched. paid, updated. gets its 5-year clock reset).
+//
+// Persistence policy: sessions persist forever. We deliberately do not set a
+// TTL so every prospect interaction becomes part of a permanent dataset for
+// later aggregation, cohort analysis, and product-market-fit research.
+//
+// In addition to the per-session key, every session id is added to a sorted
+// set "sessions:index" scored by createdAt epoch ms. That index makes
+// time-range queries cheap without scanning every key in the database.
 // =============================================================================
 
 import { Redis } from '@upstash/redis';
@@ -32,7 +38,9 @@ function getRedis(): Redis {
 }
 
 const SESSION_PREFIX = 'session:';
-const SESSION_TTL_SECONDS = 5 * 365 * 24 * 60 * 60; // 5 years (sales links persist long enough to outlive any enterprise procurement cycle)
+const SESSION_INDEX_KEY = 'sessions:index'; // sorted set, scored by createdAt epoch ms
+// No TTL: sessions persist forever. The diagnostic captures every prospect
+// interaction as permanent dataset for later aggregation and analysis.
 
 // ---------------------------------------------------------------------------
 // Backward compatibility: map old industry slugs to new ones
@@ -72,20 +80,22 @@ export async function createSession(
 ): Promise<AssessmentSession> {
   const redis = getRedis();
 
+  const now = new Date();
   const session: AssessmentSession = {
     id: uuidv4(),
-    createdAt: new Date().toISOString(),
+    createdAt: now.toISOString(),
+    lastUpdatedAt: now.toISOString(),
     companyProfile: profile,
     responses: [],
     currentQuestionIndex: 0,
     status: 'intake',
   };
 
-  await redis.set(
-    `${SESSION_PREFIX}${session.id}`,
-    JSON.stringify(session),
-    { ex: SESSION_TTL_SECONDS }
-  );
+  // Persist forever (no TTL). Index by createdAt for time-range queries.
+  await Promise.all([
+    redis.set(`${SESSION_PREFIX}${session.id}`, JSON.stringify(session)),
+    redis.zadd(SESSION_INDEX_KEY, { score: now.getTime(), member: session.id }),
+  ]);
   return session;
 }
 
@@ -111,18 +121,95 @@ export async function updateSession(
     throw new Error(`Session not found: ${id}`);
   }
 
-  const updated: AssessmentSession = { ...session, ...updates, id: session.id };
+  const nowIso = new Date().toISOString();
+  // Stamp transition timestamps as the status changes. These are write-once:
+  // we only set completedAt the first time status becomes "completed",
+  // paidAt the first time it becomes "paid", etc.
+  const transitionStamps: Partial<AssessmentSession> = {};
+  if (updates.status === 'completed' && !session.completedAt) {
+    transitionStamps.completedAt = nowIso;
+  }
+  if (updates.status === 'paid' && !session.paidAt) {
+    transitionStamps.paidAt = nowIso;
+  }
+  if (updates.status === 'report_generated' && !session.reportGeneratedAt) {
+    transitionStamps.reportGeneratedAt = nowIso;
+  }
+
+  const updated: AssessmentSession = {
+    ...session,
+    ...updates,
+    ...transitionStamps,
+    id: session.id,
+    lastUpdatedAt: nowIso,
+  };
 
   const redis = getRedis();
-  await redis.set(
-    `${SESSION_PREFIX}${id}`,
-    JSON.stringify(updated),
-    { ex: SESSION_TTL_SECONDS }
-  );
+  // Persist forever (no TTL). The index already has this id from creation.
+  await redis.set(`${SESSION_PREFIX}${id}`, JSON.stringify(updated));
   return updated;
 }
 
 export async function deleteSession(id: string): Promise<void> {
   const redis = getRedis();
-  await redis.del(`${SESSION_PREFIX}${id}`);
+  await Promise.all([
+    redis.del(`${SESSION_PREFIX}${id}`),
+    redis.zrem(SESSION_INDEX_KEY, id),
+  ]);
+}
+
+// ---------------------------------------------------------------------------
+// Bulk read operations for analytics and aggregation
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns session ids in createdAt order, optionally filtered by date range.
+ * Reverse-chronological by default (newest first).
+ */
+export async function listSessionIds(opts: {
+  fromMs?: number;
+  toMs?: number;
+  limit?: number;
+  offset?: number;
+  reverse?: boolean;
+} = {}): Promise<string[]> {
+  const redis = getRedis();
+  const fromMs = opts.fromMs ?? 0;
+  const toMs = opts.toMs ?? Date.now() + 86_400_000; // tomorrow as upper bound
+  const offset = opts.offset ?? 0;
+  const limit = opts.limit ?? 1000;
+
+  if (opts.reverse !== false) {
+    // newest first
+    return (await redis.zrange(SESSION_INDEX_KEY, toMs, fromMs, {
+      byScore: true,
+      rev: true,
+      offset,
+      count: limit,
+    })) as string[];
+  }
+  return (await redis.zrange(SESSION_INDEX_KEY, fromMs, toMs, {
+    byScore: true,
+    offset,
+    count: limit,
+  })) as string[];
+}
+
+/**
+ * Returns total count of sessions in the index, optionally within a date range.
+ */
+export async function countSessions(opts: { fromMs?: number; toMs?: number } = {}): Promise<number> {
+  const redis = getRedis();
+  const fromMs = opts.fromMs ?? 0;
+  const toMs = opts.toMs ?? Date.now() + 86_400_000;
+  return (await redis.zcount(SESSION_INDEX_KEY, fromMs, toMs)) as number;
+}
+
+/**
+ * Bulk-load sessions by id list. Returns sessions in the same order, with nulls
+ * for any id that no longer exists (e.g. deleted).
+ */
+export async function getSessions(ids: string[]): Promise<(AssessmentSession | null)[]> {
+  if (ids.length === 0) return [];
+  return Promise.all(ids.map((id) => getSession(id)));
 }
