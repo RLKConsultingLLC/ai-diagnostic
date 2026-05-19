@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-// Lazy singleton — avoids initializing at build time when env vars aren't available
+// Lazy singleton. avoids initializing at build time when env vars aren't available
 let _stripe: Stripe | null = null;
 
 function getStripe(): Stripe {

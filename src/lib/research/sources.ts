@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Public Data Source Fetchers
+// RLK AI Diagnostic. Public Data Source Fetchers
 // =============================================================================
 // Fetches company data from public sources: SEC EDGAR, news APIs, etc.
 // Each fetcher returns structured data that feeds into Claude synthesis.
@@ -8,7 +8,7 @@
 import { Industry } from '@/types/diagnostic';
 
 // ---------------------------------------------------------------------------
-// SEC EDGAR — 10-K / 10-Q Filings
+// SEC EDGAR. 10-K / 10-Q Filings
 // ---------------------------------------------------------------------------
 
 export interface SECFiling {
@@ -94,7 +94,7 @@ async function searchEDGARCompany(query: string): Promise<SECFiling[]> {
 }
 
 // ---------------------------------------------------------------------------
-// NEWS SEARCH — Uses public news APIs
+// NEWS SEARCH. Uses public news APIs
 // ---------------------------------------------------------------------------
 
 export interface RawNewsResult {

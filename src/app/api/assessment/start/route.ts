@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     const session = await createSession(profile);
 
-    // Kick off background research immediately — runs while customer answers questions
+    // Kick off background research immediately. runs while customer answers questions
     // This searches SEC filings, news, press releases, leadership interviews, etc.
     // and uses Claude to synthesize a deep company intelligence profile
     startBackgroundResearch(session.id, profile);

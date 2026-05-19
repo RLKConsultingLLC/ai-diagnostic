@@ -95,7 +95,7 @@ export default function Home() {
       {/* Diagonal Divider */}
       <div className="rlk-diagonal-divider" />
 
-      {/* The Problem — navy section for visual contrast */}
+      {/* The Problem. navy section for visual contrast */}
       <section className="bg-navy text-white py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="max-w-3xl mx-auto text-center mb-16">
@@ -150,7 +150,7 @@ export default function Home() {
               enterprise value, or evaporate.
             </p>
           </div>
-          {/* Five dimensions — left accent bar cards */}
+          {/* Five dimensions. left accent bar cards */}
           <div className="grid md:grid-cols-5 gap-0 md:gap-px bg-light/50 border border-light overflow-hidden">
             {[
               { title: "Adoption Behavior", desc: "How employees actually use AI vs. how leadership thinks they do." },
@@ -167,7 +167,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Three deliverables — McKinsey-style accent bar cards */}
+          {/* Three deliverables. McKinsey-style accent bar cards */}
           <div className="mt-16 grid md:grid-cols-3 gap-8">
             {[
               { title: "Behavioral Diagnosis", text: "61 behavioral questions that diagnose how your people actually interact with AI, not which tools you purchased. The gap between those two things is where value disappears." },
@@ -424,7 +424,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What Makes This Different — side-by-side comparison */}
+      {/* What Makes This Different. side-by-side comparison */}
       <section className="bg-white py-20 md:py-24 border-t border-light">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center mb-14">

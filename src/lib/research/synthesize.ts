@@ -1,9 +1,9 @@
 // =============================================================================
-// RLK AI Diagnostic — Claude Research Synthesis Engine
+// RLK AI Diagnostic. Claude Research Synthesis Engine
 // =============================================================================
 // Takes raw research data and uses Claude to synthesize it into a structured
 // CompanyResearchProfile. This is what makes the report feel like a $50K
-// consulting engagement — deep, specific, company-aware intelligence.
+// consulting engagement. deep, specific, company-aware intelligence.
 // =============================================================================
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -22,11 +22,12 @@ import {
   VendorAnalysis,
 } from '@/types/research';
 import { RawNewsResult, SECFiling } from './sources';
+import { stripEmDashDeep, NO_EM_DASH_DIRECTIVE } from '@/lib/text/strip-em-dash';
 
 const client = new Anthropic();
 
 // ---------------------------------------------------------------------------
-// RESEARCH CONFIDENCE — Quality-weighted instead of count-based
+// RESEARCH CONFIDENCE. Quality-weighted instead of count-based
 // ---------------------------------------------------------------------------
 
 function computeResearchConfidence(
@@ -47,14 +48,14 @@ function computeResearchConfidence(
 ): 'high' | 'moderate' | 'low' {
   let score = 0;
 
-  // SEC filings (+30) — strongest credibility signal
+  // SEC filings (+30). strongest credibility signal
   if (rawData.secFilings.length > 0) score += 30;
 
   // AI-specific news coverage (+20)
   if (rawData.aiNews.length >= 3) score += 20;
   else if (rawData.aiNews.length >= 1) score += 10;
 
-  // Recency (+15) — recent news within last 6 months
+  // Recency (+15). recent news within last 6 months
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
   const recentNews = synthesized.newsItems.filter((n) => {
@@ -63,18 +64,18 @@ function computeResearchConfidence(
   if (recentNews.length >= 3) score += 15;
   else if (recentNews.length >= 1) score += 8;
 
-  // Leadership quotes (+10) — direct executive signals
+  // Leadership quotes (+10). direct executive signals
   if (synthesized.leadershipInsights.length >= 2) score += 10;
   else if (synthesized.leadershipInsights.length >= 1) score += 5;
 
-  // Company web content (+10) — direct company data
+  // Company web content (+10). direct company data
   const hasWebContent =
     rawData.webContent.aboutText.length > 100 ||
     rawData.webContent.newsroomItems.length > 0 ||
     rawData.webContent.aiReferences.length > 0;
   if (hasWebContent) score += 10;
 
-  // Source diversity (+10) — multiple source types
+  // Source diversity (+10). multiple source types
   const sourceTypes = [
     rawData.secFilings.length > 0,
     rawData.companyNews.length > 0,
@@ -92,7 +93,7 @@ function computeResearchConfidence(
 }
 
 // ---------------------------------------------------------------------------
-// MAIN SYNTHESIS — Orchestrates Claude to build the full research profile
+// MAIN SYNTHESIS. Orchestrates Claude to build the full research profile
 // ---------------------------------------------------------------------------
 
 export async function synthesizeResearchProfile(
@@ -136,7 +137,7 @@ export async function synthesizeResearchProfile(
     rawData.industryNews.length +
     rawData.webContent.newsroomItems.length;
 
-  return {
+  const profile: CompanyResearchProfile = {
     companyName: companyProfile.companyName,
     industry: companyProfile.industry,
     recentNews: newsAnalysis.newsItems,
@@ -165,6 +166,9 @@ export async function synthesizeResearchProfile(
       earnings: strategicAnalysis.earnings,
     }),
   };
+  // Final runtime defense: deep-strip every dash-like character from every
+  // string field in the synthesized profile, regardless of what Claude said.
+  return stripEmDashDeep(profile);
 }
 
 // ---------------------------------------------------------------------------
@@ -180,13 +184,13 @@ async function synthesizeNews(
   }
 
   const newsText = news
-    .map((n, i) => `[${i + 1}] "${n.title}" — ${n.source} (${n.publishedAt})\n${n.description}`)
+    .map((n, i) => `[${i + 1}] "${n.title}". ${n.source} (${n.publishedAt})\n${n.description}`)
     .join('\n\n');
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
-    system: 'You are a senior research analyst at a management consulting firm. Analyze news articles and extract structured intelligence. Respond ONLY with valid JSON.',
+    system: 'You are a senior research analyst at a management consulting firm. Analyze news articles and extract structured intelligence. Respond ONLY with valid JSON.' + '\n\n' + NO_EM_DASH_DIRECTIVE,
     messages: [
       {
         role: 'user',
@@ -255,7 +259,7 @@ async function synthesizeAIIntelligence(
   competitorActivity: CompetitorActivity[];
 }> {
   const aiNewsText = aiNews
-    .map((n, i) => `[${i + 1}] "${n.title}" — ${n.source} (${n.publishedAt})\n${n.description}`)
+    .map((n, i) => `[${i + 1}] "${n.title}". ${n.source} (${n.publishedAt})\n${n.description}`)
     .join('\n\n');
 
   const webText = [
@@ -266,7 +270,7 @@ async function synthesizeAIIntelligence(
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
-    system: 'You are a senior AI strategy analyst at a top-tier consulting firm. Extract AI-specific intelligence from company data. Respond ONLY with valid JSON.',
+    system: 'You are a senior AI strategy analyst at a top-tier consulting firm. Extract AI-specific intelligence from company data. Respond ONLY with valid JSON.' + '\n\n' + NO_EM_DASH_DIRECTIVE,
     messages: [
       {
         role: 'user',
@@ -344,13 +348,13 @@ async function synthesizeStrategicIntel(
 }> {
   const newsText = news
     .slice(0, 15)
-    .map((n, i) => `[${i + 1}] "${n.title}" — ${n.source} (${n.publishedAt})\n${n.description}`)
+    .map((n, i) => `[${i + 1}] "${n.title}". ${n.source} (${n.publishedAt})\n${n.description}`)
     .join('\n\n');
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
-    system: 'You are a senior strategy consultant. Extract leadership, strategic, and earnings intelligence. Respond ONLY with valid JSON.',
+    system: 'You are a senior strategy consultant. Extract leadership, strategic, and earnings intelligence. Respond ONLY with valid JSON.' + '\n\n' + NO_EM_DASH_DIRECTIVE,
     messages: [
       {
         role: 'user',
@@ -424,13 +428,13 @@ async function synthesizeIndustryContext(
 }> {
   const newsText = industryNews
     .slice(0, 10)
-    .map((n, i) => `[${i + 1}] "${n.title}" — ${n.source} (${n.publishedAt})\n${n.description}`)
+    .map((n, i) => `[${i + 1}] "${n.title}". ${n.source} (${n.publishedAt})\n${n.description}`)
     .join('\n\n');
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
-    system: 'You are a senior industry analyst specializing in AI adoption across enterprise sectors. Respond ONLY with valid JSON.',
+    system: 'You are a senior industry analyst specializing in AI adoption across enterprise sectors. Respond ONLY with valid JSON.' + '\n\n' + NO_EM_DASH_DIRECTIVE,
     messages: [
       {
         role: 'user',
@@ -512,7 +516,7 @@ async function synthesizeVendorAnalysis(
       );
     })
     .slice(0, 15)
-    .map((n, i) => `[${i + 1}] "${n.title}" — ${n.source} (${n.publishedAt})\n${n.description}`)
+    .map((n, i) => `[${i + 1}] "${n.title}". ${n.source} (${n.publishedAt})\n${n.description}`)
     .join('\n\n');
 
   const useCases = profile.primaryAIUseCases?.length
@@ -522,7 +526,7 @@ async function synthesizeVendorAnalysis(
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 3000,
-    system: `You are a senior technology analyst at Gartner or Forrester. Analyze the AI vendor landscape for this company's specific industry and use cases. Be specific about vendor names, capabilities, and limitations. Your analysis should help a CIO evaluate whether their current vendor investments are optimal. Respond ONLY with valid JSON.`,
+    system: `You are a senior technology analyst at Gartner or Forrester. Analyze the AI vendor landscape for this company's specific industry and use cases. Be specific about vendor names, capabilities, and limitations. Your analysis should help a CIO evaluate whether their current vendor investments are optimal. Respond ONLY with valid JSON.\n\n${NO_EM_DASH_DIRECTIVE}`,
     messages: [
       {
         role: 'user',
@@ -581,7 +585,7 @@ Be specific. Name real vendors. Assess real capabilities. A CIO should be able t
 }
 
 // ---------------------------------------------------------------------------
-// EXECUTIVE BRIEFING — Final synthesis that ties everything together
+// EXECUTIVE BRIEFING. Final synthesis that ties everything together
 // ---------------------------------------------------------------------------
 
 async function synthesizeExecutiveBriefing(
@@ -633,7 +637,7 @@ ${industryContext.regulatory.slice(0, 3).map((r) => `- ${r.regulation}: ${r.impa
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
-    system: `You are a senior partner at a top-tier management consulting firm preparing an executive briefing for a C-suite client. Your tone is authoritative, specific, and actionable. You never hedge or use filler. Every sentence carries weight. Do not use the word "journey." Do not use generic AI maturity language.`,
+    system: `You are a senior partner at a top-tier management consulting firm preparing an executive briefing for a C-suite client. Your tone is authoritative, specific, and actionable. You never hedge or use filler. Every sentence carries weight. Do not use the word "journey." Do not use generic AI maturity language.\n\n${NO_EM_DASH_DIRECTIVE}`,
     messages: [
       {
         role: 'user',
@@ -643,13 +647,13 @@ ${contextBlock}
 
 Respond with this exact JSON structure:
 {
-  "briefing": "A 2-paragraph executive briefing (150-200 words). Paragraph 1: What public data reveals about this company's AI trajectory. Paragraph 2: The strategic implications and what's at stake. Be specific — reference actual news, initiatives, or leadership signals. This should feel like the opening of a McKinsey engagement deck.",
+  "briefing": "A 2-paragraph executive briefing (150-200 words). Paragraph 1: What public data reveals about this company's AI trajectory. Paragraph 2: The strategic implications and what's at stake. Be specific. reference actual news, initiatives, or leadership signals. This should feel like the opening of a McKinsey engagement deck.",
 
   "aiPosture": "A 3-4 sentence assessment of this company's public AI posture based on the evidence. What are they saying? What are they doing? Where is the gap between rhetoric and action?",
 
   "competitivePosition": "A 2-3 sentence assessment of where this company stands vs. their competitors in AI capability based on public signals. Name specific competitors where possible.",
 
-  "risks": ["3-5 specific, company-relevant AI risks derived from the research — not generic risks. Each should reference a specific finding."],
+  "risks": ["3-5 specific, company-relevant AI risks derived from the research. not generic risks. Each should reference a specific finding."],
 
   "opportunities": ["3-5 specific, company-relevant AI opportunities derived from the research. Each should be tied to something specific about this company, its industry, or its competitive position."]
 }`,

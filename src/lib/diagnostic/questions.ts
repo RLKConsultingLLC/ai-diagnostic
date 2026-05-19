@@ -1,8 +1,8 @@
 // =============================================================================
-// RLK AI Diagnostic — Proprietary Diagnostic Question Bank
+// RLK AI Diagnostic. Proprietary Diagnostic Question Bank
 // =============================================================================
 // 61 questions across 5 hidden dimensions. Each question diagnoses BEHAVIOR,
-// not tools. Answer options map to maturity levels 0–5.
+// not tools. Answer options map to maturity levels 0-5.
 //
 // SCORING DESIGN NOTE: Many questions use a 0, 1, 2, 4, 5 scoring pattern
 // (intentionally skipping 3). This creates a deliberate gap between "moderate"
@@ -27,7 +27,7 @@ const adoptionBehavior: DiagnosticQuestion[] = [
     options: [
       { text: 'Initial enthusiasm followed by near-complete abandonment', score: 0 },
       { text: 'A small group of champions continues use; most revert to prior methods', score: 1 },
-      { text: 'Usage stabilizes at 20–40% of intended users with informal workarounds', score: 2 },
+      { text: 'Usage stabilizes at 20-40% of intended users with informal workarounds', score: 2 },
       { text: 'Majority of intended users adopt with structured onboarding support', score: 3 },
       { text: 'Usage expands beyond initial scope as teams discover adjacent use cases', score: 5 },
     ],
@@ -98,9 +98,9 @@ const adoptionBehavior: DiagnosticQuestion[] = [
     text: 'What percentage of your workforce has modified at least one daily task using AI in the past 30 days?',
     options: [
       { text: 'Less than 5%', score: 0 },
-      { text: '5–15%', score: 1 },
-      { text: '15–35%', score: 2 },
-      { text: '35–60%', score: 3 },
+      { text: '5-15%', score: 1 },
+      { text: '15-35%', score: 2 },
+      { text: '35-60%', score: 3 },
       { text: 'More than 60%', score: 5 },
     ],
     weight: 1.4,
@@ -154,9 +154,9 @@ const adoptionBehavior: DiagnosticQuestion[] = [
     text: 'What is the typical time between identifying an AI use case and putting a working solution in front of end users?',
     options: [
       { text: 'Over 12 months, if it happens at all', score: 0 },
-      { text: '6–12 months due to approval, procurement, and implementation cycles', score: 1 },
-      { text: '3–6 months with a dedicated project team', score: 2 },
-      { text: '4–12 weeks using pre-approved tools and agile deployment practices', score: 4 },
+      { text: '6-12 months due to approval, procurement, and implementation cycles', score: 1 },
+      { text: '3-6 months with a dedicated project team', score: 2 },
+      { text: '4-12 weeks using pre-approved tools and agile deployment practices', score: 4 },
       { text: 'Under 4 weeks for standard use cases; dedicated fast-track for high-priority needs', score: 5 },
     ],
     weight: 1.2,
@@ -220,8 +220,8 @@ const authorityStructure: DiagnosticQuestion[] = [
     options: [
       { text: 'No clear approval process exists; initiatives stall in ambiguity', score: 0 },
       { text: '5+ levels including board or C-suite sign-off for any AI initiative', score: 1 },
-      { text: '3–4 levels with IT, legal, and executive review', score: 2 },
-      { text: '1–2 levels with pre-approved criteria for standard initiatives', score: 4 },
+      { text: '3-4 levels with IT, legal, and executive review', score: 2 },
+      { text: '1-2 levels with pre-approved criteria for standard initiatives', score: 4 },
       { text: 'Teams have pre-authorized budgets and guardrails to launch within defined parameters', score: 5 },
     ],
     weight: 1.3,
@@ -247,8 +247,8 @@ const authorityStructure: DiagnosticQuestion[] = [
     text: 'When an AI initiative requires budget reallocation mid-year, what typically happens?',
     options: [
       { text: 'It waits for the next budget cycle regardless of urgency', score: 0 },
-      { text: 'It requires a formal business case that takes 2–3 months to approve', score: 1 },
-      { text: 'A sponsor can advocate for reallocation through normal channels (6–8 weeks)', score: 2 },
+      { text: 'It requires a formal business case that takes 2-3 months to approve', score: 1 },
+      { text: 'A sponsor can advocate for reallocation through normal channels (6-8 weeks)', score: 2 },
       { text: 'Expedited process exists for AI investments under a defined threshold', score: 4 },
       { text: 'Dedicated AI investment pool with quarterly rebalancing authority', score: 5 },
     ],
@@ -275,7 +275,7 @@ const authorityStructure: DiagnosticQuestion[] = [
     text: 'What role does legal/compliance play in AI deployment decisions?',
     options: [
       { text: 'Legal blocks most AI initiatives citing unquantified risk', score: 0 },
-      { text: 'Legal reviews every initiative individually, creating a 3–6 month bottleneck', score: 1 },
+      { text: 'Legal reviews every initiative individually, creating a 3-6 month bottleneck', score: 1 },
       { text: 'Legal has created general guidelines but still reviews each deployment', score: 2 },
       { text: 'Pre-approved frameworks exist for common use cases; legal reviews only novel applications', score: 4 },
       { text: 'Legal is embedded in AI teams and co-designs compliant solutions', score: 5 },
@@ -409,7 +409,7 @@ const workflowIntegration: DiagnosticQuestion[] = [
     options: [
       { text: 'AI tools are standalone. Employees switch between AI and their primary systems.', score: 0 },
       { text: 'Basic API connections exist but require manual data transfer for most tasks', score: 1 },
-      { text: 'AI is integrated into 1–2 core workflows but most work is still manual', score: 2 },
+      { text: 'AI is integrated into 1-2 core workflows but most work is still manual', score: 2 },
       { text: 'AI is embedded in primary workflows with automated data flows', score: 4 },
       { text: 'AI is invisible infrastructure. Employees interact with enhanced versions of their normal tools.', score: 5 },
     ],
@@ -485,9 +485,9 @@ const workflowIntegration: DiagnosticQuestion[] = [
     text: 'What percentage of your AI projects have been successfully integrated into production workflows (not just piloted)?',
     options: [
       { text: 'Less than 10%. Most remain experiments or proofs of concept.', score: 0 },
-      { text: '10–25%. A few have made it to production.', score: 1 },
-      { text: '25–50%. About half transition from pilot to production.', score: 2 },
-      { text: '50–75%. Most pilots are designed with production integration in mind.', score: 4 },
+      { text: '10-25%. A few have made it to production.', score: 1 },
+      { text: '25-50%. About half transition from pilot to production.', score: 2 },
+      { text: '50-75%. Most pilots are designed with production integration in mind.', score: 4 },
       { text: 'More than 75%. Pilot-to-production is a well-oiled process.', score: 5 },
     ],
     weight: 1.4,
@@ -625,9 +625,9 @@ const decisionVelocity: DiagnosticQuestion[] = [
     text: 'How long does it take from identifying a valuable AI use case to having a funded pilot in progress?',
     options: [
       { text: 'More than 12 months or it never happens', score: 0 },
-      { text: '6–12 months', score: 1 },
-      { text: '3–6 months', score: 2 },
-      { text: '4–12 weeks', score: 4 },
+      { text: '6-12 months', score: 1 },
+      { text: '3-6 months', score: 2 },
+      { text: '4-12 weeks', score: 4 },
       { text: 'Less than 4 weeks for use cases within pre-approved parameters', score: 5 },
     ],
     weight: 1.3,
@@ -639,9 +639,9 @@ const decisionVelocity: DiagnosticQuestion[] = [
     text: 'When an AI pilot demonstrates clear value, how long does scaling take?',
     options: [
       { text: 'Pilots rarely lead to scaled deployment', score: 0 },
-      { text: 'Scaling requires a new business case and takes 6–12+ months', score: 1 },
-      { text: '3–6 months with dedicated resources', score: 2 },
-      { text: '1–3 months. Scaling path is defined before the pilot begins.', score: 4 },
+      { text: 'Scaling requires a new business case and takes 6-12+ months', score: 1 },
+      { text: '3-6 months with dedicated resources', score: 2 },
+      { text: '1-3 months. Scaling path is defined before the pilot begins.', score: 4 },
       { text: 'Pilots are designed to scale. Successful pilots expand automatically.', score: 5 },
     ],
     weight: 1.4,
@@ -653,7 +653,7 @@ const decisionVelocity: DiagnosticQuestion[] = [
     text: 'How often does the same AI initiative require re-approval at different organizational levels?',
     options: [
       { text: 'Constantly. Every stage requires fresh justification to new stakeholders.', score: 0 },
-      { text: 'Frequently. 3–4 separate approval processes from pilot to production.', score: 1 },
+      { text: 'Frequently. 3-4 separate approval processes from pilot to production.', score: 1 },
       { text: 'Occasionally. Key milestones require re-approval but context is preserved.', score: 2 },
       { text: 'Rarely. Initial approval covers the full lifecycle with checkpoint reviews.', score: 4 },
       { text: 'Never. Programs are approved with stage-gate criteria, not repeated justification.', score: 5 },
@@ -669,7 +669,7 @@ const decisionVelocity: DiagnosticQuestion[] = [
       { text: 'We wouldn\'t know about it for weeks or months', score: 0 },
       { text: 'Discussion happens but no action framework exists', score: 1 },
       { text: 'Assessment occurs within weeks but response takes quarters', score: 2 },
-      { text: 'Rapid assessment and response within 30–60 days', score: 4 },
+      { text: 'Rapid assessment and response within 30-60 days', score: 4 },
       { text: 'Competitive intelligence is continuous; we\'re typically ahead, not reacting', score: 5 },
     ],
     weight: 1.0,
@@ -681,9 +681,9 @@ const decisionVelocity: DiagnosticQuestion[] = [
     text: 'How long does procurement take for a new AI tool or platform?',
     options: [
       { text: '6+ months with extensive vendor evaluation and security review', score: 0 },
-      { text: '3–6 months through standard procurement process', score: 1 },
-      { text: '1–3 months with expedited review for approved categories', score: 2 },
-      { text: '2–4 weeks through pre-approved vendor marketplace', score: 4 },
+      { text: '3-6 months through standard procurement process', score: 1 },
+      { text: '1-3 months with expedited review for approved categories', score: 2 },
+      { text: '2-4 weeks through pre-approved vendor marketplace', score: 4 },
       { text: 'Days. Pre-approved tools are self-service; new vendors have a fast-track process.', score: 5 },
     ],
     weight: 1.0,
@@ -696,7 +696,7 @@ const decisionVelocity: DiagnosticQuestion[] = [
     options: [
       { text: 'AI initiatives don\'t have consistent sponsors', score: 0 },
       { text: 'Sponsors change before most initiatives complete (< 6 months)', score: 1 },
-      { text: 'Sponsors typically stay 6–12 months but continuity is disrupted', score: 2 },
+      { text: 'Sponsors typically stay 6-12 months but continuity is disrupted', score: 2 },
       { text: 'Sponsors are committed through initiative completion with succession planning', score: 4 },
       { text: 'Sponsorship is institutional, tied to roles, not individuals', score: 5 },
     ],
@@ -721,12 +721,12 @@ const decisionVelocity: DiagnosticQuestion[] = [
     id: 'DV-08',
     dimension: 'decision_velocity',
     text: 'When an AI initiative needs to be significantly restructured or pivoted, how quickly can the organization realign resources and direction?',
-    subtext: 'Think about situations where an AI project needed a major course correction — not minor tweaks, but fundamental changes in approach, scope, or technology.',
+    subtext: 'Think about situations where an AI project needed a major course correction. not minor tweaks, but fundamental changes in approach, scope, or technology.',
     options: [
       { text: 'Pivots don\'t happen; struggling projects continue unchanged until they are quietly abandoned', score: 0 },
       { text: 'Restructuring requires a new business case cycle and takes 6+ months', score: 1 },
-      { text: 'Project teams can propose pivots but budget and resource reallocation takes 2–4 months', score: 2 },
-      { text: 'Pivot authority is delegated to project sponsors; resource reallocation happens within 4–6 weeks with defined escalation paths', score: 4 },
+      { text: 'Project teams can propose pivots but budget and resource reallocation takes 2-4 months', score: 2 },
+      { text: 'Pivot authority is delegated to project sponsors; resource reallocation happens within 4-6 weeks with defined escalation paths', score: 4 },
       { text: 'Built-in pivot checkpoints with pre-approved resource flexibility; teams can restructure within 2 weeks without executive re-approval', score: 5 },
     ],
     weight: 1.0,
@@ -743,8 +743,8 @@ const decisionVelocity: DiagnosticQuestion[] = [
     text: 'How quickly can your organization decommission or replace an underperforming AI solution?',
     options: [
       { text: 'Sunken cost fallacy rules; we\'ve never shut down a deployed AI system', score: 0 },
-      { text: 'Decommissioning takes 6–12 months due to organizational inertia and vendor contracts', score: 1 },
-      { text: 'We can sunset tools in 3–6 months if a business case is made', score: 2 },
+      { text: 'Decommissioning takes 6-12 months due to organizational inertia and vendor contracts', score: 1 },
+      { text: 'We can sunset tools in 3-6 months if a business case is made', score: 2 },
       { text: 'Kill criteria are defined upfront; underperformers are flagged and replaced within 8 weeks', score: 4 },
       { text: 'Continuous performance monitoring with automated alerts; replacement and migration are standard operating procedure', score: 5 },
     ],
@@ -786,7 +786,7 @@ const decisionVelocity: DiagnosticQuestion[] = [
     options: [
       { text: 'We react only when forced; compliance is achieved months after deadlines', score: 0 },
       { text: 'Legal monitors regulations but organizational response is slow and reactive', score: 1 },
-      { text: 'A compliance team tracks requirements; adaptation takes 3–6 months', score: 2 },
+      { text: 'A compliance team tracks requirements; adaptation takes 3-6 months', score: 2 },
       { text: 'Proactive regulatory monitoring with pre-planned response protocols; adaptation within weeks', score: 4 },
       { text: 'Regulatory intelligence is embedded in AI governance; we often comply before regulations take effect and participate in shaping industry standards', score: 5 },
     ],
@@ -857,7 +857,7 @@ const economicTranslation: DiagnosticQuestion[] = [
     options: [
       { text: 'No. We cannot point to any financial impact from AI.', score: 0 },
       { text: 'Isolated examples but not at material scale', score: 1 },
-      { text: 'Measurable impact in 1–2 areas but it\'s a small fraction of AI investment', score: 2 },
+      { text: 'Measurable impact in 1-2 areas but it\'s a small fraction of AI investment', score: 2 },
       { text: 'Documented impact exceeding AI investment costs in multiple areas', score: 4 },
       { text: 'AI is a primary driver of margin expansion or revenue growth visible in financial statements', score: 5 },
     ],

@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Economic Value Estimation Model
+// RLK AI Diagnostic. Economic Value Estimation Model
 // =============================================================================
 // Calculates unrealized AI value based on company profile, stage, and
 // industry benchmarks. Produces board-ready financial framing.
@@ -80,7 +80,7 @@ const INDUSTRY_PRODUCTIVITY_POTENTIAL: Record<Industry, { low: number; high: num
 // INDUSTRY x STAGE CAPTURE RATES (2D lookup)
 // ---------------------------------------------------------------------------
 // What % of theoretical AI productivity potential the org is actually capturing.
-// Varies by BOTH maturity stage AND industry — tech-forward industries capture
+// Varies by BOTH maturity stage AND industry. tech-forward industries capture
 // more at every stage; heavily regulated / resource-constrained industries
 // capture less. Based on McKinsey 2024 Global AI Survey cross-tabs,
 // BCG AI Advantage Report peer analytics, and Gartner industry maturity curves.
@@ -143,7 +143,7 @@ export const INDUSTRY_CAPTURE_GROUP: Record<Industry, IndustryCaptureGroup> = {
 };
 
 export const CAPTURE_RATES_BY_GROUP: Record<IndustryCaptureGroup, Record<StageNumber, number>> = {
-  // Tech companies capture more at every stage — talent, infra, and culture already exist
+  // Tech companies capture more at every stage. talent, infra, and culture already exist
   tech_forward:          { 1: 0.05, 2: 0.15, 3: 0.32, 4: 0.62, 5: 0.85 },
   // Financial services: massive data and investment capacity, but compliance slows deployment
   data_rich_financial:   { 1: 0.03, 2: 0.12, 3: 0.28, 4: 0.58, 5: 0.82 },
@@ -180,7 +180,7 @@ export const CAPTURE_RATES_BY_GROUP: Record<IndustryCaptureGroup, Record<StageNu
 //     2.1x vs. pilot-only peers at the same maturity stage.)
 //
 //   Adoption Behavior (20%): Are employees actually using the tools?
-//     Adoption is the prerequisite for capture — zero usage = zero value
+//     Adoption is the prerequisite for capture. zero usage = zero value
 //     regardless of capability deployed. (Gartner 2024: actual utilization
 //     rates average 38% of licensed AI tool capacity across enterprises.)
 //
@@ -251,7 +251,7 @@ function getCaptureRateDetailed(
   const { modifier } = computeDiagnosticModifier(dimensionScores);
   const adjustedRate = baseRate * modifier;
 
-  // Clamp to [0.01, 0.95] — no organization captures 0% or 100%
+  // Clamp to [0.01, 0.95]. no organization captures 0% or 100%
   return {
     rate: Math.max(0.01, Math.min(0.95, adjustedRate)),
     baseRate,
@@ -265,7 +265,7 @@ function getCaptureRateDetailed(
 // ---------------------------------------------------------------------------
 
 function getSizeMultiplier(employeeCount: number): number {
-  if (employeeCount < 100) return 0.7;       // Small — less overhead to capture
+  if (employeeCount < 100) return 0.7;       // Small. less overhead to capture
   if (employeeCount < 500) return 0.85;
   if (employeeCount < 2000) return 1.0;
   if (employeeCount < 10000) return 1.1;      // Larger orgs have more opportunities
@@ -380,7 +380,7 @@ export function computeEconomicEstimate(
   const currentCapturePercent = captureRate * 100;
   const capturedValue = midpointPotential * captureRate;
 
-  // Unrealized value — floor at $0, cap at 50% of revenue
+  // Unrealized value. floor at $0, cap at 50% of revenue
   let unrealizedLow = Math.max(0, productivityPotentialLow * (1 - captureRate));
   let unrealizedHigh = Math.max(0, productivityPotentialHigh * (1 - captureRate));
   const revenueCap = profile.revenue * 0.5;
@@ -390,7 +390,7 @@ export function computeEconomicEstimate(
     unrealizedLow = Math.min(unrealizedLow, revenueCap * 0.7);
   }
 
-  // Wasted hours calculation — cap at 50% of total available hours
+  // Wasted hours calculation. cap at 50% of total available hours
   const hoursPerEmployee = 2080; // Standard work year
   const maxWasteableHours = profile.employeeCount * hoursPerEmployee * 0.5;
   const potentialHoursSaved = profile.employeeCount *

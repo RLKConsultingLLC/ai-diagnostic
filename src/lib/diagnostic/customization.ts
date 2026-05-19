@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Customization Engine
+// RLK AI Diagnostic. Customization Engine
 // =============================================================================
 // Adapts diagnostic behavior based on industry, company size, regulatory
 // intensity, and functional AI usage. Controls question weighting,
@@ -347,7 +347,7 @@ export const INDUSTRY_THEMES: Record<Industry, {
   competitiveThreat: string;
   regulatoryContext: string;
   keyUseCases: string[];
-  lastUpdated: string; // YYYY-MM-DD — review and refresh quarterly
+  lastUpdated: string; // YYYY-MM-DD. review and refresh quarterly
   dimensionEmphasis?: Partial<Record<Dimension, number>>; // 0.8-1.2 multiplier for report emphasis
 }> = {
   insurance: {

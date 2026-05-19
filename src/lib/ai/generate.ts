@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Report Generation via Claude API
+// RLK AI Diagnostic. Report Generation via Claude API
 // =============================================================================
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -17,6 +17,7 @@ import {
   SECTION_ORDER,
 } from '@/lib/ai/prompts';
 import { deduplicateReport } from '@/lib/ai/postProcess';
+import { stripEmDash, NO_EM_DASH_DIRECTIVE } from '@/lib/text/strip-em-dash';
 
 // ---------------------------------------------------------------------------
 // Client singleton
@@ -63,10 +64,14 @@ export async function generateReportSection(
     : user;
   const client = getClient();
 
+  // Always inject the anti-em-dash directive into every system prompt.
+  // This is one of two defenses. The other is the runtime stripper below.
+  const guardedSystem = `${system}\n\n${NO_EM_DASH_DIRECTIVE}`;
+
   const response = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
-    system,
+    system: guardedSystem,
     messages: [{ role: 'user', content: fullUser }],
   });
 
@@ -82,11 +87,9 @@ export async function generateReportSection(
     );
   }
 
-  // Post-processing: remove AI writing tells (em dashes, en dashes)
-  // The system prompt asks Claude not to use them, but it often ignores this.
-  return text
-    .replace(/—/g, ' - ')
-    .replace(/–/g, '-');
+  // Final defense: strip every dash-like character, no matter what the
+  // system prompt told the model. This is the runtime guarantee.
+  return stripEmDash(text);
 }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +100,7 @@ export async function generateFullReport(
   result: DiagnosticResult,
   research?: CompanyResearchProfile
 ): Promise<GeneratedReport> {
-  // Generate all sections in parallel — single wave for speed
+  // Generate all sections in parallel. single wave for speed
   const allPromises: Promise<ReportSection>[] = SECTION_ORDER.map(
     async (slug) => {
       const content = await generateReportSection(slug, result, research);
@@ -204,7 +207,7 @@ Rules:
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 1024,
-      system: 'You are an AI industry analyst. Respond ONLY with valid JSON array. No markdown, no explanation.',
+      system: `You are an AI industry analyst. Respond ONLY with valid JSON array. No markdown, no explanation.\n\n${NO_EM_DASH_DIRECTIVE}`,
       messages: [{ role: 'user', content: prompt }],
     });
 
@@ -216,7 +219,8 @@ Rules:
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return [];
 
-    const parsed = JSON.parse(jsonMatch[0]) as CompetitorPosition[];
+    // Strip em dashes from any string fields in the JSON before parsing
+    const parsed = JSON.parse(stripEmDash(jsonMatch[0])) as CompetitorPosition[];
     return parsed.filter(c => c.label && typeof c.capability === 'number' && typeof c.readiness === 'number').slice(0, 5);
   } catch (err) {
     console.error('[Report] Competitor position generation failed:', err);

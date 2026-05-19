@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK Consulting — Brand Design System
+// RLK Consulting. Brand Design System
 // =============================================================================
 // Extracted from official letterhead template + rlkconsultingco.com
 // =============================================================================
@@ -12,9 +12,9 @@ export const BRAND = {
   website: 'rlkconsultingco.com',
   productName: 'AI Diagnostic',
 
-  // Color palette — from letterhead gradient bar + heading styles
+  // Color palette. from letterhead gradient bar + heading styles
   colors: {
-    navy: '#0B1D3A',         // Primary — headings, header text, CTAs
+    navy: '#0B1D3A',         // Primary. headings, header text, CTAs
     navyDark: '#071428',     // Darker variant for hover states
     secondary: '#364E6E',    // H2s, secondary elements
     tertiary: '#6B7F99',     // H3s, footer text, muted content
@@ -37,7 +37,7 @@ export const BRAND = {
     gradientBar: ['#0B1D3A', '#364E6E', '#6B7F99', '#A8B5C4', '#CED5DD'],
   },
 
-  // Typography — from letterhead styles.xml
+  // Typography. from letterhead styles.xml
   fonts: {
     heading: '"Calibri", "Helvetica Neue", Arial, sans-serif',
     headingLight: '"Calibri Light", "Helvetica Neue", Arial, sans-serif',
@@ -47,9 +47,9 @@ export const BRAND = {
 
   // Font sizes (matching template hierarchy)
   sizes: {
-    h1: '2.5rem',   // 40px — Calibri Light in template
-    h2: '1.75rem',  // 28px — Bold in template
-    h3: '1.5rem',   // 24px — Bold in template
+    h1: '2.5rem',   // 40px. Calibri Light in template
+    h2: '1.75rem',  // 28px. Bold in template
+    h3: '1.5rem',   // 24px. Bold in template
     h4: '1.125rem', // 18px
     body: '1rem',    // 16px
     small: '0.875rem', // 14px

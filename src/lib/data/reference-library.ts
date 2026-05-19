@@ -1,8 +1,8 @@
 // =============================================================================
-// RLK AI Diagnostic — Industry Reference Library
+// RLK AI Diagnostic. Industry Reference Library
 // =============================================================================
 // Centralized, verified reference citations used across the report.
-// Labeled as "Industry Reference Library" — not "Sources Consulted" — to
+// Labeled as "Industry Reference Library". not "Sources Consulted". to
 // distinguish from company-specific research data.
 // =============================================================================
 

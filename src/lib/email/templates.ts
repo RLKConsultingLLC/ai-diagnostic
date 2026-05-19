@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Email Templates
+// RLK AI Diagnostic. Email Templates
 // =============================================================================
 // Branded email builder for delivering AI diagnostic reports to executives.
 // Uses inline CSS and table-based layout for maximum email client compatibility.

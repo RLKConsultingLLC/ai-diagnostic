@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       console.log(`[stripe:webhook] Unhandled event type: ${event.type}`);
   }
 
-  // Acknowledge receipt — Stripe retries on non-2xx responses.
+  // Acknowledge receipt. Stripe retries on non-2xx responses.
   return NextResponse.json({ received: true });
 }
 

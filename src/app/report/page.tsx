@@ -20,7 +20,7 @@ import {
 } from "@/lib/diagnostic/economic";
 import { buildCalibrationOverlay, type CalibrationOverlay, type DimensionCalibration } from "@/lib/research/calibration";
 import type { CompanyResearchProfile } from "@/types/research";
-// SensitivitySection removed — not shown to clients
+// SensitivitySection removed. not shown to clients
 
 // ---------------------------------------------------------------------------
 // Wrapper -- useSearchParams requires Suspense in Next.js app router
@@ -110,7 +110,7 @@ function ReportPage() {
             }
           }
         } catch {
-          // Verification failed — webhook will handle it eventually
+          // Verification failed. webhook will handle it eventually
         }
       }
 
@@ -128,7 +128,7 @@ function ReportPage() {
           if (data.report?.companyProfile) {
             setResult((prev) => prev ? { ...prev, companyProfile: data.report.companyProfile } : prev);
           }
-          // Never downgrade from "full" — preserve paid/demo access
+          // Never downgrade from "full". preserve paid/demo access
           setPhase((p) => (p === "full" || isDemo || data.paid) ? "full" : "preview");
         } else {
           // Report generation failed but we still have diagnostic data
@@ -172,16 +172,16 @@ function ReportPage() {
     return buildCalibrationOverlay(researchProfile, selfScoresByDimension as Record<import("@/types/diagnostic").Dimension, number>);
   }, [result, researchProfile]);
 
-  // Corrected capture percent — single source of truth for display
+  // Corrected capture percent. single source of truth for display
   // Old sessions lack captureRateBase; derive from current engine so math is consistent
   const correctedCapturePercent = useMemo(() => {
     if (!result) return 0;
     const est = result.economicEstimate;
     if (est.captureRateBase) {
-      // New session — stored values are authoritative
+      // New session. stored values are authoritative
       return est.currentCapturePercent;
     }
-    // Old session — recompute from current engine
+    // Old session. recompute from current engine
     const group = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP] ?? "";
     const base = CAPTURE_RATES_BY_GROUP[group]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
     const { modifier } = computeDiagnosticModifier(result.dimensionScores);
@@ -230,7 +230,7 @@ function ReportPage() {
         setPromoLoading(false);
         return;
       }
-      // Success — reload the page to show the full report
+      // Success. reload the page to show the full report
       window.location.reload();
     } catch {
       setPromoError("Unable to verify promo code. Please try again.");
@@ -302,7 +302,7 @@ function ReportPage() {
         </div>
       )}
 
-      {/* Pre-paywall content — hidden once full report is showing */}
+      {/* Pre-paywall content. hidden once full report is showing */}
       {phase !== "full" && result && (
         <>
       {/* Overall Score Hero */}
@@ -324,7 +324,7 @@ function ReportPage() {
               AI Maturity Diagnostic
             </h2>
 
-            {/* Score gauge — centered hero element */}
+            {/* Score gauge. centered hero element */}
             <div className="mb-8">
               <ScoreGauge score={result.overallScore} />
             </div>
@@ -368,7 +368,7 @@ function ReportPage() {
             {result.dimensionScores.map((ds) => {
               const desc: Record<string, string> = {
                 adoption_behavior: "Are your people actually using AI, or just talking about it?",
-                authority_structure: "Who can say yes to AI — and how fast can they do it?",
+                authority_structure: "Who can say yes to AI. and how fast can they do it?",
                 workflow_integration: "Is AI embedded in how work gets done, or sitting on the side?",
                 decision_velocity: "How quickly does your organization move from AI insight to action?",
                 economic_translation: "Can you prove AI is creating financial value?",
@@ -408,7 +408,7 @@ function ReportPage() {
         </section>
       )}
 
-      {/* Maturity Analysis — research-backed insights */}
+      {/* Maturity Analysis. research-backed insights */}
       {result && (() => {
         const sorted = [...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore);
         const analysis = getFreeMaturityAnalysis(
@@ -541,7 +541,7 @@ function ReportPage() {
                   P&L Business Case
                 </p>
                 <p className="text-white/50 text-xs leading-relaxed">
-                  How AI investment flows through your P&L — revenue impact,
+                  How AI investment flows through your P&L. revenue impact,
                   margin improvement, cost structure evolution, and the
                   compounding cost of standing still.
                 </p>
@@ -672,7 +672,7 @@ function ReportPage() {
           <section className="bg-navy text-white py-14 md:py-20 px-10 md:px-14 mb-10">
             <div className="max-w-3xl mx-auto text-center">
               <p className="text-[10px] font-semibold tracking-[0.4em] uppercase text-white/30 mb-4">
-                Confidential — Prepared for {result.companyProfile.companyName}
+                Confidential. Prepared for {result.companyProfile.companyName}
               </p>
               <div className="w-12 h-px bg-white/20 mx-auto mb-6" />
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
@@ -726,7 +726,7 @@ function ReportPage() {
 
               return (
                 <div className="mt-6 space-y-6">
-                  {/* Lead paragraph — the headline */}
+                  {/* Lead paragraph. the headline */}
                   <div className="border-l-4 border-navy pl-5">
                     <p className="text-base text-foreground/80 leading-relaxed">
                       {result.companyProfile.companyName} scores <strong className="text-secondary">{result.overallScore}/100</strong> on
@@ -734,8 +734,8 @@ function ReportPage() {
                       {result.overallScore >= 60
                         ? ` This is a competitive position, but the diagnostic reveals specific structural constraints that are preventing your AI investments from reaching their full organizational impact.`
                         : result.overallScore >= 40
-                        ? ` This places ${result.companyProfile.companyName} below the industry median for ${ind}. The gap is not in technology investment — it is in the organizational structures, governance frameworks, and measurement systems that determine whether AI investments translate into enterprise value.`
-                        : ` This represents a significant maturity gap relative to peers in ${ind}. The diagnostic reveals foundational barriers — in governance, adoption, and value measurement — that must be addressed before AI can contribute meaningfully to organizational performance.`
+                        ? ` This places ${result.companyProfile.companyName} below the industry median for ${ind}. The gap is not in technology investment. it is in the organizational structures, governance frameworks, and measurement systems that determine whether AI investments translate into enterprise value.`
+                        : ` This represents a significant maturity gap relative to peers in ${ind}. The diagnostic reveals foundational barriers. in governance, adoption, and value measurement. that must be addressed before AI can contribute meaningfully to organizational performance.`
                       }
                     </p>
                   </div>
@@ -760,7 +760,7 @@ function ReportPage() {
                         />
                         <KeyMetric
                           label="Unrealized Annual Value"
-                          value={`${fmtUSD(result.economicEstimate.unrealizedValueLow)} – ${fmtUSD(result.economicEstimate.unrealizedValueHigh)}`}
+                          value={`${fmtUSD(result.economicEstimate.unrealizedValueLow)}. ${fmtUSD(result.economicEstimate.unrealizedValueHigh)}`}
                           color="#0B1D3A"
                         />
                         <KeyMetric
@@ -796,15 +796,12 @@ function ReportPage() {
                       <SubCollapsible title="The Economic Opportunity" hint="View financial impact" icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
                         <p className="text-sm text-foreground/70 leading-relaxed">
                           The diagnostic estimates <strong className="text-secondary">{fmtUSD(result.economicEstimate.unrealizedValueLow)} to{" "}
-                          {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value —
-                          productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
+                          {fmtUSD(result.economicEstimate.unrealizedValueHigh)}</strong> in annual unrealized value. productivity improvement that {result.companyProfile.companyName} is <strong className="text-secondary">not capturing</strong> while
                           competitors in {ind} are. The estimated current capture rate is{" "}
-                          <strong className="text-secondary">{correctedCapturePercent}%</strong> —
-                          derived from a 7-input model that combines your industry group, maturity stage, and five behavioral
+                          <strong className="text-secondary">{correctedCapturePercent}%</strong>. derived from a 7-input model that combines your industry group, maturity stage, and five behavioral
                           dimension scores from the diagnostic (fully documented in Section 10 → &quot;Estimating AI Value Capture Percentages&quot;).
                           That translates to approximately <strong className="text-secondary">{fmtUSD(Math.round(unrealizedMid / 4))}{" "}
-                          forfeited per quarter</strong>. Section 5 provides the transparent methodology behind every assumption —
-                          your CFO should stress-test these before making investment decisions.
+                          forfeited per quarter</strong>. Section 5 provides the transparent methodology behind every assumption. your CFO should stress-test these before making investment decisions.
                           Section 6 translates this unrealized value into specific P&L impact: what it means for
                           revenue growth, operating margin, and cost structure over 12-24 months.
                         </p>
@@ -956,7 +953,7 @@ function ReportPage() {
                   return match ? match.body.trim() : "";
                 };
 
-                // Extract synthesis from narratives — look for "**Synthesis:**" prefix
+                // Extract synthesis from narratives. look for "**Synthesis:**" prefix
                 const extractSynthesis = (): string => {
                   for (const ns of narrativeSections) {
                     const body = ns.body || "";
@@ -995,7 +992,7 @@ function ReportPage() {
                       </div>
                     )}
 
-                    {/* Each dimension bar — one click shows ALL detail including AI narrative */}
+                    {/* Each dimension bar. one click shows ALL detail including AI narrative */}
                     <div className="space-y-2">
                       {result.dimensionScores.map((ds) => {
                         const stage = result.stageClassification.dimensionStages[ds.dimension];
@@ -1033,7 +1030,7 @@ function ReportPage() {
                       })}
                     </div>
 
-                    {/* Synthesis — cross-dimensional analysis, collapsed by default */}
+                    {/* Synthesis. cross-dimensional analysis, collapsed by default */}
                     {synthesisText && (
                       <div className="mt-4">
                         <SubCollapsible
@@ -1054,7 +1051,7 @@ function ReportPage() {
               })()
             }
           >
-            {/* No separate narrative section — everything is inside each dimension bar */}
+            {/* No separate narrative section. everything is inside each dimension bar */}
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1122,7 +1119,7 @@ function ReportPage() {
               })()
             }
           >
-            {/* No separate deep dive — narrative is merged into each constraint bar */}
+            {/* No separate deep dive. narrative is merged into each constraint bar */}
           </CollapsibleSection>
 
           {/* ================================================================= */}
@@ -1163,7 +1160,7 @@ function ReportPage() {
               </>
             }
           >
-            {/* How to read the matrix — collapsed */}
+            {/* How to read the matrix. collapsed */}
             <SubCollapsible title="How to Read This Matrix" hint="View methodology">
               <div className="bg-offwhite border border-light p-5">
                 <p className="text-sm text-foreground/70 leading-relaxed">
@@ -1180,7 +1177,7 @@ function ReportPage() {
               </div>
             </SubCollapsible>
 
-            {/* Your Quadrant Analysis — collapsed by default */}
+            {/* Your Quadrant Analysis. collapsed by default */}
             <SubCollapsible title="Your Quadrant Analysis" hint="Expand for positioning details">
               {(() => {
                 const capScore = (result.dimensionScores.find((d) => d.dimension === "adoption_behavior")?.normalizedScore || 0) * 0.5 +
@@ -1198,7 +1195,7 @@ function ReportPage() {
               })()}
             </SubCollapsible>
 
-            {/* Competitor investments — collapsed by default */}
+            {/* Competitor investments. collapsed by default */}
             <SubCollapsible title={`Where ${result.companyProfile.companyName}'s Competitors Are Investing`} hint="Expand for priority-ranked investment areas">
               <p className="text-xs text-foreground/50 mb-3">
                 At Stage {result.stageClassification.primaryStage} with an overall score of <strong className="text-secondary">{result.overallScore}/100</strong>,
@@ -1256,7 +1253,7 @@ function ReportPage() {
             title="Economic Impact Model"
             summary={`An estimated ${fmtUSD(result.economicEstimate.unrealizedValueLow)} to ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized annual AI value, with an estimated ${correctedCapturePercent}% currently captured. Transparent methodology with every assumption stated.`}
           >
-            {/* Cost of Inaction — shown directly first, the headline number */}
+            {/* Cost of Inaction. shown directly first, the headline number */}
             <div className="grid sm:grid-cols-3 gap-4 md:gap-6 mb-4">
               <div className="bg-navy/5 border border-navy/10 p-4 md:p-6">
                 <p className="text-xs font-semibold tracking-widest uppercase text-tertiary mb-2">
@@ -1312,17 +1309,17 @@ function ReportPage() {
 
             <p className="text-sm text-foreground/60 mb-4">
               {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              Every assumption is stated and every input sourced — see &quot;How We Calculate These Numbers&quot; below for the full 4-step derivation, and Section 10 (&quot;Estimating AI Value Capture Percentages&quot;) for the complete capture rate methodology, matrix, and sources.
+              Every assumption is stated and every input sourced. see &quot;How We Calculate These Numbers&quot; below for the full 4-step derivation, and Section 10 (&quot;Estimating AI Value Capture Percentages&quot;) for the complete capture rate methodology, matrix, and sources.
               Your CFO should <strong className="text-secondary">stress-test these assumptions</strong> before making investment decisions.
             </p>
 
 
-            {/* Value Waterfall — right above methodology */}
+            {/* Value Waterfall. right above methodology */}
             <SubCollapsible title="Value Waterfall">
               <EconomicWaterfall estimate={{...result.economicEstimate, currentCapturePercent: correctedCapturePercent}} profile={result.companyProfile} />
             </SubCollapsible>
 
-            {/* How we got these numbers — methodology at the bottom */}
+            {/* How we got these numbers. methodology at the bottom */}
             <SubCollapsible title="How We Calculate These Numbers">
                 <div className="space-y-3 text-sm text-foreground/70 leading-relaxed">
                   <p>
@@ -1331,21 +1328,20 @@ function ReportPage() {
                     average fully-loaded cost = {fmtUSD(Math.round(result.companyProfile.employeeCount * result.economicEstimate.costPerEmployee))}.
                     The per-employee cost is sourced from BLS Occupational Employment and Wage Statistics (2024) for{" "}
                     {industryLabel(result.companyProfile.industry)} roles, adjusted for benefits, overhead, and employer taxes.
-                    Your actual fully-loaded cost may differ — substitute your real number to refine. <em className="text-foreground/50">
+                    Your actual fully-loaded cost may differ. substitute your real number to refine. <em className="text-foreground/50">
                     (Full sourcing: Section {10} → Scoring Methodology → Data Sources.)</em>
                   </p>
                   <p>
                     <strong className="text-secondary">Step 2: AI-addressable share.</strong>{" "}
                     McKinsey&apos;s 2024 research estimates {result.economicEstimate.productivityPotentialPercent}%
                     of labor tasks in {industryLabel(result.companyProfile.industry)} are
-                    automatable or augmentable with current AI. This is not &quot;replace all workers&quot; —
-                    it means {result.economicEstimate.productivityPotentialPercent}% of time across the
+                    automatable or augmentable with current AI. This is not &quot;replace all workers&quot;. it means {result.economicEstimate.productivityPotentialPercent}% of time across the
                     workforce could be redirected to higher-value work. Accenture, Goldman Sachs, and the World Economic
-                    Forum produce corroborating estimates (18–30% range for most industries). <em className="text-foreground/50">
+                    Forum produce corroborating estimates (18-30% range for most industries). <em className="text-foreground/50">
                     (Source: McKinsey Global Institute, &quot;The Economic Potential of Generative AI,&quot; 2023.)</em>
                   </p>
                   {(() => {
-                    // All values from the economic engine — single source of truth
+                    // All values from the economic engine. single source of truth
                     // Use stored values; fall back to recomputation for old sessions
                     const fallbackGroup = INDUSTRY_CAPTURE_GROUP[result.companyProfile.industry as keyof typeof INDUSTRY_CAPTURE_GROUP] ?? "";
                     const fallbackBase = CAPTURE_RATES_BY_GROUP[fallbackGroup]?.[result.stageClassification.primaryStage as 1|2|3|4|5] ?? 0;
@@ -1375,15 +1371,15 @@ function ReportPage() {
                         </p>
                         <div className="pl-3 border-l-2 border-navy/20 space-y-2 text-[13px]">
                           <p>
-                            <strong className="text-secondary">Input 1 — Industry group baseline:</strong>{" "}
+                            <strong className="text-secondary">Input 1. Industry group baseline:</strong>{" "}
                             Your industry group ({groupLabel[group] || group}) at Stage {result.stageClassification.primaryStage} ({result.stageClassification.stageName})
                             starts at a base rate of {Math.round(bRate * 100)}%.
                             This comes from an 8×5 matrix (8 industry groups × 5 maturity stages = 40 cells)
                             calibrated against McKinsey 2024 Global AI Survey cross-tabs, BCG AI Advantage Report peer analytics,
-                            and Gartner industry maturity curves. This is <em>not</em> the capture rate used — it is the starting point before behavioral adjustment.
+                            and Gartner industry maturity curves. This is <em>not</em> the capture rate used. it is the starting point before behavioral adjustment.
                           </p>
                           <p>
-                            <strong className="text-secondary">Inputs 2–6 — Behavioral modifier ({modValue.toFixed(3)}×):</strong>{" "}
+                            <strong className="text-secondary">Inputs 2-6. Behavioral modifier ({modValue.toFixed(3)}×):</strong>{" "}
                             The base rate is then adjusted by a weighted modifier derived from your 5 behavioral dimension scores:
                             {mod.components.map((c) => {
                               const w = DIAGNOSTIC_MODIFIER_WEIGHTS[c.dimension];
@@ -1395,7 +1391,7 @@ function ReportPage() {
                           <p>
                             <strong className="text-secondary">Result:</strong>{" "}
                             {Math.round(bRate * 100)}% × {modValue.toFixed(3)} ={" "}
-                            <strong className="text-navy">{finalCapturePercent}%</strong> — this is the capture rate used in every calculation throughout this report.
+                            <strong className="text-navy">{finalCapturePercent}%</strong>. this is the capture rate used in every calculation throughout this report.
                           </p>
                         </div>
                         <p className="text-[11px] text-foreground/50 mt-1">
@@ -1460,13 +1456,13 @@ function ReportPage() {
                     for {industryLabel(result.companyProfile.industry)}.
                   </p>
 
-                  {/* Stage narrative callout — collapsed by default */}
+                  {/* Stage narrative callout. collapsed by default */}
                   <SubCollapsible title={pnl.headline}>
                     <p className="text-sm text-foreground/80 leading-relaxed mb-6">
                       {pnl.stageNarrative}
                     </p>
 
-                    {/* Two-column: Invest vs. Stand Still — side by side */}
+                    {/* Two-column: Invest vs. Stand Still. side by side */}
                     <div className="grid md:grid-cols-2 gap-4">
                       {/* INVEST column */}
                       <div className="bg-green-50/60 border border-green-200/50 p-4">
@@ -1502,7 +1498,7 @@ function ReportPage() {
                   </SubCollapsible>
 
 
-                  {/* Industry Proof Points — collapsed by default */}
+                  {/* Industry Proof Points. collapsed by default */}
                   <SubCollapsible title={`Industry Data: What the Numbers Show in ${industryLabel(result.companyProfile.industry)}`}>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {pnl.proofPoints.map((pp, i) => (
@@ -1541,7 +1537,7 @@ function ReportPage() {
                 </p>
 
 
-                {/* Risk breakdown — color-coded grid shown in preview */}
+                {/* Risk breakdown. color-coded grid shown in preview */}
                 <div className="mt-2">
                   <div className="flex items-center gap-5 mb-4">
                     <p className="text-[10px] font-semibold text-tertiary tracking-wider uppercase">Severity:</p>
@@ -1749,7 +1745,7 @@ function ReportPage() {
                   const levers = [
                     { lever: "Declining Unit Economics", group: "Pricing", likelihood: "high" as const, tcvImpact: "high" as const, description: `AI inference costs drop 30-50% annually. Build automatic 15-20% annual step-downs. At ${fmtUSD(result.companyProfile.revenue)} revenue, overpaying by 20% compounds to ${fmtUSD(Math.round(result.companyProfile.revenue * 0.002))} in unnecessary annual spend.` },
                     { lever: "Usage-Based Pricing with Caps", group: "Pricing", likelihood: "high" as const, tcvImpact: "medium" as const, description: `Negotiate consumption-based pricing with hard budget caps. ${result.stageClassification.primaryStage <= 2 ? `Organizations at this stage typically overpay by 40-60% in year one.` : `Push for 25-40% volume discounts at your scale.`}` },
-                    { lever: "Data Portability Guarantees", group: "Risk", likelihood: "low" as const, tcvImpact: "low" as const, description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement — leverage compliance mandates to negotiate.` : `Training data and fine-tuned models are proprietary IP. Most vendors resist this hard — expect pushback.`}` },
+                    { lever: "Data Portability Guarantees", group: "Risk", likelihood: "low" as const, tcvImpact: "low" as const, description: `Full data export in standard formats with 30-day extraction windows. ${result.companyProfile.regulatoryIntensity === 'high' ? `In ${industryLabel(result.companyProfile.industry)}, this is a regulatory requirement. leverage compliance mandates to negotiate.` : `Training data and fine-tuned models are proprietary IP. Most vendors resist this hard. expect pushback.`}` },
                     { lever: "Model-Agnostic Architecture", group: "Risk", likelihood: "medium" as const, tcvImpact: "medium" as const, description: `Allow model swaps without renegotiation. The LLM landscape shifts quarterly. Require API-compatible alternatives.` },
                     { lever: "Performance SLAs with Teeth", group: "Protection", likelihood: "high" as const, tcvImpact: "high" as const, description: `Tie payments to measurable outcomes: latency, accuracy, uptime. Include penalty clauses for model degradation.` },
                     { lever: "Termination Without Penalty", group: "Protection", likelihood: "medium" as const, tcvImpact: "medium" as const, description: `90-day termination clauses with data return guarantees. ${result.stageClassification.primaryStage <= 2 ? `3-year lock-ins made today will be regretted in 18 months.` : `The vendor landscape is volatile enough that long-term lock-ins carry material risk.`}` },
@@ -1807,7 +1803,7 @@ function ReportPage() {
                   below are designed to close that gap for {result.companyProfile.companyName}.
                 </p>
 
-                {/* Board-ready headline findings — sorted by severity, with color legend */}
+                {/* Board-ready headline findings. sorted by severity, with color legend */}
                 <SubCollapsible title={`Board-Ready Headline Findings (${getBoardFindings(result.overallScore, result.stageClassification, result.dimensionScores, {...result.economicEstimate, currentCapturePercent: correctedCapturePercent}, result.companyProfile).length} items)`}>
                 {(() => {
                   const severityOrder: Record<string, number> = { critical: 0, high: 1, info: 2 };
@@ -1829,7 +1825,7 @@ function ReportPage() {
                             <div key={l.label} className="flex items-center gap-2">
                               <span className="w-3 h-3 flex-shrink-0" style={{ backgroundColor: l.color }} />
                               <span className="text-[11px] text-secondary font-medium">{l.label}</span>
-                              <span className="text-[11px] text-foreground/50">— {l.detail}</span>
+                              <span className="text-[11px] text-foreground/50">,  {l.detail}</span>
                             </div>
                           ))}
                         </div>
@@ -1856,7 +1852,7 @@ function ReportPage() {
                 })()}
             </SubCollapsible>
 
-            {/* Peer board intelligence — industry-specific context */}
+            {/* Peer board intelligence. industry-specific context */}
             <SubCollapsible title={`What Peer Boards in ${industryLabel(result.companyProfile.industry).replace(/\b\w/g, (c: string) => c.toUpperCase())} Are Doing`}>
               <div className="space-y-3">
                 {getPeerBoardActions(result.companyProfile.industry, result.companyProfile.companyName).map((peer, idx) => (
@@ -1873,7 +1869,7 @@ function ReportPage() {
               </div>
             </SubCollapsible>
 
-            {/* How boards can support — action tiles in a row */}
+            {/* How boards can support. action tiles in a row */}
             <SubCollapsible title={`Stage ${result.stageClassification.primaryStage} Board Actions`}>
               <div className="grid sm:grid-cols-2 gap-3 items-start">
                 {getBoardActions(result.stageClassification.primaryStage, result.companyProfile.industry).map((action, idx) => (
@@ -1889,7 +1885,7 @@ function ReportPage() {
               </div>
             </SubCollapsible>
 
-            {/* Items for board consideration — grouped by Decision / Investment / Governance */}
+            {/* Items for board consideration. grouped by Decision / Investment / Governance */}
             <SubCollapsible title="Board Agenda: Decisions, Investments & Governance">
               <p className="text-sm text-foreground/70 leading-relaxed mb-4">
                 Based on this diagnostic, the following items may warrant <strong className="text-secondary">board-level discussion</strong>.
@@ -1966,7 +1962,7 @@ function ReportPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <a
-                  href={`mailto:ryan.king@rlkconsultingco.com?subject=${encodeURIComponent(`AI Diagnostic Strategy Session — ${result.companyProfile.companyName}`)}&body=${encodeURIComponent(`Ryan,\n\nI recently completed the RLK AI Diagnostic for ${result.companyProfile.companyName}. Our composite score came in at ${result.overallScore}/100 (${result.stageClassification.primaryStage}), with the diagnostic identifying ${fmtUSD(result.economicEstimate.unrealizedValueLow)}–${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized AI value.\n\nI'd welcome a 30-minute strategy session to:\n\n  • Walk through the findings and pressure-test key assumptions\n  • Discuss where our organization sits relative to industry benchmarks\n  • Outline a prioritized 90-day action plan\n\nPlease let me know your availability over the next week or two.\n\nBest regards,\n[Your Name]\n[Title]\n${result.companyProfile.companyName}`)}`}
+                  href={`mailto:ryan.king@rlkconsultingco.com?subject=${encodeURIComponent(`AI Diagnostic Strategy Session. ${result.companyProfile.companyName}`)}&body=${encodeURIComponent(`Ryan,\n\nI recently completed the RLK AI Diagnostic for ${result.companyProfile.companyName}. Our composite score came in at ${result.overallScore}/100 (${result.stageClassification.primaryStage}), with the diagnostic identifying ${fmtUSD(result.economicEstimate.unrealizedValueLow)}, ${fmtUSD(result.economicEstimate.unrealizedValueHigh)} in unrealized AI value.\n\nI'd welcome a 30-minute strategy session to:\n\n  • Walk through the findings and pressure-test key assumptions\n  • Discuss where our organization sits relative to industry benchmarks\n  • Outline a prioritized 90-day action plan\n\nPlease let me know your availability over the next week or two.\n\nBest regards,\n[Your Name]\n[Title]\n${result.companyProfile.companyName}`)}`}
                   className="inline-block bg-white text-navy font-semibold text-sm px-8 py-3 hover:bg-white/90 transition-colors tracking-wide"
                 >
                   Schedule a Follow-Up Meeting
@@ -2096,7 +2092,7 @@ function ReportPage() {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-offwhite">
-      {/* Print stylesheet — expands all collapsed sections, hides UI chrome */}
+      {/* Print stylesheet. expands all collapsed sections, hides UI chrome */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           .no-print { display: none !important; }
@@ -2162,7 +2158,7 @@ function SaveInteractiveReportButton({ companyName }: { companyName: string }) {
             inlinedCSS += rule.cssText + '\n';
           }
         } catch {
-          // Cross-origin stylesheet — skip silently. Recipient still gets most styles.
+          // Cross-origin stylesheet. skip silently. Recipient still gets most styles.
         }
       }
 
@@ -2181,13 +2177,13 @@ function SaveInteractiveReportButton({ companyName }: { companyName: string }) {
       // 3. Clone the live DOM. Strip the export button itself.
       const clone = document.documentElement.cloneNode(true) as HTMLElement;
       clone.querySelectorAll('.no-print').forEach((el) => el.remove());
-      // Remove all <link rel="stylesheet"> and <style> — we'll inject our inlined CSS
+      // Remove all <link rel="stylesheet"> and <style>. we'll inject our inlined CSS
       clone.querySelectorAll('link[rel="stylesheet"], style').forEach((el) => el.remove());
-      // Remove scripts — the exported file is static, no JS needed for interactivity
+      // Remove scripts. the exported file is static, no JS needed for interactivity
       clone.querySelectorAll('script').forEach((el) => el.remove());
 
       // 4. Inject a header banner identifying this as a downloaded report
-      const headerBanner = `<div style="background:#0B1D3A;color:white;padding:8px 16px;font-family:system-ui,sans-serif;font-size:12px;text-align:center;letter-spacing:0.05em">⚡ RLK AI Diagnostic — Interactive Report for ${companyName} — generated ${new Date().toLocaleDateString()}</div>`;
+      const headerBanner = `<div style="background:#0B1D3A;color:white;padding:8px 16px;font-family:system-ui,sans-serif;font-size:12px;text-align:center;letter-spacing:0.05em">⚡ RLK AI Diagnostic. Interactive Report for ${companyName}. generated ${new Date().toLocaleDateString()}</div>`;
 
       // 5. Inject the inlined styles into <head>
       const head = clone.querySelector('head');
@@ -2204,10 +2200,10 @@ function SaveInteractiveReportButton({ companyName }: { companyName: string }) {
         }
         if (!head.querySelector('title')) {
           const title = document.createElement('title');
-          title.textContent = `RLK AI Diagnostic — ${companyName}`;
+          title.textContent = `RLK AI Diagnostic. ${companyName}`;
           head.appendChild(title);
         } else {
-          head.querySelector('title')!.textContent = `RLK AI Diagnostic — ${companyName}`;
+          head.querySelector('title')!.textContent = `RLK AI Diagnostic. ${companyName}`;
         }
       }
 
@@ -2585,20 +2581,20 @@ function fmtNum(n: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Economic Scale Context — adapts "why these numbers" language to company size
+// Economic Scale Context. adapts "why these numbers" language to company size
 // ---------------------------------------------------------------------------
 
 function getEconomicScaleContext(employeeCount: number): string {
   if (employeeCount <= 50) {
-    return `For a team of ${employeeCount}, AI impact concentrates in high-leverage roles where each person carries outsized operational weight — making per-employee gains disproportionately valuable.`;
+    return `For a team of ${employeeCount}, AI impact concentrates in high-leverage roles where each person carries outsized operational weight. making per-employee gains disproportionately valuable.`;
   } else if (employeeCount <= 200) {
-    return `At ${employeeCount} employees, AI gains concentrate in core workflows rather than spreading thin across thousands of roles — which means projected savings are achievable faster with fewer dependencies.`;
+    return `At ${employeeCount} employees, AI gains concentrate in core workflows rather than spreading thin across thousands of roles. which means projected savings are achievable faster with fewer dependencies.`;
   } else if (employeeCount <= 1000) {
-    return `At ${employeeCount.toLocaleString()} employees, AI gains compound across multiple departments — large enough for meaningful automation savings, but manageable enough to implement without enterprise-scale change management.`;
+    return `At ${employeeCount.toLocaleString()} employees, AI gains compound across multiple departments. large enough for meaningful automation savings, but manageable enough to implement without enterprise-scale change management.`;
   } else if (employeeCount <= 5000) {
-    return `These numbers reflect AI impact compounding across ${employeeCount.toLocaleString()} employees and thousands of workflows — even marginal per-employee improvements translate to significant absolute dollar impact at this scale.`;
+    return `These numbers reflect AI impact compounding across ${employeeCount.toLocaleString()} employees and thousands of workflows. even marginal per-employee improvements translate to significant absolute dollar impact at this scale.`;
   } else {
-    return `These numbers are large because your organization is large — AI impact scales with ${employeeCount.toLocaleString()} employees, their fully-loaded labor cost, and the process complexity that comes with operating at this scale.`;
+    return `These numbers are large because your organization is large. AI impact scales with ${employeeCount.toLocaleString()} employees, their fully-loaded labor cost, and the process complexity that comes with operating at this scale.`;
   }
 }
 
@@ -2626,7 +2622,7 @@ function SectionHeader({ number, title }: { number: number; title: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Floating Table of Contents — sticky nav stripe at top of paid report
+// Floating Table of Contents. sticky nav stripe at top of paid report
 // ---------------------------------------------------------------------------
 
 const TOC_SECTIONS = [
@@ -2711,7 +2707,7 @@ function FloatingTOC() {
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center overflow-x-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch", msOverflowStyle: "none" }}>
-          {/* Report title — visible when sticky */}
+          {/* Report title. visible when sticky */}
           <div className={`flex-shrink-0 pl-4 pr-3 py-2.5 border-r border-white/10 transition-opacity duration-200 ${
             isSticky ? "opacity-100" : "opacity-0 w-0 pl-0 pr-0 border-0 overflow-hidden"
           }`}>
@@ -2720,7 +2716,7 @@ function FloatingTOC() {
             </span>
           </div>
 
-          {/* Section links — min-w-max ensures they scroll instead of shrink */}
+          {/* Section links. min-w-max ensures they scroll instead of shrink */}
           <div className="flex items-center gap-0.5 px-2 py-1.5 min-w-max">
             {TOC_SECTIONS.map(({ id, number, label }) => {
               const isActive = activeId === id;
@@ -2756,7 +2752,7 @@ function FloatingTOC() {
   );
 }
 
-/** Collapsible section wrapper — click header to expand, shows ALL content at once. */
+/** Collapsible section wrapper. click header to expand, shows ALL content at once. */
 function CollapsibleSection({
   number, title, summary, children, preview, sectionId, insight, badges, scorecard,
 }: {
@@ -2804,7 +2800,7 @@ function CollapsibleSection({
           {insight && <InsightCard text={insight} />}
           {/* Preview content */}
           {preview && <div className="mt-4">{preview}</div>}
-          {/* Children content — shown directly, no second expand */}
+          {/* Children content. shown directly, no second expand */}
           {children && <div className="mt-4">{children}</div>}
         </div>
       </details>
@@ -2813,7 +2809,7 @@ function CollapsibleSection({
 }
 
 // ---------------------------------------------------------------------------
-// DimensionExpander — progress bar IS the clickable expand/collapse
+// DimensionExpander. progress bar IS the clickable expand/collapse
 // ---------------------------------------------------------------------------
 
 function DimensionExpander({
@@ -2911,7 +2907,7 @@ function DimensionExpander({
 }
 
 // ---------------------------------------------------------------------------
-// ConstraintExpander — composite index bar IS the clickable expand/collapse
+// ConstraintExpander. composite index bar IS the clickable expand/collapse
 // ---------------------------------------------------------------------------
 
 function ConstraintExpander({
@@ -2958,7 +2954,7 @@ function ConstraintExpander({
             {description}
           </p>
 
-          {/* Strongest Signals + Critical Gaps — collapsed by default, side by side */}
+          {/* Strongest Signals + Critical Gaps. collapsed by default, side by side */}
           <div className="grid md:grid-cols-2 gap-3 ml-4 mb-3 items-start">
             <SubCollapsible
               title="Strongest Signals"
@@ -2997,7 +2993,7 @@ function ConstraintExpander({
 
           </div>
 
-          {/* AI narrative for this constraint — collapsed under Deeper Insights */}
+          {/* AI narrative for this constraint. collapsed under Deeper Insights */}
           {narrative && (
             <div className="ml-4 mt-1">
               <SubCollapsible title="Deeper Insights" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.456 4.186a3.001 3.001 0 00-4.412 0M12 18.75v-2.25m0 0a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /></svg>}>
@@ -3011,7 +3007,7 @@ function ConstraintExpander({
 }
 
 // ---------------------------------------------------------------------------
-// SubCollapsible — nested expand/collapse within sections
+// SubCollapsible. nested expand/collapse within sections
 // ---------------------------------------------------------------------------
 
 function SubCollapsible({
@@ -3147,7 +3143,7 @@ function KeyMetric({
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// PullQuote — extracts largest stat from content and renders as a callout
+// PullQuote. extracts largest stat from content and renders as a callout
 // ---------------------------------------------------------------------------
 
 function PullQuote({ content }: { content: string }) {
@@ -3193,7 +3189,7 @@ function PullQuote({ content }: { content: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// StatBadges — oversized stat extraction displayed as badges
+// StatBadges. oversized stat extraction displayed as badges
 // ---------------------------------------------------------------------------
 
 function StatBadges({ stats }: { stats: { value: string; label: string }[] }) {
@@ -3211,7 +3207,7 @@ function StatBadges({ stats }: { stats: { value: string; label: string }[] }) {
 }
 
 // ---------------------------------------------------------------------------
-// TrafficLight — horizontal row of colored score dots
+// TrafficLight. horizontal row of colored score dots
 // ---------------------------------------------------------------------------
 
 function TrafficLight({ items }: { items: { label: string; score: number; color: string }[] }) {
@@ -3232,7 +3228,7 @@ function TrafficLight({ items }: { items: { label: string; score: number; color:
 }
 
 // ---------------------------------------------------------------------------
-// ActionSteps — numbered timeline treatment for recommendation lists
+// ActionSteps. numbered timeline treatment for recommendation lists
 // ---------------------------------------------------------------------------
 
 function ActionSteps({ steps }: { steps: { title: string; detail: string }[] }) {
@@ -3257,7 +3253,7 @@ function ActionSteps({ steps }: { steps: { title: string; detail: string }[] }) 
 }
 
 // ---------------------------------------------------------------------------
-// InsightCard — "So What" punchline card at top of section
+// InsightCard. "So What" punchline card at top of section
 // ---------------------------------------------------------------------------
 
 function InsightCard({ text }: { text: string }) {
@@ -3269,7 +3265,7 @@ function InsightCard({ text }: { text: string }) {
   );
 }
 
-/** Chunked markdown — splits AI narrative by headings, renders each as a SubCollapsible */
+/** Chunked markdown. splits AI narrative by headings, renders each as a SubCollapsible */
 function ChunkedMarkdown({ content }: { content: string }) {
   if (!content) return null;
 
@@ -3313,7 +3309,7 @@ function ChunkedMarkdown({ content }: { content: string }) {
         const trimmedBody = section.body.trim();
         if (!section.title && !trimmedBody) return null;
         if (!section.title) {
-          // Intro text before first heading — render directly
+          // Intro text before first heading. render directly
           return <MarkdownContent key={idx} content={trimmedBody} />;
         }
         return (
@@ -3452,7 +3448,7 @@ function MarkdownContent({ content }: { content: string }) {
       return;
     }
 
-    // Horizontal rules (---, ***, ___) — skip entirely
+    // Horizontal rules (---, ***, ___). skip entirely
     if (/^[-*_]{3,}$/.test(trimmed)) {
       flushAll();
       return;
@@ -3946,7 +3942,7 @@ function CompetitiveMatrix({
               })}
             </div>
 
-            {/* Company position dot — always placed in the interior of its quadrant */}
+            {/* Company position dot. always placed in the interior of its quadrant */}
             {(() => {
               // Nudge dot away from the center crosshairs (45-55% dead zone)
               // and away from edges, keeping it clearly inside its quadrant
@@ -4490,37 +4486,37 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
   const ind = industryLabel(industry);
   const tier = isStrength ? "strong" : "weak";
 
-  // Per-question insights keyed by index + full question ID — eliminates duplication when
+  // Per-question insights keyed by index + full question ID. eliminates duplication when
   // multiple questions from the same dimension appear in one index
   const questionInsights: Record<string, Record<string, Record<string, string>>> = {
     authority_friction: {
       'AS-01': {
         strong: `Clear approval pathways with minimal layers enable AI initiatives instead of stalling them. In ${ind}, only 28% of organizations have streamlined AI governance to fewer than 2 approval stages (Gartner 2024).`,
-        weak: `Multiple approval layers create a structural bottleneck. When AI initiatives require 4+ sign-offs, average deployment timelines in ${ind} extend by 3-6 months — enough for competitors to establish first-mover advantages.`,
+        weak: `Multiple approval layers create a structural bottleneck. When AI initiatives require 4+ sign-offs, average deployment timelines in ${ind} extend by 3-6 months. enough for competitors to establish first-mover advantages.`,
       },
       'AS-03': {
-        strong: `Budget reallocation speed is a governance enabler — your organization can shift resources toward AI priorities without quarterly budget cycles creating artificial delays.`,
+        strong: `Budget reallocation speed is a governance enabler. your organization can shift resources toward AI priorities without quarterly budget cycles creating artificial delays.`,
         weak: `Slow budget reallocation means AI investments wait for budget cycles rather than responding to opportunities. In ${ind}, this rigidity adds an average of 2-3 months before any AI initiative is funded.`,
       },
       'AS-04': {
-        strong: `Effective process conflict resolution means AI deployment disagreements are handled at the operational level, not escalated to senior leadership — reducing governance friction significantly.`,
-        weak: `When AI tools conflict with existing processes, the absence of a resolution mechanism forces every disagreement to senior leadership — creating bottlenecks that discourage teams from proposing AI improvements.`,
+        strong: `Effective process conflict resolution means AI deployment disagreements are handled at the operational level, not escalated to senior leadership. reducing governance friction significantly.`,
+        weak: `When AI tools conflict with existing processes, the absence of a resolution mechanism forces every disagreement to senior leadership. creating bottlenecks that discourage teams from proposing AI improvements.`,
       },
       'AS-05': {
         strong: `Legal and compliance function as embedded partners in AI deployment, not sequential gates. This collapses the typical 60-90 day compliance review cycle to weeks.`,
         weak: `Legal and compliance operate as serial gatekeepers rather than embedded partners. In ${ind}, this pattern typically adds 60-90 days to any AI initiative that touches customer data, regulated processes, or third-party integrations.`,
       },
       'AS-07': {
-        strong: `Decentralized authority enables individual teams to adopt AI tools within guardrails — accelerating grassroots adoption without waiting for centralized mandates.`,
+        strong: `Decentralized authority enables individual teams to adopt AI tools within guardrails. accelerating grassroots adoption without waiting for centralized mandates.`,
         weak: `Over-centralized authority means every AI adoption decision requires top-down approval, stifling the grassroots experimentation that drives 60% of successful enterprise AI use cases (BCG 2024).`,
       },
       'WI-07': {
         strong: `Strong change management discipline is embedded in AI rollouts, reducing the organizational resistance that typically generates 40-60% of governance friction in ${ind}.`,
-        weak: `Weak change management converts every AI rollout into a political exercise that escalates to leadership — transforming operational friction into structural authority bottlenecks that compound over time.`,
+        weak: `Weak change management converts every AI rollout into a political exercise that escalates to leadership. transforming operational friction into structural authority bottlenecks that compound over time.`,
       },
       'DV-03': {
-        strong: `Low re-approval burden means AI initiatives sustain momentum through the pilot-to-scale transition — the phase where 68% of AI projects stall in ${ind} (McKinsey 2024).`,
-        weak: `Redundant re-approval cycles force teams to re-justify AI initiatives at every stage gate. This "permission treadmill" is the single largest contributor to pilot graveyards — initiatives approved but never scaled.`,
+        strong: `Low re-approval burden means AI initiatives sustain momentum through the pilot-to-scale transition. the phase where 68% of AI projects stall in ${ind} (McKinsey 2024).`,
+        weak: `Redundant re-approval cycles force teams to re-justify AI initiatives at every stage gate. This "permission treadmill" is the single largest contributor to pilot graveyards. initiatives approved but never scaled.`,
       },
     },
     decision_velocity: {
@@ -4529,15 +4525,15 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
         weak: `The time from AI idea to funded pilot is a primary velocity constraint. At this pace, high-potential use cases lose momentum and team enthusiasm before they ever receive resources.`,
       },
       'DV-02': {
-        strong: `Rapid pilot-to-scale transitions mean successful AI experiments reach full production quickly — capturing value that slower organizations leave in perpetual "pilot purgatory."`,
-        weak: `Slow pilot-to-production scaling is where most AI value dies. In ${ind}, organizations at this velocity take 6-12 months to scale pilots — by which time the underlying technology and competitive landscape have already shifted.`,
+        strong: `Rapid pilot-to-scale transitions mean successful AI experiments reach full production quickly. capturing value that slower organizations leave in perpetual "pilot purgatory."`,
+        weak: `Slow pilot-to-production scaling is where most AI value dies. In ${ind}, organizations at this velocity take 6-12 months to scale pilots. by which time the underlying technology and competitive landscape have already shifted.`,
       },
       'DV-03': {
         strong: `Minimal re-approval overhead means AI initiatives maintain velocity through the entire lifecycle, not just at initial approval. This eliminates the "start-stop" pattern that kills most enterprise AI projects.`,
         weak: `Repeated re-approval requirements create a "start-stop" deployment pattern. Each pause to re-justify an AI initiative costs 3-6 weeks and risks permanent project shelving as organizational attention shifts.`,
       },
       'DV-04': {
-        strong: `Fast competitive response capability means the organization can match or counter AI moves by competitors within weeks — a velocity advantage that compounds over time.`,
+        strong: `Fast competitive response capability means the organization can match or counter AI moves by competitors within weeks. a velocity advantage that compounds over time.`,
         weak: `Slow competitive response means the organization cannot react to rivals' AI deployments before they establish structural advantages. In ${ind}, this gap typically manifests as lost client relationships and eroding margins.`,
       },
       'DV-05': {
@@ -4545,37 +4541,37 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
         weak: `Procurement cycles designed for traditional software purchases are incompatible with AI deployment speed. In ${ind}, vendor procurement alone often adds 3-6 months to AI timelines.`,
       },
       'AS-01': {
-        strong: `Lean approval structures accelerate every AI decision. Budget and authority decisions move at the pace of AI market evolution — a rare advantage in ${ind} (Deloitte 2024).`,
+        strong: `Lean approval structures accelerate every AI decision. Budget and authority decisions move at the pace of AI market evolution. a rare advantage in ${ind} (Deloitte 2024).`,
         weak: `Approval layers designed for traditional IT governance add weeks per stage. In ${ind}, each additional approval layer adds an estimated 3-4 weeks, compounding to months of lost competitive positioning.`,
       },
       'AS-03': {
-        strong: `Budget velocity matches deployment ambition — resources can be reallocated to AI initiatives without waiting for quarterly planning cycles.`,
+        strong: `Budget velocity matches deployment ambition. resources can be reallocated to AI initiatives without waiting for quarterly planning cycles.`,
         weak: `Budget rigidity forces AI initiatives to compete in annual planning cycles rather than responding to real-time opportunities. This structural delay ensures you are always investing in yesterday's AI landscape.`,
       },
     },
     economic_translation: {
       'ET-01': {
-        strong: `Financial measurement infrastructure for AI is in place — you can track, attribute, and report AI-driven value creation. Only 10% of companies have mastered this capability (BCG 2024).`,
+        strong: `Financial measurement infrastructure for AI is in place. you can track, attribute, and report AI-driven value creation. Only 10% of companies have mastered this capability (BCG 2024).`,
         weak: `No financial measurement infrastructure for AI means every dollar spent is invisible to the P&L. Without measurement, you cannot optimize, justify, or defend AI investment to leadership.`,
       },
       'ET-02': {
-        strong: `AI-freed capacity is being systematically redeployed to higher-value work — converting productivity gains into measurable financial returns rather than letting them absorb invisibly.`,
-        weak: `When AI saves time, that time disappears — absorbed into existing work rather than redeployed to measurable value creation. This is the most common "value leak" in enterprise AI: productivity gains that no one captures.`,
+        strong: `AI-freed capacity is being systematically redeployed to higher-value work. converting productivity gains into measurable financial returns rather than letting them absorb invisibly.`,
+        weak: `When AI saves time, that time disappears. absorbed into existing work rather than redeployed to measurable value creation. This is the most common "value leak" in enterprise AI: productivity gains that no one captures.`,
       },
       'ET-03': {
-        strong: `AI investment can be justified to leadership with quantified evidence — a capability that unlocks continued funding and strategic confidence.`,
+        strong: `AI investment can be justified to leadership with quantified evidence. a capability that unlocks continued funding and strategic confidence.`,
         weak: `The inability to justify AI investment to leadership creates a credibility deficit that compounds with each budget cycle. In ${ind}, CFOs report that unquantified AI spending faces 2x the scrutiny of other technology investments.`,
       },
       'ET-04': {
-        strong: `Measurable AI outcomes exist and are tracked — connecting specific AI deployments to specific financial results. This makes Section 5's economic case actionable, not theoretical.`,
-        weak: `No AI outcomes are measurably connected to financial results. Without this linkage, AI remains an act of faith rather than a managed investment — and faith-based spending rarely survives leadership transitions or downturns.`,
+        strong: `Measurable AI outcomes exist and are tracked. connecting specific AI deployments to specific financial results. This makes Section 5's economic case actionable, not theoretical.`,
+        weak: `No AI outcomes are measurably connected to financial results. Without this linkage, AI remains an act of faith rather than a managed investment. and faith-based spending rarely survives leadership transitions or downturns.`,
       },
       'ET-05': {
-        strong: `Finance actively engages with AI economics — a partnership that transforms AI from a technology cost center into a quantified strategic investment with executive-level visibility.`,
-        weak: `Finance has no perspective on AI value — it appears as an undifferentiated line item in the technology budget. Until finance is a partner in AI measurement, the economic case will remain invisible to the people who control capital allocation.`,
+        strong: `Finance actively engages with AI economics. a partnership that transforms AI from a technology cost center into a quantified strategic investment with executive-level visibility.`,
+        weak: `Finance has no perspective on AI value. it appears as an undifferentiated line item in the technology budget. Until finance is a partner in AI measurement, the economic case will remain invisible to the people who control capital allocation.`,
       },
       'ET-07': {
-        strong: `AI investment is defensible to investors and stakeholders with quantified impact data — a rare competitive advantage that de-risks continued AI investment and attracts capital.`,
+        strong: `AI investment is defensible to investors and stakeholders with quantified impact data. a rare competitive advantage that de-risks continued AI investment and attracts capital.`,
         weak: `AI spending cannot be defended to external stakeholders. For private firms, this means AI investment competes with every other capital priority without evidence of return. For public firms, it invites analyst scrutiny.`,
       },
     },
@@ -4583,7 +4579,7 @@ function getQuestionInsight(qId: string, score: number, industry: string, isStre
 
   return questionInsights[indexSlug]?.[qId]?.[tier]
     || (isStrength
-      ? `This behavioral signal indicates organizational capability above ${ind} norms — a foundation that accelerates value capture from AI investment.`
+      ? `This behavioral signal indicates organizational capability above ${ind} norms. a foundation that accelerates value capture from AI investment.`
       : `This behavioral gap constrains AI value capture in ${ind}. Addressing it unlocks disproportionate returns relative to the effort required.`);
 }
 
@@ -4600,19 +4596,19 @@ function compositeIndexDescription(slug: string, score: number, industry: string
   const ind = industryLabel(industry);
   const descriptions: Record<string, Record<string, string>> = {
     authority_friction: {
-      high: `An Authority Friction score of ${score} means your governance structures enable rather than obstruct AI deployment. Decision rights are clear, approval pathways are streamlined, and legal/compliance functions operate as embedded partners rather than sequential gates. In ${ind}, fewer than 20% of organizations have achieved this level of structural clarity — it is a genuine competitive advantage that allows you to deploy AI at a pace your governance-constrained competitors cannot match.`,
+      high: `An Authority Friction score of ${score} means your governance structures enable rather than obstruct AI deployment. Decision rights are clear, approval pathways are streamlined, and legal/compliance functions operate as embedded partners rather than sequential gates. In ${ind}, fewer than 20% of organizations have achieved this level of structural clarity. it is a genuine competitive advantage that allows you to deploy AI at a pace your governance-constrained competitors cannot match.`,
       mid: `An Authority Friction score of ${score} reveals a mixed governance picture: some structures exist, but inconsistency between policy and practice creates unpredictable timelines. In ${ind}, this typically manifests as fast approvals for low-stakes AI tools but multi-month delays for anything touching core operations, customer data, or regulatory surfaces. The risk is a two-speed organization where AI adoption accelerates in safe zones but stalls where it would create the most value.`,
-      low: `An Authority Friction score of ${score} indicates severe structural barriers. AI initiatives face systemic permission bottlenecks — unclear ownership, redundant approvals, and governance gaps that prevent meaningful progress regardless of technology investment. In ${ind}, organizations at this level average 4-7 approval layers for AI initiatives vs. 1-2 at mature organizations (McKinsey 2024). Until this friction is reduced, additional AI spending will produce diminishing returns.`,
+      low: `An Authority Friction score of ${score} indicates severe structural barriers. AI initiatives face systemic permission bottlenecks. unclear ownership, redundant approvals, and governance gaps that prevent meaningful progress regardless of technology investment. In ${ind}, organizations at this level average 4-7 approval layers for AI initiatives vs. 1-2 at mature organizations (McKinsey 2024). Until this friction is reduced, additional AI spending will produce diminishing returns.`,
     },
     decision_velocity: {
       high: `A Decision Velocity score of ${score} means your organization can move from AI opportunity identification to deployed capability in weeks, not quarters. This speed is a structural advantage: while competitors debate and approve, you are already measuring results. In ${ind}, organizations at this velocity capture 2.5x more value from AI investments because they can iterate faster, fail cheaper, and scale winners before market conditions shift.`,
-      mid: `A Decision Velocity score of ${score} indicates moderate pace — your organization can execute AI initiatives but is slower than industry leaders. In ${ind}, this typically means 3-6 month deployment cycles for initiatives that leading organizations complete in 4-8 weeks. The drag usually comes from approval layers, vendor procurement timelines, or the gap between AI strategy and operational execution. Each month of delay compounds: competitors are not waiting.`,
-      low: `A Decision Velocity score of ${score} means your organization takes 6-12+ months to move from AI use case identification to pilot deployment. This pace is structurally incompatible with the current rate of AI market evolution. In ${ind}, competitive positioning now shifts quarterly — by the time your organization deploys, the opportunity landscape has already moved. Gartner's 2024 research shows organizations in the bottom quartile of AI velocity are 4x more likely to face disruption from AI-native competitors.`,
+      mid: `A Decision Velocity score of ${score} indicates moderate pace. your organization can execute AI initiatives but is slower than industry leaders. In ${ind}, this typically means 3-6 month deployment cycles for initiatives that leading organizations complete in 4-8 weeks. The drag usually comes from approval layers, vendor procurement timelines, or the gap between AI strategy and operational execution. Each month of delay compounds: competitors are not waiting.`,
+      low: `A Decision Velocity score of ${score} means your organization takes 6-12+ months to move from AI use case identification to pilot deployment. This pace is structurally incompatible with the current rate of AI market evolution. In ${ind}, competitive positioning now shifts quarterly. by the time your organization deploys, the opportunity landscape has already moved. Gartner's 2024 research shows organizations in the bottom quartile of AI velocity are 4x more likely to face disruption from AI-native competitors.`,
     },
     economic_translation: {
-      high: `An Economic Translation score of ${score} means your organization has built what most lack: the ability to connect AI activity to P&L outcomes. Finance and operations are aligned on AI measurement, value flows into financial reporting, and leadership sees AI as a quantified investment, not an act of faith. In ${ind}, this capability positions you to allocate capital to AI with the same rigor and confidence applied to any major investment — and to defend that allocation against competing priorities.`,
-      mid: `An Economic Translation score of ${score} indicates emerging but incomplete financial measurement. Some AI investments are tracked, but significant value leaks through untracked productivity gains, unmeasured quality improvements, and unrealized capacity that no one redeployed. In ${ind}, this is the most common pattern: organizations that have invested in AI but cannot yet present a credible, quantified narrative to leadership. The CFO's question — "What are we getting for this?" — does not yet have a satisfying answer.`,
-      low: `An Economic Translation score of ${score} signals that AI spending is generating no measurable financial return. Your organization is investing without a value capture mechanism — productivity gains happen but are absorbed rather than measured, and no one can connect AI activity to margin improvement, revenue growth, or cost reduction. In ${ind}, this pattern typically leads to AI budget cuts within 12-18 months as leadership patience for unquantified technology spending expires (Deloitte 2024). Section 5 quantifies the value at risk.`,
+      high: `An Economic Translation score of ${score} means your organization has built what most lack: the ability to connect AI activity to P&L outcomes. Finance and operations are aligned on AI measurement, value flows into financial reporting, and leadership sees AI as a quantified investment, not an act of faith. In ${ind}, this capability positions you to allocate capital to AI with the same rigor and confidence applied to any major investment. and to defend that allocation against competing priorities.`,
+      mid: `An Economic Translation score of ${score} indicates emerging but incomplete financial measurement. Some AI investments are tracked, but significant value leaks through untracked productivity gains, unmeasured quality improvements, and unrealized capacity that no one redeployed. In ${ind}, this is the most common pattern: organizations that have invested in AI but cannot yet present a credible, quantified narrative to leadership. The CFO's question. "What are we getting for this?". does not yet have a satisfying answer.`,
+      low: `An Economic Translation score of ${score} signals that AI spending is generating no measurable financial return. Your organization is investing without a value capture mechanism. productivity gains happen but are absorbed rather than measured, and no one can connect AI activity to margin improvement, revenue growth, or cost reduction. In ${ind}, this pattern typically leads to AI budget cuts within 12-18 months as leadership patience for unquantified technology spending expires (Deloitte 2024). Section 5 quantifies the value at risk.`,
     },
   };
   const tier = score >= 70 ? "high" : score >= 40 ? "mid" : "low";
@@ -4622,9 +4618,9 @@ function compositeIndexDescription(slug: string, score: number, industry: string
 function compositeIndexBenchmark(slug: string, score: number, industry: string): string {
   const ind = industryLabel(industry);
   const benchmarks: Record<string, string> = {
-    authority_friction: `In ${ind}, the median Authority Friction score is approximately 38/100 (McKinsey Global AI Survey 2024). Organizations scoring above 65 are classified as "governance-ready" for enterprise-scale deployment — they have formal AI decision rights, streamlined approval pathways, and compliance embedded into the deployment process rather than imposed as an afterthought. Your score of ${score} places you ${score >= 65 ? "in the top quartile — a structural advantage that enables deployment speed your competitors cannot match" : score >= 38 ? "near the industry median. You have some governance foundations but lack the structural clarity that separates fast-deploying organizations from those stuck in approval cycles" : "below the industry median, indicating governance structures that will bottleneck every AI initiative regardless of its strategic merit"}. Gartner projects that by 2027, 75% of large enterprises will have formalized AI governance frameworks, up from 35% today — the window to build governance as a competitive advantage is narrowing.`,
-    decision_velocity: `The average time from AI use case identification to production deployment is 8.4 months across industries (Deloitte 2024). In ${ind}, this ranges from 6 to 14 months depending on regulatory intensity and organizational complexity. Top-quartile organizations deploy in under 10 weeks — a 4-5x velocity advantage that compounds with every deployment cycle. Your score of ${score} suggests your typical deployment cycle is ${score >= 70 ? "competitive with industry leaders, giving you a meaningful speed-to-value advantage that compounds over time" : score >= 40 ? "near the industry average of 6-9 months. This pace is workable today but will become a liability as AI-native competitors accelerate — closing the velocity gap should be a 90-day priority" : "significantly longer than peers, placing you at material competitive risk. While you are still in approval cycles, faster organizations are already measuring results and iterating"}. BCG's 2024 research found that AI deployment velocity — not AI spending — is the strongest predictor of enterprise AI ROI.`,
-    economic_translation: `Only 10% of companies generate significant, measurable financial returns from AI; 70% report minimal or no quantifiable impact (BCG AI Advantage Report 2024). In ${ind}, the median economic translation score is approximately 35/100 — most organizations cannot answer the CFO's question: "What are we getting for this?" Your score of ${score} positions you ${score >= 60 ? "among the rare organizations that can credibly demonstrate AI ROI to leadership, investors, and analysts — a capability that unlocks continued investment and strategic confidence" : score >= 35 ? "near the industry median. You have pockets of measurable value but lack the systematic measurement infrastructure that would make AI investment defensible at the executive level" : "below the industry median, meaning your organization is investing in AI without capturing proportionate financial evidence of return. Deloitte's 2024 State of AI report found that 58% of organizations with low translation scores eventually cut AI budgets — creating a negative spiral of underinvestment and underperformance"}.`,
+    authority_friction: `In ${ind}, the median Authority Friction score is approximately 38/100 (McKinsey Global AI Survey 2024). Organizations scoring above 65 are classified as "governance-ready" for enterprise-scale deployment. they have formal AI decision rights, streamlined approval pathways, and compliance embedded into the deployment process rather than imposed as an afterthought. Your score of ${score} places you ${score >= 65 ? "in the top quartile. a structural advantage that enables deployment speed your competitors cannot match" : score >= 38 ? "near the industry median. You have some governance foundations but lack the structural clarity that separates fast-deploying organizations from those stuck in approval cycles" : "below the industry median, indicating governance structures that will bottleneck every AI initiative regardless of its strategic merit"}. Gartner projects that by 2027, 75% of large enterprises will have formalized AI governance frameworks, up from 35% today. the window to build governance as a competitive advantage is narrowing.`,
+    decision_velocity: `The average time from AI use case identification to production deployment is 8.4 months across industries (Deloitte 2024). In ${ind}, this ranges from 6 to 14 months depending on regulatory intensity and organizational complexity. Top-quartile organizations deploy in under 10 weeks. a 4-5x velocity advantage that compounds with every deployment cycle. Your score of ${score} suggests your typical deployment cycle is ${score >= 70 ? "competitive with industry leaders, giving you a meaningful speed-to-value advantage that compounds over time" : score >= 40 ? "near the industry average of 6-9 months. This pace is workable today but will become a liability as AI-native competitors accelerate. closing the velocity gap should be a 90-day priority" : "significantly longer than peers, placing you at material competitive risk. While you are still in approval cycles, faster organizations are already measuring results and iterating"}. BCG's 2024 research found that AI deployment velocity. not AI spending. is the strongest predictor of enterprise AI ROI.`,
+    economic_translation: `Only 10% of companies generate significant, measurable financial returns from AI; 70% report minimal or no quantifiable impact (BCG AI Advantage Report 2024). In ${ind}, the median economic translation score is approximately 35/100. most organizations cannot answer the CFO's question: "What are we getting for this?" Your score of ${score} positions you ${score >= 60 ? "among the rare organizations that can credibly demonstrate AI ROI to leadership, investors, and analysts. a capability that unlocks continued investment and strategic confidence" : score >= 35 ? "near the industry median. You have pockets of measurable value but lack the systematic measurement infrastructure that would make AI investment defensible at the executive level" : "below the industry median, meaning your organization is investing in AI without capturing proportionate financial evidence of return. Deloitte's 2024 State of AI report found that 58% of organizations with low translation scores eventually cut AI budgets. creating a negative spiral of underinvestment and underperformance"}.`,
   };
   return benchmarks[slug] || `Industry benchmark data for ${ind} suggests organizations at your score level have specific improvement opportunities relative to top-quartile performers in AI maturity.`;
 }
@@ -4633,18 +4629,18 @@ function compositeIndexRisks(slug: string, score: number): string {
   const risks: Record<string, Record<string, string>> = {
     authority_friction: {
       high: "Over-governance risk: mature governance structures can calcify into bureaucracy if not actively managed. Monitor for approval processes that outlive their purpose, governance committees that slow rather than enable, and compliance requirements that expand beyond regulatory necessity. The goal is governance that scales with AI ambition, not governance that constrains it.",
-      mid: "Shadow AI proliferation is your primary exposure. Inconsistent governance across business units means employees in under-governed areas are using AI tools without oversight — creating data leakage, compliance gaps, and model risk that accumulate invisibly. Gartner estimates 75% of enterprise AI usage in mid-governance organizations is untracked. Additionally, governance inconsistency erodes trust: business units that face heavy approval burdens see AI-mature peers moving faster and begin circumventing controls.",
+      mid: "Shadow AI proliferation is your primary exposure. Inconsistent governance across business units means employees in under-governed areas are using AI tools without oversight. creating data leakage, compliance gaps, and model risk that accumulate invisibly. Gartner estimates 75% of enterprise AI usage in mid-governance organizations is untracked. Additionally, governance inconsistency erodes trust: business units that face heavy approval burdens see AI-mature peers moving faster and begin circumventing controls.",
       low: "Critical structural exposure on multiple fronts: ungoverned AI usage creates immediate compliance and data security risk; the absence of clear decision authority means no one can approve, fund, or kill AI initiatives with conviction; and the resulting organizational ambiguity guarantees that AI investment will be diffuse, uncoordinated, and ultimately indefensible to leadership. This score means the governance problem must be solved before any AI scaling investment can yield returns.",
     },
     decision_velocity: {
-      high: "Speed-quality tradeoff requires active management. Rapid deployment can introduce technical debt, skip adequate model validation, or outpace the organization's ability to absorb change. The risk is not moving too fast — it is moving fast without the monitoring and feedback loops to catch problems early. Ensure velocity is paired with automated testing, staged rollouts, and clear rollback protocols.",
-      mid: "Competitive window risk is material. AI capabilities shift quarterly, and moderate velocity means your deployed solutions may already be outdated by the time they reach production. More critically, each slow cycle demoralizes the teams closest to AI work — McKinsey reports that AI talent retention drops 35% in organizations where deployment cycles exceed 6 months. The compounding effect: you lose both competitive positioning and the people best equipped to close the gap.",
-      low: "Disruption vulnerability is acute. At this velocity, the organization cannot respond to AI-driven market shifts before competitors establish structural advantages. The pattern is predictable: slow organizations lose first on cost structure (competitors automate faster), then on talent (AI engineers leave for faster environments), then on customer experience (AI-enabled competitors set new service expectations). Each quarter of delay compounds the recovery cost — Accenture estimates that late movers spend 2-3x more to achieve the same AI capability as early adopters.",
+      high: "Speed-quality tradeoff requires active management. Rapid deployment can introduce technical debt, skip adequate model validation, or outpace the organization's ability to absorb change. The risk is not moving too fast. it is moving fast without the monitoring and feedback loops to catch problems early. Ensure velocity is paired with automated testing, staged rollouts, and clear rollback protocols.",
+      mid: "Competitive window risk is material. AI capabilities shift quarterly, and moderate velocity means your deployed solutions may already be outdated by the time they reach production. More critically, each slow cycle demoralizes the teams closest to AI work. McKinsey reports that AI talent retention drops 35% in organizations where deployment cycles exceed 6 months. The compounding effect: you lose both competitive positioning and the people best equipped to close the gap.",
+      low: "Disruption vulnerability is acute. At this velocity, the organization cannot respond to AI-driven market shifts before competitors establish structural advantages. The pattern is predictable: slow organizations lose first on cost structure (competitors automate faster), then on talent (AI engineers leave for faster environments), then on customer experience (AI-enabled competitors set new service expectations). Each quarter of delay compounds the recovery cost. Accenture estimates that late movers spend 2-3x more to achieve the same AI capability as early adopters.",
     },
     economic_translation: {
       high: "Optimization plateau risk: as the easy-to-measure value is captured, incremental gains become harder to quantify. The risk is over-indexing on measurable outcomes at the expense of transformative but harder-to-quantify initiatives (culture change, capability building, strategic positioning). Ensure your measurement framework can accommodate longer-horizon value creation, not just quarterly efficiency gains.",
-      mid: "AI investment is entering the credibility danger zone. Without systematic value measurement, CFO and leadership confidence erodes predictably: initial enthusiasm lasts 2-3 quarters, then scrutiny intensifies. If you cannot present a defensible financial narrative within the next 12 months, expect AI budgets to face the same fate as most enterprise technology spending — cut during the next downturn and reallocated to initiatives with clearer ROI.",
-      low: "AI funding is at existential risk. Without any measurable financial return, the organization's AI investment is defensible only on faith — and leadership patience for faith-based technology spending typically expires within 12-18 months. Beyond the budget risk, inability to measure value means inability to optimize: you cannot direct investment toward high-performing AI use cases or away from underperforming ones. Every dollar of AI spend is equally unaccountable, which guarantees waste.",
+      mid: "AI investment is entering the credibility danger zone. Without systematic value measurement, CFO and leadership confidence erodes predictably: initial enthusiasm lasts 2-3 quarters, then scrutiny intensifies. If you cannot present a defensible financial narrative within the next 12 months, expect AI budgets to face the same fate as most enterprise technology spending. cut during the next downturn and reallocated to initiatives with clearer ROI.",
+      low: "AI funding is at existential risk. Without any measurable financial return, the organization's AI investment is defensible only on faith. and leadership patience for faith-based technology spending typically expires within 12-18 months. Beyond the budget risk, inability to measure value means inability to optimize: you cannot direct investment toward high-performing AI use cases or away from underperforming ones. Every dollar of AI spend is equally unaccountable, which guarantees waste.",
     },
   };
   const tier = score >= 70 ? "high" : score >= 40 ? "mid" : "low";
@@ -4842,7 +4838,7 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
     fintech_payments: [
       { area: "Real-Time AI Fraud Detection & Transaction Risk Scoring", detail: "Stripe Radar processes 100B+ transactions/year using ML, blocking $5B+ in fraud annually with sub-100ms decisioning. Visa Advanced Authorization uses AI to score 100% of transactions, blocking $40B+ in attempted fraud per year. Mastercard's Decision Intelligence is now in second-generation AI, prevented an estimated $20B in fraud across 159B annual transactions in 2024.", source: "Source: Stripe Radar Public Disclosures 2024; Visa Q4 2024 Earnings; Mastercard 2024 Annual Report" },
       { area: "AI-Driven Credit Underwriting & BNPL Risk Models", detail: "Affirm's underwriting AI evaluates 1M+ data points per applicant, approving 30% more borrowers than legacy FICO-only models with materially lower defaults. Klarna's AI-driven credit decisioning powers 150M+ active consumers globally. Upstart's AI lending models have originated $36B+ in loans with delinquency 75% lower than peer credit-score-based decisions.", source: "Source: Affirm 2024 Annual Report; Klarna 2024 Investor Day; Upstart Q3 2024 Earnings" },
-      { area: "Generative AI for Customer Service & Dispute Resolution", detail: "Klarna's AI assistant handles 2.3M conversations/month — equivalent to 700 full-time agents — with customer satisfaction matching human agents and resolution time cut from 11 to under 2 minutes. PayPal deploys generative AI across 30K+ employees. Stripe Sigma+ uses LLMs to automate merchant inquiries and chargeback evidence packets.", source: "Source: Klarna 2024 AI Update; PayPal Investor Day 2024; Stripe Sessions 2024" },
+      { area: "Generative AI for Customer Service & Dispute Resolution", detail: "Klarna's AI assistant handles 2.3M conversations/month. equivalent to 700 full-time agents. with customer satisfaction matching human agents and resolution time cut from 11 to under 2 minutes. PayPal deploys generative AI across 30K+ employees. Stripe Sigma+ uses LLMs to automate merchant inquiries and chargeback evidence packets.", source: "Source: Klarna 2024 AI Update; PayPal Investor Day 2024; Stripe Sessions 2024" },
       { area: "AI for KYC, AML & Sanctions Screening", detail: "ComplyAdvantage and Sardine AI process 100B+ entity-resolution decisions annually for fintech KYC/AML. Plaid's AI risk platform serves 8K+ fintech apps with real-time identity verification. JPMorgan reports 95% reduction in false-positive sanctions alerts via AI screening.", source: "Source: ComplyAdvantage State of Financial Crime 2024; Plaid 2024 Fintech Effect Report; JPMorgan Operations Update 2024" },
       { area: "AI-Powered Merchant Onboarding & Risk Underwriting", detail: "Stripe's Atlas AI accelerates merchant onboarding from days to minutes. Adyen's RevenueAccelerate platform uses ML to optimize authorization rates per merchant. Square (Block) deploys AI across 4M+ sellers for risk assessment and instant funding.", source: "Source: Stripe Atlas Public Brief 2024; Adyen 2024 Annual Report; Block 2024 Investor Day" },
       { area: "Embedded AI for Personalized Financial Products", detail: "Cash App (Block) uses AI to personalize 50M+ users' product offers, driving 30%+ engagement lift. Revolut's AI delivers contextual financial recommendations across 45M users. Robinhood deploys AI to surface personalized investment opportunities and risk warnings.", source: "Source: Block Q4 2024 Earnings; Revolut 2024 Annual Report; Robinhood Investor Day 2024" },
@@ -4859,8 +4855,8 @@ function getCompetitorInvestmentAreas(industry: string): { area: string; detail:
   const defaults = [
     { area: "Customer-Facing AI (Chatbots, Virtual Assistants)", detail: "Organizations across industries are deploying conversational AI for customer service. Bank of America's Erica handles 1.5B+ interactions/year. Comcast's AI assistant resolves 30% of support calls without agents. If your call center is still fully human-staffed, you are over-spending and under-serving.", source: "Source: Gartner Customer Service AI Survey 2024; Bank of America Q3 2024 Report" },
     { area: "Process Automation & Intelligent Document Processing", detail: "JPMorgan's COiN platform processes 12,000 commercial credit agreements in seconds (previously 360,000 hours of lawyer work). UiPath and Automation Anywhere report 40-60% efficiency gains in document workflows. Your competitors are processing in minutes what takes your teams days.", source: "Source: McKinsey Operations Practice 2024; JPMorgan Technology Report 2024" },
-    { area: "Predictive Analytics for Demand & Operations", detail: "Walmart's AI demand forecasting improved accuracy 20% and reduced waste by $1B+. Starbucks uses ML to personalize 400M customer offers/week. The organizations winning are not just collecting data — they are acting on it in real time.", source: "Source: BCG Operations Report 2024; Walmart 2024 Investor Day; Starbucks Deep Brew Platform Update" },
-    { area: "Generative AI for Content & Code", detail: "GitHub Copilot now has 1.3M paid subscribers, with adopters reporting 55% faster task completion. Salesforce Einstein GPT generates 1T+ predictions/week. Your developers and knowledge workers are likely already using these tools — the question is whether you know about it and are governing it.", source: "Source: GitHub 2024 Octoverse Report; Salesforce Q3 2024 Earnings; Deloitte Tech Trends 2024" },
+    { area: "Predictive Analytics for Demand & Operations", detail: "Walmart's AI demand forecasting improved accuracy 20% and reduced waste by $1B+. Starbucks uses ML to personalize 400M customer offers/week. The organizations winning are not just collecting data. they are acting on it in real time.", source: "Source: BCG Operations Report 2024; Walmart 2024 Investor Day; Starbucks Deep Brew Platform Update" },
+    { area: "Generative AI for Content & Code", detail: "GitHub Copilot now has 1.3M paid subscribers, with adopters reporting 55% faster task completion. Salesforce Einstein GPT generates 1T+ predictions/week. Your developers and knowledge workers are likely already using these tools. the question is whether you know about it and are governing it.", source: "Source: GitHub 2024 Octoverse Report; Salesforce Q3 2024 Earnings; Deloitte Tech Trends 2024" },
     { area: "AI-Powered Cybersecurity & Threat Detection", detail: "CrowdStrike's AI processes 2T+ security events/week. IBM reports organizations using AI security detect breaches 108 days faster and save $1.76M per incident. Your competitors are using AI to defend against threats that are already using AI to attack.", source: "Source: IBM Cost of a Data Breach Report 2024; CrowdStrike Annual Threat Report 2024" },
     { area: "Workforce Intelligence & Talent Optimization", detail: "Microsoft's Viva Copilot Analytics identifies 8.8 hours/week of meeting time that could be redirected to deep work. Unilever uses AI screening for 1.8M annual applications, reducing hiring time 75%. Workday's ML-powered skills intelligence maps talent gaps across 60M+ workers. Your talent strategy is either AI-augmented or falling behind.", source: "Source: Microsoft Work Trend Index 2024; Unilever HR Innovation Report; Workday Rising 2024" },
   ];
@@ -4923,7 +4919,7 @@ interface PnLImpactData {
 }
 
 // ---------------------------------------------------------------------------
-// Pre-paywall "Maturity Analysis" — research-backed insights
+// Pre-paywall "Maturity Analysis". research-backed insights
 // ---------------------------------------------------------------------------
 
 interface FreeReportInsight {
@@ -4953,40 +4949,40 @@ function getFreeMaturityAnalysis(
 
   // Stage-specific headlines
   const headlines: Record<number, string> = {
-    1: `${companyName} is in the earliest phase of AI maturity — and the window to act is narrowing.`,
+    1: `${companyName} is in the earliest phase of AI maturity. and the window to act is narrowing.`,
     2: `${companyName} has begun experimenting with AI, but experiments without structure become expensive distractions.`,
     3: `${companyName} has a foundation, but the gap between "functional AI" and "value-creating AI" is where most organizations stall.`,
-    4: `${companyName} has real AI capabilities — the question is whether the organization is structured to compound them.`,
-    5: `${companyName} operates at the frontier of AI maturity — but leadership at this stage requires constant reinvention.`,
+    4: `${companyName} has real AI capabilities. the question is whether the organization is structured to compound them.`,
+    5: `${companyName} operates at the frontier of AI maturity. but leadership at this stage requires constant reinvention.`,
   };
 
   // Industry-specific competitive context paragraphs
   const industryContextMap: Record<string, string> = {
     insurance: `The insurance industry is undergoing the most significant technology-driven transformation since the advent of actuarial software. McKinsey's 2024 Global Insurance Report found that AI-mature insurers achieve 40-60% faster claims processing, 15-25% improvement in loss ratios through predictive underwriting, and 3x higher customer retention through personalized engagement. Carriers like Lemonade, Root, and Ping An have demonstrated that AI-native models can underwrite policies in seconds, not weeks. For a ${rev}-revenue carrier like ${companyName}, the competitive implications are existential: Deloitte estimates that insurers who fail to reach AI maturity Stage 3+ by 2027 will lose 15-20% market share to digitally-native competitors.`,
     financial_services: `Financial services leads all industries in AI investment, but BCG's 2024 analysis reveals a stark divide: the top quartile of AI-mature banks generate 2.3x the revenue per employee of bottom-quartile peers. JPMorgan's COO recently disclosed that their AI initiatives save $1.5B annually across fraud detection, trading optimization, and customer operations. Goldman Sachs reports that AI-assisted analysts produce research 40% faster with measurably higher accuracy. For ${companyName} at ${rev} in revenue, Accenture estimates that financial institutions at Stage ${stage} leave 3-7% of revenue equivalent on the table through manual processes, slower decision cycles, and unoptimized risk models.`,
-    healthcare: `Healthcare AI adoption is accelerating under regulatory and cost pressure. Mayo Clinic's 2024 outcomes report showed AI-assisted diagnostics reduce misdiagnosis rates by 30% and cut average time-to-treatment by 40%. Kaiser Permanente reported $2.1B in operational savings from AI-driven scheduling, predictive care pathways, and claims automation. McKinsey's 2024 healthcare analysis estimates that AI-mature health systems achieve 20-30% lower administrative costs — the single largest expense category. For ${companyName}, Deloitte's health sector benchmark suggests organizations at Stage ${stage} are spending 35-50% more per member on administrative overhead than their AI-mature peers.`,
+    healthcare: `Healthcare AI adoption is accelerating under regulatory and cost pressure. Mayo Clinic's 2024 outcomes report showed AI-assisted diagnostics reduce misdiagnosis rates by 30% and cut average time-to-treatment by 40%. Kaiser Permanente reported $2.1B in operational savings from AI-driven scheduling, predictive care pathways, and claims automation. McKinsey's 2024 healthcare analysis estimates that AI-mature health systems achieve 20-30% lower administrative costs. the single largest expense category. For ${companyName}, Deloitte's health sector benchmark suggests organizations at Stage ${stage} are spending 35-50% more per member on administrative overhead than their AI-mature peers.`,
     technology: `Technology companies face a unique paradox: they build AI for others but often lag in applying it to their own operations. GitHub's 2024 developer survey found that engineering teams using AI-assisted development ship 55% more features with 30% fewer defects. Meta's internal productivity data shows AI-augmented teams reduce time-to-market by 40%. Microsoft reports that Copilot adoption across their enterprise yields 29% faster task completion. For ${companyName} at ${rev} revenue, the productivity gap compounds: Gartner estimates that technology firms below Stage 3 AI maturity experience 2-3x higher employee attrition as top talent migrates to AI-forward employers.`,
     retail_ecommerce: `Retail is being reshaped by AI at every point in the value chain. Amazon's AI-driven demand forecasting reduces inventory carrying costs by 25%, while Walmart's machine learning models have cut out-of-stock rates by 30%. McKinsey's 2024 retail report found that AI-personalized customer experiences drive 15-25% higher conversion rates and 20% larger average order values. Starbucks attributes $1B+ in incremental revenue to its AI recommendation engine. For ${companyName} at ${rev}, BCG estimates that retailers below Stage 3 AI maturity forfeit 2-4% of annual revenue through suboptimal pricing, inventory misallocation, and generic customer experiences.`,
-    manufacturing: `Manufacturing AI adoption separates leaders from laggards at a rate unseen since lean production. Siemens reports that AI-driven predictive maintenance reduces unplanned downtime by 50% and extends equipment life by 20-40%. Toyota's AI quality control systems catch defects 10x faster than human inspection. McKinsey's 2024 industrial survey found that AI-mature manufacturers achieve 15-30% higher OEE (Overall Equipment Effectiveness). For a manufacturer of ${companyName}'s scale, Deloitte estimates the productivity gap between Stage ${stage} and Stage 4+ organizations equates to 5-8% of operating margin — a competitive gap that widens every quarter.`,
+    manufacturing: `Manufacturing AI adoption separates leaders from laggards at a rate unseen since lean production. Siemens reports that AI-driven predictive maintenance reduces unplanned downtime by 50% and extends equipment life by 20-40%. Toyota's AI quality control systems catch defects 10x faster than human inspection. McKinsey's 2024 industrial survey found that AI-mature manufacturers achieve 15-30% higher OEE (Overall Equipment Effectiveness). For a manufacturer of ${companyName}'s scale, Deloitte estimates the productivity gap between Stage ${stage} and Stage 4+ organizations equates to 5-8% of operating margin. a competitive gap that widens every quarter.`,
     energy_utilities: `The energy sector is deploying AI to manage grid complexity, optimize asset performance, and navigate the clean energy transition. Duke Energy's AI-driven grid management reduced outage duration by 30% and prevented $150M in infrastructure failures. BP's machine learning models optimize refinery output by 2-3%, worth hundreds of millions annually at scale. McKinsey's 2024 energy report found that AI-mature utilities achieve 20-35% better asset utilization. For ${companyName} at ${rev}, the infrastructure-heavy nature of energy makes AI maturity gaps especially costly: Accenture estimates that utilities at Stage ${stage} spend 25-40% more on maintenance per asset than AI-optimized peers.`,
-    shipping_logistics: `Logistics is undergoing an AI-driven revolution in route optimization, demand forecasting, and warehouse automation. UPS's ORION system saves 100M miles annually through AI-optimized routing — approximately $400M in fuel and labor costs. Maersk reports 15% improvement in container utilization through predictive demand modeling. Amazon's AI-driven warehouse robotics process orders 4x faster than manual operations. McKinsey's 2024 logistics report found that AI-mature supply chain operators achieve 15-25% lower cost-to-serve. For ${companyName} at ${rev}, Deloitte estimates Stage ${stage} logistics companies carry 20-35% higher per-unit costs than AI-optimized competitors.`,
+    shipping_logistics: `Logistics is undergoing an AI-driven revolution in route optimization, demand forecasting, and warehouse automation. UPS's ORION system saves 100M miles annually through AI-optimized routing. approximately $400M in fuel and labor costs. Maersk reports 15% improvement in container utilization through predictive demand modeling. Amazon's AI-driven warehouse robotics process orders 4x faster than manual operations. McKinsey's 2024 logistics report found that AI-mature supply chain operators achieve 15-25% lower cost-to-serve. For ${companyName} at ${rev}, Deloitte estimates Stage ${stage} logistics companies carry 20-35% higher per-unit costs than AI-optimized competitors.`,
     consulting_services: `Professional services and consulting firms face an AI inflection point: McKinsey's own internal data shows AI-augmented consultants deliver analyses 40% faster with broader evidence bases. Deloitte reports that AI-assisted audit teams cover 100% of transactions versus the 5-10% sample historically possible. EY's AI-driven tax automation handles routine compliance 60% faster. For ${companyName} at ${rev}, the leverage model amplifies AI's impact: BCG estimates that consulting and professional services firms at Stage ${stage} achieve 15-25% lower utilization rates because their people spend disproportionate time on tasks AI could accelerate or automate.`,
     aerospace_defense: `Aerospace and defense is among the most AI-intensive industries by R&D spend. Lockheed Martin's AI-driven predictive maintenance for the F-35 program reduced unscheduled downtime by 40%. Boeing's digital twin simulations powered by machine learning cut design iteration cycles from months to days. The DoD's 2024 AI strategy requires all major contractors to demonstrate AI integration capabilities for future contract eligibility. For ${companyName}, Deloitte's defense sector analysis shows that contractors below Stage 3 AI maturity are increasingly disadvantaged in competitive bids, as the DoD explicitly weights AI capability in source selection criteria.`,
     telecommunications: `Telecom operators are using AI to manage network complexity, reduce churn, and create new revenue streams. T-Mobile's AI-driven customer retention system reduced churn by 30%, worth an estimated $1.2B annually. AT&T's network AI detects and resolves issues 50% faster than manual NOC operations. Ericsson's 2024 industry report found AI-mature operators achieve 15-20% better network efficiency. For ${companyName} at ${rev}, McKinsey estimates that telecom operators at Stage ${stage} spend 25-40% more on network operations and customer retention than AI-optimized peers, a gap that compounds as 5G and edge computing increase network complexity.`,
-    government_federal: `Federal agencies are under mandate to deploy AI responsibly at scale. Executive Order 14110 (October 2023) and OMB Memorandum M-24-10 (March 2024) require every major agency to appoint a Chief AI Officer, publish an AI use-case inventory, and complete impact assessments for safety- or rights-impacting AI. DoD's Chief Digital and AI Office (CDAO) operates Task Force Lima for generative AI across the department. GSA's AI Center of Excellence supports agency adoption. For ${companyName}, GAO's 2024 assessments found that agencies at Stage ${stage} maturity face the greatest compliance exposure under M-24-10 because governance artifacts — inventories, impact assessments, and red-team results — lag behind technology deployment.`,
-    government_state_local: `State and local governments are accelerating AI adoption under a patchwork of state executive orders (CA EO N-12-23, NY, NJ) and sector-specific legislation (Colorado AI Act, Texas HB 2060). The fastest movers — California CDT, NYC Office of Technology and Innovation, Texas DIR — operate formal GenAI sandboxes, procurement guardrails, and bias-assessment toolkits. For ${companyName}, the primary risk at Stage ${stage} is not under-adoption but unmanaged adoption: public-records exposure, civil-rights litigation, and procurement audit findings compound quickly when AI is deployed without documented governance, impact assessments, and public-facing disclosure.`,
+    government_federal: `Federal agencies are under mandate to deploy AI responsibly at scale. Executive Order 14110 (October 2023) and OMB Memorandum M-24-10 (March 2024) require every major agency to appoint a Chief AI Officer, publish an AI use-case inventory, and complete impact assessments for safety- or rights-impacting AI. DoD's Chief Digital and AI Office (CDAO) operates Task Force Lima for generative AI across the department. GSA's AI Center of Excellence supports agency adoption. For ${companyName}, GAO's 2024 assessments found that agencies at Stage ${stage} maturity face the greatest compliance exposure under M-24-10 because governance artifacts. inventories, impact assessments, and red-team results. lag behind technology deployment.`,
+    government_state_local: `State and local governments are accelerating AI adoption under a patchwork of state executive orders (CA EO N-12-23, NY, NJ) and sector-specific legislation (Colorado AI Act, Texas HB 2060). The fastest movers. California CDT, NYC Office of Technology and Innovation, Texas DIR. operate formal GenAI sandboxes, procurement guardrails, and bias-assessment toolkits. For ${companyName}, the primary risk at Stage ${stage} is not under-adoption but unmanaged adoption: public-records exposure, civil-rights litigation, and procurement audit findings compound quickly when AI is deployed without documented governance, impact assessments, and public-facing disclosure.`,
     nonprofit_ngo: `Nonprofits and NGOs are deploying AI for mission acceleration under tight resource and ethics constraints. The Gates Foundation has committed $30M+ to AI for global development. The American Red Cross and World Food Programme deploy AI for disaster response and anticipatory action. Partnership on AI's 2024 guidance emphasizes that mission-driven organizations must balance donor expectations, beneficiary rights, and operational efficiency. For ${companyName}, Bridgespan Group's 2024 analysis finds that nonprofits at Stage ${stage} face a distinctive risk: donor and grantmaker scrutiny of AI governance is rising faster than operational AI adoption, creating reputational exposure ahead of operational benefit.`,
     real_estate_commercial: `Commercial real estate is adopting AI across leasing, valuation, property operations, and capital markets. CBRE, JLL, and Cushman & Wakefield deploy proprietary AI platforms for deal-pipeline analytics and lease abstraction. JLL's JLL GPT was one of the first large-language models built for the CRE vertical. Prologis uses AI for energy optimization across 1.2B+ sq ft of logistics space. For ${companyName} at ${rev}, Altus Group's 2024 CRE technology benchmark finds that firms at Stage ${stage} spend 20-35% more per asset on property operations than AI-optimized peers, with the gap widening as AI-enabled tenant experience becomes a leasing differentiator.`,
     real_estate_residential: `Residential real estate is being reshaped by AI in pricing, search, underwriting, and property management. Zillow's AI-powered Zestimate covers 100M+ homes. Opendoor's AI pricing models underwrite iBuyer offers at scale. Rocket Mortgage deploys AI across loan origination. For ${companyName} at ${rev}, STRATMOR's 2024 benchmark finds that residential real-estate operators at Stage ${stage} carry 25-40% higher origination and servicing costs per unit than AI-enabled peers, with AI-driven tenant-screening, pricing, and fraud-detection becoming competitive necessities rather than differentiators.`,
     media_entertainment: `Media and entertainment companies are deploying AI across content personalization, production workflow, and rights management. Netflix attributes 80%+ of watched content to AI recommendations. Disney operates an enterprise AI task force with board oversight. Comcast and NBCUniversal integrate AI across Xfinity operations and Peacock personalization. For ${companyName} at ${rev}, PwC's 2024 Global Entertainment & Media Outlook finds that firms at Stage ${stage} are most exposed to the AI-driven disruption of content discovery and advertising pricing, with AI-optimized competitors capturing disproportionate share of shifting attention and ad budgets.`,
-    fintech_payments: `Fintech and payments is one of the highest-leverage AI verticals: every transaction is a real-time decision (fraud, auth, KYC, risk) and AI compresses both unit cost and loss rates simultaneously. Stripe Radar processes 100B+ transactions/year and blocks $5B+ in fraud annually with sub-100ms ML decisioning. Visa's AI-powered Advanced Authorization scores 100% of transactions and has blocked $40B+ in attempted fraud per year. Klarna's AI assistant handles 2.3M conversations/month — equivalent to 700 full-time agents — with resolution time cut from 11 to under 2 minutes. For ${companyName} at ${rev}, the cost of being a Stage ${stage} payments company is structural: fast-following AI-native fintechs (Stripe, Adyen, Block) are setting auth-rate, fraud-loss, and customer-service unit economics that legacy players struggle to match without rebuilding their data and ML stack from the ground up.`,
-    food_beverage: `Food and beverage manufacturers are deploying AI across demand sensing, supply chain, product R&D, and quality control. PepsiCo's AI demand sensing cut forecast error from 40% to 20% at the store-SKU level, reducing waste $450M and improving on-shelf availability 12%. Nestlé's AI-powered R&D platform screens 10,000+ flavor combinations and reduced new product launch cycles from 18 months to 10 months. General Mills' AI supply-chain optimization saves $180M annually across 30+ plants. For ${companyName} at ${rev}, McKinsey's 2024 CPG report estimates that F&B manufacturers at Stage ${stage} forfeit 2-4% of revenue-equivalent through forecast error, trade-spend inefficiency, and SKU-rationalization lag — a gap that compounds as AI-enabled competitors adjust pricing, assortment, and promotions in real time.`,
+    fintech_payments: `Fintech and payments is one of the highest-leverage AI verticals: every transaction is a real-time decision (fraud, auth, KYC, risk) and AI compresses both unit cost and loss rates simultaneously. Stripe Radar processes 100B+ transactions/year and blocks $5B+ in fraud annually with sub-100ms ML decisioning. Visa's AI-powered Advanced Authorization scores 100% of transactions and has blocked $40B+ in attempted fraud per year. Klarna's AI assistant handles 2.3M conversations/month. equivalent to 700 full-time agents. with resolution time cut from 11 to under 2 minutes. For ${companyName} at ${rev}, the cost of being a Stage ${stage} payments company is structural: fast-following AI-native fintechs (Stripe, Adyen, Block) are setting auth-rate, fraud-loss, and customer-service unit economics that legacy players struggle to match without rebuilding their data and ML stack from the ground up.`,
+    food_beverage: `Food and beverage manufacturers are deploying AI across demand sensing, supply chain, product R&D, and quality control. PepsiCo's AI demand sensing cut forecast error from 40% to 20% at the store-SKU level, reducing waste $450M and improving on-shelf availability 12%. Nestlé's AI-powered R&D platform screens 10,000+ flavor combinations and reduced new product launch cycles from 18 months to 10 months. General Mills' AI supply-chain optimization saves $180M annually across 30+ plants. For ${companyName} at ${rev}, McKinsey's 2024 CPG report estimates that F&B manufacturers at Stage ${stage} forfeit 2-4% of revenue-equivalent through forecast error, trade-spend inefficiency, and SKU-rationalization lag. a gap that compounds as AI-enabled competitors adjust pricing, assortment, and promotions in real time.`,
     cpg: `Consumer packaged goods leaders are using AI to manage demand volatility, optimize trade spend, and accelerate innovation. P&G's AI demand-sensing platform improved forecast accuracy 20% and reduced waste $500M+. Unilever uses AI screening to process 1.8M annual applications (75% faster hiring) and AI-powered Scope 3 emissions tracking across 150,000+ suppliers. Kraft Heinz uses AI to optimize $5B+ in annual trade spend, improving ROI 12%. For ${companyName} at ${rev}, BCG's 2024 CPG Advantage Report finds that manufacturers at Stage ${stage} leave 3-5% of revenue unrealized through suboptimal trade-promotion ROI, demand-plan inaccuracy, and slow response to retailer-specific patterns.`,
     dtc: `Direct-to-consumer brands live and die on AI-powered personalization, attribution, and customer-lifecycle economics. Warby Parker's AI virtual try-on lifted conversion 32% and cut return rates from 15% to 6%. Glossier's AI personalization engine drove 28% repeat-purchase-rate lift and 18% higher AOV. Dollar Shave Club's AI subscription optimization cut churn 35%. For ${companyName} at ${rev}, a16z's 2024 DTC Benchmark shows that brands at Stage ${stage} typically operate with 40-60% higher customer-acquisition cost than AI-optimized peers because their paid-media, retention, and creative workflows aren't yet instrumented for real-time AI optimization.`,
   };
 
   // Map sub-industry slugs to the parent industryContextMap entry above. Only
-  // legitimate same-peer-group mappings — anything with a distinct operating
+  // legitimate same-peer-group mappings. anything with a distinct operating
   // model has its own entry and is NOT aliased here.
   const contextAliases: Record<string, string> = {
     healthcare_providers: 'healthcare',
@@ -5021,32 +5017,32 @@ function getFreeMaturityAnalysis(
   };
 
   const industryContext = industryContextMap[industry] || industryContextMap[contextAliases[industry] || ''] ||
-    `Across industries, the evidence is unambiguous: McKinsey's 2024 Global AI Survey found that top-quartile AI adopters generate 2.5x more value from their AI investments than bottom-quartile organizations at the same spend level. BCG's AI Advantage Report showed AI leaders achieve 1.5x higher EBITDA growth rates, with the gap widening each year as organizational learning compounds. For ${companyName} at ${rev} revenue, Accenture estimates that organizations at Stage ${stage} capture only ${stage <= 2 ? "5-15%" : "25-40%"} of available AI value — meaning the majority of your technology investment is generating returns well below its potential. The competitive window is not infinite: Deloitte's transformation research shows organizations that begin structured AI programs 18 months later pay 40% more in implementation costs and face 2-3x higher talent acquisition costs.`;
+    `Across industries, the evidence is unambiguous: McKinsey's 2024 Global AI Survey found that top-quartile AI adopters generate 2.5x more value from their AI investments than bottom-quartile organizations at the same spend level. BCG's AI Advantage Report showed AI leaders achieve 1.5x higher EBITDA growth rates, with the gap widening each year as organizational learning compounds. For ${companyName} at ${rev} revenue, Accenture estimates that organizations at Stage ${stage} capture only ${stage <= 2 ? "5-15%" : "25-40%"} of available AI value. meaning the majority of your technology investment is generating returns well below its potential. The competitive window is not infinite: Deloitte's transformation research shows organizations that begin structured AI programs 18 months later pay 40% more in implementation costs and face 2-3x higher talent acquisition costs.`;
 
   // Research-backed insights keyed to weakest dimension
   const dimensionInsights: Record<string, FreeReportInsight[]> = {
     adoption_behavior: [
-      { label: "The Adoption Gap Is Widening", stat: "72%", body: `of enterprise AI projects fail to move beyond the pilot stage according to Gartner's 2024 analysis. The primary cause is not technology — it is adoption failure. Organizations that lack structured change management and user onboarding lose an average of 60% of intended users within 90 days of deployment. For ${companyName}, your Adoption Behavior score of ${overallScore <= 35 ? "below 35" : "below median"} suggests this pattern is already in effect.`, source: "Gartner AI Adoption Report, 2024" },
-      { label: "Adoption Drives 3x More Value Than Spend", stat: "3x", body: `McKinsey's 2024 survey of 1,400 enterprises found that AI adoption maturity — not investment level — is the primary predictor of value generation. Organizations with high adoption scores generate 3x more measurable value than those with equal AI budgets but low adoption. Spending more without fixing adoption compounds the waste.`, source: "McKinsey Global AI Survey, 2024" },
+      { label: "The Adoption Gap Is Widening", stat: "72%", body: `of enterprise AI projects fail to move beyond the pilot stage according to Gartner's 2024 analysis. The primary cause is not technology. it is adoption failure. Organizations that lack structured change management and user onboarding lose an average of 60% of intended users within 90 days of deployment. For ${companyName}, your Adoption Behavior score of ${overallScore <= 35 ? "below 35" : "below median"} suggests this pattern is already in effect.`, source: "Gartner AI Adoption Report, 2024" },
+      { label: "Adoption Drives 3x More Value Than Spend", stat: "3x", body: `McKinsey's 2024 survey of 1,400 enterprises found that AI adoption maturity. not investment level. is the primary predictor of value generation. Organizations with high adoption scores generate 3x more measurable value than those with equal AI budgets but low adoption. Spending more without fixing adoption compounds the waste.`, source: "McKinsey Global AI Survey, 2024" },
       { label: "Top Talent Follows AI Adoption", stat: "34%", body: `of technology workers cite AI tooling and organizational AI maturity as a top-3 factor in employer selection according to Gartner. Companies with low AI adoption scores face a self-reinforcing disadvantage: the talent needed to improve AI capabilities preferentially joins organizations where AI is already embedded in workflows.`, source: "Gartner Tech Workforce Survey, 2024" },
     ],
     authority_structure: [
       { label: "Governance Is the #1 Predictor of AI ROI", stat: "2.6x", body: `Deloitte's 2024 State of AI survey found that organizations with a dedicated AI leader and clear governance frameworks are 2.6x more likely to scale AI successfully and 3.1x more likely to report positive ROI. Your Authority Structure score indicates governance gaps that are limiting ${companyName}'s ability to move from experiment to enterprise value.`, source: "Deloitte State of AI in the Enterprise, 2024" },
-      { label: "Decision Layers Kill AI Momentum", stat: "7.2 months", body: `The average enterprise AI initiative requires 7.2 months from concept to production deployment — but McKinsey found that organizations with streamlined AI governance cut this to 2.8 months. Each additional approval layer adds an average of 6 weeks. The compounding effect of slow governance is not just delay — it is talent attrition, missed market windows, and competitor advantage.`, source: "McKinsey AI Deployment Benchmark, 2024" },
-      { label: "Siloed AI Ownership Fragments Value", stat: "40%", body: `BCG reports that organizations where AI governance is fragmented across business units with no central coordination capture 40% less value than those with federated governance models. The issue is not centralization vs. decentralization — it is the absence of a coherent framework for prioritization, resource allocation, and cross-functional learning.`, source: "BCG AI Advantage Report, 2024" },
+      { label: "Decision Layers Kill AI Momentum", stat: "7.2 months", body: `The average enterprise AI initiative requires 7.2 months from concept to production deployment. but McKinsey found that organizations with streamlined AI governance cut this to 2.8 months. Each additional approval layer adds an average of 6 weeks. The compounding effect of slow governance is not just delay. it is talent attrition, missed market windows, and competitor advantage.`, source: "McKinsey AI Deployment Benchmark, 2024" },
+      { label: "Siloed AI Ownership Fragments Value", stat: "40%", body: `BCG reports that organizations where AI governance is fragmented across business units with no central coordination capture 40% less value than those with federated governance models. The issue is not centralization vs. decentralization. it is the absence of a coherent framework for prioritization, resource allocation, and cross-functional learning.`, source: "BCG AI Advantage Report, 2024" },
     ],
     workflow_integration: [
-      { label: "Embedded AI Generates 4x the Value of Standalone Tools", stat: "4x", body: `Accenture's 2024 Technology Vision found that AI integrated directly into existing workflows generates 4x the measurable business value of standalone AI applications. The difference is utilization: embedded AI is used daily by default, while standalone tools require deliberate effort to adopt. ${companyName}'s Workflow Integration score suggests AI remains adjacent to — rather than embedded in — core processes.`, source: "Accenture Technology Vision, 2024" },
-      { label: "Legacy Integration Is the Top Barrier", stat: "67%", body: `of CIOs surveyed by Gartner cite legacy system integration as the primary obstacle to AI value creation — ahead of budget, talent, and data quality. The cost of workarounds compounds: organizations that delay integration spend 2-3x more when they eventually undertake it, because both the legacy systems and the AI capabilities have evolved independently.`, source: "Gartner CIO Survey, 2024" },
+      { label: "Embedded AI Generates 4x the Value of Standalone Tools", stat: "4x", body: `Accenture's 2024 Technology Vision found that AI integrated directly into existing workflows generates 4x the measurable business value of standalone AI applications. The difference is utilization: embedded AI is used daily by default, while standalone tools require deliberate effort to adopt. ${companyName}'s Workflow Integration score suggests AI remains adjacent to. rather than embedded in. core processes.`, source: "Accenture Technology Vision, 2024" },
+      { label: "Legacy Integration Is the Top Barrier", stat: "67%", body: `of CIOs surveyed by Gartner cite legacy system integration as the primary obstacle to AI value creation. ahead of budget, talent, and data quality. The cost of workarounds compounds: organizations that delay integration spend 2-3x more when they eventually undertake it, because both the legacy systems and the AI capabilities have evolved independently.`, source: "Gartner CIO Survey, 2024" },
       { label: "API-First Organizations Move 3x Faster", stat: "3x", body: `McKinsey's digital transformation analysis shows that organizations with modern, API-first architecture deploy AI capabilities 3x faster and at 40% lower cost than those requiring custom integration for each initiative. The infrastructure gap becomes the strategy gap.`, source: "McKinsey Digital Transformation Report, 2024" },
     ],
     decision_velocity: [
-      { label: "Speed of AI Decision-Making Separates Winners", stat: "5.3x", body: `BCG's 2024 analysis found that organizations in the top quartile of AI decision velocity are 5.3x more likely to achieve breakthrough AI outcomes. The mechanism is not just faster execution — it is faster learning. Each iteration generates data that improves the next decision. Organizations that take 6 months to approve an AI pilot lose 6 months of compounding organizational intelligence.`, source: "BCG AI Decision Velocity Study, 2024" },
-      { label: "AI Momentum Is Perishable", stat: "18 months", body: `Deloitte's transformation research shows that the cost of delayed AI action compounds at approximately 15-20% per year. An AI initiative that would cost $5M to implement today will cost $7-8M if started 18 months from now — not because the technology is more expensive, but because organizational readiness, talent availability, and competitive positioning all deteriorate with delay.`, source: "Deloitte AI Transformation Economics, 2024" },
-      { label: "Committee-Driven AI Fails at 3x the Rate", stat: "3x", body: `McKinsey found that AI initiatives governed by committee-based decision-making fail at 3x the rate of those with single-threaded ownership. The issue is not collective wisdom — it is diffusion of accountability. When everyone owns AI, no one owns AI outcomes.`, source: "McKinsey AI Operating Model Report, 2024" },
+      { label: "Speed of AI Decision-Making Separates Winners", stat: "5.3x", body: `BCG's 2024 analysis found that organizations in the top quartile of AI decision velocity are 5.3x more likely to achieve breakthrough AI outcomes. The mechanism is not just faster execution. it is faster learning. Each iteration generates data that improves the next decision. Organizations that take 6 months to approve an AI pilot lose 6 months of compounding organizational intelligence.`, source: "BCG AI Decision Velocity Study, 2024" },
+      { label: "AI Momentum Is Perishable", stat: "18 months", body: `Deloitte's transformation research shows that the cost of delayed AI action compounds at approximately 15-20% per year. An AI initiative that would cost $5M to implement today will cost $7-8M if started 18 months from now. not because the technology is more expensive, but because organizational readiness, talent availability, and competitive positioning all deteriorate with delay.`, source: "Deloitte AI Transformation Economics, 2024" },
+      { label: "Committee-Driven AI Fails at 3x the Rate", stat: "3x", body: `McKinsey found that AI initiatives governed by committee-based decision-making fail at 3x the rate of those with single-threaded ownership. The issue is not collective wisdom. it is diffusion of accountability. When everyone owns AI, no one owns AI outcomes.`, source: "McKinsey AI Operating Model Report, 2024" },
     ],
     economic_translation: [
-      { label: "Most Organizations Cannot Quantify AI ROI", stat: "78%", body: `Gartner's 2024 survey found that 78% of organizations cannot accurately quantify the business value of their AI investments. This is not an accounting failure — it is a strategic one. Without clear economic measurement, AI investments compete for budget on narrative alone, making them vulnerable to the first quarter of cost pressure.`, source: "Gartner AI Value Measurement Survey, 2024" },
+      { label: "Most Organizations Cannot Quantify AI ROI", stat: "78%", body: `Gartner's 2024 survey found that 78% of organizations cannot accurately quantify the business value of their AI investments. This is not an accounting failure. it is a strategic one. Without clear economic measurement, AI investments compete for budget on narrative alone, making them vulnerable to the first quarter of cost pressure.`, source: "Gartner AI Value Measurement Survey, 2024" },
       { label: "Measured AI Gets 2.4x More Investment", stat: "2.4x", body: `McKinsey found that AI programs with clear economic measurement frameworks receive 2.4x more sustained investment than those without. The correlation is causal: measurable programs demonstrate value, which drives confidence, which drives funding, which drives more value. ${companyName}'s Economic Translation score suggests this virtuous cycle has not yet been established.`, source: "McKinsey AI Investment Patterns, 2024" },
       { label: "CFO Buy-In Is the Unlock", stat: "89%", body: `Deloitte reports that 89% of successful enterprise AI programs have active CFO sponsorship and established financial governance for AI spend. When the CFO treats AI as a measurable investment rather than a technology experiment, the entire organization's relationship with AI changes.`, source: "Deloitte CFO AI Governance Study, 2024" },
     ],
@@ -5056,10 +5052,10 @@ function getFreeMaturityAnalysis(
   const insights = dimensionInsights[weakKey] || dimensionInsights.adoption_behavior;
 
   const closingHook = stage <= 2
-    ? `The full report translates these findings into dollar-denominated impact specific to ${companyName}: where the value is trapped, what it costs you every quarter, and the exact sequence of interventions — with named owners, timelines, and KPIs — to begin capturing it. Organizations that wait 12 months to act pay 2-3x more to close the same gaps.`
+    ? `The full report translates these findings into dollar-denominated impact specific to ${companyName}: where the value is trapped, what it costs you every quarter, and the exact sequence of interventions. with named owners, timelines, and KPIs. to begin capturing it. Organizations that wait 12 months to act pay 2-3x more to close the same gaps.`
     : stage <= 3
-    ? `The full report maps ${companyName}'s specific path from Stage ${stage} to Stage ${stage + 1}, quantifying the P&L impact of each dimension improvement and identifying the 3-5 highest-leverage interventions. RLK Consulting then works with clients to build a tailored 90-day operationalization plan. The difference between Stage ${stage} and Stage ${stage + 1} is not incremental — it represents a step-change in value capture.`
-    : `The full report details how ${companyName} can protect and extend its AI advantage: where competitors are closing the gap, which capabilities are most at risk of disruption, and the specific investments required to maintain leadership. At Stage ${stage}, the risk is not falling behind — it is assuming the current position is durable without continued strategic investment.`;
+    ? `The full report maps ${companyName}'s specific path from Stage ${stage} to Stage ${stage + 1}, quantifying the P&L impact of each dimension improvement and identifying the 3-5 highest-leverage interventions. RLK Consulting then works with clients to build a tailored 90-day operationalization plan. The difference between Stage ${stage} and Stage ${stage + 1} is not incremental. it represents a step-change in value capture.`
+    : `The full report details how ${companyName} can protect and extend its AI advantage: where competitors are closing the gap, which capabilities are most at risk of disruption, and the specific investments required to maintain leadership. At Stage ${stage}, the risk is not falling behind. it is assuming the current position is durable without continued strategic investment.`;
 
   return {
     headline: headlines[stage] || headlines[2],
@@ -5099,7 +5095,7 @@ function getPnLImpact(
     private_equity: 0.45,         // Preqin/McKinsey: PE management fee + carry margin
     venture_capital: 0.40,        // Cambridge Associates: VC fund-level avg margin
     hedge_funds: 0.42,            // HFR/Preqin: hedge fund management avg margin
-    fintech_payments: 0.25,       // Public fintech composite (PayPal, Block, Adyen) — payments take rate × scale efficiencies
+    fintech_payments: 0.25,       // Public fintech composite (PayPal, Block, Adyen). payments take rate × scale efficiencies
     healthcare_providers: 0.12,   // AHA Hospital Statistics 2024: system avg operating margin
     healthcare_payers: 0.10,      // Kaiser Family Foundation: managed care avg margin
     healthcare_services: 0.12,    // Deloitte Health Services Outlook 2024: services avg margin
@@ -5167,7 +5163,7 @@ function getPnLImpact(
     utilities: 0.015,             // Accenture Utilities 2024: regulated rate dampens upside
     chemicals_materials: 0.02,    // McKinsey Chemicals 2024: process yield & pricing AI
     industrial_services: 0.02,    // Deloitte Industrial 2024: service optimization AI
-    software_saas: 0.04,          // Gartner 2024: highest AI leverage — product + ops
+    software_saas: 0.04,          // Gartner 2024: highest AI leverage. product + ops
     it_services: 0.025,           // Gartner/IDC 2024: delivery automation & upsell AI
     hardware_electronics: 0.03,   // IDC 2024: design cycle & supply chain AI
     telecommunications: 0.03,     // BCG Telecom 2024: churn reduction & ARPU uplift
@@ -5255,12 +5251,12 @@ function getPnLImpact(
   let stageNarrative: string;
 
   if (stage >= 4) {
-    headline = "Protecting Your AI Edge — Why Leaders Can't Coast";
+    headline = "Protecting Your AI Edge. Why Leaders Can't Coast";
     const regressFromStage = stage; // you regress from where you are
     const regressToStage = Math.max(1, stage - 1);
-    stageNarrative = `At Stage ${stage}, ${companyName} has built real AI capability. But competitive advantages in AI erode faster than they were built. BCG's 2024 research found that organizations pausing AI investment after reaching Stage ${regressFromStage} regress to Stage ${regressToStage} behavioral patterns within 12-18 months — the organizational muscle atrophies quickly. Your ${capturePercent}% capture rate means you are converting real value, but competitors investing aggressively can close your lead in 2-3 quarters. The question is not whether to invest more, but whether your current pace is sufficient to maintain separation. In ${ind}, the cost of losing your AI edge is measured in market share points, not basis points.`;
+    stageNarrative = `At Stage ${stage}, ${companyName} has built real AI capability. But competitive advantages in AI erode faster than they were built. BCG's 2024 research found that organizations pausing AI investment after reaching Stage ${regressFromStage} regress to Stage ${regressToStage} behavioral patterns within 12-18 months. the organizational muscle atrophies quickly. Your ${capturePercent}% capture rate means you are converting real value, but competitors investing aggressively can close your lead in 2-3 quarters. The question is not whether to invest more, but whether your current pace is sufficient to maintain separation. In ${ind}, the cost of losing your AI edge is measured in market share points, not basis points.`;
   } else if (stage === 3) {
-    headline = "The Inflection Point — Where AI Investment Pays Off or Doesn't";
+    headline = "The Inflection Point. Where AI Investment Pays Off or Doesn't";
     // Compute an industry-specific Stage 4 capture estimate so the "asymmetric
     // math" framing uses real numbers rather than hardcoded 25%→55% values.
     const captureGroup = (INDUSTRY_CAPTURE_GROUP as Record<string, string>)[industry] ?? "professional_services";
@@ -5269,17 +5265,17 @@ function getPnLImpact(
     const unrealizedPercent = Math.max(0, 100 - capturePercent);
     const uplift = Math.max(0, stage4Percent - capturePercent);
     const multiple = capturePercent > 0 ? (stage4Percent / capturePercent).toFixed(1) : "2";
-    stageNarrative = `Stage 3 is where AI either becomes a P&L driver or remains an expensive experiment. ${companyName}'s current ${capturePercent}% capture rate means ${unrealizedPercent}% of AI-addressable value is going unrealized. The math of moving from Stage 3 to Stage 4 is asymmetric in your favor: typical Stage 4 organizations in ${ind} operate around ${stage4Percent}% capture — a ${uplift}-point uplift that translates to roughly ${multiple}x the returns on the same AI-addressable pool. Organizations that invest decisively at this stage see P&L impact within 12-18 months. Those that don't face a different math: competitors at Stage 4 are operating at structurally lower costs and faster cycle times, and the gap compounds every quarter. In ${ind}, that gap translates directly to pricing power, customer retention, and talent attraction.`;
+    stageNarrative = `Stage 3 is where AI either becomes a P&L driver or remains an expensive experiment. ${companyName}'s current ${capturePercent}% capture rate means ${unrealizedPercent}% of AI-addressable value is going unrealized. The math of moving from Stage 3 to Stage 4 is asymmetric in your favor: typical Stage 4 organizations in ${ind} operate around ${stage4Percent}% capture. a ${uplift}-point uplift that translates to roughly ${multiple}x the returns on the same AI-addressable pool. Organizations that invest decisively at this stage see P&L impact within 12-18 months. Those that don't face a different math: competitors at Stage 4 are operating at structurally lower costs and faster cycle times, and the gap compounds every quarter. In ${ind}, that gap translates directly to pricing power, customer retention, and talent attraction.`;
   } else {
-    headline = "The Compounding Cost of Delay — Every Quarter Matters";
-    stageNarrative = `At Stage ${stage} with a ${capturePercent}% capture rate, ${companyName} is forfeiting ${100 - capturePercent}% of AI-addressable value — not because the technology doesn't exist, but because the organizational infrastructure to capture it hasn't been built. Each quarter of delay doesn't just forfeit that quarter's value; it deepens the organizational learning deficit. Competitors at Stage 3+ have spent 12-24 months building AI workflows, governance frameworks, and measurement systems that compound in effectiveness. In ${ind}, the organizations investing now are locking in cost structures and customer experiences that late movers will spend 2-3x more to replicate. Accenture's 2024 research shows early AI investors achieve 40% lower implementation costs than organizations that start 18 months later — the learning curve has a price.`;
+    headline = "The Compounding Cost of Delay. Every Quarter Matters";
+    stageNarrative = `At Stage ${stage} with a ${capturePercent}% capture rate, ${companyName} is forfeiting ${100 - capturePercent}% of AI-addressable value. not because the technology doesn't exist, but because the organizational infrastructure to capture it hasn't been built. Each quarter of delay doesn't just forfeit that quarter's value; it deepens the organizational learning deficit. Competitors at Stage 3+ have spent 12-24 months building AI workflows, governance frameworks, and measurement systems that compound in effectiveness. In ${ind}, the organizations investing now are locking in cost structures and customer experiences that late movers will spend 2-3x more to replicate. Accenture's 2024 research shows early AI investors achieve 40% lower implementation costs than organizations that start 18 months later. the learning curve has a price.`;
   }
 
   // ---- Industry-specific revenue growth descriptions ----
   const revGrowthInvest: Record<string, string> = {
     insurance: `AI-driven dynamic pricing, personalized cross-sell, and accelerated underwriting expand premium volume and improve win rates. ${companyName}'s Adoption Behavior score of ${getScore('adoption_behavior')}/100 suggests current pricing models are leaving revenue on the table that AI-enabled competitors are already capturing.`,
     banking: `AI-powered relationship intelligence, personalized product recommendations, and automated loan origination drive fee income and interest revenue. With a Workflow Integration score of ${getScore('workflow_integration')}/100, ${companyName} has significant room to embed AI into revenue-generating processes.`,
-    fintech_payments: `AI-driven authorization-rate optimization, fraud-loss reduction, and personalized merchant/consumer experiences directly grow net revenue. Adyen's RevenueAccelerate increases authorization rates 1-2 percentage points per merchant — at ${companyName}'s scale, every 100 bps of auth rate is material take-rate uplift. With ${getScore('workflow_integration')}/100 Workflow Integration, ${companyName} has room to embed AI deeper into the transaction path.`,
+    fintech_payments: `AI-driven authorization-rate optimization, fraud-loss reduction, and personalized merchant/consumer experiences directly grow net revenue. Adyen's RevenueAccelerate increases authorization rates 1-2 percentage points per merchant. at ${companyName}'s scale, every 100 bps of auth rate is material take-rate uplift. With ${getScore('workflow_integration')}/100 Workflow Integration, ${companyName} has room to embed AI deeper into the transaction path.`,
     healthcare_providers: `AI-optimized patient scheduling, reduced no-shows, improved coding accuracy, and capacity utilization drive incremental revenue without adding beds. ${companyName}'s ${getScore('workflow_integration')}/100 Workflow Integration score indicates scheduling and revenue cycle workflows are ripe for AI optimization.`,
     healthcare_payers: `AI-driven member engagement, predictive risk adjustment, and claims accuracy improvement increase per-member revenue and reduce STARs rating penalties. Current Decision Velocity of ${getScore('decision_velocity')}/100 suggests ${companyName} is slower than peers to deploy revenue-protecting AI.`,
     life_sciences_pharma: `AI-accelerated drug discovery, clinical trial optimization, and commercial analytics compress time-to-revenue for pipeline assets. Each month of accelerated launch is worth millions in patent-protected revenue.`,
@@ -5303,7 +5299,7 @@ function getPnLImpact(
     healthcare_payers: `STARs rating degradation and member attrition as competitors deploy AI-driven care coordination and member engagement that demonstrably improves outcomes and satisfaction scores.`,
     life_sciences_pharma: `Pipeline velocity falls behind competitors using AI-accelerated discovery. Each 6-month delay in clinical development costs $50-100M in foregone patent-protected revenue.`,
     software_saas: `Customer churn accelerates and NRR declines as competitors ship AI-native features that become table stakes. Products without embedded AI are increasingly perceived as legacy.`,
-    retail: `Conversion and basket size stagnate while AI-enabled competitors deliver hyper-personalized experiences. Amazon's AI recommendation engine drives 35% of revenue — that gap compounds every quarter.`,
+    retail: `Conversion and basket size stagnate while AI-enabled competitors deliver hyper-personalized experiences. Amazon's AI recommendation engine drives 35% of revenue. that gap compounds every quarter.`,
     food_beverage: `Forecast error and trade-promotion ROI stagnate while AI-enabled F&B peers continuously optimize. Every point of lost forecast accuracy translates to obsolete inventory, missed retail-shelf sets, and lower sell-through. At ${companyName}'s scale, the cumulative cost of manual demand planning vs. AI demand sensing is typically 1-2% of net revenue per year.`,
     cpg: `Retailer scorecards and trade-spend ROI degrade as AI-enabled CPG competitors win more retail execution and promotional lift at lower cost. Private-label brands with AI-powered demand planning increasingly out-execute manual-forecasting incumbents on the same shelves.`,
     dtc: `CAC inflates and LTV compresses as AI-enabled DTC competitors run tighter paid-media attribution, creative iteration, and lifecycle personalization. Every 10% CAC gap against AI-optimized peers shrinks payback windows that were already tight.`,
@@ -5311,7 +5307,7 @@ function getPnLImpact(
     manufacturing_process: `Process efficiency gap widens against AI-optimized competitors achieving tighter tolerances, less waste, and higher throughput from equivalent capital assets.`,
     energy_oil_gas: `Production optimization gap widens as AI-enabled operators extract 2-3% more value from equivalent reserves and infrastructure.`,
     telecommunications: `Churn rate increases 0.3-0.5% annually relative to AI-enabled carriers offering proactive service and personalized retention. At ${companyName}'s revenue base, that's ${fmtUSD(Math.round(revenue * 0.004))} per year.`,
-    consulting_services: `Utilization rates fall 5-10% behind AI-augmented competitors who deliver faster, at lower cost, with broader evidence bases — compressing both revenue and margin.`,
+    consulting_services: `Utilization rates fall 5-10% behind AI-augmented competitors who deliver faster, at lower cost, with broader evidence bases. compressing both revenue and margin.`,
   };
 
   // ---- Industry-specific margin descriptions ----
@@ -5319,10 +5315,10 @@ function getPnLImpact(
     insurance: `Claims automation, straight-through processing, and AI-driven fraud detection reduce loss adjustment expenses and operating costs. At ${companyName}'s scale, every 1% of combined ratio improvement is worth ${fmtUSD(Math.round(revenue * 0.01))}.`,
     banking: `AI-powered credit decisioning, compliance automation, and customer service chatbots reduce operating expense ratio. With Authority Structure at ${getScore('authority_structure')}/100, governance improvements alone could unlock faster deployment of margin-enhancing AI.`,
     fintech_payments: `AI compresses three of the largest cost centers: customer service (Klarna replaced 700 agents with one AI assistant), fraud loss reserves (Stripe Radar, Visa Advanced Authorization cut fraud loss rates materially), and engineering productivity. At ${companyName}'s scale, even a 100bps reduction in fraud loss rate compounds to material EBITDA expansion alongside the customer-service automation savings.`,
-    healthcare_providers: `AI-driven clinical documentation, prior authorization automation, denials management, and staffing optimization reduce administrative burden — the single largest cost category. ${isLarge ? 'At 13,000+ employees, even small per-FTE efficiency gains compound to material savings.' : `At ${employeeCount} employees, targeted automation of highest-volume workflows delivers outsized margin impact.`}`,
+    healthcare_providers: `AI-driven clinical documentation, prior authorization automation, denials management, and staffing optimization reduce administrative burden. the single largest cost category. ${isLarge ? 'At 13,000+ employees, even small per-FTE efficiency gains compound to material savings.' : `At ${employeeCount} employees, targeted automation of highest-volume workflows delivers outsized margin impact.`}`,
     healthcare_payers: `AI claims adjudication, medical necessity review, and provider network optimization reduce medical loss ratio and administrative costs. Anthem reports 200bps MLR improvement from AI-driven utilization management.`,
     life_sciences_pharma: `AI-accelerated clinical trial design, manufacturing quality prediction, and regulatory filing automation compress timelines and reduce development costs across the pipeline.`,
-    software_saas: `AI automates customer support, QA testing, and internal operations while AI-assisted development accelerates feature delivery. GitHub Copilot users report 55% faster task completion — applied across ${companyName}'s engineering org, that is transformative.`,
+    software_saas: `AI automates customer support, QA testing, and internal operations while AI-assisted development accelerates feature delivery. GitHub Copilot users report 55% faster task completion. applied across ${companyName}'s engineering org, that is transformative.`,
     retail: `AI inventory optimization, labor scheduling, and supply chain management reduce shrinkage, overstocking, and fulfillment costs. Walmart reports $1B+ in annual savings from AI demand forecasting alone.`,
     food_beverage: `AI-powered supply-chain optimization, predictive maintenance on processing lines, and computer-vision quality inspection reduce waste, scrap, and giveaway. General Mills saved $180M annually across 30+ plants via AI scheduling and waste reduction. Nestlé's AI supply chain saved CHF 800M in 2024. At ${companyName}'s scale, every 1% of ingredient-waste reduction is worth approximately ${fmtUSD(Math.round(revenue * 0.005))}.`,
     cpg: `AI-driven plant scheduling, packaging-line optimization, and logistics automation shrink COGS. P&G and Unilever routinely report 5-10% unit-cost reductions through AI-driven factory and supply-chain programs. At ${(ebitdaMargin * 100).toFixed(0)}% operating margin, each 1 point of COGS improvement compounds materially.`,
@@ -5334,26 +5330,26 @@ function getPnLImpact(
   };
 
   const marginCoast: Record<string, string> = {
-    insurance: `Operating expense gap widens as peers automate claims processing and underwriting. ${companyName}'s combined ratio disadvantage compounds every quarter — at ${fmtUSD(revenue)}, each basis point is ${fmtUSD(Math.round(revenue * 0.0001))}.`,
-    banking: `Efficiency ratio deteriorates relative to AI-optimized peers. JPMorgan targets a sub-50% efficiency ratio through AI — banks that can't match this face structural margin compression.`,
+    insurance: `Operating expense gap widens as peers automate claims processing and underwriting. ${companyName}'s combined ratio disadvantage compounds every quarter. at ${fmtUSD(revenue)}, each basis point is ${fmtUSD(Math.round(revenue * 0.0001))}.`,
+    banking: `Efficiency ratio deteriorates relative to AI-optimized peers. JPMorgan targets a sub-50% efficiency ratio through AI. banks that can't match this face structural margin compression.`,
     fintech_payments: `Fraud loss rates, customer-service cost per ticket, and KYC/AML operational overhead remain elevated while AI-native peers continuously compress unit economics. In an industry where take rates are already compressed by competition, AI laggards face a margin squeeze that doesn't have an obvious recovery path without rebuilding the underlying ML and data stack.`,
-    healthcare_providers: `Administrative cost per patient encounter rises while AI-optimized systems reduce theirs. The gap is existential for providers operating on ${(ebitdaMargin * 100).toFixed(0)}% margins — there's no room for inefficiency.`,
+    healthcare_providers: `Administrative cost per patient encounter rises while AI-optimized systems reduce theirs. The gap is existential for providers operating on ${(ebitdaMargin * 100).toFixed(0)}% margins. there's no room for inefficiency.`,
     healthcare_payers: `MLR creeps upward as manual utilization management falls behind AI-driven peers. Administrative cost per member grows while competitors shrink theirs.`,
     life_sciences_pharma: `R&D cost per approved drug remains at $2.6B industry average while AI-enabled competitors cut development costs 20-30%, allowing more pipeline bets per dollar.`,
     software_saas: `Support costs, development velocity, and infrastructure costs fall behind AI-native competitors. The margin gap becomes a product gap as competitors reinvest savings into features.`,
     retail: `Shrinkage, labor cost, and inventory carrying costs remain at legacy levels while AI-enabled competitors continuously optimize. At ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margins, ${ind} has no room for structural cost disadvantage.`,
     food_beverage: `Plant scheduling inefficiency, ingredient waste, and transportation cost remain elevated while AI-optimized F&B peers continuously compress unit costs. At ${(ebitdaMargin * 100).toFixed(0)}% operating margin, a half-point of structural COGS disadvantage is existential, and private-label and AI-native brands are actively pricing to exploit it.`,
-    cpg: `Trade-spend ROI, forecast accuracy, and retail-execution costs lag AI-optimized peers. CPG boards increasingly demand AI-driven accountability on trade spend — a laggard position here is difficult to defend at the next budget cycle.`,
+    cpg: `Trade-spend ROI, forecast accuracy, and retail-execution costs lag AI-optimized peers. CPG boards increasingly demand AI-driven accountability on trade spend. a laggard position here is difficult to defend at the next budget cycle.`,
     dtc: `Paid-media efficiency, creative production cost, and customer-service cost-to-serve remain elevated while AI-native DTC competitors run leaner on every unit. In a payback-window-constrained business, this is the difference between scaling and stalling.`,
     manufacturing_discrete: `Maintenance costs, scrap rates, and downtime remain at legacy levels while competitors deploy AI that continuously improves. The cost gap compounds with every production cycle.`,
-    energy_oil_gas: `Per-barrel operating costs remain elevated versus AI-optimized operators. In a commodity business, the low-cost producer wins — and AI is redefining what "low cost" means.`,
+    energy_oil_gas: `Per-barrel operating costs remain elevated versus AI-optimized operators. In a commodity business, the low-cost producer wins. and AI is redefining what "low cost" means.`,
     telecommunications: `Network operating costs and customer service costs remain elevated while competitors automate. At ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margin, margin erosion translates directly to shareholder value destruction.`,
-    consulting_services: `Utilization and productivity lag AI-augmented competitors. The consulting business model depends on leverage — firms that don't augment their people with AI face structural margin compression.`,
+    consulting_services: `Utilization and productivity lag AI-augmented competitors. The consulting business model depends on leverage. firms that don't augment their people with AI face structural margin compression.`,
   };
 
   // ---- Industry-specific cost structure descriptions ----
   const costInvest = isLarge
-    ? `At ${employeeCount.toLocaleString()} employees, AI-driven automation of repetitive workflows compounds to material structural cost reduction. ${companyName}'s Workflow Integration score (${getScore('workflow_integration')}/100) indicates significant untapped automation potential in core ${ind} operations — every 1% of labor cost shifted to AI-variable costs saves ${fmtUSD(Math.round(employeeCount * 850 * 0.01))} annually.`
+    ? `At ${employeeCount.toLocaleString()} employees, AI-driven automation of repetitive workflows compounds to material structural cost reduction. ${companyName}'s Workflow Integration score (${getScore('workflow_integration')}/100) indicates significant untapped automation potential in core ${ind} operations. every 1% of labor cost shifted to AI-variable costs saves ${fmtUSD(Math.round(employeeCount * 850 * 0.01))} annually.`
     : isMid
     ? `With ${employeeCount} employees, ${companyName} can target AI automation of the 5-10 highest-volume workflows to shift from fixed headcount to scalable AI capacity. In ${ind}, mid-size organizations see the fastest ROI from AI cost restructuring because they're large enough to benefit but agile enough to deploy quickly.`
     : `At ${employeeCount} employees, ${companyName} can punch above its weight by using AI to match the output capacity of organizations 3-5x its size. In ${ind}, small organizations deploying AI effectively achieve per-employee productivity 40-60% higher than non-AI peers (BCG 2024).`;
@@ -5366,7 +5362,7 @@ function getPnLImpact(
 
   // ---- Talent descriptions ----
   const talentInvest = highReg
-    ? `In ${ind}, AI-mature organizations attract top compliance, clinical, and technical talent who want to work with modern tools — not against legacy systems. Deloitte 2024 finds 23% lower turnover at AI-mature organizations. For ${companyName} with ${employeeCount.toLocaleString()} employees, that translates to real retention savings and reduced knowledge loss in a highly regulated environment where institutional expertise is irreplaceable.`
+    ? `In ${ind}, AI-mature organizations attract top compliance, clinical, and technical talent who want to work with modern tools. not against legacy systems. Deloitte 2024 finds 23% lower turnover at AI-mature organizations. For ${companyName} with ${employeeCount.toLocaleString()} employees, that translates to real retention savings and reduced knowledge loss in a highly regulated environment where institutional expertise is irreplaceable.`
     : `AI-enabled workplaces attract top ${ind} talent who increasingly evaluate employers by technology maturity. Deloitte 2024 finds 23% lower turnover at AI-mature organizations. For ${companyName}, reduced turnover of even 1-2% among ${employeeCount.toLocaleString()} employees saves ${fmtUSD(talentSavings)} in recruiting, onboarding, and lost productivity costs.`;
 
   const talentCoast = highReg
@@ -5375,29 +5371,29 @@ function getPnLImpact(
 
   // ---- Risk descriptions ----
   const riskInvest = highReg
-    ? `In ${ind} with ${regulatoryIntensity} regulatory intensity, structured AI governance is not optional — it's a compliance requirement. ${companyName}'s Authority Structure score of ${getScore('authority_structure')}/100 indicates governance gaps that create direct regulatory exposure. Proactive AI governance reduces shadow AI incidents, demonstrates compliance readiness, and avoids the ${fmtUSD(Math.round(riskCostBase))}-equivalent cost of a material AI-related incident.`
+    ? `In ${ind} with ${regulatoryIntensity} regulatory intensity, structured AI governance is not optional. it's a compliance requirement. ${companyName}'s Authority Structure score of ${getScore('authority_structure')}/100 indicates governance gaps that create direct regulatory exposure. Proactive AI governance reduces shadow AI incidents, demonstrates compliance readiness, and avoids the ${fmtUSD(Math.round(riskCostBase))}-equivalent cost of a material AI-related incident.`
     : `Structured AI governance prevents the most expensive AI failures: data breaches, biased outputs, and compliance violations. ${companyName}'s Authority Structure score of ${getScore('authority_structure')}/100 suggests governance gaps that create unnecessary risk. IBM 2024 data shows organizations with AI governance frameworks experience 73% fewer material incidents.`;
 
   const riskCoast = highReg
-    ? `Ungoverned AI proliferation in a ${regulatoryIntensity}-regulation ${ind} environment creates compounding compliance exposure. Regulators are actively developing AI-specific requirements — ${companyName}'s governance gaps (Authority Structure: ${getScore('authority_structure')}/100) will become audit findings. IBM reports the avg cost of an AI-related data breach at ${fmtUSD(Math.round(riskCostBase))} for organizations of this size and regulatory profile.`
-    : `Shadow AI proliferates without governance — your people are already using AI tools you don't know about. IBM reports the avg cost of an AI-related data breach at ${fmtUSD(Math.round(riskCostBase))}. With Authority Structure at ${getScore('authority_structure')}/100, ${companyName} has limited visibility into what AI tools are being used with what data.`;
+    ? `Ungoverned AI proliferation in a ${regulatoryIntensity}-regulation ${ind} environment creates compounding compliance exposure. Regulators are actively developing AI-specific requirements. ${companyName}'s governance gaps (Authority Structure: ${getScore('authority_structure')}/100) will become audit findings. IBM reports the avg cost of an AI-related data breach at ${fmtUSD(Math.round(riskCostBase))} for organizations of this size and regulatory profile.`
+    : `Shadow AI proliferates without governance. your people are already using AI tools you don't know about. IBM reports the avg cost of an AI-related data breach at ${fmtUSD(Math.round(riskCostBase))}. With Authority Structure at ${getScore('authority_structure')}/100, ${companyName} has limited visibility into what AI tools are being used with what data.`;
 
   // ---- 5 P&L Scenarios ----
   const scenarios: PnLScenario[] = [
     {
       label: "Revenue Growth",
-      investUpside: revGrowthInvest[industry] || `AI-driven ${ind.toLowerCase()}-specific optimization — including demand forecasting, customer personalization, and pricing intelligence — drives ${(revUp * 100).toFixed(1)}% incremental revenue growth. With an Adoption Behavior score of ${getScore('adoption_behavior')}/100, ${companyName} has meaningful room to embed AI into revenue-generating workflows.`,
+      investUpside: revGrowthInvest[industry] || `AI-driven ${ind.toLowerCase()}-specific optimization. including demand forecasting, customer personalization, and pricing intelligence. drives ${(revUp * 100).toFixed(1)}% incremental revenue growth. With an Adoption Behavior score of ${getScore('adoption_behavior')}/100, ${companyName} has meaningful room to embed AI into revenue-generating workflows.`,
       investDollar: fmtUSD(Math.round(revenue * revUp)),
       coastDownside: revGrowthCoast[industry] || (stage >= 4
-        ? `Revenue growth decelerates as fast-following ${ind.toLowerCase()} competitors close your AI lead through targeted investment in the same workflows that drive your current advantage. At Stage ${stage}, ${companyName}'s market-share premium erodes 2-4 quarters after aggressive peers match your AI operating model — the advantage is durable only if it keeps moving.`
+        ? `Revenue growth decelerates as fast-following ${ind.toLowerCase()} competitors close your AI lead through targeted investment in the same workflows that drive your current advantage. At Stage ${stage}, ${companyName}'s market-share premium erodes 2-4 quarters after aggressive peers match your AI operating model. the advantage is durable only if it keeps moving.`
         : `Revenue growth stagnates as AI-enabled ${ind.toLowerCase()} competitors capture market share through faster innovation, better personalization, and lower customer acquisition costs. At Stage ${stage}, ${companyName} is falling ${stage <= 2 ? '18-24 months' : '12-18 months'} behind peers who are already scaling AI-driven revenue initiatives.`),
       coastDollar: `-${fmtUSD(Math.round(revenue * erosionRate))}`,
     },
     {
       label: "Operating Margin",
-      investUpside: marginInvest[industry] || `AI-driven process automation, workflow optimization, and error reduction improve operating margin by ${(marginUp * 100).toFixed(1)}% of revenue across ${ind.toLowerCase()} operations. ${companyName}'s weakest dimension — ${dimensionLabel(weakest?.dimension || '')} at ${weakest?.normalizedScore}/100 — represents the highest-leverage target for margin-enhancing AI.`,
+      investUpside: marginInvest[industry] || `AI-driven process automation, workflow optimization, and error reduction improve operating margin by ${(marginUp * 100).toFixed(1)}% of revenue across ${ind.toLowerCase()} operations. ${companyName}'s weakest dimension. ${dimensionLabel(weakest?.dimension || '')} at ${weakest?.normalizedScore}/100. represents the highest-leverage target for margin-enhancing AI.`,
       investDollar: `+${fmtUSD(Math.round(revenue * marginUp))}`,
-      coastDownside: marginCoast[industry] || `Operating costs rise relative to AI-optimized ${ind.toLowerCase()} peers. With ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margins, ${companyName} has limited buffer — every quarter of delay widens the structural cost gap as competitors continuously optimize.`,
+      coastDownside: marginCoast[industry] || `Operating costs rise relative to AI-optimized ${ind.toLowerCase()} peers. With ${(ebitdaMargin * 100).toFixed(0)}% EBITDA margins, ${companyName} has limited buffer. every quarter of delay widens the structural cost gap as competitors continuously optimize.`,
       coastDollar: `-${fmtUSD(Math.round(revenue * marginUp * 0.4))}`,
     },
     {
@@ -5443,7 +5439,7 @@ function getPnLImpact(
 
     // ---- Capital Markets ----
     capital_markets: [
-      { claim: "Goldman Sachs estimates AI-enabled banks will achieve 3-5% ROE improvement by 2027 — at scale, this separates winners from consolidation targets", metric: "3-5% ROE uplift", source: "Goldman Sachs Research 2024" },
+      { claim: "Goldman Sachs estimates AI-enabled banks will achieve 3-5% ROE improvement by 2027. at scale, this separates winners from consolidation targets", metric: "3-5% ROE uplift", source: "Goldman Sachs Research 2024" },
       { claim: "Citadel's AI-driven trading strategies contributed to $8B+ in net gains in 2024; the firm estimates AI alpha generation accounts for 35% of total performance", metric: "35% of alpha from AI", source: "Bloomberg Markets 2024" },
       { claim: "BlackRock's Aladdin AI platform manages risk analytics across $10T+ in assets; AI enhancements reduced portfolio risk model runtime from hours to minutes, enabling real-time rebalancing", metric: "$10T+ on AI platform", source: "BlackRock 10-K 2024" },
       { claim: "Morgan Stanley's AI financial advisor assistant reduced advisor onboarding time 40% and increased AUM per advisor 12%, worth approximately $200M annually", metric: "12% AUM increase", source: "Morgan Stanley Investor Day 2024" },
@@ -5474,7 +5470,7 @@ function getPnLImpact(
     // ---- Life Sciences & Pharma ----
     life_sciences_pharma: [
       { claim: "Pfizer's AI drug discovery platform reduced lead compound identification time from 4.5 years to 18 months for its oncology pipeline, valued at $1.2B in accelerated revenue per approved drug", metric: "67% faster discovery", source: "Pfizer R&D Day 2024" },
-      { claim: "Roche's AI pathology platform improved clinical trial patient matching accuracy 40%, reducing trial enrollment time by 30% — worth $600M in accelerated pipeline value across 15 active programs", metric: "30% faster enrollment", source: "Roche Annual Report 2024" },
+      { claim: "Roche's AI pathology platform improved clinical trial patient matching accuracy 40%, reducing trial enrollment time by 30%. worth $600M in accelerated pipeline value across 15 active programs", metric: "30% faster enrollment", source: "Roche Annual Report 2024" },
       { claim: "AstraZeneca estimates AI-enabled clinical trial design saved $350M in 2024 by reducing protocol amendments 55% and improving first-attempt regulatory submission success", metric: "$350M trial savings", source: "AstraZeneca 10-K 2024" },
       { claim: "Novartis deployed AI across 50+ manufacturing sites for real-time quality prediction, reducing batch failures 35% and saving $200M in annual production waste", metric: "35% fewer batch failures", source: "Novartis Investor Day 2024" },
     ],
@@ -5483,7 +5479,7 @@ function getPnLImpact(
     retail: [
       { claim: "Walmart's AI demand forecasting reduced out-of-stock incidents 30% across 4,700 US stores, worth an estimated $1.5B in recovered annual revenue", metric: "$1.5B revenue recovery", source: "Walmart 10-K 2024" },
       { claim: "Target's AI-powered inventory optimization reduced markdowns by $800M in 2024, a 2.1 percentage point gross margin improvement on its $107B revenue base", metric: "$800M markdown savings", source: "Target Q4 2024 Earnings Call" },
-      { claim: "Starbucks' Deep Brew AI engine personalizes 400M customer offers weekly, increasing average ticket size 15% for loyalty members — an estimated $1.2B in incremental annual revenue", metric: "15% ticket uplift", source: "Starbucks Investor Day 2024" },
+      { claim: "Starbucks' Deep Brew AI engine personalizes 400M customer offers weekly, increasing average ticket size 15% for loyalty members. an estimated $1.2B in incremental annual revenue", metric: "15% ticket uplift", source: "Starbucks Investor Day 2024" },
     ],
 
     // ---- Ecommerce & Digital ----
@@ -5511,7 +5507,7 @@ function getPnLImpact(
 
     // ---- Manufacturing (Process) ----
     manufacturing_process: [
-      { claim: "Dow Chemical's AI process control optimization increased ethylene cracker yield 3%, worth $350M annually across its $57B revenue base — pure margin on existing capacity", metric: "3% yield improvement", source: "Dow 10-K 2024" },
+      { claim: "Dow Chemical's AI process control optimization increased ethylene cracker yield 3%, worth $350M annually across its $57B revenue base. pure margin on existing capacity", metric: "3% yield improvement", source: "Dow 10-K 2024" },
       { claim: "BASF's AI-powered catalyst optimization reduced R&D cycle time 40% for specialty chemicals, accelerating $1.2B in new product revenue by 18 months", metric: "40% faster R&D cycles", source: "BASF Annual Report 2024" },
       { claim: "ArcelorMittal's AI steel quality prediction reduced off-spec production 45%, saving $280M annually in rework and scrap across 35 integrated steel mills", metric: "45% quality improvement", source: "ArcelorMittal Investor Day 2024" },
     ],
@@ -5557,14 +5553,14 @@ function getPnLImpact(
     media_entertainment: [
       { claim: "Netflix's AI recommendation engine drives 80% of content watched; the company estimates this personalization saves $1B annually in content licensing by reducing churn 5-8%", metric: "$1B content savings", source: "Netflix 10-K 2024" },
       { claim: "Disney's AI-powered park yield management increased per-guest spending 22% at Walt Disney World through dynamic pricing and personalized offers, worth $1.8B annually", metric: "22% spend per guest", source: "Disney Q3 2024 Earnings Call" },
-      { claim: "Spotify's AI-driven Discover Weekly and personalized playlists increased average listening time 30%, directly improving ad revenue per user and reducing churn — worth $600M annually", metric: "30% more listening time", source: "Spotify Investor Day 2024" },
+      { claim: "Spotify's AI-driven Discover Weekly and personalized playlists increased average listening time 30%, directly improving ad revenue per user and reducing churn. worth $600M annually", metric: "30% more listening time", source: "Spotify Investor Day 2024" },
       { claim: "Warner Bros. Discovery's AI content performance prediction improved greenlight accuracy 35%, reducing write-offs by $400M annually on its $23B content spend", metric: "35% better greenlights", source: "WBD Annual Report 2024" },
     ],
 
     // ---- Software / SaaS ----
     software_saas: [
       { claim: "GitHub Copilot adopters report 55% faster task completion; at average developer cost of $165K, this represents $90K in productivity value per developer annually", metric: "55% productivity gain", source: "GitHub Octoverse 2024" },
-      { claim: "Meta's AI recommendation engine improvements drove $10B+ in incremental advertising revenue in 2024 — algorithmic precision directly drives top-line growth", metric: "$10B+ revenue", source: "Meta 10-K 2024" },
+      { claim: "Meta's AI recommendation engine improvements drove $10B+ in incremental advertising revenue in 2024. algorithmic precision directly drives top-line growth", metric: "$10B+ revenue", source: "Meta 10-K 2024" },
       { claim: "Salesforce reports Einstein AI generates 1T+ predictions per week for customers; early Agentforce adopters reduced service resolution time 40%, worth $500M+ in aggregate customer savings", metric: "1T+ predictions/week", source: "Salesforce 10-K 2024" },
       { claim: "ServiceNow's AI workflow automation reduced customer incident resolution time 52%, driving 35% net new ACV growth in AI-enabled SKUs worth $2.1B in 2024 bookings", metric: "52% faster resolution", source: "ServiceNow Q4 2024 Earnings Call" },
     ],
@@ -5574,7 +5570,7 @@ function getPnLImpact(
       { claim: "NVIDIA's AI-designed chip architectures reduced Blackwell GPU design cycle 30%, compressing time-to-market from 24 to 17 months and accelerating $47B in data center revenue", metric: "30% faster design cycle", source: "NVIDIA 10-K 2024" },
       { claim: "Apple's AI-powered supply chain optimization reduced component inventory buffer 20% across 200+ suppliers, freeing $4.5B in working capital annually", metric: "$4.5B working capital freed", source: "Apple 10-K 2024" },
       { claim: "Intel's AI yield optimization improved manufacturing yields 5% at its Fab 34 facility, converting $1.2B in annual wafer waste to productive output", metric: "5% yield improvement", source: "Intel Investor Day 2024" },
-      { claim: "Microsoft reports Copilot for M365 early adopters achieve 29% faster document creation and 64% faster email triage — at enterprise scale, this is hundreds of millions in labor productivity", metric: "29-64% time savings", source: "Microsoft Work Trend Index 2024" },
+      { claim: "Microsoft reports Copilot for M365 early adopters achieve 29% faster document creation and 64% faster email triage. at enterprise scale, this is hundreds of millions in labor productivity", metric: "29-64% time savings", source: "Microsoft Work Trend Index 2024" },
     ],
 
     // ---- Transportation ----
@@ -5586,7 +5582,7 @@ function getPnLImpact(
 
     // ---- Shipping & Logistics ----
     shipping_logistics: [
-      { claim: "UPS's ORION AI routing optimization saves $400M annually on a $91B revenue base — a direct 0.44% margin improvement from a single AI application", metric: "$400M/year", source: "UPS 10-K 2024" },
+      { claim: "UPS's ORION AI routing optimization saves $400M annually on a $91B revenue base. a direct 0.44% margin improvement from a single AI application", metric: "$400M/year", source: "UPS 10-K 2024" },
       { claim: "Maersk's AI-driven demand forecasting reduced empty container repositioning costs by 15%, worth approximately $600M annually across their fleet", metric: "15% cost reduction", source: "Maersk Annual Report 2024" },
       { claim: "DHL reports AI predictive maintenance cut unplanned vehicle downtime 40%, converting $180M in annual losses to productive capacity", metric: "40% downtime reduction", source: "DHL Innovation Center 2024" },
       { claim: "Amazon's AI demand forecasting reduced excess inventory carrying costs by $1.2B in 2024, directly improving working capital efficiency", metric: "$1.2B savings", source: "Amazon Q3 2024 Earnings Call" },
@@ -5644,8 +5640,8 @@ function getPnLImpact(
     // ---- Fintech & Payments ----
     fintech_payments: [
       { claim: "Stripe Radar processed 100B+ transactions in 2024 and blocked $5B+ in fraud with sub-100ms ML decisioning, enabling Stripe merchants to authorize more legitimate transactions while losing less to fraud", metric: "$5B+ fraud blocked", source: "Stripe Radar Public Disclosures 2024" },
-      { claim: "Visa's AI-powered Advanced Authorization scored 100% of 280B+ annual transactions and blocked an estimated $40B in attempted fraud in 2024 — fraud losses on the network remain at historic lows of ~6 cents per $100 of payment volume", metric: "$40B fraud prevented", source: "Visa Q4 2024 Earnings; Visa Annual Report 2024" },
-      { claim: "Klarna's AI customer-service assistant handles 2.3M conversations/month — equivalent to 700 full-time agents — cutting average handling time from 11 minutes to under 2 minutes while maintaining customer-satisfaction parity with human agents", metric: "700 agents replaced", source: "Klarna 2024 AI Update; Q1 2024 Investor Update" },
+      { claim: "Visa's AI-powered Advanced Authorization scored 100% of 280B+ annual transactions and blocked an estimated $40B in attempted fraud in 2024. fraud losses on the network remain at historic lows of ~6 cents per $100 of payment volume", metric: "$40B fraud prevented", source: "Visa Q4 2024 Earnings; Visa Annual Report 2024" },
+      { claim: "Klarna's AI customer-service assistant handles 2.3M conversations/month. equivalent to 700 full-time agents. cutting average handling time from 11 minutes to under 2 minutes while maintaining customer-satisfaction parity with human agents", metric: "700 agents replaced", source: "Klarna 2024 AI Update; Q1 2024 Investor Update" },
     ],
 
     // ---- Healthcare Services ----
@@ -5720,7 +5716,7 @@ function getPnLImpact(
 
     // ---- Government (Federal) ----
     government_federal: [
-      { claim: "IRS AI fraud detection identified $5.4B in fraudulent refund claims in 2024, a 40% improvement over prior methods — the single highest ROI AI deployment across federal government", metric: "$5.4B fraud caught", source: "IRS Data Book 2024" },
+      { claim: "IRS AI fraud detection identified $5.4B in fraudulent refund claims in 2024, a 40% improvement over prior methods. the single highest ROI AI deployment across federal government", metric: "$5.4B fraud caught", source: "IRS Data Book 2024" },
       { claim: "VA's AI radiology screening system processed 4M scans in 2024, reducing radiologist wait times from 45 days to 3 days and catching 22% more early-stage cancers in veterans", metric: "93% faster reads", source: "VA Office of Health Informatics 2024" },
       { claim: "DoD's AI predictive maintenance for military vehicles reduced unscheduled depot maintenance 30%, improving fleet readiness from 72% to 85% and saving $1.2B annually", metric: "13pt readiness gain", source: "GAO AI in Defense Report 2024" },
     ],
@@ -5748,10 +5744,10 @@ function getPnLImpact(
   };
 
   const defaultProofPoints: IndustryProofPoint[] = [
-    { claim: "McKinsey's 2024 survey found organizations at AI maturity Stage 4+ generate 2.5x more measurable value from AI initiatives than Stage 2 organizations — the gap is not linear, it's exponential", metric: "2.5x value generation", source: "McKinsey Global AI Survey 2024" },
+    { claim: "McKinsey's 2024 survey found organizations at AI maturity Stage 4+ generate 2.5x more measurable value from AI initiatives than Stage 2 organizations. the gap is not linear, it's exponential", metric: "2.5x value generation", source: "McKinsey Global AI Survey 2024" },
     { claim: "BCG research shows AI leaders achieve 1.5x higher EBITDA growth rates than AI laggards, with the gap widening each year as organizational learning compounds", metric: "1.5x EBITDA growth", source: "BCG AI Advantage Report 2024" },
-    { claim: "Accenture estimates AI-first operating models reduce SG&A costs by 15-25% over 3 years — the structural cost advantage becomes a permanent competitive moat", metric: "15-25% SG&A reduction", source: "Accenture Technology Vision 2024" },
-    { claim: "Deloitte found organizations that invest systematically in AI talent and infrastructure see 23% lower employee turnover — the talent multiplier alone often justifies the investment", metric: "23% lower turnover", source: "Deloitte Human Capital Trends 2024" },
+    { claim: "Accenture estimates AI-first operating models reduce SG&A costs by 15-25% over 3 years. the structural cost advantage becomes a permanent competitive moat", metric: "15-25% SG&A reduction", source: "Accenture Technology Vision 2024" },
+    { claim: "Deloitte found organizations that invest systematically in AI talent and infrastructure see 23% lower employee turnover. the talent multiplier alone often justifies the investment", metric: "23% lower turnover", source: "Deloitte Human Capital Trends 2024" },
   ];
 
   // Ensure exactly 4 proof points for clean 2x2 grid layout
@@ -5773,7 +5769,7 @@ function getPnLImpact(
     ? `Even at Stage ${stage}, standing still forfeits ${fmtUSD(quarterly)} per quarter. Over three years, competitive erosion compounds the loss to ${fmtUSD(year3)} as competitors close the capability gap and begin to match or exceed your AI-driven advantages.`
     : stage === 3
     ? `At your estimated capture rate, ${companyName} forfeits an estimated ${fmtUSD(quarterly)} every quarter. But the real cost compounds: as competitors at Stage 4+ build organizational learning advantages, the cost to close the gap grows approximately 15% annually. Over three years, total estimated forfeited value reaches ${fmtUSD(year3)}.`
-    : `At an estimated ${capturePercent}% capture rate, ${companyName} forfeits an estimated ${fmtUSD(quarterly)} every quarter — approximately ${fmtUSD(Math.round(quarterly / 90))} every single day. This is not a static loss: competitors investing now are building compounding advantages in cost structure, talent, and customer experience. Over three years, the total estimated forfeited value reaches ${fmtUSD(year3)}, and the organizational deficit grows proportionally harder to close.`;
+    : `At an estimated ${capturePercent}% capture rate, ${companyName} forfeits an estimated ${fmtUSD(quarterly)} every quarter. approximately ${fmtUSD(Math.round(quarterly / 90))} every single day. This is not a static loss: competitors investing now are building compounding advantages in cost structure, talent, and customer experience. Over three years, the total estimated forfeited value reaches ${fmtUSD(year3)}, and the organizational deficit grows proportionally harder to close.`;
 
   // ---- EBITDA Projection ----
   const investEBITDA = currentEBITDA + (revenue * marginUp) + (revenue * revUp * ebitdaMargin);
@@ -5916,7 +5912,7 @@ function getIndustryCompetitors(
 function getGartnerContext(industry: string, stage: number): string {
   const ind = industryLabel(industry);
   if (stage <= 2) {
-    return `For organizations at Stage ${stage} in ${ind}, Gartner recommends prioritizing vendors in the "Leaders" and "Visionaries" quadrants of the relevant Magic Quadrant — specifically those with strong implementation support, low time-to-value, and proven onboarding for organizations early in their AI journey. Avoid niche players that require significant internal expertise to deploy. Forrester's 2024 analysis emphasizes that early-stage organizations should select vendors based on "ecosystem completeness" (training, support, community) rather than pure technical capability.`;
+    return `For organizations at Stage ${stage} in ${ind}, Gartner recommends prioritizing vendors in the "Leaders" and "Visionaries" quadrants of the relevant Magic Quadrant. specifically those with strong implementation support, low time-to-value, and proven onboarding for organizations early in their AI journey. Avoid niche players that require significant internal expertise to deploy. Forrester's 2024 analysis emphasizes that early-stage organizations should select vendors based on "ecosystem completeness" (training, support, community) rather than pure technical capability.`;
   }
   if (stage <= 3) {
     return `At Stage ${stage} in ${ind}, your organization is ready for a broader vendor portfolio. Gartner recommends a mix of established "Leaders" for core infrastructure and selectively engaging "Challengers" and "Visionaries" for innovative capabilities in specific domains. The key evaluation criteria at this stage shift from ease-of-adoption to platform extensibility, integration depth, and total cost of ownership. Forrester's 2024 Wave analyses suggest mid-maturity organizations should also invest in MLOps/AI platform vendors to build internal deployment capabilities.`;
@@ -5925,7 +5921,7 @@ function getGartnerContext(industry: string, stage: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Vendor Stack Assessment — grouped by use case with heat-map ratings
+// Vendor Stack Assessment. grouped by use case with heat-map ratings
 // ---------------------------------------------------------------------------
 
 interface VendorRating {
@@ -6289,7 +6285,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
       { metric: "AI-Assisted Diagnostic Accuracy", category: "Clinical Quality", dimension: "workflow_integration", detail: "Leading health systems achieve 85%+ concordance between AI-flagged findings and clinician confirmation. Track improvement from your current baseline across radiology, pathology, or clinical decision support.", targetBySize: { micro: "80%+", small: "82%+", mid: "85%+", large: "85%+" }, numericTarget: 85 },
       { metric: "Revenue Cycle AI Capture Rate", category: "Financial Operations", dimension: "economic_translation", detail: "AI-powered coding and prior authorization reduces claim denials 30-40%. Measure the dollar value of denied claims recovered through AI-assisted processes.", targetBySize: { micro: "$25K/qtr", small: "$75K/qtr", mid: "$250K/qtr", large: "$1M+/qtr" }, numericTarget: 80 },
       { metric: "Patient Throughput Improvement", category: "Operational Efficiency", dimension: "decision_velocity", detail: "AI-optimized scheduling and patient flow at peer institutions improves throughput 15-20% without additional capacity. Measure patients per day per provider.", targetBySize: { micro: "8%", small: "10%", mid: "15%", large: "18%" }, numericTarget: 75 },
-      { metric: "Clinical Workflow AI Adoption", category: "Digital Transformation", dimension: "adoption_behavior", detail: "Percentage of clinical workflows with active AI augmentation — from order entry to discharge planning. Peer leaders target 40%+ within 12 months of scaling.", targetBySize: { micro: "30%", small: "35%", mid: "40%", large: "45%" }, numericTarget: 80 },
+      { metric: "Clinical Workflow AI Adoption", category: "Digital Transformation", dimension: "adoption_behavior", detail: "Percentage of clinical workflows with active AI augmentation. from order entry to discharge planning. Peer leaders target 40%+ within 12 months of scaling.", targetBySize: { micro: "30%", small: "35%", mid: "40%", large: "45%" }, numericTarget: 80 },
       { metric: "AI ROI Measurement Coverage", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of active AI initiatives with standardized ROI tracking. Without measurement, AI budgets are indefensible in the next planning cycle.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
     ],
     high: [
@@ -6301,7 +6297,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
   },
   financial_services: {
     low: [
-      { metric: "AI Tool Inventory & Risk Classification", category: "Regulatory Compliance", dimension: "authority_structure", detail: "OCC, FDIC, and SEC are increasing AI scrutiny. Complete inventory with risk tiers is the foundation of defensible governance — and a regulatory expectation, not a nice-to-have.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "AI Tool Inventory & Risk Classification", category: "Regulatory Compliance", dimension: "authority_structure", detail: "OCC, FDIC, and SEC are increasing AI scrutiny. Complete inventory with risk tiers is the foundation of defensible governance. and a regulatory expectation, not a nice-to-have.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
       { metric: "Fraud Detection Pilot Accuracy", category: "Risk Operations", dimension: "workflow_integration", detail: "ML-based fraud models reduce false positives 40-60% vs. rule-based systems. Even a pilot on one transaction type proves the business case for AI investment.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
       { metric: "Compliance Workflow AI Coverage", category: "Regulatory Efficiency", dimension: "workflow_integration", detail: "Percentage of compliance workflows with AI-assisted monitoring, documentation, or reporting. Regulators expect you to use available technology for oversight.", targetBySize: { micro: "10%", small: "15%", mid: "20%", large: "25%" }, numericTarget: 75 },
       { metric: "AI Governance Committee Establishment", category: "Governance Foundation", dimension: "authority_structure", detail: "Formal AI governance body with clear charter, risk appetite framework, and model validation requirements. Required by evolving regulatory guidance from OCC and Fed.", targetBySize: { micro: "Chartered", small: "Chartered", mid: "Chartered", large: "Chartered" }, numericTarget: 100 },
@@ -6310,7 +6306,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
     mid: [
       { metric: "Straight-Through Processing Rate", category: "Operational Efficiency", dimension: "decision_velocity", detail: "Leading institutions achieve 70%+ STP on standard transactions. Each percentage point reduces manual handling cost and error rate proportionally.", targetBySize: { micro: "50%+", small: "55%+", mid: "60%+", large: "70%+" }, numericTarget: 80 },
       { metric: "Fraud False Positive Reduction", category: "Risk Operations", dimension: "workflow_integration", detail: "ML models reduce false positives 40-60% while maintaining or improving catch rates. Fewer false positives means less customer friction and lower investigation costs.", targetBySize: { micro: "25%", small: "30%", mid: "35%", large: "40%" }, numericTarget: 80 },
-      { metric: "AI-Influenced Revenue Attribution", category: "Revenue Impact", dimension: "economic_translation", detail: "Quantify assets or revenue where AI models materially influence decisions — advisory recommendations, risk pricing, portfolio construction, or client acquisition.", targetBySize: { micro: "$1M+", small: "$5M+", mid: "$50M+", large: "$500M+" }, numericTarget: 75 },
+      { metric: "AI-Influenced Revenue Attribution", category: "Revenue Impact", dimension: "economic_translation", detail: "Quantify assets or revenue where AI models materially influence decisions. advisory recommendations, risk pricing, portfolio construction, or client acquisition.", targetBySize: { micro: "$1M+", small: "$5M+", mid: "$50M+", large: "$500M+" }, numericTarget: 75 },
       { metric: "Model Risk Management Maturity", category: "Risk Governance", dimension: "authority_structure", detail: "Percentage of production AI models with documented validation, bias testing, and ongoing monitoring per SR 11-7 / OCC 2011-12 guidance.", targetBySize: { micro: "80%", small: "85%", mid: "90%", large: "95%" }, numericTarget: 90 },
       { metric: "Customer AI Interaction Satisfaction", category: "Client Experience", dimension: "adoption_behavior", detail: "NPS or satisfaction score for AI-powered client interactions (chatbots, robo-advisory, automated onboarding). Track against human-assisted baseline.", targetBySize: { micro: "On par", small: "On par", mid: "+5pts", large: "+10pts" }, numericTarget: 75 },
     ],
@@ -6334,7 +6330,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
       { metric: "First-Pass Yield Improvement", category: "Production Quality", dimension: "economic_translation", detail: "AI-optimized process parameters improve first-pass yield 2-5% at advanced manufacturers. Even 1% yield improvement translates to significant margin impact at scale.", targetBySize: { micro: "1%", small: "1.5%", mid: "2%", large: "3%" }, numericTarget: 75 },
       { metric: "Energy Consumption per Unit Reduction", category: "Operational Cost", dimension: "economic_translation", detail: "AI-optimized energy management reduces per-unit energy cost 10-15%. Measurable, defensible savings that directly impact COGS.", targetBySize: { micro: "5%", small: "8%", mid: "10%", large: "12%" }, numericTarget: 75 },
       { metric: "Supply Chain Forecast Accuracy", category: "Planning & Logistics", dimension: "workflow_integration", detail: "ML-based demand and supply forecasting improves accuracy 15-25% over traditional methods, reducing inventory carrying costs and stockouts.", targetBySize: { micro: "+10%", small: "+12%", mid: "+15%", large: "+20%" }, numericTarget: 80 },
-      { metric: "AI Initiative ROI Tracking", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of active AI initiatives with standardized ROI measurement. Manufacturing CFOs need hard numbers — not pilot stories — to approve the next investment cycle.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
+      { metric: "AI Initiative ROI Tracking", category: "Financial Governance", dimension: "economic_translation", detail: "Percentage of active AI initiatives with standardized ROI measurement. Manufacturing CFOs need hard numbers. not pilot stories. to approve the next investment cycle.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
     ],
     high: [
       { metric: "Digital Twin Coverage", category: "Advanced Operations", dimension: "workflow_integration", detail: "AI-powered digital twins of production processes enable simulation, optimization, and predictive scenario planning. The competitive moat of next-generation manufacturing.", targetBySize: { micro: "1 line", small: "1 facility", mid: "3+ facilities", large: "Enterprise" }, numericTarget: 85 },
@@ -6376,12 +6372,12 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
     mid: [
       { metric: "AI-Powered Feature Usage Rate", category: "Product Engagement", dimension: "workflow_integration", detail: "Percentage of active users engaging with AI-powered features monthly. Building AI features nobody uses is worse than not building them.", targetBySize: { micro: "20%+", small: "25%+", mid: "30%+", large: "35%+" }, numericTarget: 80 },
       { metric: "Code Review Automation Coverage", category: "Engineering Efficiency", dimension: "workflow_integration", detail: "Percentage of code reviews with AI-assisted analysis (security, performance, style). Reduces review cycle time 40-60% at leading engineering orgs.", targetBySize: { micro: "50%", small: "55%", mid: "60%", large: "70%" }, numericTarget: 80 },
-      { metric: "AI Feature Revenue Attribution", category: "Revenue Impact", dimension: "economic_translation", detail: "Revenue directly attributable to AI-powered features — upsell, retention, or net-new. The metric that justifies the next round of AI investment.", targetBySize: { micro: "$100K+", small: "$500K+", mid: "$2M+", large: "$10M+" }, numericTarget: 75 },
+      { metric: "AI Feature Revenue Attribution", category: "Revenue Impact", dimension: "economic_translation", detail: "Revenue directly attributable to AI-powered features. upsell, retention, or net-new. The metric that justifies the next round of AI investment.", targetBySize: { micro: "$100K+", small: "$500K+", mid: "$2M+", large: "$10M+" }, numericTarget: 75 },
       { metric: "Model Deployment Velocity", category: "Engineering Speed", dimension: "decision_velocity", detail: "Time from trained model to production deployment. Best-in-class teams deploy in hours, not weeks. Slow deployment kills AI competitive advantage.", targetBySize: { micro: "<1 wk", small: "<1 wk", mid: "<3 days", large: "<1 day" }, numericTarget: 80 },
       { metric: "AI Incident Response Time", category: "Operational Reliability", dimension: "authority_structure", detail: "Mean time to detect and mitigate AI model degradation, bias drift, or hallucination in production. Customer-facing AI failures are brand-damaging.", targetBySize: { micro: "<4hr", small: "<2hr", mid: "<1hr", large: "<30min" }, numericTarget: 85 },
     ],
     high: [
-      { metric: "AI-Native Product Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from products where AI is the core value proposition, not an add-on feature. This is the future P&L — measure it separately from legacy revenue.", targetBySize: { micro: "15%+", small: "15%+", mid: "20%+", large: "25%+" }, numericTarget: 85 },
+      { metric: "AI-Native Product Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from products where AI is the core value proposition, not an add-on feature. This is the future P&L. measure it separately from legacy revenue.", targetBySize: { micro: "15%+", small: "15%+", mid: "20%+", large: "25%+" }, numericTarget: 85 },
       { metric: "AI Competitive Moat Strength", category: "Market Position", dimension: "workflow_integration", detail: "Proprietary data flywheel, model performance advantage, or AI-enabled network effects that competitors cannot easily replicate. Qualitative + quantitative assessment.", targetBySize: { micro: "Assessed", small: "Assessed", mid: "Measured", large: "Measured" }, numericTarget: 85 },
       { metric: "Platform AI API Revenue", category: "Ecosystem Value", dimension: "economic_translation", detail: "Revenue from AI capabilities exposed as APIs or platform features to customers and partners. The platform play is where technology companies capture exponential value.", targetBySize: { micro: "Launched", small: "Launched", mid: "$1M+", large: "$5M+" }, numericTarget: 80 },
       { metric: "AI R&D Efficiency Ratio", category: "Investment Returns", dimension: "decision_velocity", detail: "Revenue generated per dollar of AI R&D investment. Top-quartile technology companies achieve 5:1+ within 24 months of focused AI investment.", targetBySize: { micro: "3:1+", small: "3:1+", mid: "4:1+", large: "5:1+" }, numericTarget: 85 },
@@ -6434,7 +6430,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
   telecommunications: {
     low: [
       { metric: "Network Anomaly Detection Pilot", category: "Network Operations", dimension: "workflow_integration", detail: "Deploy AI-based anomaly detection on core network segments. ML models detect network issues 60-80% faster than threshold-based alerting.", targetBySize: { micro: "1 segment", small: "1 segment", mid: "2 segments", large: "3 segments" }, numericTarget: 70 },
-      { metric: "Customer Churn Prediction Model", category: "Revenue Protection", dimension: "decision_velocity", detail: "ML-based churn prediction with at least 30-day advance warning. Telecom churn costs 5-10x more than retention — predictive targeting is table stakes.", targetBySize: { micro: "1 model", small: "1 model", mid: "1 model", large: "2 models" }, numericTarget: 70 },
+      { metric: "Customer Churn Prediction Model", category: "Revenue Protection", dimension: "decision_velocity", detail: "ML-based churn prediction with at least 30-day advance warning. Telecom churn costs 5-10x more than retention. predictive targeting is table stakes.", targetBySize: { micro: "1 model", small: "1 model", mid: "1 model", large: "2 models" }, numericTarget: 70 },
       { metric: "AI Governance & Data Framework", category: "Compliance Foundation", dimension: "authority_structure", detail: "Governance covering customer data usage for AI, algorithmic fairness in pricing/service, and network AI safety. FCC and state AG scrutiny is increasing.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
       { metric: "Contact Center AI Pilot", category: "Customer Experience", dimension: "adoption_behavior", detail: "Deploy AI-assisted customer service (chatbot, agent assist, or call routing) on highest-volume issue type. Reduces cost per interaction 20-40%.", targetBySize: { micro: "1 use case", small: "1 use case", mid: "2 use cases", large: "3 use cases" }, numericTarget: 70 },
       { metric: "Frontline Staff AI Training", category: "Workforce Readiness", dimension: "adoption_behavior", detail: "Percentage of NOC, field, and contact center staff trained on AI-augmented tools and workflows.", targetBySize: { micro: "35%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
@@ -6456,22 +6452,22 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
   aerospace_defense: {
     low: [
       { metric: "Predictive Maintenance Pilot (Fleet/Systems)", category: "Mission Readiness", dimension: "workflow_integration", detail: "Deploy AI-predicted maintenance on highest-criticality platforms. DoD and prime contractors report 25-40% reduction in unscheduled maintenance through predictive analytics.", targetBySize: { micro: "1 system", small: "1-2 systems", mid: "3 systems", large: "5 systems" }, numericTarget: 70 },
-      { metric: "AI Security & Classification Framework", category: "Compliance & Security", dimension: "authority_structure", detail: "Formal AI governance covering ITAR, CMMC, and classified environment constraints. AI deployment in defense requires security-first architecture — not an afterthought.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
-      { metric: "Supply Chain Visibility AI", category: "Program Management", dimension: "decision_velocity", detail: "AI-powered supply chain risk monitoring for critical components and long-lead items. Defense supply chains are uniquely fragile — visibility is a strategic imperative.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
+      { metric: "AI Security & Classification Framework", category: "Compliance & Security", dimension: "authority_structure", detail: "Formal AI governance covering ITAR, CMMC, and classified environment constraints. AI deployment in defense requires security-first architecture. not an afterthought.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
+      { metric: "Supply Chain Visibility AI", category: "Program Management", dimension: "decision_velocity", detail: "AI-powered supply chain risk monitoring for critical components and long-lead items. Defense supply chains are uniquely fragile. visibility is a strategic imperative.", targetBySize: { micro: "1 pilot", small: "1 pilot", mid: "2 pilots", large: "3 pilots" }, numericTarget: 70 },
       { metric: "Engineering Team AI Adoption", category: "Workforce Enablement", dimension: "adoption_behavior", detail: "Percentage of engineering and program management staff using AI tools for design, analysis, documentation, or code generation.", targetBySize: { micro: "30%", small: "30%", mid: "35%", large: "40%" }, numericTarget: 75 },
       { metric: "Digital Engineering Foundation", category: "Technical Infrastructure", dimension: "workflow_integration", detail: "Model-based systems engineering (MBSE) with AI-ready data architecture. Without digital thread infrastructure, AI cannot operate across the program lifecycle.", targetBySize: { micro: "Assessed", small: "Assessed", mid: "Piloted", large: "Piloted" }, numericTarget: 65 },
     ],
     mid: [
       { metric: "Platform Availability Improvement", category: "Mission Readiness", dimension: "decision_velocity", detail: "AI-predicted maintenance and logistics optimization improving platform operational availability. Every 1% improvement in Ao translates to mission capability.", targetBySize: { micro: "3%", small: "4%", mid: "5%", large: "7%" }, numericTarget: 80 },
       { metric: "Digital Twin Coverage", category: "Advanced Engineering", dimension: "workflow_integration", detail: "Systems with AI-powered digital twins for simulation, prognostics, and mission planning. The DoD Digital Engineering Strategy makes this a contract requirement.", targetBySize: { micro: "1 system", small: "2 systems", mid: "3+ systems", large: "5+ systems" }, numericTarget: 80 },
-      { metric: "Program Cost Variance Reduction", category: "Financial Performance", dimension: "economic_translation", detail: "AI-assisted cost estimation and risk prediction reducing program cost overruns. Defense programs average 20%+ cost growth — AI can cut this significantly.", targetBySize: { micro: "10%", small: "12%", mid: "15%", large: "20%" }, numericTarget: 75 },
+      { metric: "Program Cost Variance Reduction", category: "Financial Performance", dimension: "economic_translation", detail: "AI-assisted cost estimation and risk prediction reducing program cost overruns. Defense programs average 20%+ cost growth. AI can cut this significantly.", targetBySize: { micro: "10%", small: "12%", mid: "15%", large: "20%" }, numericTarget: 75 },
       { metric: "Autonomous Test & Evaluation Coverage", category: "Quality Assurance", dimension: "workflow_integration", detail: "Percentage of test procedures with AI-augmented analysis, anomaly detection, or automated evaluation. Reduces test cycle time 20-30%.", targetBySize: { micro: "15%", small: "20%", mid: "25%", large: "35%" }, numericTarget: 80 },
       { metric: "AI ROI Documentation for Contracts", category: "Business Development", dimension: "economic_translation", detail: "AI capabilities with documented ROI for inclusion in proposals and contract modifications. AI is increasingly a discriminator in competitive source selections.", targetBySize: { micro: "3 cases", small: "5 cases", mid: "8 cases", large: "12 cases" }, numericTarget: 75 },
     ],
     high: [
       { metric: "AI-Enabled Contract Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from contracts where AI capabilities are a material differentiator or deliverable. The future competitive advantage in defense and aerospace.", targetBySize: { micro: "10%+", small: "15%+", mid: "20%+", large: "25%+" }, numericTarget: 85 },
       { metric: "Autonomous Systems Maturity", category: "Technology Leadership", dimension: "workflow_integration", detail: "Number of autonomous or semi-autonomous systems in production or advanced development. Autonomy is the defining technology race in defense.", targetBySize: { micro: "1 system", small: "2 systems", mid: "3+ systems", large: "5+ systems" }, numericTarget: 85 },
-      { metric: "Cross-Program AI Reuse Rate", category: "Portfolio Efficiency", dimension: "decision_velocity", detail: "Percentage of AI models and components reused across programs. Reuse is the path from one-off projects to scalable AI capability — and dramatically improves program margins.", targetBySize: { micro: "20%", small: "25%", mid: "35%", large: "45%" }, numericTarget: 85 },
+      { metric: "Cross-Program AI Reuse Rate", category: "Portfolio Efficiency", dimension: "decision_velocity", detail: "Percentage of AI models and components reused across programs. Reuse is the path from one-off projects to scalable AI capability. and dramatically improves program margins.", targetBySize: { micro: "20%", small: "25%", mid: "35%", large: "45%" }, numericTarget: 85 },
       { metric: "A&D AI Portfolio ROI", category: "Investment Returns", dimension: "economic_translation", detail: "Blended return across all AI investments: predictive maintenance, digital engineering, autonomous systems, and contract differentiation.", targetBySize: { micro: "2:1+", small: "2.5:1+", mid: "3:1+", large: "4:1+" }, numericTarget: 85 },
     ],
   },
@@ -6492,7 +6488,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
     ],
     high: [
       { metric: "AI-Native Service Revenue %", category: "Strategic Growth", dimension: "economic_translation", detail: "Revenue from services where AI is the core deliverable: AI strategy advisory, implementation, managed AI services. The fastest-growing segment in professional services.", targetBySize: { micro: "15%+", small: "20%+", mid: "25%+", large: "30%+" }, numericTarget: 85 },
-      { metric: "Revenue per Consultant Improvement", category: "Firm Economics", dimension: "economic_translation", detail: "AI-driven improvement in revenue per consultant — the fundamental unit economics metric. Firms that crack this reshape their entire business model.", targetBySize: { micro: "+10%", small: "+12%", mid: "+15%", large: "+20%" }, numericTarget: 85 },
+      { metric: "Revenue per Consultant Improvement", category: "Firm Economics", dimension: "economic_translation", detail: "AI-driven improvement in revenue per consultant. the fundamental unit economics metric. Firms that crack this reshape their entire business model.", targetBySize: { micro: "+10%", small: "+12%", mid: "+15%", large: "+20%" }, numericTarget: 85 },
       { metric: "Proprietary AI Platform Value", category: "Competitive Moat", dimension: "workflow_integration", detail: "Client-facing AI platforms or tools built on proprietary data and methodology. The transition from selling hours to selling recurring capability.", targetBySize: { micro: "1 platform", small: "1 platform", mid: "2 platforms", large: "3+ platforms" }, numericTarget: 80 },
       { metric: "AI Practice Margin vs. Traditional", category: "Portfolio Performance", dimension: "decision_velocity", detail: "Margin comparison between AI-powered engagements and traditional delivery. Successful AI practices achieve 5-15 points higher margin.", targetBySize: { micro: "+5pts", small: "+8pts", mid: "+10pts", large: "+12pts" }, numericTarget: 85 },
     ],
@@ -6501,7 +6497,7 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Record<string, KPITemplate[]>> = {
     low: [
       { metric: "AI Tool Inventory & Governance", category: "Risk Management", dimension: "authority_structure", detail: "Complete inventory of all AI tools in use across the organization with risk classification. You cannot govern what you cannot see.", targetBySize: { micro: "100%", small: "100%", mid: "100%", large: "100%" }, numericTarget: 100 },
       { metric: "AI Pilot Deployments", category: "Innovation Pipeline", dimension: "decision_velocity", detail: "Number of governed AI pilots actively in deployment. Focus on use cases with clear ROI and measurable outcomes to build organizational evidence.", targetBySize: { micro: "1", small: "2", mid: "3", large: "5" }, numericTarget: 70 },
-      { metric: "Workforce AI Readiness Rate", category: "Workforce Development", dimension: "adoption_behavior", detail: "Percentage of workforce completing AI awareness training. Adoption is the #1 bottleneck in AI transformation — technology without adoption is waste.", targetBySize: { micro: "40%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
+      { metric: "Workforce AI Readiness Rate", category: "Workforce Development", dimension: "adoption_behavior", detail: "Percentage of workforce completing AI awareness training. Adoption is the #1 bottleneck in AI transformation. technology without adoption is waste.", targetBySize: { micro: "40%", small: "30%", mid: "25%", large: "20%" }, numericTarget: 75 },
       { metric: "AI Governance Framework", category: "Compliance Foundation", dimension: "authority_structure", detail: "Formal AI governance covering ethics, data privacy, model validation, and escalation protocols. Essential before scaling any AI deployment.", targetBySize: { micro: "Drafted", small: "Drafted", mid: "Ratified", large: "Ratified" }, numericTarget: 100 },
       { metric: "Process Automation Baseline", category: "Operational Efficiency", dimension: "workflow_integration", detail: "Deploy AI-assisted automation on your highest-volume, most repetitive process. Establish baseline metrics before and after for defensible ROI.", targetBySize: { micro: "1 process", small: "2 processes", mid: "3 processes", large: "5 processes" }, numericTarget: 70 },
     ],
@@ -6612,7 +6608,7 @@ function isSameCompany(peerCompany: string, userCompany: string | undefined): bo
   const user = normalizeCompanyName(userCompany);
   if (!peer || !user) return false;
   if (peer === user) return true;
-  // Bidirectional substring check — catches "Deloitte" ⊂ "Deloitte Consulting"
+  // Bidirectional substring check. catches "Deloitte" ⊂ "Deloitte Consulting"
   if (peer.includes(user) || user.includes(peer)) return true;
   // First-token match for brand-prefixed names (require >=3 chars to avoid
   // false positives on short tokens like "AI" or "US").
@@ -6694,7 +6690,7 @@ function scrubUserCompanyFromText(text: string, userCompany: string | undefined)
 function getPeerBoardActions(industry: string, userCompanyName?: string): { company: string; action: string; source: string }[] {
   const peers: Record<string, { company: string; action: string; source: string }[]> = {
     shipping_logistics: [
-      { company: "UPS", action: "Board established a dedicated Technology Committee in 2023 to oversee AI and automation investments. CEO Carol Tomé committed $1B+ annually to smart logistics technology. UPS's ORION AI platform now makes 20M+ routing decisions daily — a board-mandated priority.", source: "UPS 2024 Proxy Statement; 2024 10-K Filing" },
+      { company: "UPS", action: "Board established a dedicated Technology Committee in 2023 to oversee AI and automation investments. CEO Carol Tomé committed $1B+ annually to smart logistics technology. UPS's ORION AI platform now makes 20M+ routing decisions daily. a board-mandated priority.", source: "UPS 2024 Proxy Statement; 2024 10-K Filing" },
       { company: "Maersk", action: "Board approved a $2B digital transformation program with AI at the center. Maersk's board now receives quarterly AI maturity scorecards. Board member Navneet Kapoor (ex-Mastercard CTO) was added specifically for AI/digital oversight.", source: "Maersk 2024 Annual Report; Board Composition Disclosure 2024" },
       { company: "DHL (Deutsche Post)", action: "Supervisory board approved the 'Strategy 2025+' digital acceleration initiative including AI-powered warehouse automation, predictive logistics, and autonomous vehicle testing. Board receives annual digital maturity assessments.", source: "Deutsche Post DHL 2024 Annual Report; Strategy 2025+ Public Summary" },
     ],
@@ -6735,18 +6731,18 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
       { company: "Salesforce", action: "Board oversees Einstein AI platform generating 1T+ predictions/week. CEO Marc Benioff mandated AI-first product development. Board Technology Committee reviews AI trust metrics including bias, toxicity, and accuracy quarterly.", source: "Salesforce 2024 Annual Report; Dreamforce 2024" },
     ],
     consulting_services: [
-      { company: "Accenture", action: "Board approved $3B AI investment over 3 years — the largest in professional services history. CEO Julie Sweet mandated AI training for all 733K+ employees. Board receives quarterly updates on AI-generated revenue and internal productivity metrics. Accenture's AI practice now generates $2B+ annually.", source: "Accenture 2024 Annual Report; Q4 2024 Earnings Call" },
+      { company: "Accenture", action: "Board approved $3B AI investment over 3 years. the largest in professional services history. CEO Julie Sweet mandated AI training for all 733K+ employees. Board receives quarterly updates on AI-generated revenue and internal productivity metrics. Accenture's AI practice now generates $2B+ annually.", source: "Accenture 2024 Annual Report; Q4 2024 Earnings Call" },
       { company: "McKinsey & Company", action: "Senior Partners voted to embed generative AI across all client engagements. McKinsey's proprietary Lilli platform (AI knowledge assistant) is used by 30,000+ consultants daily. The firm invested $2B+ in AI capabilities and acquired QuantumBlack as its AI-native division. Board governance tracks AI utilization rates and quality impact.", source: "McKinsey 2024 Annual Review; QuantumBlack Public Disclosures" },
       { company: "Deloitte", action: "Board approved enterprise-wide AI strategy with $2B+ commitment. CEO Joe Ucuzoglu positioned AI as 'the defining technology of our era.' Deloitte's AI practice serves 75% of Fortune 500 clients. Board-level AI Ethics Committee governs responsible deployment across audit, tax, consulting, and advisory practices.", source: "Deloitte 2024 Global Report; State of Generative AI in the Enterprise, Q4 2024" },
     ],
     legal_services: [
-      { company: "Allen & Overy", action: "Board approved firm-wide deployment of Harvey AI (GPT-4-powered legal assistant) across all practice groups — the first Magic Circle firm to do so. Managing Partner mandated AI literacy training for all 5,500+ lawyers. Board tracks AI-augmented billable hours and client satisfaction.", source: "Allen & Overy 2024 Annual Review; Financial Times Legal AI Report 2024" },
+      { company: "Allen & Overy", action: "Board approved firm-wide deployment of Harvey AI (GPT-4-powered legal assistant) across all practice groups. the first Magic Circle firm to do so. Managing Partner mandated AI literacy training for all 5,500+ lawyers. Board tracks AI-augmented billable hours and client satisfaction.", source: "Allen & Overy 2024 Annual Review; Financial Times Legal AI Report 2024" },
       { company: "Clifford Chance", action: "Board governs AI deployment through dedicated Innovation Committee. Invested in proprietary AI tools for contract analysis and due diligence. The firm's Applied Solutions division builds AI products for both internal use and client-facing services.", source: "Clifford Chance 2024 Annual Review; Legal Technology Survey 2024" },
       { company: "Latham & Watkins", action: "Management Committee approved AI-first knowledge management strategy. The firm deploys multiple AI tools across litigation, M&A, and regulatory practices. Partners report 25-40% faster document review and due diligence through AI augmentation.", source: "Latham & Watkins Innovation Report 2024; American Lawyer Technology Survey" },
     ],
     accounting_audit: [
       { company: "PwC", action: "Board approved $1B AI investment over 3 years. CEO Bob Moritz mandated AI training for all 328K+ employees globally. PwC's AI-powered audit platform now covers 100% of transactions versus historical 5-10% sampling. Board receives quarterly AI adoption and quality metrics.", source: "PwC 2024 Global Annual Review; Audit Innovation Report 2024" },
-      { company: "EY", action: "Board oversees EY.ai platform — a $1.4B investment positioning AI as central to all service lines. CEO Carmine Di Sibio mandated that every engagement evaluate AI applicability. EY's AI-driven tax automation processes 60% of routine compliance work.", source: "EY 2024 Global Review; EY.ai Platform Public Disclosures" },
+      { company: "EY", action: "Board oversees EY.ai platform. a $1.4B investment positioning AI as central to all service lines. CEO Carmine Di Sibio mandated that every engagement evaluate AI applicability. EY's AI-driven tax automation processes 60% of routine compliance work.", source: "EY 2024 Global Review; EY.ai Platform Public Disclosures" },
       { company: "KPMG", action: "Board approved enterprise AI transformation with dedicated AI governance framework. KPMG's AI-powered audit tools analyze 100% of journal entries and flag anomalies automatically. The firm invested $2B+ in technology including AI across audit, tax, and advisory.", source: "KPMG 2024 Global Annual Review; Transparency Report 2024" },
     ],
     aerospace_defense: [
@@ -6767,7 +6763,7 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
     utilities: [
       { company: "NextEra Energy", action: "Board's Risk and Strategy Committee oversees AI across grid optimization, renewable forecasting, and wildfire risk management. NextEra deploys AI for 30+ GW of renewable generation forecasting. Board receives quarterly AI reliability and regulator-facing performance metrics.", source: "NextEra Energy 2024 Annual Report; FERC Reliability Filings 2024" },
       { company: "Duke Energy", action: "Board approved enterprise AI program covering grid modernization, outage prediction, and customer service. Duke's AI platform processes 100M+ smart-meter readings daily. Board Technology Committee reviews AI cybersecurity and NERC CIP compliance quarterly.", source: "Duke Energy 2024 Annual Report; NERC CIP Compliance Summary" },
-      { company: "Southern Company", action: "Board oversees AI deployment across generation fleet, transmission, and retail operations. Southern's AI-enabled predictive maintenance extended unit availability 2–4% across the fleet. Board receives annual AI governance and rate-case-facing reliability assurance reports.", source: "Southern Company 2024 Annual Report; Investor Day 2024" },
+      { company: "Southern Company", action: "Board oversees AI deployment across generation fleet, transmission, and retail operations. Southern's AI-enabled predictive maintenance extended unit availability 2-4% across the fleet. Board receives annual AI governance and rate-case-facing reliability assurance reports.", source: "Southern Company 2024 Annual Report; Investor Day 2024" },
     ],
     telecommunications: [
       { company: "AT&T", action: "Board's Corporate Governance and Nominating Committee oversees AI investments across network operations and customer care. AT&T's Ask AT&T generative-AI assistant is used by 80,000+ employees. Board receives quarterly AI risk, network-reliability, and customer-experience metrics.", source: "AT&T 2024 Annual Report; 2024 Proxy Statement" },
@@ -6791,7 +6787,7 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
     ],
     real_estate_commercial: [
       { company: "CBRE", action: "Board oversees AI deployment through dedicated Technology and Innovation governance. CBRE's AI-powered deal-pipeline analytics, lease abstraction, and valuation tools serve 130,000+ professionals globally. Board receives quarterly AI adoption and data-governance metrics.", source: "CBRE 2024 Annual Report; Technology and Innovation Public Brief 2024" },
-      { company: "JLL", action: "Board approved JLL GPT — one of the first proprietary large-language models built for commercial real estate. JLL's Azimuth AI platform covers leasing, capital markets, and property management. Board Technology Committee governs AI data privacy and client-facing risk.", source: "JLL 2024 Annual Report; JLL GPT Public Announcement 2023" },
+      { company: "JLL", action: "Board approved JLL GPT. one of the first proprietary large-language models built for commercial real estate. JLL's Azimuth AI platform covers leasing, capital markets, and property management. Board Technology Committee governs AI data privacy and client-facing risk.", source: "JLL 2024 Annual Report; JLL GPT Public Announcement 2023" },
       { company: "Prologis", action: "Board's Innovation Committee governs AI deployment across the world's largest logistics real-estate portfolio. Prologis deploys AI for energy optimization, predictive maintenance, and customer-demand forecasting across 1.2B+ sq ft of industrial space.", source: "Prologis 2024 Annual Report; Investor Day 2024" },
     ],
     nonprofit_ngo: [
@@ -6801,7 +6797,7 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
     ],
     food_beverage: [
       { company: "Nestlé", action: "Board oversees one of the most mature AI programs in global food: an R&D platform that screens 10,000+ flavor and formulation combinations, AI-powered demand sensing across 190+ countries, and a supply-chain AI program that saved CHF 800M in 2024. Board's Innovation & Sustainability Committee tracks AI adoption alongside food-safety KPIs.", source: "Nestlé 2024 Annual Report; Nestlé R&D Technology Update 2024" },
-      { company: "General Mills", action: "Board approved enterprise AI transformation anchored in a strategic Microsoft Azure partnership. AI supply-chain optimization reduced ingredient waste 25% and improved production-scheduling accuracy from 82% to 95% across 30+ manufacturing plants — $180M in annualized savings. Board Technology Committee tracks AI ROI quarterly.", source: "General Mills 2024 10-K; Investor Day 2024" },
+      { company: "General Mills", action: "Board approved enterprise AI transformation anchored in a strategic Microsoft Azure partnership. AI supply-chain optimization reduced ingredient waste 25% and improved production-scheduling accuracy from 82% to 95% across 30+ manufacturing plants. $180M in annualized savings. Board Technology Committee tracks AI ROI quarterly.", source: "General Mills 2024 10-K; Investor Day 2024" },
       { company: "PepsiCo", action: "Board oversees AI across beverages and snacks: AI demand sensing cut forecast error from 40% to 20% at the store-SKU level, reducing waste $450M and lifting on-shelf availability 12%. PepsiCo's AI-powered marketing and R&D platforms are reviewed as part of the board's long-term growth strategy.", source: "PepsiCo 2024 Investor Day; 2024 Annual Report" },
       { company: "Tyson Foods", action: "Board governs AI deployment across protein processing, food safety, and supply chain. Tyson deploys computer vision for poultry grading and predictive maintenance across processing facilities. CEO Donnie King has publicly committed to AI-enabled productivity across Tyson's 120K+ workforce.", source: "Tyson Foods 2024 Annual Report; Q4 2024 Earnings Call" },
     ],
@@ -6812,17 +6808,16 @@ function getPeerBoardActions(industry: string, userCompanyName?: string): { comp
     ],
     dtc: [
       { company: "Warby Parker", action: "Board oversees AI virtual try-on technology that lifted online conversion 32% and cut return rates from 15% to 6%, saving $45M in reverse logistics on $600M revenue. Board Technology Committee tracks AI-enabled customer-experience metrics.", source: "Warby Parker 2024 10-K; Warby Parker Digital Innovation Report 2024" },
-      { company: "Glossier", action: "Board governs AI-powered personalization engine that lifted repeat-purchase rates 28% and average order value 18% — $80M incremental annual revenue. Board reviews AI data-governance and privacy practices alongside growth metrics.", source: "Glossier 2024 Brand Report; CB Insights DTC AI Benchmark 2024" },
+      { company: "Glossier", action: "Board governs AI-powered personalization engine that lifted repeat-purchase rates 28% and average order value 18%. $80M incremental annual revenue. Board reviews AI data-governance and privacy practices alongside growth metrics.", source: "Glossier 2024 Brand Report; CB Insights DTC AI Benchmark 2024" },
       { company: "Dollar Shave Club", action: "Board oversees AI subscription-optimization engine that cut churn 35% by predicting delivery preferences and dynamically adjusting cadence, retaining $120M in annual recurring revenue.", source: "Dollar Shave Club 2024 Impact Report; Harvard Business Review DTC Subscription Case Study 2024" },
     ],
   };
   const defaults = [
-    { company: "Industry Leaders (Cross-Sector)", action: "According to NACD's 2024 survey, 62% of S&P 500 boards have added AI as a standing agenda item, up from 28% in 2022. Leading boards are moving from 'awareness' to 'accountability' — requiring measurable AI ROI, not just activity updates.", source: "NACD 2024 Board Oversight of AI Report" },
+    { company: "Industry Leaders (Cross-Sector)", action: "According to NACD's 2024 survey, 62% of S&P 500 boards have added AI as a standing agenda item, up from 28% in 2022. Leading boards are moving from 'awareness' to 'accountability'. requiring measurable AI ROI, not just activity updates.", source: "NACD 2024 Board Oversight of AI Report" },
     { company: "McKinsey Top-Quartile AI Companies", action: "Boards of the highest-performing AI organizations share three traits: (1) at least one director with deep AI expertise, (2) quarterly AI maturity reporting tied to strategy, and (3) ring-fenced AI transformation budgets separate from IT.", source: "McKinsey 2024 Global AI Survey" },
     { company: "Deloitte AI Leaders Benchmark", action: "Organizations where the board actively governs AI transformation are 2.6x more likely to scale AI beyond pilots. Board engagement is the single strongest predictor of AI transformation success, ahead of budget, talent, or technology choices.", source: "Deloitte 2024 State of AI in the Enterprise, 6th Edition" },
   ];
-  // Map specific sub-industries to their peer group. Only legitimate mappings —
-  // industries whose peer set is genuinely the same (e.g. retail sub-segments).
+  // Map specific sub-industries to their peer group. Only legitimate mappings. // industries whose peer set is genuinely the same (e.g. retail sub-segments).
   // Industries with materially different peer sets (aerospace, telecom, energy,
   // utilities, gov, nonprofit, real estate) have direct entries above.
   const peerAliases: Record<string, string> = {

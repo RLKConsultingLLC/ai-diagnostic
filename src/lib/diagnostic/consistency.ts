@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Internal Consistency Cross-Checks
+// RLK AI Diagnostic. Internal Consistency Cross-Checks
 // =============================================================================
 // Detects contradictory response patterns that undermine diagnostic accuracy.
 // E.g., claiming fast decision velocity while reporting 6+ month approval times.

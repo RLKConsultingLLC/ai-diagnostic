@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Diagnostic Engine Orchestrator
+// RLK AI Diagnostic. Diagnostic Engine Orchestrator
 // =============================================================================
 // Main entry point that runs the full diagnostic pipeline:
 //   responses → dimension scores → indices → stage → economics → result
@@ -47,7 +47,7 @@ export function runDiagnostic(
   // Step 6: Compute overall score
   const overallScore = computeOverallScore(dimensionScores);
 
-  // Step 7: Sensitivity analysis — which questions have the most leverage?
+  // Step 7: Sensitivity analysis. which questions have the most leverage?
   const sensitivityAnalysis = computeSensitivityAnalysis(responses, profile);
 
   return {

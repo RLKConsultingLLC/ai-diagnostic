@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Post-Generation Quality Pass
+// RLK AI Diagnostic. Post-Generation Quality Pass
 // =============================================================================
 // Runs a single Claude call after all sections are generated to:
 //   1. Remove duplicative content across sections
@@ -44,7 +44,7 @@ export async function deduplicateReport(
     )
     .join('\n\n');
 
-  const systemPrompt = `You are a senior editorial quality controller for executive strategy reports. Your job is to review a multi-section AI diagnostic report and return a cleaned version. You MUST preserve every section's structure, headings, and analytical substance — you are editing for quality, not rewriting.
+  const systemPrompt = `You are a senior editorial quality controller for executive strategy reports. Your job is to review a multi-section AI diagnostic report and return a cleaned version. You MUST preserve every section's structure, headings, and analytical substance. you are editing for quality, not rewriting.
 
 Your mandate:
 1. DEDUPLICATION: Identify sentences, paragraphs, or statistics that appear nearly verbatim across multiple sections. When a point is made in an earlier section, later sections should reference "as noted in Section X" or rephrase with new context rather than repeating. A statistic cited in 1-2 sections is fine; the same stat in 3+ sections is duplicative.
@@ -55,7 +55,7 @@ Your mandate:
 Rules:
 - Do NOT add new content, analysis, or recommendations
 - Do NOT change section headings or markdown structure
-- Do NOT remove substantive analysis — only remove or rephrase duplicated passages
+- Do NOT remove substantive analysis. only remove or rephrase duplicated passages
 - Preserve all specific numbers, dollar amounts, and data points
 - Keep the same authoritative, direct tone
 - Return the COMPLETE cleaned report with all sections, using the exact same section delimiter format`;
@@ -87,7 +87,7 @@ Return the cleaned report using this exact format for each section:
     if (!text || text.length < sectionTexts.length * 0.5) {
       // Safety: if response is suspiciously short, return originals
       console.warn(
-        '[postProcess] Dedup response too short — returning originals'
+        '[postProcess] Dedup response too short. returning originals'
       );
       return sections;
     }

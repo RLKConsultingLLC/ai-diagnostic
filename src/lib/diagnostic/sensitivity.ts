@@ -1,9 +1,9 @@
 // =============================================================================
-// RLK AI Diagnostic — Sensitivity Analysis
+// RLK AI Diagnostic. Sensitivity Analysis
 // =============================================================================
 // For each question, hypothetically increases the score by +1 and re-runs the
 // scoring pipeline to measure the delta. Returns the top 10 highest-impact
-// questions — "which answers have the most leverage on the overall result?"
+// questions. "which answers have the most leverage on the overall result?"
 // =============================================================================
 
 import type {
@@ -33,7 +33,7 @@ export function computeSensitivityAnalysis(
     const question = DIAGNOSTIC_QUESTIONS.find((q) => q.id === response.questionId);
     if (!question) continue;
 
-    // Max score is 5 — skip if already at max
+    // Max score is 5. skip if already at max
     const maxOption = Math.max(...question.options.map((o) => o.score));
     if (response.score >= maxOption) continue;
 

@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Industry-Aware Question Router
+// RLK AI Diagnostic. Industry-Aware Question Router
 // =============================================================================
 // Returns the diagnostic question set with industry-specific examples
 // applied as subtext. The core questions remain the same across industries,

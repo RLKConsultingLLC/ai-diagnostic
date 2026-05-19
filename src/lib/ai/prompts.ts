@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Prompt Templates for Narrative Generation
+// RLK AI Diagnostic. Prompt Templates for Narrative Generation
 // =============================================================================
 
 import type {
@@ -17,14 +17,14 @@ import { DIAGNOSTIC_QUESTIONS } from '@/lib/diagnostic/questions';
 // Shared helpers
 // ---------------------------------------------------------------------------
 
-const SYSTEM_MESSAGE = `You are a senior executive strategy advisor who has spent 20 years counseling Fortune 500 boards on technology transformation. You write with the authority and specificity of a McKinsey senior partner addressing a board of directors. Your analysis is data-driven, your recommendations are concrete, and you never hedge. You speak as a peer to CIOs, CFOs, and CEOs — not as a vendor or consultant seeking approval.
+const SYSTEM_MESSAGE = `You are a senior executive strategy advisor who has spent 20 years counseling Fortune 500 boards on technology transformation. You write with the authority and specificity of a McKinsey senior partner addressing a board of directors. Your analysis is data-driven, your recommendations are concrete, and you never hedge. You speak as a peer to CIOs, CFOs, and CEOs. not as a vendor or consultant seeking approval.
 
 Rules you must follow in every response:
 - Do not use the word "journey."
 - Do not use generic maturity-model language such as "climbing the maturity curve," "leveling up," or "moving up the ladder."
 - Never hedge with "it depends" or "consider exploring." State what to do.
 - Use specific numbers from the diagnostic data provided. Do not invent statistics.
-- Write in markdown with headers. Do not use bullet-point walls — use short, punchy paragraphs.
+- Write in markdown with headers. Do not use bullet-point walls. use short, punchy paragraphs.
 - Tone: authoritative, direct, peer-level. No jargon. No filler.
 - Never use em dashes or double dashes. Use commas, periods, or colons instead.
 - NEVER cite a named report, study, or white paper unless it appears in the COMPANY INTELLIGENCE data block. If no company-specific research data is provided, do not fabricate citations. You may reference industry patterns without attribution.
@@ -122,7 +122,7 @@ function formatDimensionLabel(dimension: string): string {
 
 function serializeCompositeIndices(indices: CompositeIndex[]): string {
   const lines = indices.map(
-    (i) => `- ${i.name} (${i.slug}): ${i.score}/100 — ${i.interpretation}`
+    (i) => `- ${i.name} (${i.slug}): ${i.score}/100. ${i.interpretation}`
   );
   return `COMPOSITE INDICES:\n${lines.join('\n')}`;
 }
@@ -132,7 +132,7 @@ function serializeStageClassification(stage: StageClassification): string {
     ([dim, stageNum]) => `  - ${formatDimensionLabel(dim)}: Stage ${stageNum}`
   );
   return `STAGE CLASSIFICATION:
-- Primary Stage: ${stage.primaryStage} — "${stage.stageName}"
+- Primary Stage: ${stage.primaryStage}. "${stage.stageName}"
 - Description: ${stage.stageDescription}
 - Confidence: ${(stage.confidence * 100).toFixed(0)}%
 - Dimension-Level Stages:
@@ -219,7 +219,7 @@ ${serializeEconomicEstimate(result.economicEstimate)}`;
 }
 
 // ---------------------------------------------------------------------------
-// Research intelligence serialization — makes reports deeply custom
+// Research intelligence serialization. makes reports deeply custom
 // ---------------------------------------------------------------------------
 
 function serializeResearchIntelligence(research: CompanyResearchProfile): string {
@@ -359,14 +359,14 @@ export function executiveSummaryPrompt(result: DiagnosticResult, research?: Comp
 
 This is the opening section of an AI Maturity diagnostic report. It must accomplish these things in exactly this order:
 1. State the organization's AI maturity stage and what that means in plain language (one sentence).
-2. Deliver the headline financial figure — the unrealized value range (${formatCurrency(result.economicEstimate.unrealizedValueLow)} – ${formatCurrency(result.economicEstimate.unrealizedValueHigh)}) — and frame it as what the board is leaving on the table.
+2. Deliver the headline financial figure. the unrealized value range (${formatCurrency(result.economicEstimate.unrealizedValueLow)}. ${formatCurrency(result.economicEstimate.unrealizedValueHigh)}). and frame it as what the board is leaving on the table.
 3. Provide a one-sentence diagnosis: the single most important structural reason this organization is underperforming on AI.
 
 Then provide 2-3 short paragraphs of supporting context that connect the overall score to the dimension-level findings.
 
-CRITICAL — PEER GAP ANALYSIS: You MUST include a paragraph that explicitly identifies where this organization lags its peers. The weakest dimension is ${formatDimensionLabel(weakest.dimension)} at ${weakest.normalizedScore}/100, followed by ${formatDimensionLabel(secondWeakest.dimension)} at ${secondWeakest.normalizedScore}/100. Their strongest dimension is ${formatDimensionLabel(strongest.dimension)} at ${strongest.normalizedScore}/100. Call out the specific gap between strongest and weakest (${strongest.normalizedScore - weakest.normalizedScore} points). Explain what this imbalance means in practical terms for ${formatIndustryLabel(result.companyProfile.industry)}.
+CRITICAL. PEER GAP ANALYSIS: You MUST include a paragraph that explicitly identifies where this organization lags its peers. The weakest dimension is ${formatDimensionLabel(weakest.dimension)} at ${weakest.normalizedScore}/100, followed by ${formatDimensionLabel(secondWeakest.dimension)} at ${secondWeakest.normalizedScore}/100. Their strongest dimension is ${formatDimensionLabel(strongest.dimension)} at ${strongest.normalizedScore}/100. Call out the specific gap between strongest and weakest (${strongest.normalizedScore - weakest.normalizedScore} points). Explain what this imbalance means in practical terms for ${formatIndustryLabel(result.companyProfile.industry)}.
 
-CRITICAL — CLOSING CTA: End the executive summary with a closing paragraph that says: this diagnostic identifies the gaps, but closing them requires a tailored 90-day operationalization plan. RLK Consulting builds these plans with clients — translating diagnostic findings into specific governance structures, vendor decisions, and organizational changes. Contact RLK to schedule a strategy session.${research ? '\n\nCRITICAL: You have access to company intelligence below. Reference at least one specific finding — a recent news item, leadership signal, or competitor move — to demonstrate that this report is built on real-world intelligence, not just survey data.' : ''}
+CRITICAL. CLOSING CTA: End the executive summary with a closing paragraph that says: this diagnostic identifies the gaps, but closing them requires a tailored 90-day operationalization plan. RLK Consulting builds these plans with clients. translating diagnostic findings into specific governance structures, vendor decisions, and organizational changes. Contact RLK to schedule a strategy session.${research ? '\n\nCRITICAL: You have access to company intelligence below. Reference at least one specific finding. a recent news item, leadership signal, or competitor move. to demonstrate that this report is built on real-world intelligence, not just survey data.' : ''}
 
 DIAGNOSTIC DATA:
 ${buildDiagnosticDataBlock(result, research)}
@@ -376,7 +376,7 @@ OUTPUT FORMAT:
 - 400 words maximum. Every sentence must carry weight.
 - No bullet points in this section. Flowing paragraphs only.
 - The peer gap paragraph must use specific dimension names and scores.
-- The final paragraph must be the RLK CTA — natural and authoritative, not salesy.`,
+- The final paragraph must be the RLK CTA. natural and authoritative, not salesy.`,
   };
 }
 
@@ -394,7 +394,7 @@ This section must analyze each of the five dimensions and explain what the score
 - What the score tells us the organization is NOT doing (gap)
 - What an organization at Stage ${result.stageClassification.primaryStage + 1 > 5 ? 5 : result.stageClassification.primaryStage + 1} would be doing differently
 
-Pay special attention to dimension-level stage divergence. Where one dimension is significantly ahead or behind the others, call that out explicitly — it reveals structural imbalance.${research ? '\n\nYou have company intelligence from public sources. Where leadership has made public statements about AI, reference them. Where the company has announced AI initiatives, assess whether the diagnostic data supports or contradicts their public narrative.' : ''}
+Pay special attention to dimension-level stage divergence. Where one dimension is significantly ahead or behind the others, call that out explicitly. it reveals structural imbalance.${research ? '\n\nYou have company intelligence from public sources. Where leadership has made public statements about AI, reference them. Where the company has announced AI initiatives, assess whether the diagnostic data supports or contradicts their public narrative.' : ''}
 
 DIAGNOSTIC DATA:
 ${buildDiagnosticDataBlock(result, research)}
@@ -405,7 +405,7 @@ OUTPUT FORMAT:
 - 500-700 words total
 - Each dimension subsection: 2-3 paragraphs
 - Close with a synthesis paragraph that identifies the dominant pattern across all five dimensions
-- Use specific scores. Do not round or approximate — use the exact numbers provided.`,
+- Use specific scores. Do not round or approximate. use the exact numbers provided.`,
   };
 }
 
@@ -428,11 +428,11 @@ export function structuralConstraintsPrompt(result: DiagnosticResult, research?:
     system: SYSTEM_MESSAGE,
     user: `Write the Structural Constraints section for ${result.companyProfile.companyName}.
 
-This section explains WHY the organization is stuck — not what scores it got, but what organizational structures, governance patterns, and authority dynamics are preventing faster AI adoption.
+This section explains WHY the organization is stuck. not what scores it got, but what organizational structures, governance patterns, and authority dynamics are preventing faster AI adoption.
 
 Focus areas:
-1. Authority Friction: The Authority Friction Index is ${authorityFriction?.score ?? 'N/A'}/100 (${authorityFriction?.interpretation ?? 'N/A'}). The Authority Structure dimension score is ${authorityScore}/100. Analyze what this means — who has decision rights over AI initiatives, and how that slows or accelerates adoption.
-2. Decision Velocity: The Decision Velocity Index is ${decisionVelocity?.score ?? 'N/A'}/100 (${decisionVelocity?.interpretation ?? 'N/A'}). Translate this into concrete organizational behavior — how many approval layers exist, how fast can a team go from pilot to production.
+1. Authority Friction: The Authority Friction Index is ${authorityFriction?.score ?? 'N/A'}/100 (${authorityFriction?.interpretation ?? 'N/A'}). The Authority Structure dimension score is ${authorityScore}/100. Analyze what this means. who has decision rights over AI initiatives, and how that slows or accelerates adoption.
+2. Decision Velocity: The Decision Velocity Index is ${decisionVelocity?.score ?? 'N/A'}/100 (${decisionVelocity?.interpretation ?? 'N/A'}). Translate this into concrete organizational behavior. how many approval layers exist, how fast can a team go from pilot to production.
 3. Governance Bottlenecks: Given the regulatory intensity (${result.companyProfile.regulatoryIntensity}), identify whether governance is appropriately sized or creating unnecessary friction.
 
 Do NOT just restate the scores. Explain the organizational dynamics they reveal.
@@ -462,15 +462,15 @@ export function financialImpactPrompt(result: DiagnosticResult, research?: Compa
 The economic model shows:
 - This ${formatCurrency(result.companyProfile.revenue)}-revenue organization could unlock ${econ.productivityPotentialPercent}% productivity improvement through AI
 - Currently capturing only ${econ.currentCapturePercent}% of that potential
-- Unrealized value: ${formatCurrency(econ.unrealizedValueLow)} – ${formatCurrency(econ.unrealizedValueHigh)} annually
+- Unrealized value: ${formatCurrency(econ.unrealizedValueLow)}. ${formatCurrency(econ.unrealizedValueHigh)} annually
 - ${econ.annualWastedHours.toLocaleString()} hours/year wasted on tasks AI could automate or augment
 - Per-employee cost of AI underperformance: ${formatCurrency(econ.costPerEmployee)}/year
 - Industry benchmark context: ${econ.industryBenchmark}
 
 Frame this section around three financial narratives:
-1. The Cost of Inaction — what the organization loses each quarter it delays
-2. The Capture Gap — the delta between current capture (${econ.currentCapturePercent}%) and what Stage ${Math.min(result.stageClassification.primaryStage + 1, 5)} organizations in ${formatIndustryLabel(result.companyProfile.industry)} typically capture
-3. The ROI Frame — position the unrealized value against typical AI investment costs to show the return multiple
+1. The Cost of Inaction. what the organization loses each quarter it delays
+2. The Capture Gap. the delta between current capture (${econ.currentCapturePercent}%) and what Stage ${Math.min(result.stageClassification.primaryStage + 1, 5)} organizations in ${formatIndustryLabel(result.companyProfile.industry)} typically capture
+3. The ROI Frame. position the unrealized value against typical AI investment costs to show the return multiple
 
 Use specific dollar amounts, percentages, and timeframes. No vague "significant savings" language.${research?.financialHighlights ? `\n\nPublic financial data is available. Reference their actual R&D spend, technology budget, or recent financial performance where it strengthens the financial narrative.` : ''}
 
@@ -547,9 +547,9 @@ export function competitivePositioningPrompt(result: DiagnosticResult, research?
 This section must answer the board's real question: "Are we falling behind?"
 
 Analysis framework:
-1. Stage Context — Stage ${result.stageClassification.primaryStage} ("${result.stageClassification.stageName}") organizations in ${formatIndustryLabel(result.companyProfile.industry)} represent what share of the market? What are leaders in this industry doing at Stage 4-5?
-2. Dimension Comparison — Where is the organization ahead of industry norms and where is it behind? Use the dimension scores and industry context to make specific comparisons.
-3. Window Analysis — Based on the organization's current stage and the pace of AI adoption in ${formatIndustryLabel(result.companyProfile.industry)}, how long before the gap becomes structurally difficult to close?
+1. Stage Context. Stage ${result.stageClassification.primaryStage} ("${result.stageClassification.stageName}") organizations in ${formatIndustryLabel(result.companyProfile.industry)} represent what share of the market? What are leaders in this industry doing at Stage 4-5?
+2. Dimension Comparison. Where is the organization ahead of industry norms and where is it behind? Use the dimension scores and industry context to make specific comparisons.
+3. Window Analysis. Based on the organization's current stage and the pace of AI adoption in ${formatIndustryLabel(result.companyProfile.industry)}, how long before the gap becomes structurally difficult to close?
 
 Be direct about competitive risk. If the organization is behind, say so plainly. If it has advantages, name them specifically.
 
@@ -563,7 +563,7 @@ OUTPUT FORMAT:
 - Use H3 subheaders for each analysis area
 - 400-500 words total
 - Must include at least one specific reference to what leading organizations in their industry are doing differently
-- End with a clear verdict: ahead, at pace, or behind — and by how much.`,
+- End with a clear verdict: ahead, at pace, or behind. and by how much.`,
   };
 }
 
@@ -592,10 +592,10 @@ This section must be calibrated to their specific risk profile:
 - Authority Structure Score: ${authorityScore}/100 (low scores suggest governance gaps)
 
 Address these risk domains:
-1. Shadow AI Exposure — With a Workflow Integration score of ${workflowScore}/100 and Authority Structure at ${authorityScore}/100, estimate the degree to which employees are using unapproved AI tools. Low integration + low authority = high shadow AI risk.
-2. Compliance & Regulatory Risk — Given ${profile.regulatoryIntensity} regulatory intensity in ${formatIndustryLabel(profile.industry)}, what specific regulatory frameworks apply (e.g., EU AI Act, SOX implications, HIPAA, industry-specific regulations)? Where is the organization most exposed?
-3. Data Governance Gaps — Based on the workflow integration and adoption patterns, what data is likely flowing through AI tools without proper governance?
-4. Board Liability — What questions should the board be asking that they probably are not? What governance structures should exist?
+1. Shadow AI Exposure. With a Workflow Integration score of ${workflowScore}/100 and Authority Structure at ${authorityScore}/100, estimate the degree to which employees are using unapproved AI tools. Low integration + low authority = high shadow AI risk.
+2. Compliance & Regulatory Risk. Given ${profile.regulatoryIntensity} regulatory intensity in ${formatIndustryLabel(profile.industry)}, what specific regulatory frameworks apply (e.g., EU AI Act, SOX implications, HIPAA, industry-specific regulations)? Where is the organization most exposed?
+3. Data Governance Gaps. Based on the workflow integration and adoption patterns, what data is likely flowing through AI tools without proper governance?
+4. Board Liability. What questions should the board be asking that they probably are not? What governance structures should exist?
 
 Be specific to their industry and regulatory context. Generic "AI ethics" guidance is worthless here.${research?.regulatoryDevelopments?.length ? '\n\nYou have specific regulatory intelligence. Reference actual regulations and their implications for this company.' : ''}
 
@@ -716,7 +716,7 @@ export function ninetyDayActionPlanPrompt(result: DiagnosticResult, research?: C
 
   // Composite index context
   const compositeContext = result.compositeIndices
-    .map((ci) => `- ${ci.name}: ${ci.score}/100 — ${ci.interpretation}`)
+    .map((ci) => `- ${ci.name}: ${ci.score}/100. ${ci.interpretation}`)
     .join('\n');
 
   const ind = formatIndustryLabel(result.companyProfile.industry);
@@ -773,7 +773,7 @@ You MUST make this plan unmistakably specific to ${ind}. For each action:
 
 Produce 4-6 prioritized actions. Each action MUST include:
 - A specific, measurable action tied to a specific lowest-scoring question (not "improve AI governance" but "appoint a Chief AI Officer reporting to the CEO and publish an AI acceptable-use policy within 30 days, directly addressing the governance vacuum revealed by your score of ${weakestDimension.normalizedScore}/100 in ${formatDimensionLabel(weakestDimension.dimension)}")
-- Owner by role (e.g., CIO, CFO, CHRO, CEO, Head of Data, Managing Partner, Practice Lead) — use titles appropriate for ${ind}
+- Owner by role (e.g., CIO, CFO, CHRO, CEO, Head of Data, Managing Partner, Practice Lead). use titles appropriate for ${ind}
 - Timeframe within the 90-day window (Days 1-30, Days 31-60, Days 61-90)
 - Expected outcome with a measurable indicator specific to ${ind}
 - A 1-2 sentence "${ind} context" note explaining why this specific action matters more (or less) in this industry than in others
@@ -794,7 +794,7 @@ OUTPUT FORMAT:
 }
 
 // ---------------------------------------------------------------------------
-// Section registry — maps slugs to prompt functions
+// Section registry. maps slugs to prompt functions
 // ---------------------------------------------------------------------------
 
 export const SECTION_PROMPTS: Record<

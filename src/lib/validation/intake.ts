@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Intake Validation
+// RLK AI Diagnostic. Intake Validation
 // =============================================================================
 // Shared validation for CompanyProfile used by both client and server.
 // =============================================================================
