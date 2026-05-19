@@ -18,6 +18,8 @@ import {
   DIAGNOSTIC_MODIFIER_WEIGHTS,
   computeDiagnosticModifier,
 } from "@/lib/diagnostic/economic";
+import { buildCalibrationOverlay, type CalibrationOverlay, type DimensionCalibration } from "@/lib/research/calibration";
+import type { CompanyResearchProfile } from "@/types/research";
 // SensitivitySection removed — not shown to clients
 
 // ---------------------------------------------------------------------------
@@ -142,6 +144,33 @@ function ReportPage() {
       cancelled = true;
     };
   }, [sessionId, isDemo, stripeSession]);
+
+  // Publicly available evidence overlay (fetched once when sessionId loads)
+  const [researchProfile, setResearchProfile] = useState<CompanyResearchProfile | null>(null);
+  useEffect(() => {
+    if (!sessionId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/research/profile?sessionId=${encodeURIComponent(sessionId)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data?.profile) setResearchProfile(data.profile);
+      } catch {
+        // Silent. Calibration is additive. If it fails, report renders without it.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [sessionId]);
+
+  const calibration: CalibrationOverlay | null = useMemo(() => {
+    if (!result) return null;
+    const selfScoresByDimension = result.dimensionScores.reduce((acc, ds) => {
+      acc[ds.dimension] = ds.normalizedScore;
+      return acc;
+    }, {} as Record<string, number>);
+    return buildCalibrationOverlay(researchProfile, selfScoresByDimension as Record<import("@/types/diagnostic").Dimension, number>);
+  }, [result, researchProfile]);
 
   // Corrected capture percent — single source of truth for display
   // Old sessions lack captureRateBase; derive from current engine so math is consistent
@@ -951,6 +980,21 @@ function ReportPage() {
                       <PentagonRadar dimensions={result.dimensionScores} />
                     </div>
 
+                    {/* Publicly available evidence summary banner. Shows only when research exists. */}
+                    {calibration?.available && (
+                      <div className="mb-5 bg-navy/5 border-l-0 border border-navy/10 px-4 py-3">
+                        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
+                          <span className="text-[10px] font-semibold tracking-wide uppercase text-secondary">Publicly available evidence overlay</span>
+                          <span className="text-[10px] text-tertiary">{calibration.sourcesConsulted} public sources reviewed</span>
+                          <span className="text-[10px] text-tertiary capitalize">{calibration.confidenceLevel} synthesis confidence</span>
+                        </div>
+                        <p className="text-sm text-foreground/75 leading-relaxed">{calibration.summary}</p>
+                        <p className="text-[11px] text-tertiary mt-1.5 italic">
+                          Self-reported scores are kept as the primary diagnostic. The publicly available evidence overlay is shown alongside so the gap itself can be discussed.
+                        </p>
+                      </div>
+                    )}
+
                     {/* Each dimension bar — one click shows ALL detail including AI narrative */}
                     <div className="space-y-2">
                       {result.dimensionScores.map((ds) => {
@@ -983,6 +1027,7 @@ function ReportPage() {
                             subtitle={dimDesc[ds.dimension] || ""}
                             interpretation={dimensionInterpretation(ds.dimension, ds.normalizedScore)}
                             narrative={findNarrativeClean(ds.dimension)}
+                            calibration={calibration?.available ? calibration.byDimension[ds.dimension] : undefined}
                           />
                         );
                       })}
@@ -2780,10 +2825,11 @@ function CollapsibleSection({
 // ---------------------------------------------------------------------------
 
 function DimensionExpander({
-  dimension, label, score, stage, barColor, subtitle, interpretation, narrative,
+  dimension, label, score, stage, barColor, subtitle, interpretation, narrative, calibration,
 }: {
   dimension: string; label: string; score: number; stage: number;
   barColor: string; subtitle: string; interpretation: string; narrative?: string;
+  calibration?: DimensionCalibration;
 }) {
   // Native <details>/<summary> for clean HTML export and built-in accessibility
   const dimIcons: Record<string, React.ReactNode> = {
@@ -2830,6 +2876,37 @@ function DimensionExpander({
           <p className="text-sm text-foreground/70 leading-relaxed">
             <strong className="text-secondary">{score}/100</strong> - {interpretation}
           </p>
+          {calibration && calibration.confidence !== 'insufficient' && (
+            <div className="mt-3 bg-offwhite/60 border border-light px-3 py-2.5">
+              <div className="flex items-center gap-3 mb-1.5">
+                <span className="text-[10px] font-semibold tracking-wide uppercase text-tertiary">Publicly available evidence</span>
+                <span className="text-sm font-bold text-secondary">{calibration.evidenceScore}/100</span>
+                <span className={`text-[10px] font-semibold tracking-wide px-1.5 py-0.5 ${calibration.delta < -8 ? 'bg-red-50 text-red-700' : calibration.delta > 8 ? 'bg-green-50 text-green-700' : 'bg-navy/5 text-secondary'}`}>
+                  {calibration.delta > 0 ? `+${calibration.delta}` : calibration.delta} vs self
+                </span>
+                <span className="text-[9px] uppercase tracking-wide text-tertiary/70">{calibration.confidence} confidence</span>
+              </div>
+              <p className="text-xs text-foreground/70 leading-relaxed">{calibration.narrative}</p>
+              {calibration.signals.length > 0 && (
+                <details className="mt-2 group">
+                  <summary className="list-none cursor-pointer text-[10px] font-semibold tracking-wide uppercase text-tertiary hover:text-secondary inline-flex items-center gap-1">
+                    <svg className="w-2.5 h-2.5 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                    Show signals ({calibration.signals.length})
+                  </summary>
+                  <ul className="mt-2 space-y-1.5">
+                    {calibration.signals.map((sig, i) => (
+                      <li key={i} className="text-[11px] text-foreground/70 leading-relaxed">
+                        <span className="block">{sig.text}</span>
+                        <span className="block text-tertiary/70 italic">Source: {sig.source}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
           {narrative && (
             <div className="mt-4 pt-3 border-t border-light">
               <MarkdownContent content={narrative} />
