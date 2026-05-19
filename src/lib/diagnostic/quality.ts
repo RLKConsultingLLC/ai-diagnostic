@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Response Quality Assessment
+// RLK AI Diagnostic. Response Quality Assessment
 // =============================================================================
 // Detects speed-clicking, straight-lining, and other indicators of low-quality
 // responses. Flags suspect data before it enters the scoring engine.
@@ -65,7 +65,7 @@ export function assessResponseQuality(
       qualityGrade = 'acceptable';
     }
   } else {
-    // No timing data (legacy responses) — cannot assess speed, check straight-lining only
+    // No timing data (legacy responses). cannot assess speed, check straight-lining only
     if (straightLineDetected) {
       qualityGrade = 'low';
     } else {

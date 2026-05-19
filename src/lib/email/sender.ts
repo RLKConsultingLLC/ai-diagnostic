@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Email Sender
+// RLK AI Diagnostic. Email Sender
 // =============================================================================
 // Sends diagnostic report emails via Resend with PDF attachment.
 // Reads RESEND_API_KEY from environment variables.

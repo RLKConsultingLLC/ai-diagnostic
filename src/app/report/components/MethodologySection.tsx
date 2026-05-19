@@ -140,7 +140,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
           </div>
           </div>
 
-          {/* Data sources — right column */}
+          {/* Data sources. right column */}
           <div>
             <div className="space-y-2">
               {[
@@ -172,7 +172,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
           The capture rate is the single most consequential assumption in this report. It determines how much
           of the theoretical AI productivity potential an organization is <em>actually realizing</em> today, and therefore
           drives the entire unrealized value calculation. Because of its importance, the methodology and every
-          source informing it are documented in full below. <strong className="text-secondary">These are estimates</strong> — they should be
+          source informing it are documented in full below. <strong className="text-secondary">These are estimates</strong>. they should be
           stress-tested against your internal data before being presented as fact.
         </p>
 
@@ -216,7 +216,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                 <strong className="text-secondary">2. BCG &quot;AI Advantage&quot; Report (2024).</strong>{" "}
                 BCG&apos;s research distinguishes &quot;AI leaders&quot; (top 10% by revenue impact) from mainstream adopters.
                 Leaders report 2.5x the economic return from AI investments. BCG finds that AI leaders in tech capture
-                60-80% of addressable value vs. 15-25% for the average enterprise — a spread that informs the Stage 4-5
+                60-80% of addressable value vs. 15-25% for the average enterprise. a spread that informs the Stage 4-5
                 column. Critically, BCG attributes the gap primarily to organizational factors (governance, talent,
                 change management) rather than technology choices, validating the stage-based approach.
               </p>
@@ -234,8 +234,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
                 from this organization&apos;s scores across all five behavioral dimensions. Each dimension is weighted by its
                 empirical contribution to value capture variance (see weights below). A score of 50/100 on any dimension is
                 neutral (1.0×); score 0 pulls the rate down by up to 25%; score 100 pushes it up by up to 25%. This means
-                the final capture rate reflects 7 inputs: industry group, maturity stage, and 5 behavioral dimension scores —
-                making it the most organization-specific number in the report. BCG 2024 data validates this approach: organizational
+                the final capture rate reflects 7 inputs: industry group, maturity stage, and 5 behavioral dimension scores. making it the most organization-specific number in the report. BCG 2024 data validates this approach: organizational
                 capability factors (governance, talent, measurement, adoption) explain 70% of capture rate variance among
                 same-stage organizations.
               </p>
@@ -368,7 +367,7 @@ export default function MethodologySection({ result, sectionNumber, bare }: Meth
             </table>
           </div>
 
-          {/* The actual calculation for this user — uses stored values from economic engine */}
+          {/* The actual calculation for this user. uses stored values from economic engine */}
           <div className="bg-offwhite border border-light p-4">
             <p className="text-[10px] font-bold tracking-wider uppercase text-tertiary mb-2">Your Capture Rate Derivation</p>
             <div className="space-y-1.5 text-xs text-foreground/60 leading-relaxed font-mono">

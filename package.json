@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/check-em-dashes.mjs && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:em-dashes": "node scripts/check-em-dashes.mjs",
+    "prebuild": "node scripts/check-em-dashes.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.88.0",

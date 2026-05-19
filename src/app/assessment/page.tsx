@@ -17,7 +17,7 @@ import { validateCompanyProfile } from "@/lib/validation/intake";
 // Static Data
 // ---------------------------------------------------------------------------
 
-// INDUSTRY_GROUPS removed — replaced by MCC_INDUSTRY_TREE via IndustrySelector
+// INDUSTRY_GROUPS removed. replaced by MCC_INDUSTRY_TREE via IndustrySelector
 
 const AI_USE_CASES = [
   "Customer Service / Chatbots",

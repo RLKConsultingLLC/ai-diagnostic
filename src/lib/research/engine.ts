@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Background Research Engine
+// RLK AI Diagnostic. Background Research Engine
 // =============================================================================
 // Orchestrates the full research pipeline. Runs in the background while
 // the customer completes the diagnostic assessment.
@@ -80,7 +80,7 @@ export function startBackgroundResearch(
 
   activeJobs.set(sessionId, job);
 
-  // Fire and forget — runs in background
+  // Fire and forget. runs in background
   executeResearch(sessionId, profile).catch((error) => {
     console.error(`[Research] Failed for session ${sessionId}:`, error);
     const failedJob = activeJobs.get(sessionId);

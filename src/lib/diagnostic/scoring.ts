@@ -1,7 +1,7 @@
 // =============================================================================
-// RLK AI Diagnostic — Scoring Engine
+// RLK AI Diagnostic. Scoring Engine
 // =============================================================================
-// Computes dimension scores, composite indices, and normalizes to 0–100 scale.
+// Computes dimension scores, composite indices, and normalizes to 0-100 scale.
 // =============================================================================
 
 import {
@@ -74,7 +74,7 @@ export function computeDimensionScores(
 // ---------------------------------------------------------------------------
 // Derived from: approval layers, workflow ownership, governance bottlenecks
 // Sources: AS-01, AS-03, AS-04, AS-05, AS-07, WI-07, DV-03
-// Note: This is an INVERSE index — higher score = LESS friction
+// Note: This is an INVERSE index. higher score = LESS friction
 // ---------------------------------------------------------------------------
 
 export const AUTHORITY_FRICTION_COMPONENTS: { questionId: string; weight: number }[] = [

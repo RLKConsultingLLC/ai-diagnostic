@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — PDF Report Generator (Executive-Grade)
+// RLK AI Diagnostic. PDF Report Generator (Executive-Grade)
 // =============================================================================
 // Renders a branded, multi-page diagnostic report with SVG charts and
 // data visualizations using @react-pdf/renderer.
@@ -47,7 +47,7 @@ const C = {
   white: '#FFFFFF',
   offWhite: '#F7F8FA',
   // Brand-only score palette (no traffic-light colors)
-  radarFill: '#E1E5ED', // Navy at ~12% on white — safe flat color for SVG fill
+  radarFill: '#E1E5ED', // Navy at ~12% on white. safe flat color for SVG fill
   gradientBar: ['#0B1D3A', '#364E6E', '#6B7F99', '#A8B5C4', '#CED5DD'],
 } as const;
 
@@ -175,7 +175,7 @@ function arc(cx: number, cy: number, r: number, s0: number, s1: number): string 
 // SVG CHART COMPONENTS
 // =============================================================================
 
-/** Circular gauge showing overall score (0–100). */
+/** Circular gauge showing overall score (0-100). */
 function ScoreRing({ score, size = 130 }: { score: number; size?: number }) {
   const cx = size / 2;
   const cy = size / 2;
@@ -404,7 +404,7 @@ function StageTimeline({ stage }: { stage: StageClassification }) {
   );
 }
 
-/** Cover page stage bar — shows all 5 stages with the current stage highlighted. */
+/** Cover page stage bar. shows all 5 stages with the current stage highlighted. */
 function CoverStageBar({ stage }: { stage: StageClassification }) {
   const nums = [1, 2, 3, 4, 5] as const;
   const names = ['Awareness', 'Experimentation', 'Organizational', 'Strategic', 'Transformational'];
@@ -450,7 +450,7 @@ function CoverStageBar({ stage }: { stage: StageClassification }) {
   );
 }
 
-/** Score legend — explains what the score tiers mean. Placed on exec dashboard. */
+/** Score legend. explains what the score tiers mean. Placed on exec dashboard. */
 function ScoreLegend() {
   const tiers = [
     { label: 'Leading', range: '80-100', color: C.navy },
@@ -541,7 +541,7 @@ function EconomicDashboard({ est }: { est: EconomicEstimate }) {
           ESTIMATED UNREALIZED AI VALUE
         </Text>
         <Text style={{ fontFamily: FONT_B, fontSize: 22, color: C.white, marginBottom: 3 }}>
-          {fmt$(est.unrealizedValueLow)} – {fmt$(est.unrealizedValueHigh)}
+          {fmt$(est.unrealizedValueLow)}. {fmt$(est.unrealizedValueHigh)}
         </Text>
         <Text style={{ fontSize: 8, color: C.light }}>
           Annually | Current capture: {est.currentCapturePercent}% of potential
@@ -622,8 +622,7 @@ function AtAGlance({ result }: { result: DiagnosticResult }) {
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 6.5, color: C.tertiary }}>Unrealized Value</Text>
           <Text style={{ fontFamily: FONT_B, fontSize: 10, color: C.navy }}>
-            {fmt$(result.economicEstimate.unrealizedValueLow)} –
-          </Text>
+            {fmt$(result.economicEstimate.unrealizedValueLow)}. </Text>
           <Text style={{ fontFamily: FONT_B, fontSize: 10, color: C.navy }}>
             {fmt$(result.economicEstimate.unrealizedValueHigh)}
           </Text>
@@ -955,7 +954,7 @@ function ExecDashPage({ report, result }: { report: GeneratedReport; result: Dia
             ESTIMATED UNREALIZED AI VALUE
           </Text>
           <Text style={{ fontFamily: FONT_B, fontSize: 16, color: C.white }}>
-            {fmt$(result.economicEstimate.unrealizedValueLow)} – {fmt$(result.economicEstimate.unrealizedValueHigh)}
+            {fmt$(result.economicEstimate.unrealizedValueLow)}. {fmt$(result.economicEstimate.unrealizedValueHigh)}
           </Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
@@ -1149,7 +1148,7 @@ function AboutPage() {
         <Text style={{ fontSize: 9.5, color: C.body, lineHeight: 1.6, marginBottom: 8 }}>
           Our AI Diagnostic gives organizational leaders the same caliber of AI
           readiness analysis that Fortune 100 companies receive from top-tier
-          strategy firms — made accessible, actionable, and specific to your
+          strategy firms. made accessible, actionable, and specific to your
           organization.
         </Text>
         <Text style={{ fontSize: 9.5, color: C.body, lineHeight: 1.6, marginBottom: 8 }}>

@@ -1,10 +1,10 @@
 // =============================================================================
-// RLK AI Diagnostic — Redis Session Store (Upstash)
+// RLK AI Diagnostic. Redis Session Store (Upstash)
 // =============================================================================
 // Serverless-compatible persistence via Upstash Redis REST API.
 // Each session is stored as a JSON string keyed by "session:{id}".
 // Sessions auto-expire after 5 years (TTL refreshes on every write, so any
-// session that gets touched — paid, updated — gets its 5-year clock reset).
+// session that gets touched. paid, updated. gets its 5-year clock reset).
 // =============================================================================
 
 import { Redis } from '@upstash/redis';

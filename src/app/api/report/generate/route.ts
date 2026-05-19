@@ -3,7 +3,7 @@
 // =============================================================================
 // Generates an AI-powered diagnostic report from a completed diagnostic.
 // Incorporates background research data (10-K, news, leadership intel) if
-// available — this is what makes the report feel deeply custom.
+// available. this is what makes the report feel deeply custom.
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -90,10 +90,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate the full AI report — enriched with research if available
+    // Generate the full AI report. enriched with research if available
     const report = await generateFullReport(session.diagnosticResult, researchProfile ?? undefined);
 
-    // Preserve 'paid' status — never downgrade it to 'report_generated'
+    // Preserve 'paid' status. never downgrade it to 'report_generated'
     const statusUpdate = session.status === 'paid' ? 'paid' : 'report_generated';
     await updateSession(sessionId, {
       generatedReport: report,

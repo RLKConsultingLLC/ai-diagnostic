@@ -420,7 +420,7 @@ export const MCC_INDUSTRY_TREE: MCCCategory[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Search helper — flattened list for typeahead filtering
+// Search helper. flattened list for typeahead filtering
 // ---------------------------------------------------------------------------
 
 export interface FlatIndustry {

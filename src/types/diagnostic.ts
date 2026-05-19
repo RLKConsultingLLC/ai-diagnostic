@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Core Diagnostic Types
+// RLK AI Diagnostic. Core Diagnostic Types
 // =============================================================================
 
 export type Dimension =
@@ -11,7 +11,7 @@ export type Dimension =
 
 export interface AnswerOption {
   text: string;
-  score: number; // 0–5
+  score: number; // 0-5
 }
 
 export interface DiagnosticQuestion {
@@ -122,7 +122,7 @@ export interface ConsistencyFlag {
 export interface DimensionScore {
   dimension: Dimension;
   rawScore: number;
-  normalizedScore: number; // 0–100
+  normalizedScore: number; // 0-100
   questionCount: number;
   maxPossible: number;
 }
@@ -130,7 +130,7 @@ export interface DimensionScore {
 export interface CompositeIndex {
   name: string;
   slug: 'authority_friction' | 'decision_velocity' | 'economic_translation';
-  score: number; // 0–100
+  score: number; // 0-100
   components: { questionId: string; weight: number; score: number }[];
   interpretation: string;
 }
@@ -143,7 +143,7 @@ export interface StageClassification {
   stageDescription: string;
   dimensionStages: Record<Dimension, StageNumber>;
   mixedStageNarrative: string;
-  confidence: number; // 0–1, lower when dimensions diverge significantly
+  confidence: number; // 0-1, lower when dimensions diverge significantly
   confidenceFactors?: Record<string, number>;
 }
 
@@ -155,7 +155,7 @@ export interface EconomicSource {
 }
 
 export interface EconomicEstimate {
-  productivityPotentialPercent: number; // 10–35%
+  productivityPotentialPercent: number; // 10-35%
   currentCapturePercent: number;
   /** Raw base rate from the industry-group × stage matrix (e.g. 0.25 = 25%) */
   captureRateBase: number;
@@ -181,7 +181,7 @@ export interface DiagnosticResult {
   compositeIndices: CompositeIndex[];
   stageClassification: StageClassification;
   economicEstimate: EconomicEstimate;
-  overallScore: number; // 0–100 composite
+  overallScore: number; // 0-100 composite
   responseQuality?: ResponseQualityMetrics;
   consistencyFlags?: ConsistencyFlag[];
   researchAlignment?: string; // Narrative from research-scoring integration

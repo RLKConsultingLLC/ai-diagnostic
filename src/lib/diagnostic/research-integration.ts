@@ -1,5 +1,5 @@
 // =============================================================================
-// RLK AI Diagnostic — Research → Scoring Integration
+// RLK AI Diagnostic. Research → Scoring Integration
 // =============================================================================
 // Detects discrepancies between public research data and self-reported
 // diagnostic responses. Modulates confidence and can adjust dimension scores
@@ -146,7 +146,7 @@ export function computeResearchAdjustments(
 
   if (research.confidenceLevel === 'high') {
     narrativeParts.push(
-      'Research confidence is HIGH — public data is abundant and should be weighted accordingly.'
+      'Research confidence is HIGH. public data is abundant and should be weighted accordingly.'
     );
   }
 

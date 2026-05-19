@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
     const verification = await verifyPayment(stripeSessionId);
 
     if (verification.paid && verification.assessmentId) {
-      // Mark the session as paid (idempotent — safe if webhook already did it)
+      // Mark the session as paid (idempotent. safe if webhook already did it)
       try {
         await updateSession(verification.assessmentId, {
           status: 'paid',
           paymentId: stripeSessionId,
         });
       } catch {
-        // Session might not exist — that's OK, webhook will handle it
+        // Session might not exist. that's OK, webhook will handle it
       }
 
       return NextResponse.json({
