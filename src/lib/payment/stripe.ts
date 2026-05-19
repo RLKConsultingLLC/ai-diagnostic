@@ -16,7 +16,7 @@ function getStripe(): Stripe {
   return _stripe;
 }
 
-const DEFAULT_PRICE_CENTS = 49700; // $497.00
+const DEFAULT_PRICE_CENTS = 39700; // $397.00
 
 interface CreateCheckoutParams {
   assessmentId: string;
@@ -38,7 +38,7 @@ interface PaymentVerification {
 
 /**
  * Creates a Stripe Checkout session for the diagnostic report purchase.
- * Default price is $497 one-time payment unless a specific priceId is provided.
+ * Default price is $397 one-time payment unless a specific priceId is provided.
  */
 export async function createCheckoutSession(
   params: CreateCheckoutParams
@@ -62,7 +62,7 @@ export async function createCheckoutSession(
     // Use a pre-configured Stripe Price object
     sessionConfig.line_items = [{ price: priceId, quantity: 1 }];
   } else {
-    // Inline price: $497 one-time
+    // Inline price: $397 one-time
     sessionConfig.line_items = [
       {
         price_data: {

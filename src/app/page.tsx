@@ -462,7 +462,7 @@ export default function Home() {
                   "Identifies structural barriers your team cannot see from inside",
                   "Quantifies unrealized value in dollar terms",
                   "Delivers a 90-day action plan with owners by role",
-                  "$497, delivered in minutes, enriched with public intelligence",
+                  "$397, delivered in minutes, enriched with public intelligence",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-white/40 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -496,7 +496,7 @@ export default function Home() {
               RLK AI Diagnostic
             </div>
             <div className="flex items-baseline justify-center gap-1 mb-2">
-              <span className="text-5xl font-bold text-navy">$497</span>
+              <span className="text-5xl font-bold text-navy">$397</span>
             </div>
             <p className="text-sm text-tertiary mb-8">One-time assessment</p>
             <ul className="text-left text-sm text-foreground/80 space-y-3 mb-10">

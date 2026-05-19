@@ -40,7 +40,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-lg font-semibold text-navy mb-3">Payment and Refunds</h2>
             <ul className="list-disc pl-5 space-y-2">
-              <li>The diagnostic report is a one-time purchase at the listed price ($497 unless otherwise indicated).</li>
+              <li>The diagnostic report is a one-time purchase at the listed price ($397 unless otherwise indicated).</li>
               <li>Payment is processed securely via Stripe.</li>
               <li>Because the report is generated immediately upon payment, all sales are final. If you experience a technical issue preventing report delivery, contact us and we will resolve it.</li>
             </ul>
