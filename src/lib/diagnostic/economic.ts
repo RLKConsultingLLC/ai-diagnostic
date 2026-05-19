@@ -435,7 +435,7 @@ export function computeEconomicEstimate(
 // HELPERS
 // ---------------------------------------------------------------------------
 
-function formatIndustryName(industry: Industry): string {
+export function formatIndustryName(industry: Industry): string {
   const labels: Partial<Record<Industry, string>> = {
     insurance: 'Insurance', banking: 'Banking', capital_markets: 'Capital Markets',
     asset_wealth_management: 'Asset & Wealth Management', investment_banking: 'Investment Banking',
