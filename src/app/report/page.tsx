@@ -620,8 +620,8 @@ function ReportPage() {
                 )}
               </button>
               <p className="text-white/40 text-xs mt-4">
-                Secure payment via Stripe. Includes downloadable PDF
-                formatted for executive review.
+                Secure payment via Stripe. Includes a downloadable
+                interactive report formatted for executive review.
               </p>
 
               {/* Promo code input */}
