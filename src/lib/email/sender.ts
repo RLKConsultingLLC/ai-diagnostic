@@ -76,3 +76,49 @@ export async function sendReportEmail(
     id: data?.id,
   };
 }
+
+// =============================================================================
+// OPERATOR NOTIFICATIONS
+// =============================================================================
+// Internal notifications routed to OPERATOR_NOTIFICATION_EMAIL (defaults to
+// ryan.king@rlkconsultingco.com). Used for every started-diagnostic event
+// and every paid-or-bypassed event. Failure to send must not break the
+// user-facing flow, so callers wrap these in try/catch.
+// =============================================================================
+
+import {
+  buildStartedNotificationEmail,
+  buildPaymentNotificationEmail,
+  type StartedNotificationInput,
+  type PaymentNotificationInput,
+} from './templates';
+
+const OPERATOR_EMAIL = process.env.OPERATOR_NOTIFICATION_EMAIL?.trim() || 'ryan.king@rlkconsultingco.com';
+
+async function sendOperatorEmail(subject: string, html: string, text: string): Promise<SendReportEmailResult> {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) {
+    console.warn('[email] RESEND_API_KEY not set, skipping operator notification:', subject);
+    return { success: false, error: 'RESEND_API_KEY not set' };
+  }
+  const resend = new Resend(apiKey);
+  const { data, error } = await resend.emails.send({
+    from: `${FROM_NAME} <${FROM_ADDRESS}>`,
+    to: [OPERATOR_EMAIL],
+    subject,
+    html,
+    text,
+  });
+  if (error) return { success: false, error: error.message };
+  return { success: true, id: data?.id };
+}
+
+export async function sendDiagnosticStartedNotification(input: StartedNotificationInput): Promise<SendReportEmailResult> {
+  const { subject, html, text } = buildStartedNotificationEmail(input);
+  return sendOperatorEmail(subject, html, text);
+}
+
+export async function sendPaymentReceivedNotification(input: PaymentNotificationInput): Promise<SendReportEmailResult> {
+  const { subject, html, text } = buildPaymentNotificationEmail(input);
+  return sendOperatorEmail(subject, html, text);
+}

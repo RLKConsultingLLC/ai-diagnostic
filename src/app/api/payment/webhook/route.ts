@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/payment/stripe';
-import { updateSession } from '@/lib/db/store';
+import { getSession, updateSession } from '@/lib/db/store';
+import { sendPaymentReceivedNotification } from '@/lib/email/sender';
+import { formatIndustryName } from '@/lib/diagnostic/economic';
 
 export const maxDuration = 30;
 
@@ -53,11 +55,37 @@ export async function POST(request: NextRequest) {
       // Mark the assessment session as paid
       if (assessmentId) {
         try {
+          const existing = await getSession(assessmentId);
+          const wasAlreadyPaid = existing?.status === 'paid';
+
           await updateSession(assessmentId, {
             status: 'paid',
             paymentId: session.id,
           });
           console.log(`[stripe:webhook] Session ${assessmentId} marked as paid`);
+
+          if (!wasAlreadyPaid && existing) {
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnostic.rlkconsultingco.com';
+            const amountUsd = session.amount_total ? Math.round(session.amount_total / 100) : 397;
+            sendPaymentReceivedNotification({
+              companyName: existing.companyProfile.companyName,
+              industryLabel: formatIndustryName(existing.companyProfile.industry),
+              revenue: existing.companyProfile.revenue,
+              employeeCount: existing.companyProfile.employeeCount,
+              executiveName: existing.companyProfile.executiveName,
+              executiveTitle: existing.companyProfile.executiveTitle,
+              executiveEmail: existing.companyProfile.executiveEmail,
+              customerEmail: customerEmail === 'unknown' ? undefined : customerEmail,
+              sessionId: assessmentId,
+              reportUrl: `${appUrl}/report?sessionId=${assessmentId}`,
+              paymentMethod: 'stripe',
+              stripeSessionId: session.id,
+              amountUsd,
+              timestamp: new Date().toISOString(),
+            }).catch((err) => {
+              console.error('[stripe:webhook] operator notification failed:', err);
+            });
+          }
         } catch (err) {
           console.error(`[stripe:webhook] Failed to update session ${assessmentId}:`, err);
         }

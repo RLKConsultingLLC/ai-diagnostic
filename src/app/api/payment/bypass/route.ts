@@ -8,6 +8,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, updateSession } from '@/lib/db/store';
+import { sendPaymentReceivedNotification } from '@/lib/email/sender';
+import { formatIndustryName } from '@/lib/diagnostic/economic';
 
 export const maxDuration = 30;
 
@@ -58,6 +60,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Was this session already paid? If so this call is a TTL refresh and
+    // should not trigger a duplicate operator notification.
+    const wasAlreadyPaid = session.status === 'paid';
+
     // Mark as paid with a bypass identifier
     await updateSession(sessionId, {
       status: 'paid',
@@ -68,7 +74,29 @@ export async function POST(request: NextRequest) {
       sessionId,
       companyName: session.companyProfile.companyName,
       code: promoCode.trim().toUpperCase(),
+      wasAlreadyPaid,
     });
+
+    if (!wasAlreadyPaid) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnostic.rlkconsultingco.com';
+      sendPaymentReceivedNotification({
+        companyName: session.companyProfile.companyName,
+        industryLabel: formatIndustryName(session.companyProfile.industry),
+        revenue: session.companyProfile.revenue,
+        employeeCount: session.companyProfile.employeeCount,
+        executiveName: session.companyProfile.executiveName,
+        executiveTitle: session.companyProfile.executiveTitle,
+        executiveEmail: session.companyProfile.executiveEmail,
+        customerEmail: session.companyProfile.executiveEmail,
+        sessionId,
+        reportUrl: `${appUrl}/report?sessionId=${sessionId}`,
+        paymentMethod: 'bypass',
+        promoCode: promoCode.trim().toUpperCase(),
+        timestamp: new Date().toISOString(),
+      }).catch((err) => {
+        console.error('[payment:bypass] operator notification failed:', err);
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
