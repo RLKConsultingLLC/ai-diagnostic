@@ -172,7 +172,7 @@ export default function Home() {
             {[
               { title: "Behavioral Diagnosis", text: "61 behavioral questions that diagnose how your people actually interact with AI, not which tools you purchased. The gap between those two things is where value disappears." },
               { title: "Financial Quantification", text: "Dollar-denominated unrealized value your board can act on. Not vendor ROI projections. An independent economic model that translates behavioral patterns into financial exposure." },
-              { title: "Board-Ready Report", text: "A 5 to 8 page PDF briefing designed for executive and board audiences. Enriched with company-specific intelligence from public filings, news, and competitive analysis. Includes a 90-day action plan with named owners." },
+              { title: "Board-Ready Report", text: "An interactive board briefing designed for executive and board audiences, with collapsible sections that work in any browser. Enriched with company-specific intelligence from public filings, news, and competitive analysis. Includes a 90-day action plan with named owners." },
             ].map((item) => (
               <div key={item.title} className="bg-offwhite border border-light border-l-[3px] border-l-navy p-8">
                 <h3 className="text-lg font-semibold mb-3">{item.title}</h3>
@@ -414,7 +414,7 @@ export default function Home() {
                 Get Your Board Report
               </h3>
               <p className="text-foreground/70 text-sm leading-relaxed max-w-xs mx-auto">
-                Download a professionally formatted PDF briefing with
+                Download a self-contained interactive briefing with
                 executive summary, vendor landscape analysis, competitive
                 positioning, and a 90-day action plan with named owners
                 by role.
@@ -507,7 +507,7 @@ export default function Home() {
                 "Dollar-denominated unrealized value quantification",
                 "Company-specific intelligence from public filings and news",
                 "AI vendor landscape analysis for your industry and use cases",
-                "Board-ready PDF report with executive summary",
+                "Board-ready interactive report with executive summary",
                 "90-day action plan with owners by role",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">
