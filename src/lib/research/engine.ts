@@ -95,6 +95,34 @@ export function startBackgroundResearch(
 }
 
 /**
+ * Synchronously run research for a session and return the completed job.
+ * Used to backfill prebaked sessions or to run on-demand from the report page.
+ * Caller must set a long maxDuration on the route handler that calls this.
+ */
+export async function runResearchSync(
+  sessionId: string,
+  profile: CompanyProfile
+): Promise<ResearchJob> {
+  const job: ResearchJob = {
+    sessionId,
+    companyName: profile.companyName,
+    status: 'queued',
+    startedAt: new Date().toISOString(),
+    progress: {
+      financials: false,
+      news: false,
+      leadership: false,
+      aiIntelligence: false,
+      industry: false,
+      synthesis: false,
+    },
+  };
+  activeJobs.set(sessionId, job);
+  await executeResearch(sessionId, profile);
+  return activeJobs.get(sessionId) || job;
+}
+
+/**
  * Get the current status of a research job.
  */
 export async function getResearchStatus(sessionId: string): Promise<ResearchJob | null> {
