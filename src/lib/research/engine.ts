@@ -46,7 +46,8 @@ function getRedis(): Redis {
 }
 
 const RESEARCH_PREFIX = 'research:';
-const RESEARCH_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 days
+// No TTL: research profiles persist forever alongside sessions so the full
+// dataset is preserved for later aggregation and product analysis.
 
 // In-memory job tracker for real-time progress during active research
 const activeJobs = new Map<string, ResearchJob>();
@@ -236,11 +237,8 @@ async function executeResearch(
 async function persistJob(job: ResearchJob): Promise<void> {
   try {
     const redis = getRedis();
-    await redis.set(
-      `${RESEARCH_PREFIX}${job.sessionId}`,
-      JSON.stringify(job),
-      { ex: RESEARCH_TTL_SECONDS }
-    );
+    // Persist forever, alongside the session it belongs to.
+    await redis.set(`${RESEARCH_PREFIX}${job.sessionId}`, JSON.stringify(job));
   } catch (error) {
     console.error(`[Research] Failed to persist job ${job.sessionId}:`, error);
   }

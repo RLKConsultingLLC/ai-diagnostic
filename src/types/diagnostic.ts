@@ -233,6 +233,11 @@ export interface GeneratedReport {
 export interface AssessmentSession {
   id: string;
   createdAt: string;
+  // Write-once state-transition timestamps. Used for funnel analytics.
+  completedAt?: string;        // first time status became "completed"
+  reportGeneratedAt?: string;  // first time status became "report_generated"
+  paidAt?: string;             // first time status became "paid"
+  lastUpdatedAt?: string;      // updated on every write
   companyProfile: CompanyProfile;
   responses: AssessmentResponse[];
   currentQuestionIndex: number;
