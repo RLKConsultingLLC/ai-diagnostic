@@ -23,6 +23,28 @@ import type { CompanyResearchProfile } from "@/types/research";
 // SensitivitySection removed. not shown to clients
 
 // ---------------------------------------------------------------------------
+// ILLUSTRATIVE SAMPLE REGISTRY
+// ---------------------------------------------------------------------------
+// Sessions in this list are treated as marketing samples, not real client
+// engagements. They render with a diagonal watermark behind the content and
+// a top banner clarifying that the company shown is not a client and the
+// numbers are modeled from publicly available information.
+//
+// Add a sessionId to this list when you want to feature the report on the
+// marketing site or otherwise use it as a public sample.
+//
+// Real sales-pitch prebakes (sent directly to a prospect) should NOT be in
+// this list. They render clean so the prospect sees the report as a
+// diagnostic of their own company.
+// ---------------------------------------------------------------------------
+const ILLUSTRATIVE_SESSION_IDS: ReadonlySet<string> = new Set([
+  // Dollar Tree (marketing site sample)
+  "3d2031fd-b704-42cb-9ced-533bc8450a5e",
+  // PayPal (marketing site sample)
+  "80591db3-8d47-4faf-a47f-5ce41c04c0c1",
+]);
+
+// ---------------------------------------------------------------------------
 // Wrapper -- useSearchParams requires Suspense in Next.js app router
 // ---------------------------------------------------------------------------
 
@@ -52,6 +74,10 @@ function ReportPage() {
 
   const isDemo = params.get("demo") === "true";
   const stripeSession = params.get("stripe_session");
+  // Illustrative samples (Dollar Tree, PayPal, etc.) render with a watermark
+  // behind the content and a top banner clarifying that the company is not
+  // a client. Real sales prebakes render clean.
+  const isIllustrative = sessionId ? ILLUSTRATIVE_SESSION_IDS.has(sessionId) : false;
   const [phase, setPhase] = useState<Phase>("loading");
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [report, setReport] = useState<GeneratedReport | null>(null);
@@ -241,7 +267,7 @@ function ReportPage() {
   // ---------- Loading state ----------
   if (phase === "loading") {
     return (
-      <Shell>
+      <Shell illustrative={isIllustrative} companyName={result?.companyProfile.companyName ?? ""}>
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <Spinner size="lg" />
           <h2 className="mt-6 text-xl font-semibold text-secondary">
@@ -264,7 +290,7 @@ function ReportPage() {
   // ---------- Error fallback ----------
   if (error && !result) {
     return (
-      <Shell>
+      <Shell illustrative={isIllustrative} companyName="">
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <div className="w-14 h-14 bg-red-50 flex items-center justify-center mb-4">
             <svg
@@ -295,7 +321,7 @@ function ReportPage() {
 
   // ---------- Results ----------
   return (
-    <Shell>
+    <Shell illustrative={isIllustrative} companyName={result?.companyProfile.companyName ?? ""}>
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-800 text-sm px-5 py-3">
           {error}
@@ -2089,9 +2115,9 @@ function ReportPage() {
 // Shell
 // ---------------------------------------------------------------------------
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, illustrative = false, companyName = "" }: { children: React.ReactNode; illustrative?: boolean; companyName?: string }) {
   return (
-    <div className="min-h-screen bg-offwhite">
+    <div className="min-h-screen bg-offwhite relative">
       {/* Print stylesheet. expands all collapsed sections, hides UI chrome */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
@@ -2110,25 +2136,86 @@ function Shell({ children }: { children: React.ReactNode }) {
           /* Clean page breaks */
           .print-section { page-break-inside: avoid; margin-bottom: 20px; }
           h3, h4, h5 { page-break-after: avoid; }
+          /* Illustrative watermark stays visible in print and in the
+             interactive HTML export. */
+          .illustrative-watermark { display: block !important; }
         }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
+        /* Illustrative sample watermark: fixed diagonal text behind all content */
+        .illustrative-watermark {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          pointer-events: none;
+          z-index: 0;
+          overflow: hidden;
+          user-select: none;
+        }
+        .illustrative-watermark svg { width: 100%; height: 100%; display: block; }
+        .illustrative-content-layer { position: relative; z-index: 1; }
       `}} />
-      <div className="rlk-gradient-bar no-print" />
-      <header className="bg-white border-b border-light no-print">
-        <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
-          >
-            RLK AI Diagnostic
-          </Link>
-          <span className="text-xs text-tertiary">AI Diagnostic Report</span>
-        </div>
-      </header>
-      <main className="mx-auto max-w-5xl px-6 py-10 md:py-14">
-        {children}
-      </main>
+      {illustrative && <IllustrativeWatermark />}
+      <div className="illustrative-content-layer">
+        {illustrative && companyName && <IllustrativeBanner companyName={companyName} />}
+        <div className="rlk-gradient-bar no-print" />
+        <header className="bg-white border-b border-light no-print">
+          <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
+            <Link
+              href="/"
+              className="text-navy text-sm font-bold tracking-[0.3em] uppercase"
+            >
+              RLK AI Diagnostic
+            </Link>
+            <span className="text-xs text-tertiary">AI Diagnostic Report</span>
+          </div>
+        </header>
+        <main className="mx-auto max-w-5xl px-6 py-10 md:py-14">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Illustrative-sample banner and watermark
+// ---------------------------------------------------------------------------
+// Rendered only for sessions in ILLUSTRATIVE_SESSION_IDS. The banner is the
+// unmistakable, readable disclaimer at the top of every page. The watermark
+// is a diagonal repeating pattern behind all content that survives the
+// interactive HTML export and print.
+// ---------------------------------------------------------------------------
+
+function IllustrativeBanner({ companyName }: { companyName: string }) {
+  return (
+    <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5 text-center text-xs md:text-sm leading-snug">
+      <span className="font-bold tracking-wide uppercase">Illustrative sample.</span>{" "}
+      <span>
+        {companyName} is not a client of RLK Consulting. All data is modeled from publicly available information to demonstrate the format and analytical depth of the RLK AI Diagnostic.
+      </span>
+    </div>
+  );
+}
+
+function IllustrativeWatermark() {
+  // A single SVG with a diagonal text pattern. Light navy, low opacity.
+  // The text repeats to fill the viewport. Fixed position keeps it visible
+  // as the user scrolls. The interactive HTML export captures this SVG.
+  return (
+    <div className="illustrative-watermark" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1800" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="illustrative-pattern" x="0" y="0" width="600" height="220" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)">
+            <text x="0" y="80" fontFamily="Inter, system-ui, sans-serif" fontWeight="800" fontSize="58" letterSpacing="4" fill="#0B1D3A" fillOpacity="0.07">
+              ILLUSTRATIVE SAMPLE
+            </text>
+            <text x="0" y="170" fontFamily="Inter, system-ui, sans-serif" fontWeight="600" fontSize="28" letterSpacing="3" fill="#0B1D3A" fillOpacity="0.06">
+              NOT A CLIENT OF RLK CONSULTING
+            </text>
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="1200" height="1800" fill="url(#illustrative-pattern)" />
+      </svg>
     </div>
   );
 }
