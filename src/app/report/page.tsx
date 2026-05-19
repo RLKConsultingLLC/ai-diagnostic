@@ -616,7 +616,7 @@ function ReportPage() {
                     Redirecting to Checkout...
                   </>
                 ) : (
-                  "Get Your Full Diagnostic Report: $497"
+                  "Get Your Full Diagnostic Report: $397"
                 )}
               </button>
               <p className="text-white/40 text-xs mt-4">

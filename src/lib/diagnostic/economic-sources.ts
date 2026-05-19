@@ -1,7 +1,7 @@
 // =============================================================================
 // RLK AI Diagnostic. Economic Model Source Citations
 // =============================================================================
-// Provenance for every constant in the economic model. Makes the $497 product
+// Provenance for every constant in the economic model. Makes the $397 product
 // defensible when a CFO asks "where did you get these numbers?"
 // =============================================================================
 
