@@ -66,14 +66,13 @@ export default function ReportPageWrapper() {
 // Main page component
 // ---------------------------------------------------------------------------
 
-type Phase = "loading" | "preview" | "full";
+type Phase = "loading" | "full";
 
 function ReportPage() {
   const params = useSearchParams();
   const sessionId = params.get("sessionId");
 
-  const isDemo = params.get("demo") === "true";
-  const stripeSession = params.get("stripe_session");
+  const isDemo = params.get("demo") === "true"; // kept for watermark/illustrative rendering
   // Illustrative samples (Dollar Tree, PayPal, etc.) render with a watermark
   // behind the content and a top banner clarifying that the company is not
   // a client. Real sales prebakes render clean.
@@ -82,16 +81,12 @@ function ReportPage() {
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [report, setReport] = useState<GeneratedReport | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [promoCode, setPromoCode] = useState("");
-  const [promoLoading, setPromoLoading] = useState(false);
-  const [promoError, setPromoError] = useState<string | null>(null);
 
   // Fetch session data first (diagnostic results), then try report generation
   useEffect(() => {
     if (!sessionId) {
       setError("No session ID provided.");
-      setPhase("preview");
+      setPhase("full");
       return;
     }
 
@@ -105,13 +100,7 @@ function ReportPage() {
           const sessionData = await sessionRes.json();
           if (!cancelled && sessionData.session?.diagnosticResult) {
             setResult(sessionData.session.diagnosticResult);
-            // In demo mode or paid session, skip paywall and show full report
-            const isPaid = sessionData.session.status === "paid";
-            if (isDemo || isPaid) {
-              setPhase("full");
-            } else {
-              setPhase("preview");
-            }
+            setPhase("full");
             if (sessionData.session.generatedReport) {
               setReport(sessionData.session.generatedReport);
             }
@@ -119,25 +108,6 @@ function ReportPage() {
         }
       } catch {
         // Session fetch failed, continue to report generation
-      }
-
-      // Step 1.5: If returning from Stripe checkout, verify payment
-      if (stripeSession && !cancelled) {
-        try {
-          const verifyRes = await fetch("/api/payment/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stripeSessionId: stripeSession }),
-          });
-          if (verifyRes.ok) {
-            const verifyData = await verifyRes.json();
-            if (verifyData.paid) {
-              setPhase("full");
-            }
-          }
-        } catch {
-          // Verification failed. webhook will handle it eventually
-        }
       }
 
       // Step 2: Try to generate the AI report (requires ANTHROPIC_API_KEY)
@@ -154,22 +124,19 @@ function ReportPage() {
           if (data.report?.companyProfile) {
             setResult((prev) => prev ? { ...prev, companyProfile: data.report.companyProfile } : prev);
           }
-          // Never downgrade from "full". preserve paid/demo access
-          setPhase((p) => (p === "full" || isDemo || data.paid) ? "full" : "preview");
+          setPhase("full");
         } else {
-          // Report generation failed but we still have diagnostic data
-          // Don't downgrade from "full" if already set (e.g., paid session)
-          if (!cancelled) setPhase((p) => p === "full" ? "full" : (isDemo ? "full" : "preview"));
+          if (!cancelled) setPhase("full");
         }
       } catch {
-        if (!cancelled) setPhase((p) => p === "full" ? "full" : (isDemo ? "full" : "preview"));
+        if (!cancelled) setPhase("full");
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [sessionId, isDemo, stripeSession]);
+  }, [sessionId]);
 
   // Publicly available evidence overlay (fetched once when sessionId loads)
   const [researchProfile, setResearchProfile] = useState<CompanyResearchProfile | null>(null);
@@ -213,56 +180,6 @@ function ReportPage() {
     const { modifier } = computeDiagnosticModifier(result.dimensionScores);
     return Math.round(Math.max(0.01, Math.min(0.95, base * modifier)) * 100);
   }, [result]);
-
-  // Payment handler
-  const handleCheckout = useCallback(async () => {
-    if (!sessionId || !result) return;
-    setCheckoutLoading(true);
-    try {
-      const res = await fetch("/api/payment/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assessmentId: sessionId,
-          companyName: result.companyProfile.companyName,
-          email: result.companyProfile.executiveEmail || "",
-        }),
-      });
-      if (!res.ok) throw new Error("Checkout failed.");
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch {
-      setError("Unable to start checkout. Please try again.");
-      setCheckoutLoading(false);
-    }
-  }, [sessionId, result]);
-
-  // Promo code handler
-  const handlePromoCode = useCallback(async () => {
-    if (!sessionId || !promoCode.trim()) return;
-    setPromoLoading(true);
-    setPromoError(null);
-    try {
-      const res = await fetch("/api/payment/bypass", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, promoCode: promoCode.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setPromoError(data.error || "Invalid promo code");
-        setPromoLoading(false);
-        return;
-      }
-      // Success. reload the page to show the full report
-      window.location.reload();
-    } catch {
-      setPromoError("Unable to verify promo code. Please try again.");
-      setPromoLoading(false);
-    }
-  }, [sessionId, promoCode]);
 
   // ---------- Loading state ----------
   if (phase === "loading") {
@@ -328,367 +245,10 @@ function ReportPage() {
         </div>
       )}
 
-      {/* Pre-paywall content. hidden once full report is showing */}
-      {phase !== "full" && result && (
-        <>
-      {/* Overall Score Hero */}
+
+
+      {/* Full Report */}
       {result && (
-        <section className="bg-white border border-light overflow-hidden mb-10 shadow-sm">
-          {/* Decorative top gradient bar */}
-          <div className="h-1.5 bg-gradient-to-r from-navy via-navy/70 to-navy/30" />
-
-          <div className="px-6 md:px-10 lg:px-14 pt-10 md:pt-14 pb-8 md:pb-10 text-center">
-            {/* Company name */}
-            <p className="text-[11px] md:text-xs font-semibold text-navy/40 tracking-[0.35em] uppercase mb-3">
-              Prepared for
-            </p>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-navy tracking-tight mb-1">
-              {result.companyProfile.companyName}
-            </h1>
-            <div className="mx-auto w-12 h-px bg-navy/15 my-5" />
-            <h2 className="text-base md:text-lg font-semibold text-navy/70 tracking-wide uppercase mb-8">
-              AI Maturity Diagnostic
-            </h2>
-
-            {/* Score gauge. centered hero element */}
-            <div className="mb-8">
-              <ScoreGauge score={result.overallScore} />
-            </div>
-
-            {/* Meta line */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs text-foreground/35">
-              <span>
-                Completed{" "}
-                {new Date(result.completedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-              <span className="hidden sm:inline text-foreground/15">|</span>
-              <span>RLK Consulting Framework</span>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Stage Classification */}
-      {result && (
-        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Stage Classification</h2>
-          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
-          <StageDisplay stage={result.stageClassification} dimensionScores={result.dimensionScores} />
-        </section>
-      )}
-
-      {/* Dimension Scores */}
-      {result && (
-        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">Dimension Scores</h2>
-          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-4" />
-          <p className="text-sm text-foreground/50 mb-6">
-            Five behavioral dimensions that determine whether your AI investments translate into organizational value.
-          </p>
-
-          <div className="space-y-6">
-            {result.dimensionScores.map((ds) => {
-              const desc: Record<string, string> = {
-                adoption_behavior: "Are your people actually using AI, or just talking about it?",
-                authority_structure: "Who can say yes to AI. and how fast can they do it?",
-                workflow_integration: "Is AI embedded in how work gets done, or sitting on the side?",
-                decision_velocity: "How quickly does your organization move from AI insight to action?",
-                economic_translation: "Can you prove AI is creating financial value?",
-              };
-              return (
-                <div key={ds.dimension}>
-                  <p className="text-[11px] text-foreground/45 leading-snug mb-1.5">
-                    {desc[ds.dimension] || ""}
-                  </p>
-                  <DimensionBar score={ds} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Economic Impact */}
-      {result && (
-        <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-          <h2 className="text-xl md:text-2xl font-bold text-navy tracking-tight mb-1">
-            Economic Impact Summary
-          </h2>
-          <p className="text-sm text-foreground/50 mb-1">
-            {industryLabel(result.companyProfile.industry, result.companyProfile.industryDisplayLabel)} industry benchmarks applied to {result.companyProfile.companyName}
-          </p>
-          <div className="h-px bg-gradient-to-r from-navy/20 via-navy/8 to-transparent mb-6" />
-          <EconomicSummary estimate={{...result.economicEstimate, currentCapturePercent: correctedCapturePercent}} />
-          <div className="mt-6 bg-navy/5 border border-navy/10 p-4 text-center">
-            <p className="text-sm text-foreground/70">
-              {getEconomicScaleContext(result.companyProfile.employeeCount)}{" "}
-              The full report provides the <strong className="text-secondary">transparent step-by-step methodology</strong>,{" "}
-              {industryLabel(result.companyProfile.industry)} peer benchmarks, and five P&L scenarios modeled to your revenue and employee base.
-              Your CFO should stress-test these assumptions before acting on them.
-            </p>
-          </div>
-        </section>
-      )}
-
-      {/* Maturity Analysis. research-backed insights */}
-      {result && (() => {
-        const sorted = [...result.dimensionScores].sort((a, b) => a.normalizedScore - b.normalizedScore);
-        const analysis = getFreeMaturityAnalysis(
-          result.stageClassification.primaryStage,
-          result.companyProfile.industry,
-          result.overallScore,
-          result.companyProfile.companyName,
-          result.companyProfile.revenue,
-          result.companyProfile.employeeCount,
-          sorted[0].dimension,
-        );
-        return (
-          <section className="bg-white border border-light border-t-[3px] border-t-navy/10 p-6 md:p-10 lg:p-12 mb-10 shadow-sm">
-            <h2 className="text-lg mb-4">Maturity Analysis</h2>
-
-            {/* Headline */}
-            <div className="border-l-4 border-navy pl-5 mb-6">
-              <p className="text-base text-foreground/80 leading-relaxed font-medium">
-                {analysis.headline}
-              </p>
-            </div>
-
-            {/* Industry context */}
-            <p className="text-sm text-foreground/70 leading-relaxed mb-8">
-              {analysis.industryContext}
-            </p>
-
-            {/* Research-backed insight cards */}
-            <div className="space-y-4 mb-8">
-              {analysis.insights.map((insight, i) => (
-                <div key={i} className="bg-offwhite border border-light p-5">
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl font-bold text-navy shrink-0 leading-none mt-0.5">
-                      {insight.stat}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-navy mb-1">
-                        {insight.label}
-                      </p>
-                      <p className="text-xs text-foreground/60 leading-relaxed">
-                        {insight.body}
-                      </p>
-                      <p className="text-[10px] text-tertiary italic mt-2">
-                        {insight.source}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mixed stage narrative (if applicable) */}
-            {result.stageClassification.mixedStageNarrative && (
-              <p className="text-sm text-foreground/60 leading-relaxed mb-6 italic">
-                {result.stageClassification.mixedStageNarrative}
-              </p>
-            )}
-
-            {/* Closing hook */}
-            <div className="bg-navy/5 border border-navy/10 p-4">
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                {analysis.closingHook}
-              </p>
-            </div>
-          </section>
-        );
-      })()}
-
-        </>
-      )}
-
-      {/* Paywall / Full Report */}
-      {phase === "preview" && (
-        <section className="bg-navy text-white p-6 md:p-10 mb-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-xl md:text-2xl font-bold mb-3">
-                <span className="text-white">Your Diagnostic Data is Ready.</span>
-                <br />
-                <span style={{ color: "#c9a84c" }}>The Full Analysis Goes Deeper.</span>
-              </h2>
-              <p className="text-white/70 text-sm leading-relaxed max-w-lg mx-auto">
-                The scores above are the starting point. The full RLK AI Diagnostic
-                translates these numbers into an executive-grade
-                analysis your leadership team can act on immediately.
-              </p>
-            </div>
-
-            {/* What's included grid */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-8 text-left">
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  AI Posture Diagnosis
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  What your behavioral patterns reveal about how AI actually
-                  operates inside your organization, not how leadership thinks
-                  it does.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Structural Constraints
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  The specific authority structures, governance bottlenecks, and
-                  approval dynamics preventing your AI investments from scaling.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Competitive Positioning
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  Where you stand vs. industry peers with real company data,
-                  competitor analysis, and competitive window assessment.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Financial Impact Analysis
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  Dollar-denominated cost of inaction, capture gap analysis, and
-                  ROI framing your CFO can use for investment decisions.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  P&L Business Case
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  How AI investment flows through your P&L. revenue impact,
-                  margin improvement, cost structure evolution, and the
-                  compounding cost of standing still.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Security & Governance Risks
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  Shadow AI exposure, compliance gaps, and the governance
-                  questions your leadership team should be asking but likely is not.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Vendor Landscape Assessment
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  Are your AI vendors worth what you are paying? Independent
-                  analysis of your vendor stack with buy/build/partner
-                  recommendations.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Board-Ready Messaging
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  Pre-built board presentation findings, peer benchmarks, and
-                  recommended asks structured as decision items per NACD guidance.
-                </p>
-              </div>
-              <div className="bg-white/10 border border-white/10 p-4">
-                <p className="text-white text-sm font-semibold mb-1">
-                  Messages for the Board
-                </p>
-                <p className="text-white/50 text-xs leading-relaxed">
-                  Board-ready findings with specific decision items, investment
-                  asks, and governance recommendations aligned to NACD best
-                  practices.
-                </p>
-              </div>
-            </div>
-
-            {/* Enrichment callout */}
-            <div className="bg-white/5 border border-white/10 p-4 mb-8 text-center">
-              <p className="text-white/80 text-xs font-semibold tracking-widest uppercase mb-1">
-                Enriched with public intelligence
-              </p>
-              <p className="text-white/50 text-xs leading-relaxed">
-                Your report is not generated from survey data alone. Our AI
-                researches your company using SEC filings, news, leadership
-                signals, competitor activity, and regulatory developments to
-                produce analysis specific to{" "}
-                <span className="text-white font-medium">
-                  {result?.companyProfile.companyName || "your organization"}
-                </span>
-                .
-              </p>
-            </div>
-
-            {/* CTA */}
-            <div className="text-center">
-              <button
-                onClick={handleCheckout}
-                disabled={checkoutLoading}
-                className="bg-white text-navy px-10 py-4 text-base font-semibold hover:bg-offwhite transition-colors disabled:opacity-60 inline-flex items-center gap-2"
-              >
-                {checkoutLoading ? (
-                  <>
-                    <Spinner />
-                    Redirecting to Checkout...
-                  </>
-                ) : (
-                  "Get Your Full Diagnostic Report: $397"
-                )}
-              </button>
-              <p className="text-white/40 text-xs mt-4">
-                Secure payment via Stripe. Includes a downloadable
-                interactive report formatted for executive review.
-              </p>
-
-              {/* Promo code input */}
-              <div className="mt-6 pt-5 border-t border-white/10">
-                <p className="text-white/40 text-[10px] tracking-widest uppercase mb-2">
-                  Have a promo code?
-                </p>
-                <div className="flex items-center justify-center gap-2 max-w-xs mx-auto">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(null); }}
-                    onKeyDown={(e) => e.key === "Enter" && handlePromoCode()}
-                    placeholder="Enter code"
-                    className="bg-white/10 border border-white/20 text-white text-xs px-3 py-2 flex-1 placeholder:text-white/30 focus:outline-none focus:border-white/40"
-                  />
-                  <button
-                    onClick={handlePromoCode}
-                    disabled={promoLoading || !promoCode.trim()}
-                    className="bg-white/15 border border-white/20 text-white text-xs px-4 py-2 font-semibold hover:bg-white/25 transition-colors disabled:opacity-40"
-                  >
-                    {promoLoading ? "..." : "Apply"}
-                  </button>
-                </div>
-                {promoError && (
-                  <p className="text-red-300 text-[11px] mt-2">{promoError}</p>
-                )}
-              </div>
-
-              <p className="text-white/30 text-xs mt-4">
-                Built on frameworks honed across years of advising CIOs and
-                technology executives at McKinsey, Deloitte, and now at RLK
-                Consulting.
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Full Report Sections (post-payment) */}
-      {phase === "full" && result && (
         <div className="mb-8">
           <SaveInteractiveReportButton companyName={result.companyProfile.companyName} />
           {/* ================================================================= */}
@@ -2709,7 +2269,7 @@ function SectionHeader({ number, title }: { number: number; title: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Floating Table of Contents. sticky nav stripe at top of paid report
+// Floating Table of Contents. sticky nav stripe at top of report
 // ---------------------------------------------------------------------------
 
 const TOC_SECTIONS = [
@@ -5006,7 +4566,7 @@ interface PnLImpactData {
 }
 
 // ---------------------------------------------------------------------------
-// Pre-paywall "Maturity Analysis". research-backed insights
+// Maturity Analysis helper. research-backed insights
 // ---------------------------------------------------------------------------
 
 interface FreeReportInsight {

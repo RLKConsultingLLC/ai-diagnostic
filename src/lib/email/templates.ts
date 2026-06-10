@@ -15,6 +15,7 @@ export interface ReportEmailInput {
   unrealizedValueHigh: number;
   overallScore: number;
   reportUrl: string;
+  calendlyUrl?: string;
 }
 
 export interface ReportEmailOutput {
@@ -52,7 +53,10 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
     unrealizedValueHigh,
     overallScore,
     reportUrl,
+    calendlyUrl,
   } = input;
+
+  const scheduleUrl = calendlyUrl || process.env.CALENDLY_URL || '';
 
   const valueLow = formatCurrency(unrealizedValueLow);
   const valueHigh = formatCurrency(unrealizedValueHigh);
@@ -129,7 +133,7 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                 </tr>
                 <tr>
                   <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:15px;color:${BODY_TEXT};line-height:26px;padding-bottom:24px;">
-                    Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete. The full report is attached as a PDF for your review.
+                    Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete. Your full interactive report is ready. Nine sections, instant access, no login required.
                   </td>
                 </tr>
               </table>
@@ -159,19 +163,26 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                 </tr>
               </table>
 
-              <!-- What's in the report -->
+              <!-- Primary CTA: Access Report -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
-                    Your attached report includes:
+                  <td align="center">
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${reportUrl}" style="height:52px;v-text-anchor:middle;width:300px;" arcsize="0%" strokecolor="${NAVY}" fillcolor="${NAVY}">
+                      <w:anchorlock/>
+                      <center style="color:#ffffff;font-family:Calibri,sans-serif;font-size:14px;font-weight:bold;">ACCESS YOUR INTERACTIVE REPORT</center>
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-->
+                    <a href="${reportUrl}" target="_blank" style="display:inline-block;background-color:${NAVY};color:#ffffff;font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:1px;text-transform:uppercase;">
+                      Access Your Interactive Report
+                    </a>
+                    <!--<![endif]-->
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:26px;padding-top:8px;padding-left:16px;">
-                    &bull;&nbsp; Five-dimension AI maturity scoring with benchmarks<br/>
-                    &bull;&nbsp; Competitive positioning and industry context<br/>
-                    &bull;&nbsp; Economic impact analysis with ROI estimates<br/>
-                    &bull;&nbsp; Prioritized 90-day action roadmap
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${TERTIARY};text-align:center;padding-top:10px;">
+                    No login required &nbsp;&middot;&nbsp; Nine sections &nbsp;&middot;&nbsp; Instant access
                   </td>
                 </tr>
               </table>
@@ -183,24 +194,18 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                 </tr>
               </table>
 
-              <!-- CTA -->
+              <!-- Secondary CTA: Schedule with Calendly -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
-                    Want to discuss these findings with your leadership team? We offer a complimentary 30-minute strategy session to walk through the results and identify quick wins.
+                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-bottom:16px;">
+                    I review every report personally. If you want to walk through the findings together: what the scores mean for your specific situation, where to act first, how to frame this for your board. Use the link below to schedule time directly.
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding-top:16px;" align="center">
-                    <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="mailto:ryan.king@rlkconsultingco.com?subject=AI Diagnostic Follow-Up" style="height:48px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="${NAVY}" fillcolor="${NAVY}">
-                      <w:anchorlock/>
-                      <center style="color:#ffffff;font-family:Calibri,sans-serif;font-size:14px;font-weight:bold;">SCHEDULE A STRATEGY SESSION</center>
-                    </v:roundrect>
-                    <![endif]-->
+                  <td align="center">
                     <!--[if !mso]><!-->
-                    <a href="mailto:ryan.king@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20%E2%80%94%20${encodeURIComponent(companyName)}" target="_blank" style="display:inline-block;background-color:${NAVY};color:#ffffff;font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:14px 36px;letter-spacing:1px;text-transform:uppercase;">
-                      Schedule a Strategy Session
+                    <a href="${scheduleUrl || `mailto:ryan.king@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20%E2%80%94%20${encodeURIComponent(companyName)}`}" target="_blank" style="display:inline-block;background-color:transparent;color:${NAVY};font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:13px 36px;letter-spacing:1px;text-transform:uppercase;border:2px solid ${NAVY};">
+                      Schedule Time to Discuss Results
                     </a>
                     <!--<![endif]-->
                   </td>
@@ -287,22 +292,21 @@ ${'='.repeat(52)}
 
 ${recipientName},
 
-Your RLK AI Diagnostic for ${companyName} is complete. The full report is attached as a PDF.
+Your RLK AI Diagnostic for ${companyName} is complete. Your full interactive report is ready below.
+
+ACCESS YOUR REPORT
+${reportUrl}
 
 KEY FINDINGS
 ${'-'.repeat(52)}
 Stage ${stageNumber}: ${stageName} | Overall Score: ${overallScore}/100
 Estimated unrealized AI value: ${valueLow} - ${valueHigh} annually
 
-Your report includes:
-  - Five-dimension AI maturity scoring with benchmarks
-  - Competitive positioning and industry context
-  - Economic impact analysis with ROI estimates
-  - Prioritized 90-day action roadmap
-
 ${'-'.repeat(52)}
 
-Want to discuss these findings? We offer a complimentary 30-minute strategy session. Reply to this email or contact ryan.king@rlkconsultingco.com.
+I review every report personally. If you want to walk through the findings together: what the scores mean, where to act first, how to frame this for your board. Schedule time directly:
+
+${scheduleUrl || 'ryan.king@rlkconsultingco.com'}
 
 Ryan King
 Founder, RLK Consulting

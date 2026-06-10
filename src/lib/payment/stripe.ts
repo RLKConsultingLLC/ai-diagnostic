@@ -69,13 +69,18 @@ export async function createCheckoutSession(
           currency: 'usd',
           unit_amount: DEFAULT_PRICE_CENTS,
           product_data: {
-            name: 'RLK AI Diagnostic | Full Report',
-            description: `AI readiness diagnostic report for ${companyName}`,
+            name: 'RLK AI Diagnostic',
+            description: `Full nine-section report for ${companyName}. Financial impact estimate, priority actions, competitive positioning, and vendor recommendations. Delivered instantly.`,
           },
         },
         quantity: 1,
       },
     ];
+    sessionConfig.custom_text = {
+      submit: {
+        message: 'Your report opens immediately after payment. No wait, no scheduling, no follow-up calls required.',
+      },
+    };
   }
 
   const session = await getStripe().checkout.sessions.create(sessionConfig);

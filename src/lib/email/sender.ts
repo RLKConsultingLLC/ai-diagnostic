@@ -21,6 +21,7 @@ export interface SendReportEmailInput {
   unrealizedValueHigh: number;
   overallScore: number;
   reportUrl: string;
+  calendlyUrl?: string;
   pdfBuffer?: Buffer; // Optional PDF attachment
 }
 

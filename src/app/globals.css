@@ -23,13 +23,13 @@
   --color-accent: var(--rlk-accent);
   --color-light: var(--rlk-light);
   --color-offwhite: var(--rlk-offwhite);
-  --font-sans: Calibri, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Calibri, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -52,7 +52,7 @@ body {
   }
 }
 
-/* RLK Gradient Bar — decorative 5-segment header element */
+/* RLK Gradient Bar: decorative 5-segment header element */
 .rlk-gradient-bar {
   height: 4px;
   width: 100%;
@@ -91,7 +91,7 @@ body {
 }
 
 /* ================================================================
-   RLK Section Dividers — clean, minimal, consulting-grade
+   RLK Section Dividers: clean, minimal, consulting-grade
    ================================================================ */
 
 /* Subtle centered gradient line between sections */
@@ -111,7 +111,7 @@ body {
   );
 }
 
-/* White-to-navy transition — smooth gradient fade into footer */
+/* White-to-navy transition: smooth gradient fade into footer */
 .rlk-diagonal-white-to-navy {
   width: 100%;
   height: 80px;

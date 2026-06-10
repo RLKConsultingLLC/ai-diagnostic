@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/payment/stripe';
 import { getSession, updateSession } from '@/lib/db/store';
-import { sendPaymentReceivedNotification } from '@/lib/email/sender';
+import { sendPaymentReceivedNotification, sendReportEmail } from '@/lib/email/sender';
 import { formatIndustryName } from '@/lib/diagnostic/economic';
 
 export const maxDuration = 30;
@@ -67,6 +67,9 @@ export async function POST(request: NextRequest) {
           if (!wasAlreadyPaid && existing) {
             const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnostic.rlkconsultingco.com';
             const amountUsd = session.amount_total ? Math.round(session.amount_total / 100) : 397;
+            const reportUrl = `${appUrl}/report?sessionId=${assessmentId}`;
+
+            // Operator notification (fire-and-forget)
             sendPaymentReceivedNotification({
               companyName: existing.companyProfile.companyName,
               industryLabel: formatIndustryName(existing.companyProfile.industry),
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
               executiveEmail: existing.companyProfile.executiveEmail,
               customerEmail: customerEmail === 'unknown' ? undefined : customerEmail,
               sessionId: assessmentId,
-              reportUrl: `${appUrl}/report?sessionId=${assessmentId}`,
+              reportUrl,
               paymentMethod: 'stripe',
               stripeSessionId: session.id,
               amountUsd,
@@ -85,6 +88,40 @@ export async function POST(request: NextRequest) {
             }).catch((err) => {
               console.error('[stripe:webhook] operator notification failed:', err);
             });
+
+            // Customer report delivery email (fire-and-forget)
+            const recipientEmail = existing.companyProfile.executiveEmail
+              || (customerEmail !== 'unknown' ? customerEmail : null);
+            const result = existing.diagnosticResult;
+
+            if (recipientEmail && result) {
+              sendReportEmail({
+                to: recipientEmail,
+                recipientName: existing.companyProfile.executiveName || existing.companyProfile.companyName,
+                companyName: existing.companyProfile.companyName,
+                stageName: result.stageClassification.stageName,
+                stageNumber: result.stageClassification.primaryStage,
+                unrealizedValueLow: result.economicEstimate.unrealizedValueLow,
+                unrealizedValueHigh: result.economicEstimate.unrealizedValueHigh,
+                overallScore: result.overallScore,
+                reportUrl,
+                calendlyUrl: process.env.CALENDLY_URL,
+              }).then((res) => {
+                if (res.success) {
+                  console.log(`[stripe:webhook] Report email sent to ${recipientEmail} (id: ${res.id})`);
+                } else {
+                  console.error(`[stripe:webhook] Report email failed: ${res.error}`);
+                }
+              }).catch((err) => {
+                console.error('[stripe:webhook] Report email threw:', err);
+              });
+            } else {
+              console.warn('[stripe:webhook] Skipping report email: missing recipient or diagnosticResult', {
+                hasEmail: !!recipientEmail,
+                hasResult: !!result,
+                assessmentId,
+              });
+            }
           }
         } catch (err) {
           console.error(`[stripe:webhook] Failed to update session ${assessmentId}:`, err);

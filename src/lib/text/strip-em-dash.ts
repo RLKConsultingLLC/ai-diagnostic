@@ -20,12 +20,11 @@ const EM_DASH_RE = /[—–―⸺⸻]/g;
 // Surrounding-whitespace handling. We want intelligent replacement that does
 // not produce double spaces or orphan punctuation.
 //
-//  word — word     becomes  word. word          (sentence break)
-//  word—word       becomes  word, word          (clause break, no spaces)
-//  word —word      becomes  word, word
-//  word— word      becomes  word, word
+//  spaced dash (word [dash] word)   becomes  word. word   (sentence break)
+//  tight dash  (word[dash]word)     becomes  word, word   (clause break)
+//  half-spaced variants             become   word, word
 //
-// Numeric ranges (e.g. "10–15") are normalized to "10-15" via a hyphen so
+// Numeric ranges (e.g. "10-15") are normalized to a plain hyphen so
 // numeric content stays readable.
 
 const NUMERIC_RANGE_RE = /(\d)\s*[—–―⸺⸻]\s*(\d)/g;
