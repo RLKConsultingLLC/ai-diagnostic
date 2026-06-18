@@ -105,15 +105,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Side effects, fire-and-forget. Failures here must not block the response.
+    // Run side effects to completion BEFORE responding. On Vercel serverless,
+    // the function instance freezes the moment the response is flushed, so any
+    // un-awaited (fire-and-forget) promise is unreliable: the external Beehiiv
+    // HTTP call and the Resend sends can be killed mid-flight. We await them.
+    // Promise.allSettled ensures one failure never blocks the others, and the
+    // sender functions return result objects rather than throwing on send
+    // failure, so a down provider still lets the user reach the report.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnostic.rlkconsultingco.com';
     const reportUrl = `${appUrl}/report?sessionId=${sessionId}`;
+    const dr = updated.diagnosticResult;
 
-    // Beehiiv subscription
-    const beehiivPromise = subscribeToBeehiiv(email, sessionId, updated.companyProfile.companyName);
+    // Beehiiv subscription first, since the operator notification reports its result.
+    const bh = await subscribeToBeehiiv(email, sessionId, updated.companyProfile.companyName);
 
-    // Operator notification (depends on beehiiv result to populate the row)
-    beehiivPromise.then((bh) => {
+    await Promise.allSettled([
       sendDiagnosticUnlockedNotification({
         companyName: updated.companyProfile.companyName,
         industryLabel: formatIndustryName(updated.companyProfile.industry),
@@ -130,37 +136,27 @@ export async function POST(request: NextRequest) {
         reportUrl,
         timestamp: nowIso,
         subscribedToNewsletter: bh.subscribed,
-      }).catch((err) => {
-        console.error('[unlock-report] operator notification failed:', err);
-      });
-    });
+      }),
+      // Branded report email to the user. Fulfills the gate's promise of a copy
+      // and is the controlled, on-brand touchpoint. Only sent once the report
+      // has been generated (diagnosticResult present).
+      dr
+        ? sendReportEmail({
+            to: email,
+            recipientName: updated.companyProfile.executiveName || updated.companyProfile.companyName,
+            companyName: updated.companyProfile.companyName,
+            stageName: dr.stageClassification.stageName,
+            stageNumber: dr.stageClassification.primaryStage,
+            unrealizedValueLow: dr.economicEstimate.unrealizedValueLow,
+            unrealizedValueHigh: dr.economicEstimate.unrealizedValueHigh,
+            overallScore: dr.overallScore,
+            reportUrl,
+            calendlyUrl: process.env.CALENDLY_URL,
+          })
+        : Promise.resolve(),
+    ]);
 
-    // Branded report email to the user. Fulfills the gate's promise of a copy
-    // and gives a controlled, on-brand touchpoint rather than relying solely on
-    // the Beehiiv welcome automation. Fire-and-forget.
-    const dr = updated.diagnosticResult;
-    if (dr) {
-      sendReportEmail({
-        to: email,
-        recipientName: updated.companyProfile.executiveName || updated.companyProfile.companyName,
-        companyName: updated.companyProfile.companyName,
-        stageName: dr.stageClassification.stageName,
-        stageNumber: dr.stageClassification.primaryStage,
-        unrealizedValueLow: dr.economicEstimate.unrealizedValueLow,
-        unrealizedValueHigh: dr.economicEstimate.unrealizedValueHigh,
-        overallScore: dr.overallScore,
-        reportUrl,
-        calendlyUrl: process.env.CALENDLY_URL,
-      }).then((res) => {
-        if (!res.success) {
-          console.error('[unlock-report] report email failed:', res.error);
-        }
-      }).catch((err) => {
-        console.error('[unlock-report] report email threw:', err);
-      });
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, subscribed: bh.subscribed });
   } catch (err) {
     console.error('[POST /api/assessment/unlock-report]', err);
     return NextResponse.json({ error: 'Failed to unlock report' }, { status: 500 });
