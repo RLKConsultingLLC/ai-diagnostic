@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, updateSession } from '@/lib/db/store';
-import { sendDiagnosticUnlockedNotification } from '@/lib/email/sender';
+import { sendDiagnosticUnlockedNotification, sendReportEmail } from '@/lib/email/sender';
 import { formatIndustryName } from '@/lib/diagnostic/economic';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -134,6 +134,31 @@ export async function POST(request: NextRequest) {
         console.error('[unlock-report] operator notification failed:', err);
       });
     });
+
+    // Branded report email to the user. Fulfills the gate's promise of a copy
+    // and gives a controlled, on-brand touchpoint rather than relying solely on
+    // the Beehiiv welcome automation. Fire-and-forget.
+    const dr = updated.diagnosticResult;
+    if (dr) {
+      sendReportEmail({
+        to: email,
+        recipientName: updated.companyProfile.executiveName || updated.companyProfile.companyName,
+        companyName: updated.companyProfile.companyName,
+        stageName: dr.stageClassification.stageName,
+        stageNumber: dr.stageClassification.primaryStage,
+        unrealizedValueLow: dr.economicEstimate.unrealizedValueLow,
+        unrealizedValueHigh: dr.economicEstimate.unrealizedValueHigh,
+        overallScore: dr.overallScore,
+        reportUrl,
+        calendlyUrl: process.env.CALENDLY_URL,
+      }).then((res) => {
+        if (!res.success) {
+          console.error('[unlock-report] report email failed:', res.error);
+        }
+      }).catch((err) => {
+        console.error('[unlock-report] report email threw:', err);
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
