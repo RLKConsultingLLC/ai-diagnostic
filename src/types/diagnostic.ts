@@ -236,6 +236,7 @@ export interface AssessmentSession {
   // Write-once state-transition timestamps. Used for funnel analytics.
   completedAt?: string;        // first time status became "completed"
   reportGeneratedAt?: string;  // first time status became "report_generated"
+  reportUnlockedAt?: string;   // first time the user entered email to view the report
   paidAt?: string;             // first time status became "paid"
   lastUpdatedAt?: string;      // updated on every write
   companyProfile: CompanyProfile;

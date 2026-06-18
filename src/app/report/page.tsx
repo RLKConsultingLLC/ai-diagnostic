@@ -66,7 +66,7 @@ export default function ReportPageWrapper() {
 // Main page component
 // ---------------------------------------------------------------------------
 
-type Phase = "loading" | "full";
+type Phase = "loading" | "email-gate" | "full";
 
 function ReportPage() {
   const params = useSearchParams();
@@ -77,10 +77,15 @@ function ReportPage() {
   // behind the content and a top banner clarifying that the company is not
   // a client. Real sales prebakes render clean.
   const isIllustrative = sessionId ? ILLUSTRATIVE_SESSION_IDS.has(sessionId) : false;
+  // Illustrative samples and demo previews bypass the email gate so they
+  // can be shared with prospects without forcing a capture flow.
+  const bypassGate = isIllustrative || isDemo;
+
   const [phase, setPhase] = useState<Phase>("loading");
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [report, setReport] = useState<GeneratedReport | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [prefilledEmail, setPrefilledEmail] = useState<string>("");
 
   // Fetch session data first (diagnostic results), then try report generation
   useEffect(() => {
@@ -93,6 +98,8 @@ function ReportPage() {
     let cancelled = false;
 
     (async () => {
+      let sessionUnlocked = false;
+
       // Step 1: Try to get the session with diagnostic results
       try {
         const sessionRes = await fetch(`/api/assessment/session?sessionId=${sessionId}`);
@@ -100,9 +107,19 @@ function ReportPage() {
           const sessionData = await sessionRes.json();
           if (!cancelled && sessionData.session?.diagnosticResult) {
             setResult(sessionData.session.diagnosticResult);
-            setPhase("full");
+            sessionUnlocked = Boolean(sessionData.session.reportUnlockedAt);
+            if (sessionData.session.companyProfile?.executiveEmail) {
+              setPrefilledEmail(sessionData.session.companyProfile.executiveEmail);
+            }
             if (sessionData.session.generatedReport) {
               setReport(sessionData.session.generatedReport);
+            }
+            // Decide phase: bypass for illustrative/demo, full if already unlocked,
+            // otherwise gate behind email capture.
+            if (bypassGate || sessionUnlocked) {
+              setPhase("full");
+            } else {
+              setPhase("email-gate");
             }
           }
         }
@@ -110,7 +127,9 @@ function ReportPage() {
         // Session fetch failed, continue to report generation
       }
 
-      // Step 2: Try to generate the AI report (requires ANTHROPIC_API_KEY)
+      // Step 2: Try to generate the AI report (requires ANTHROPIC_API_KEY).
+      // Generation runs regardless of unlock status so the report is ready
+      // the moment the user submits the gate.
       try {
         const res = await fetch("/api/report/generate", {
           method: "POST",
@@ -124,19 +143,51 @@ function ReportPage() {
           if (data.report?.companyProfile) {
             setResult((prev) => prev ? { ...prev, companyProfile: data.report.companyProfile } : prev);
           }
-          setPhase("full");
+          // Only advance to "full" if the gate is bypassed or already cleared.
+          // Otherwise leave the phase as "email-gate" pending the user's submit.
+          setPhase((prev) => (prev === "email-gate" ? "email-gate" : "full"));
         } else {
-          if (!cancelled) setPhase("full");
+          if (!cancelled) {
+            setPhase((prev) => (prev === "email-gate" ? "email-gate" : "full"));
+          }
         }
       } catch {
-        if (!cancelled) setPhase("full");
+        if (!cancelled) {
+          setPhase((prev) => (prev === "email-gate" ? "email-gate" : "full"));
+        }
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [sessionId, bypassGate]);
+
+  // ---------------------------------------------------------------------------
+  // Email gate submit handler. POSTs to /api/assessment/unlock-report which
+  // persists the email, subscribes to Beehiiv, and notifies the operator.
+  // ---------------------------------------------------------------------------
+  const handleUnlock = useCallback(
+    async (email: string): Promise<{ success: boolean; error?: string }> => {
+      if (!sessionId) return { success: false, error: "Session not found." };
+      try {
+        const res = await fetch("/api/assessment/unlock-report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, email }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({} as { error?: string }));
+          return { success: false, error: data.error || "Could not unlock the report." };
+        }
+        setPhase("full");
+        return { success: true };
+      } catch {
+        return { success: false, error: "Network error. Try again." };
+      }
+    },
+    [sessionId]
+  );
 
   // Publicly available evidence overlay (fetched once when sessionId loads)
   const [researchProfile, setResearchProfile] = useState<CompanyResearchProfile | null>(null);
@@ -200,6 +251,19 @@ function ReportPage() {
             <LoadingStep label="Generating narrative" />
           </div>
         </div>
+      </Shell>
+    );
+  }
+
+  // ---------- Email gate ----------
+  if (phase === "email-gate" && result) {
+    return (
+      <Shell illustrative={isIllustrative} companyName={result.companyProfile.companyName}>
+        <EmailGate
+          companyName={result.companyProfile.companyName}
+          prefilledEmail={prefilledEmail}
+          onUnlock={handleUnlock}
+        />
       </Shell>
     );
   }
@@ -1674,6 +1738,95 @@ function ReportPage() {
 // ---------------------------------------------------------------------------
 // Shell
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// EmailGate. Required step before the full report renders.
+// On submit, /api/assessment/unlock-report fires:
+//   1. Persists email + reportUnlockedAt timestamp on the session
+//   2. Subscribes the email to the RLK Beehiiv newsletter
+//   3. Sends an operator notification to Ryan
+// ---------------------------------------------------------------------------
+function EmailGate({
+  companyName,
+  prefilledEmail,
+  onUnlock,
+}: {
+  companyName: string;
+  prefilledEmail: string;
+  onUnlock: (email: string) => Promise<{ success: boolean; error?: string }>;
+}) {
+  const [email, setEmail] = useState(prefilledEmail);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!EMAIL_REGEX.test(trimmed)) {
+      setErrorMsg("Enter a valid work email.");
+      return;
+    }
+    setErrorMsg(null);
+    setSubmitting(true);
+    const result = await onUnlock(trimmed);
+    if (!result.success) {
+      setSubmitting(false);
+      setErrorMsg(result.error || "Could not unlock the report.");
+    }
+    // On success, the parent advances phase and re-renders.
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto py-16 px-6">
+      <div className="bg-white border border-light px-8 py-10 sm:px-12 sm:py-14">
+        <p className="text-[11px] font-bold tracking-[0.25em] uppercase text-tertiary mb-3">
+          One step to your report
+        </p>
+        <h2 className="font-serif text-3xl font-bold text-navy leading-tight tracking-tight mb-4">
+          Where should we send your report?
+        </h2>
+        <p className="text-base text-body leading-relaxed mb-6 max-w-prose">
+          {companyName ? <>Your full diagnostic for <span className="font-semibold text-navy">{companyName}</span> is ready. </> : <>Your full diagnostic is ready. </>}
+          Enter your email to view it. You will also receive a copy, plus the quarterly RLK Dispatch on what is working in mid-market AI right now.
+        </p>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <label htmlFor="unlock-email" className="text-[11px] font-bold tracking-[0.2em] uppercase text-tertiary">
+            Work email
+          </label>
+          <input
+            id="unlock-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            autoComplete="email"
+            autoFocus
+            disabled={submitting}
+            className="border border-light px-4 py-3 text-base text-navy focus:outline-none focus:border-navy disabled:opacity-60"
+            required
+          />
+          {errorMsg && (
+            <p className="text-sm text-red-600 mt-1">{errorMsg}</p>
+          )}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-2 bg-navy text-white text-sm font-semibold tracking-wide py-3 px-6 hover:bg-secondary transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {submitting ? "Unlocking your report…" : "View my report →"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-xs text-tertiary leading-relaxed">
+          One email per quarter. Unsubscribe any time with a single click. RLK Consulting does not sell or share email lists. The report is yours; the dispatch is optional.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function Shell({ children, illustrative = false, companyName = "" }: { children: React.ReactNode; illustrative?: boolean; companyName?: string }) {
   return (

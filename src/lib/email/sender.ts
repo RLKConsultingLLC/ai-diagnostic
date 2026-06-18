@@ -90,8 +90,10 @@ export async function sendReportEmail(
 import {
   buildStartedNotificationEmail,
   buildPaymentNotificationEmail,
+  buildUnlockNotificationEmail,
   type StartedNotificationInput,
   type PaymentNotificationInput,
+  type UnlockNotificationInput,
 } from './templates';
 
 const OPERATOR_EMAIL = process.env.OPERATOR_NOTIFICATION_EMAIL?.trim() || 'ryan.king@rlkconsultingco.com';
@@ -121,5 +123,10 @@ export async function sendDiagnosticStartedNotification(input: StartedNotificati
 
 export async function sendPaymentReceivedNotification(input: PaymentNotificationInput): Promise<SendReportEmailResult> {
   const { subject, html, text } = buildPaymentNotificationEmail(input);
+  return sendOperatorEmail(subject, html, text);
+}
+
+export async function sendDiagnosticUnlockedNotification(input: UnlockNotificationInput): Promise<SendReportEmailResult> {
+  const { subject, html, text } = buildUnlockNotificationEmail(input);
   return sendOperatorEmail(subject, html, text);
 }

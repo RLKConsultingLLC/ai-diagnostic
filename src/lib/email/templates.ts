@@ -395,6 +395,67 @@ export function buildStartedNotificationEmail(input: StartedNotificationInput): 
   return { subject, html, text };
 }
 
+export interface UnlockNotificationInput {
+  companyName: string;
+  industryLabel: string;
+  revenue?: number;
+  employeeCount?: number;
+  executiveName?: string;
+  executiveTitle?: string;
+  executiveEmail: string;     // required, this is the unlock email
+  websiteUrl?: string;
+  ticker?: string;
+  overallScore?: number;
+  stageName?: string;
+  sessionId: string;
+  reportUrl: string;
+  timestamp: string;
+  subscribedToNewsletter: boolean;
+}
+
+export function buildUnlockNotificationEmail(input: UnlockNotificationInput): ReportEmailOutput {
+  const subject = `Diagnostic completed: ${input.companyName} (${input.executiveEmail})`;
+
+  const rows = [
+    ['Email captured', input.executiveEmail],
+    ['Newsletter subscribed', input.subscribedToNewsletter ? 'yes' : 'no (check Beehiiv config)'],
+    ['Company', input.companyName + (input.ticker ? ` (${input.ticker})` : '')],
+    ['Industry', input.industryLabel],
+    ['Revenue', fmtUSD(input.revenue)],
+    ['Employees', input.employeeCount ? input.employeeCount.toLocaleString() : 'n/a'],
+    ['Executive', `${input.executiveName || 'n/a'}${input.executiveTitle ? ', ' + input.executiveTitle : ''}`],
+    ['Website', input.websiteUrl || 'n/a'],
+    ['Overall score', input.overallScore != null ? String(input.overallScore) : 'n/a'],
+    ['Stage', input.stageName || 'n/a'],
+    ['Completed at', input.timestamp],
+  ];
+
+  const tableHtml = rows.map(([k, v]) => `<tr><td style="padding:6px 14px 6px 0;color:${TERTIARY};font-size:13px;width:170px;vertical-align:top;">${k}</td><td style="padding:6px 0;color:${BODY_TEXT};font-size:14px;font-weight:600;">${v}</td></tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:${OFFWHITE};color:${BODY_TEXT};">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${OFFWHITE};padding:32px 16px;"><tr><td>
+<table cellpadding="0" cellspacing="0" border="0" align="center" style="background:white;max-width:580px;width:100%;border:1px solid ${LIGHT};">
+<tr><td style="background:${NAVY};padding:18px 24px;">
+<div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;">RLK AI Diagnostic. Operator Notification</div>
+<div style="color:white;font-size:18px;font-weight:700;margin-top:6px;">Diagnostic completed and unlocked</div>
+</td></tr>
+<tr><td style="padding:24px;">
+<p style="margin:0 0 16px;font-size:14px;color:${BODY_TEXT};">A prospect completed the diagnostic and entered their email to view the report. Reply to them directly if it looks like a fit.</p>
+<table cellpadding="0" cellspacing="0" border="0" width="100%">${tableHtml}</table>
+<div style="margin-top:24px;text-align:center;">
+<a href="${input.reportUrl}" style="display:inline-block;background:${NAVY};color:white;font-size:13px;font-weight:600;padding:10px 22px;text-decoration:none;letter-spacing:0.05em;">View their report</a>
+</div>
+<p style="margin:24px 0 0;font-size:11px;color:${TERTIARY};">Session ID: ${input.sessionId}</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>`;
+
+  const text = `RLK AI Diagnostic. Diagnostic completed and unlocked\n\n${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\nView their report: ${input.reportUrl}\nSession ID: ${input.sessionId}\n`;
+
+  return { subject, html, text };
+}
+
 export interface PaymentNotificationInput {
   companyName: string;
   industryLabel: string;
