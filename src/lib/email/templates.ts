@@ -80,7 +80,7 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
   </noscript>
   <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:${OFFWHITE};font-family:Calibri,'Segoe UI',system-ui,-apple-system,sans-serif;">
+<body style="margin:0;padding:0;background-color:${OFFWHITE};font-family:Inter,system-ui,-apple-system,sans-serif;">
   <!-- Outer wrapper -->
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};">
     <tr>
@@ -88,19 +88,9 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
         <!-- Inner container -->
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;overflow:hidden;">
 
-          <!-- RLK Gradient Bar -->
+          <!-- Top rule -->
           <tr>
-            <td style="font-size:0;line-height:0;height:5px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="width:20%;background-color:${NAVY};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${SECONDARY};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${TERTIARY};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${ACCENT};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${LIGHT};height:5px;font-size:1px;line-height:1px;">&nbsp;</td>
-                </tr>
-              </table>
-            </td>
+            <td style="font-size:0;line-height:0;height:4px;background-color:${NAVY};">&nbsp;</td>
           </tr>
 
           <!-- Header -->
@@ -108,12 +98,12 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
             <td style="background-color:${NAVY};padding:32px 40px;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:13px;font-weight:bold;color:#ffffff;letter-spacing:4px;text-transform:uppercase;text-align:center;">
+                  <td style="font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:bold;color:#ffffff;letter-spacing:3px;text-transform:uppercase;text-align:center;">
                     RLK CONSULTING
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${ACCENT};letter-spacing:2px;text-transform:uppercase;text-align:center;padding-top:8px;">
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:11px;color:${ACCENT};letter-spacing:2px;text-transform:uppercase;text-align:center;padding-top:8px;">
                     AI Diagnostic Report
                   </td>
                 </tr>
@@ -127,34 +117,34 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
               <!-- Greeting -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:18px;color:${NAVY};line-height:28px;padding-bottom:24px;font-weight:600;">
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:18px;color:${NAVY};line-height:28px;padding-bottom:24px;font-weight:600;">
                     ${recipientName},
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:15px;color:${BODY_TEXT};line-height:26px;padding-bottom:24px;">
-                    Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete. Your full interactive report is ready. Nine sections, instant access, no login required.
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:15px;color:${BODY_TEXT};line-height:26px;padding-bottom:24px;">
+                    Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete. Your full interactive report is ready below.
                   </td>
                 </tr>
               </table>
 
               <!-- Findings summary box -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};border-left:3px solid ${NAVY};margin-bottom:24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};margin-bottom:24px;">
                 <tr>
                   <td style="padding:24px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${TERTIARY};letter-spacing:2px;text-transform:uppercase;padding-bottom:14px;font-weight:600;">
-                          Key Findings
+                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};font-weight:600;padding-bottom:14px;">
+                          Key findings
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
+                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
                           <strong style="color:${NAVY};">Stage ${stageNumber}: ${stageName}</strong> &nbsp;|&nbsp; Overall Score: <strong style="color:${NAVY};">${overallScore}/100</strong>
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-top:8px;">
+                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-top:8px;">
                           Estimated unrealized AI value: <strong style="color:${NAVY};">${valueLow} &ndash; ${valueHigh}</strong> annually
                         </td>
                       </tr>
@@ -170,19 +160,19 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                     <!--[if mso]>
                     <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${reportUrl}" style="height:52px;v-text-anchor:middle;width:300px;" arcsize="0%" strokecolor="${NAVY}" fillcolor="${NAVY}">
                       <w:anchorlock/>
-                      <center style="color:#ffffff;font-family:Calibri,sans-serif;font-size:14px;font-weight:bold;">ACCESS YOUR INTERACTIVE REPORT</center>
+                      <center style="color:#ffffff;font-family:Inter,system-ui,sans-serif;font-size:14px;font-weight:bold;">ACCESS YOUR INTERACTIVE REPORT</center>
                     </v:roundrect>
                     <![endif]-->
                     <!--[if !mso]><!-->
-                    <a href="${reportUrl}" target="_blank" style="display:inline-block;background-color:${NAVY};color:#ffffff;font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:1px;text-transform:uppercase;">
+                    <a href="${reportUrl}" target="_blank" style="display:inline-block;background-color:${NAVY};color:#ffffff;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:1px;text-transform:uppercase;">
                       Access Your Interactive Report
                     </a>
                     <!--<![endif]-->
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${TERTIARY};text-align:center;padding-top:10px;">
-                    No login required &nbsp;&middot;&nbsp; Nine sections &nbsp;&middot;&nbsp; Instant access
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};text-align:center;padding-top:10px;">
+                    No login required. Bookmark this link to return any time.
                   </td>
                 </tr>
               </table>
@@ -197,14 +187,14 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
               <!-- Secondary CTA: Schedule with Calendly -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-bottom:16px;">
-                    I review every report personally. If you want to walk through the findings together: what the scores mean for your specific situation, where to act first, how to frame this for your board. Use the link below to schedule time directly.
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-bottom:16px;">
+                    I review every report personally. If you want to walk through the findings and talk about next steps, use the link below to schedule time directly.
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
                     <!--[if !mso]><!-->
-                    <a href="${scheduleUrl || `mailto:ryan.king@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20%E2%80%94%20${encodeURIComponent(companyName)}`}" target="_blank" style="display:inline-block;background-color:transparent;color:${NAVY};font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:13px 36px;letter-spacing:1px;text-transform:uppercase;border:2px solid ${NAVY};">
+                    <a href="${scheduleUrl || `mailto:hello@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20-%20${encodeURIComponent(companyName)}`}" target="_blank" style="display:inline-block;background-color:transparent;color:${NAVY};font-family:Inter,system-ui,-apple-system,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:13px 36px;letter-spacing:1px;text-transform:uppercase;border:2px solid ${NAVY};">
                       Schedule Time to Discuss Results
                     </a>
                     <!--<![endif]-->
@@ -222,18 +212,18 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
                   <td style="padding-top:20px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:14px;color:${NAVY};line-height:22px;font-weight:600;">
+                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${NAVY};line-height:22px;font-weight:600;">
                           Ryan King
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
+                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
                           Founder, RLK Consulting
                         </td>
                       </tr>
                       <tr>
-                        <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
-                          <a href="mailto:ryan.king@rlkconsultingco.com" style="color:${SECONDARY};text-decoration:none;">ryan.king@rlkconsultingco.com</a>
+                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
+                          <a href="mailto:hello@rlkconsultingco.com" style="color:${SECONDARY};text-decoration:none;">hello@rlkconsultingco.com</a>
                         </td>
                       </tr>
                     </table>
@@ -248,34 +238,24 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
             <td style="background-color:${NAVY};padding:24px 40px;text-align:center;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:12px;color:${ACCENT};text-align:center;padding-bottom:8px;">
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${ACCENT};text-align:center;padding-bottom:8px;">
                     <a href="https://www.rlkconsultingco.com" target="_blank" rel="noopener noreferrer" style="color:${ACCENT};text-decoration:none;font-weight:600;">
                       www.rlkconsultingco.com
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family:Calibri,'Segoe UI',system-ui,sans-serif;font-size:11px;color:${TERTIARY};text-align:center;">
-                    RLK Consulting, LLC &nbsp;|&nbsp; CIO Advisory
+                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:11px;color:${TERTIARY};text-align:center;">
+                    RLK Consulting, LLC
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Bottom gradient bar -->
+          <!-- Bottom rule -->
           <tr>
-            <td style="font-size:0;line-height:0;height:4px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="width:20%;background-color:${NAVY};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${SECONDARY};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${TERTIARY};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${ACCENT};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
-                  <td style="width:20%;background-color:${LIGHT};height:4px;font-size:1px;line-height:1px;">&nbsp;</td>
-                </tr>
-              </table>
-            </td>
+            <td style="font-size:0;line-height:0;height:4px;background-color:${NAVY};">&nbsp;</td>
           </tr>
 
         </table>
@@ -304,17 +284,17 @@ Estimated unrealized AI value: ${valueLow} - ${valueHigh} annually
 
 ${'-'.repeat(52)}
 
-I review every report personally. If you want to walk through the findings together: what the scores mean, where to act first, how to frame this for your board. Schedule time directly:
+I review every report personally. If you want to walk through the findings and talk about next steps, schedule time directly:
 
-${scheduleUrl || 'ryan.king@rlkconsultingco.com'}
+${scheduleUrl || 'hello@rlkconsultingco.com'}
 
 Ryan King
 Founder, RLK Consulting
-ryan.king@rlkconsultingco.com
+hello@rlkconsultingco.com
 
 ${'='.repeat(52)}
 www.rlkconsultingco.com
-RLK Consulting, LLC | CIO Advisory
+RLK Consulting, LLC
 `;
 
   return { subject, html, text };
@@ -501,7 +481,7 @@ export function buildPaymentNotificationEmail(input: PaymentNotificationInput): 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:${OFFWHITE};color:${BODY_TEXT};">
 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${OFFWHITE};padding:32px 16px;"><tr><td>
 <table cellpadding="0" cellspacing="0" border="0" align="center" style="background:white;max-width:580px;width:100%;border:1px solid ${LIGHT};">
-<tr><td style="background:${NAVY};padding:18px 24px;border-left:4px solid ${accentColor};">
+<tr><td style="background:${NAVY};padding:18px 24px;">
 <div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;">RLK AI Diagnostic. Operator Notification</div>
 <div style="color:white;font-size:18px;font-weight:700;margin-top:6px;">${headerLabel}</div>
 </td></tr>
