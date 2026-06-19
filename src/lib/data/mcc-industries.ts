@@ -339,6 +339,10 @@ export const MCC_INDUSTRY_TREE: MCCCategory[] = [
     name: 'Personal Services',
     defaultSlug: 'retail',
     subcategories: [
+      { label: 'Life & Personal Coaching', diagnosticSlug: 'consulting_services' },
+      { label: 'Executive & Leadership Coaching', diagnosticSlug: 'consulting_services' },
+      { label: 'Career Coaching', diagnosticSlug: 'consulting_services' },
+      { label: 'Wellness & Health Coaching', diagnosticSlug: 'consulting_services' },
       { label: 'Laundry & Dry Cleaning', diagnosticSlug: 'retail' },
       { label: 'Beauty Salons & Barber Shops', diagnosticSlug: 'retail' },
       { label: 'Spas & Wellness Services', diagnosticSlug: 'healthcare_services' },
