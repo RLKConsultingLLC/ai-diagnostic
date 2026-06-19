@@ -28,8 +28,8 @@ export default function Home() {
             <a href="#how-it-works" className="hover:text-navy transition-colors">
               How It Works
             </a>
-            <a href="#pricing" className="hover:text-navy transition-colors">
-              Pricing
+            <a href="#what-you-get" className="hover:text-navy transition-colors">
+              What You Get
             </a>
             <Link
               href="/assessment"
@@ -470,7 +470,7 @@ export default function Home() {
                   "Identifies structural barriers your team cannot see from inside",
                   "Quantifies unrealized value in dollar terms",
                   "Delivers a 90-day action plan with owners by role",
-                  "$397, delivered in minutes, enriched with public intelligence",
+                  "Complimentary, delivered in minutes, enriched with public intelligence",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-white/40 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -488,11 +488,11 @@ export default function Home() {
       {/* Diagonal Divider */}
       <div className="rlk-diagonal-divider-reverse" />
 
-      {/* Pricing */}
-      <section id="pricing" className="bg-offwhite py-20 md:py-24">
+      {/* What You Get */}
+      <section id="what-you-get" className="bg-offwhite py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center mb-14">
-            <h2 className="text-2xl md:text-3xl mb-3">Investment</h2>
+            <h2 className="text-2xl md:text-3xl mb-3">What You Receive</h2>
             <p className="text-tertiary text-base max-w-xl mx-auto">
               The same analytical framework RLK applies in six-figure
               advisory engagements. Productized for leadership teams that
@@ -503,10 +503,10 @@ export default function Home() {
             <div className="text-sm font-semibold text-tertiary tracking-widest uppercase mb-4">
               RLK AI Diagnostic
             </div>
-            <div className="flex items-baseline justify-center gap-1 mb-2">
-              <span className="text-5xl font-bold text-navy">$397</span>
+            <div className="inline-block bg-navy text-white px-5 py-2 text-sm font-bold tracking-[0.2em] uppercase mb-3">
+              Complimentary
             </div>
-            <p className="text-sm text-tertiary mb-8">One-time assessment</p>
+            <p className="text-sm text-tertiary mb-8">No credit card. Email registration only.</p>
             <ul className="text-left text-sm text-foreground/80 space-y-3 mb-10">
               {[
                 "61-question behavioral diagnostic across 5 dimensions",
@@ -543,8 +543,7 @@ export default function Home() {
               Begin Your Assessment
             </Link>
             <p className="text-xs text-tertiary mt-4">
-              Secure payment processed by Stripe. All data treated as
-              confidential.
+              Your responses are confidential. RLK Consulting does not sell or share contact information.
             </p>
           </div>
         </div>
@@ -594,10 +593,10 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#pricing"
+                    href="#what-you-get"
                     className="hover:text-white transition-colors"
                   >
-                    Pricing
+                    What You Get
                   </a>
                 </li>
                 <li>
