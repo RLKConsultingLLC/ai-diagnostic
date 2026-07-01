@@ -2,12 +2,13 @@
 // POST /api/assessment/unlock-report
 // =============================================================================
 // Captures an email address against a completed session, subscribes the email
-// to the RLK Beehiiv newsletter, and notifies the operator that someone has
+// to the RLK MailerLite newsletter, and notifies the operator that someone has
 // finished the diagnostic. The session's `reportUnlockedAt` timestamp gates
 // access to the full report on the client side.
 //
-// Side effects are fire-and-forget: failures in Beehiiv or operator email
-// must not block the user from seeing their report.
+// Side effects are awaited (Vercel serverless freezes on response flush).
+// Failures in MailerLite or operator email must not block the user from
+// seeing their report.
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,56 +18,44 @@ import { formatIndustryName } from '@/lib/diagnostic/economic';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Beehiiv publication + automation. Mirrors the RLK consulting site config.
-const BEEHIIV_PUBLICATION_ID = 'pub_a8a8a961-4586-4bcc-bca5-45eacd84fc8e';
-const BEEHIIV_WELCOME_AUTOMATION_ID = 'aut_3b3d188e-f99c-4f0c-b476-7f5870329824';
+const ML_GROUP_DISPATCH     = '190844532918584468';
+const ML_GROUP_NEW_UNSORTED = '191003221215413502';
 
-interface BeehiivResult {
+interface SubscribeResult {
   subscribed: boolean;
   error?: string;
 }
 
-async function subscribeToBeehiiv(email: string, sessionId: string, companyName: string): Promise<BeehiivResult> {
-  const apiKey = process.env.BEEHIIV_API_KEY?.trim();
+async function subscribeToMailerLite(email: string, companyName: string): Promise<SubscribeResult> {
+  const apiKey = process.env.MAILERLITE_API_KEY?.trim();
   if (!apiKey) {
-    console.warn('[unlock-report] BEEHIIV_API_KEY not set, skipping subscription for', email);
-    return { subscribed: false, error: 'BEEHIIV_API_KEY not set' };
+    console.warn('[unlock-report] MAILERLITE_API_KEY not set, skipping subscription for', email);
+    return { subscribed: false, error: 'MAILERLITE_API_KEY not set' };
   }
 
   try {
-    const res = await fetch(
-      `https://api.beehiiv.com/v2/publications/${BEEHIIV_PUBLICATION_ID}/subscriptions`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          email,
-          reactivate_existing: false,
-          send_welcome_email: false,
-          utm_source: 'ai-diagnostic',
-          utm_medium: 'report-unlock',
-          utm_campaign: 'diagnostic-completion',
-          referring_site: 'diagnostic.rlkconsultingco.com',
-          custom_fields: [
-            { name: 'company', value: companyName },
-            { name: 'session_id', value: sessionId },
-          ],
-          automation_ids: [BEEHIIV_WELCOME_AUTOMATION_ID],
-        }),
-      }
-    );
+    const res = await fetch('https://connect.mailerlite.com/api/subscribers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        email,
+        fields: { company: companyName },
+        groups: [ML_GROUP_DISPATCH, ML_GROUP_NEW_UNSORTED],
+      }),
+    });
 
     if (!res.ok) {
       const body = await res.text();
-      console.error(`[unlock-report] Beehiiv ${res.status}:`, body);
-      return { subscribed: false, error: `Beehiiv ${res.status}` };
+      console.error(`[unlock-report] MailerLite ${res.status}:`, body);
+      return { subscribed: false, error: `MailerLite ${res.status}` };
     }
     return { subscribed: true };
   } catch (err) {
-    console.error('[unlock-report] Beehiiv fetch threw:', err);
+    console.error('[unlock-report] MailerLite fetch threw:', err);
     return { subscribed: false, error: err instanceof Error ? err.message : 'unknown error' };
   }
 }
@@ -105,19 +94,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Run side effects to completion BEFORE responding. On Vercel serverless,
-    // the function instance freezes the moment the response is flushed, so any
-    // un-awaited (fire-and-forget) promise is unreliable: the external Beehiiv
-    // HTTP call and the Resend sends can be killed mid-flight. We await them.
-    // Promise.allSettled ensures one failure never blocks the others, and the
-    // sender functions return result objects rather than throwing on send
-    // failure, so a down provider still lets the user reach the report.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://diagnostic.rlkconsultingco.com';
     const reportUrl = `${appUrl}/report?sessionId=${sessionId}`;
     const dr = updated.diagnosticResult;
 
-    // Beehiiv subscription first, since the operator notification reports its result.
-    const bh = await subscribeToBeehiiv(email, sessionId, updated.companyProfile.companyName);
+    const ml = await subscribeToMailerLite(email, updated.companyProfile.companyName);
 
     await Promise.allSettled([
       sendDiagnosticUnlockedNotification({
@@ -135,7 +116,7 @@ export async function POST(request: NextRequest) {
         sessionId,
         reportUrl,
         timestamp: nowIso,
-        subscribedToNewsletter: bh.subscribed,
+        subscribedToNewsletter: ml.subscribed,
       }),
       // Branded report email to the user. Fulfills the gate's promise of a copy
       // and is the controlled, on-brand touchpoint. Only sent once the report
@@ -156,7 +137,7 @@ export async function POST(request: NextRequest) {
         : Promise.resolve(),
     ]);
 
-    return NextResponse.json({ success: true, subscribed: bh.subscribed });
+    return NextResponse.json({ success: true, subscribed: ml.subscribed });
   } catch (err) {
     console.error('[POST /api/assessment/unlock-report]', err);
     return NextResponse.json({ error: 'Failed to unlock report' }, { status: 500 });

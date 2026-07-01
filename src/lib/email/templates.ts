@@ -398,7 +398,7 @@ export function buildUnlockNotificationEmail(input: UnlockNotificationInput): Re
 
   const rows = [
     ['Email captured', input.executiveEmail],
-    ['Newsletter subscribed', input.subscribedToNewsletter ? 'yes' : 'no (check Beehiiv config)'],
+    ['Newsletter subscribed', input.subscribedToNewsletter ? 'yes' : 'no (check MailerLite config)'],
     ['Company', input.companyName + (input.ticker ? ` (${input.ticker})` : '')],
     ['Industry', input.industryLabel],
     ['Revenue', fmtUSD(input.revenue)],

@@ -165,7 +165,7 @@ function ReportPage() {
 
   // ---------------------------------------------------------------------------
   // Email gate submit handler. POSTs to /api/assessment/unlock-report which
-  // persists the email, subscribes to Beehiiv, and notifies the operator.
+  // persists the email, subscribes to MailerLite, and notifies the operator.
   // ---------------------------------------------------------------------------
   const handleUnlock = useCallback(
     async (email: string): Promise<{ success: boolean; error?: string }> => {
@@ -1743,7 +1743,7 @@ function ReportPage() {
 // EmailGate. Required step before the full report renders.
 // On submit, /api/assessment/unlock-report fires:
 //   1. Persists email + reportUnlockedAt timestamp on the session
-//   2. Subscribes the email to the RLK Beehiiv newsletter
+//   2. Subscribes the email to the RLK MailerLite newsletter
 //   3. Sends an operator notification to Ryan
 // ---------------------------------------------------------------------------
 function EmailGate({
