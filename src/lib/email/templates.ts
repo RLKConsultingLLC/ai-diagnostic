@@ -63,206 +63,75 @@ export function buildReportEmail(input: ReportEmailInput): ReportEmailOutput {
 
   const subject = `Your AI Diagnostic Report | ${companyName}`;
 
+  const FONT = "Calibri,'Segoe UI',system-ui,sans-serif";
+
   const html = `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>${subject}</title>
-  <!--[if mso]>
-  <noscript>
-    <xml>
-      <o:OfficeDocumentSettings>
-        <o:PixelsPerInch>96</o:PixelsPerInch>
-      </o:OfficeDocumentSettings>
-    </xml>
-  </noscript>
-  <![endif]-->
-</head>
-<body style="margin:0;padding:0;background-color:${OFFWHITE};font-family:Inter,system-ui,-apple-system,sans-serif;">
-  <!-- Outer wrapper -->
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};">
-    <tr>
-      <td align="center" style="padding:32px 16px;">
-        <!-- Inner container -->
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;overflow:hidden;">
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:${OFFWHITE};font-family:${FONT};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${OFFWHITE};">
+<tr><td align="center" style="padding:32px 16px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#fff;overflow:hidden;">
 
-          <!-- Top rule -->
-          <tr>
-            <td style="font-size:0;line-height:0;height:4px;background-color:${NAVY};">&nbsp;</td>
-          </tr>
+<!-- Five-stripe gradient bar -->
+<tr><td style="font-size:0;line-height:0;height:5px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+<td style="width:20%;background:${NAVY};height:5px;">&nbsp;</td>
+<td style="width:20%;background:${SECONDARY};height:5px;">&nbsp;</td>
+<td style="width:20%;background:${TERTIARY};height:5px;">&nbsp;</td>
+<td style="width:20%;background:${ACCENT};height:5px;">&nbsp;</td>
+<td style="width:20%;background:${LIGHT};height:5px;">&nbsp;</td>
+</tr></table></td></tr>
 
-          <!-- Header -->
-          <tr>
-            <td style="background-color:${NAVY};padding:32px 40px;text-align:center;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:bold;color:#ffffff;letter-spacing:3px;text-transform:uppercase;text-align:center;">
-                    RLK CONSULTING
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:11px;color:${ACCENT};letter-spacing:2px;text-transform:uppercase;text-align:center;padding-top:8px;">
-                    AI Diagnostic Report
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+<!-- Header -->
+<tr><td style="background:${NAVY};padding:32px 40px;text-align:center;">
+<div style="font-size:13px;font-weight:bold;color:#fff;letter-spacing:4px;text-transform:uppercase;">RLK CONSULTING</div>
+<div style="font-size:11px;color:${ACCENT};letter-spacing:2px;text-transform:uppercase;padding-top:8px;">AI Diagnostic Report</div>
+</td></tr>
 
-          <!-- Body content -->
-          <tr>
-            <td style="padding:40px 40px 24px 40px;">
-              <!-- Greeting -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:18px;color:${NAVY};line-height:28px;padding-bottom:24px;font-weight:600;">
-                    ${recipientName},
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:15px;color:${BODY_TEXT};line-height:26px;padding-bottom:24px;">
-                    Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete. Your full interactive report is ready below.
-                  </td>
-                </tr>
-              </table>
+<!-- Body -->
+<tr><td style="padding:40px 40px 24px;">
+<p style="font-size:15px;color:${BODY_TEXT};line-height:26px;margin:0 0 20px;">Hi ${recipientName}. Your RLK AI Diagnostic for <strong style="color:${NAVY};">${companyName}</strong> is complete.</p>
 
-              <!-- Findings summary box -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${OFFWHITE};margin-bottom:24px;">
-                <tr>
-                  <td style="padding:24px;">
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};font-weight:600;padding-bottom:14px;">
-                          Key findings
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;">
-                          <strong style="color:${NAVY};">Stage ${stageNumber}: ${stageName}</strong> &nbsp;|&nbsp; Overall Score: <strong style="color:${NAVY};">${overallScore}/100</strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-top:8px;">
-                          Estimated unrealized AI value: <strong style="color:${NAVY};">${valueLow} &ndash; ${valueHigh}</strong> annually
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+<!-- Findings box -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${OFFWHITE};border:1px solid ${LIGHT};margin-bottom:28px;">
+<tr><td style="padding:20px 24px 12px;font-size:11px;color:${TERTIARY};letter-spacing:2px;text-transform:uppercase;font-weight:600;">Key Findings</td></tr>
+<tr><td style="padding:0 24px 6px;font-size:14px;color:${BODY_TEXT};line-height:24px;"><strong style="color:${NAVY};">Stage ${stageNumber}: ${stageName}</strong> &nbsp;|&nbsp; Overall Score: <strong style="color:${NAVY};">${overallScore}/100</strong></td></tr>
+<tr><td style="padding:0 24px 20px;font-size:14px;color:${BODY_TEXT};line-height:24px;">Estimated unrealized AI value: <strong style="color:${NAVY};">${valueLow} &ndash; ${valueHigh}</strong> annually</td></tr>
+</table>
 
-              <!-- Primary CTA: Access Report -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-                <tr>
-                  <td align="center">
-                    <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${reportUrl}" style="height:52px;v-text-anchor:middle;width:300px;" arcsize="0%" strokecolor="${NAVY}" fillcolor="${NAVY}">
-                      <w:anchorlock/>
-                      <center style="color:#ffffff;font-family:Inter,system-ui,sans-serif;font-size:14px;font-weight:bold;">ACCESS YOUR INTERACTIVE REPORT</center>
-                    </v:roundrect>
-                    <![endif]-->
-                    <!--[if !mso]><!-->
-                    <a href="${reportUrl}" target="_blank" style="display:inline-block;background-color:${NAVY};color:#ffffff;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:1px;text-transform:uppercase;">
-                      Access Your Interactive Report
-                    </a>
-                    <!--<![endif]-->
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};text-align:center;padding-top:10px;">
-                    No login required. Bookmark this link to return any time.
-                  </td>
-                </tr>
-              </table>
+<!-- Primary CTA -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+<tr><td align="center">
+<a href="${reportUrl}" target="_blank" style="display:inline-block;background:${NAVY};color:#fff;font-size:11px;font-weight:bold;text-decoration:none;padding:10px 20px;letter-spacing:1px;text-transform:uppercase;">Access Your Interactive Report</a>
+</td></tr>
+<tr><td style="font-size:12px;color:${TERTIARY};text-align:center;padding-top:10px;">No login required. Bookmark this link to return any time.</td></tr>
+</table>
 
-              <!-- Separator -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-                <tr>
-                  <td style="border-top:1px solid ${LIGHT};font-size:1px;line-height:1px;">&nbsp;</td>
-                </tr>
-              </table>
+<p style="font-size:14px;color:${BODY_TEXT};line-height:24px;margin:0 0 20px;">I review every report personally. If you want to walk through the findings and talk about next steps, use the link below to schedule time directly.</p>
 
-              <!-- Secondary CTA: Schedule with Calendly -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${BODY_TEXT};line-height:24px;padding-bottom:16px;">
-                    I review every report personally. If you want to walk through the findings and talk about next steps, use the link below to schedule time directly.
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center">
-                    <!--[if !mso]><!-->
-                    <a href="${scheduleUrl || `mailto:hello@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20-%20${encodeURIComponent(companyName)}`}" target="_blank" style="display:inline-block;background-color:transparent;color:${NAVY};font-family:Inter,system-ui,-apple-system,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:13px 36px;letter-spacing:1px;text-transform:uppercase;border:2px solid ${NAVY};">
-                      Schedule Time to Discuss Results
-                    </a>
-                    <!--<![endif]-->
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+<!-- Secondary CTA -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+<tr><td align="center">
+<a href="${scheduleUrl || `mailto:hello@rlkconsultingco.com?subject=AI%20Diagnostic%20Follow-Up%20-%20${encodeURIComponent(companyName)}`}" target="_blank" style="display:inline-block;background:${SECONDARY};color:#fff;font-size:11px;font-weight:bold;text-decoration:none;padding:10px 20px;letter-spacing:1px;text-transform:uppercase;">Schedule Time to Discuss Results</a>
+</td></tr>
+</table>
+</td></tr>
 
-          <!-- Signature -->
-          <tr>
-            <td style="padding:0 40px 32px 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid ${LIGHT};">
-                <tr>
-                  <td style="padding-top:20px;">
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:${NAVY};line-height:22px;font-weight:600;">
-                          Ryan King
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
-                          Founder, RLK Consulting
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${TERTIARY};line-height:20px;">
-                          <a href="mailto:hello@rlkconsultingco.com" style="color:${SECONDARY};text-decoration:none;">hello@rlkconsultingco.com</a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+<!-- Signature -->
+<tr><td style="padding:0 40px 32px;">
+<div style="font-size:14px;color:${NAVY};font-weight:600;">Ryan King</div>
+<div style="font-size:12px;color:${TERTIARY};">Founder, RLK Consulting</div>
+<div style="font-size:12px;color:${TERTIARY};"><a href="mailto:hello@rlkconsultingco.com" style="color:${SECONDARY};text-decoration:none;">hello@rlkconsultingco.com</a></div>
+</td></tr>
 
-          <!-- Footer -->
-          <tr>
-            <td style="background-color:${NAVY};padding:24px 40px;text-align:center;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:${ACCENT};text-align:center;padding-bottom:8px;">
-                    <a href="https://www.rlkconsultingco.com" target="_blank" rel="noopener noreferrer" style="color:${ACCENT};text-decoration:none;font-weight:600;">
-                      www.rlkconsultingco.com
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-family:Inter,system-ui,-apple-system,sans-serif;font-size:11px;color:${TERTIARY};text-align:center;">
-                    RLK Consulting, LLC
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+<!-- Footer -->
+<tr><td style="background:${NAVY};padding:24px 40px;text-align:center;">
+<div style="font-size:12px;padding-bottom:6px;"><a href="https://www.rlkconsultingco.com" style="color:${ACCENT};text-decoration:none;font-weight:600;">www.rlkconsultingco.com</a></div>
+<div style="font-size:11px;color:${TERTIARY};">RLK Consulting, LLC | Strategy Advisory | Richmond, VA</div>
+<div style="font-size:10px;color:${SECONDARY};padding-top:10px;">You are receiving this because you completed an AI diagnostic at rlkconsultingco.com.</div>
+</td></tr>
 
-          <!-- Bottom rule -->
-          <tr>
-            <td style="font-size:0;line-height:0;height:4px;background-color:${NAVY};">&nbsp;</td>
-          </tr>
-
-        </table>
-        <!-- /Inner container -->
-      </td>
-    </tr>
-  </table>
+</table></td></tr></table>
   <!-- /Outer wrapper -->
 </body>
 </html>`;
